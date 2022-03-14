@@ -1884,5 +1884,12 @@ extension Strings {
       value: "Go back",
       comment: "The transaction edit error alert button which will dismiss the alert."
     )
+    public static let dappsConnectionNotificationTitle = NSLocalizedString(
+      "wallet.dappsConnectionNotificationTitle",
+      tableName: "BraveWallet",
+      bundle: .braveWallet,
+      value: "This page wants to interact with Brave Wallet",
+      comment: "The title of the notification which will prompt at the top of the browser when users are visiting web3 site that is not yet connected with Brave Wallet."
+    )
   }
 }
