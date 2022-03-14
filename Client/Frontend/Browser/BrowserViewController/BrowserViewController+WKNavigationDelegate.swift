@@ -63,6 +63,9 @@ extension BrowserViewController: WKNavigationDelegate {
       return
     }
 
+        tabManager.selectedTab?.isWalletIconVisible = false
+        updateURLBarWalletButton()
+
     updateFindInPageVisibility(visible: false)
 
     // If we are going to navigate to a new page, hide the reader mode button. Unless we
@@ -475,6 +478,7 @@ extension BrowserViewController: WKNavigationDelegate {
           isPrivate: PrivateBrowsingManager.shared.isPrivateBrowsing
         )
       }
+            tab.updateEthereumProperties()
       tab.reportPageLoad(to: rewards, redirectionURLs: tab.redirectURLs)
       tab.redirectURLs = []
       if webView.url?.isLocal == false {

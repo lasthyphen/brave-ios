@@ -6,13 +6,15 @@
 import Foundation
 import BraveCore
 
+#if DEBUG
+
 /// A test eth json controller which can be passed to a ``NetworkStore`` that implements some basic
 /// functionality for the use of SwiftUI Previews.
 ///
 /// - note: Do not use this directly, use ``NetworkStore.previewStore``
 class MockJsonRpcService: BraveWalletJsonRpcService {
   private var chainId: String = BraveWallet.MainnetChainId
-  private var networks: [BraveWallet.NetworkInfo] = [.mainnet, .rinkeby, .ropsten]
+  private var networks: [BraveWallet.NetworkInfo] = [.mockMainnet, .mockRinkeby, .mockRopsten]
   private var networkURL: URL?
   private var observers: NSHashTable<BraveWalletJsonRpcServiceObserver> = .weakObjects()
   
@@ -123,7 +125,7 @@ class MockJsonRpcService: BraveWalletJsonRpcService {
 }
 
 extension BraveWallet.NetworkInfo {
-  static let mainnet: BraveWallet.NetworkInfo = .init(
+  static let mockMainnet: BraveWallet.EthereumChain = .init(
     chainId: BraveWallet.MainnetChainId,
     chainName: "Mainnet",
     blockExplorerUrls: ["https://etherscan.io"],
@@ -135,7 +137,7 @@ extension BraveWallet.NetworkInfo {
     coin: .eth,
     data: .init(ethData: .init(isEip1559: true))
   )
-  static let rinkeby: BraveWallet.NetworkInfo = .init(
+  static let mockRinkeby: BraveWallet.EthereumChain = .init(
     chainId: BraveWallet.RinkebyChainId,
     chainName: "Rinkeby",
     blockExplorerUrls: ["https://rinkeby.etherscan.io"],
@@ -147,7 +149,7 @@ extension BraveWallet.NetworkInfo {
     coin: .eth,
     data: .init(ethData: .init(isEip1559: true))
   )
-  static let ropsten: BraveWallet.NetworkInfo = .init(
+  static let mockRopsten: BraveWallet.EthereumChain = .init(
     chainId: BraveWallet.RopstenChainId,
     chainName: "Ropsten",
     blockExplorerUrls: ["https://ropsten.etherscan.io"],
@@ -160,3 +162,5 @@ extension BraveWallet.NetworkInfo {
     data: .init(ethData: .init(isEip1559: true))
   )
 }
+
+#endif
