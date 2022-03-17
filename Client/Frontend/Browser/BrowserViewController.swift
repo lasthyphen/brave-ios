@@ -780,8 +780,6 @@ class BrowserViewController: UIViewController, BrowserViewControllerDelegate {
           self?.statusBarOverlay.backgroundColor = .urlBarBackground
         }
       })
-        
-        BraveVPN.scheduleVPNAlertsTask()
   }
 
   fileprivate let defaultBrowserNotificationId = "defaultBrowserNotification"
