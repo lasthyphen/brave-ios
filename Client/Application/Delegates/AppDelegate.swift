@@ -324,6 +324,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     AdblockResourceDownloader.shared.startLoading()
 
+        PrivacyReportsNotification.scheduleIfNeeded()
+      
     return shouldPerformAdditionalDelegateHandling
   }
 
