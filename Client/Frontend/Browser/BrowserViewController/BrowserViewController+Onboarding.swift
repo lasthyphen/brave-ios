@@ -193,9 +193,9 @@ extension BrowserViewController {
     }
   }
 
-    func notifyTrackersBlocked(domain: String, trackerName: String, remainingTrackersCount: Int) {
+  func notifyTrackersBlocked(domain: String, trackerName: String, remainingTrackersCount: Int) {
     let controller = WelcomeBraveBlockedAdsController().then {
-            $0.setData(domain: domain, trackerBlocked: trackerName, trackerCount: remainingTrackersCount)
+      $0.setData(domain: domain, trackerBlocked: trackerName, trackerCount: remainingTrackersCount)
     }
 
     let popover = PopoverController(contentController: controller)
