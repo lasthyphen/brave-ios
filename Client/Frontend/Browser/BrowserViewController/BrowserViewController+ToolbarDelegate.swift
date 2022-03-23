@@ -11,6 +11,8 @@ import Storage
 import Data
 import SwiftUI
 
+private let log = Logger.browserLogger
+
 // MARK: - TopToolbarDelegate
 
 extension BrowserViewController: TopToolbarDelegate {
@@ -42,7 +44,8 @@ extension BrowserViewController: TopToolbarDelegate {
   }
 
   func topToolbarDidPressLockImageView(_ urlBar: TopToolbarView) {
-    guard let trust = tabManager.selectedTab?.webView?.serverTrust else {
+    guard let webView = tabManager.selectedTab?.webView,
+          let trust = webView.serverTrust else {
       return
     }
 
@@ -55,11 +58,25 @@ extension BrowserViewController: TopToolbarDelegate {
     if let serverCertificate = serverCertificates.first,
       let certificate = BraveCertificateModel(certificate: serverCertificate)
     {
-      let certificateViewController = CertificateViewController(certificate: certificate)
-
-      let popover = PopoverController(contentController: certificateViewController, contentSizeBehavior: .preferredContentSize)
-      popover.addsConvenientDismissalMargins = false
-      popover.present(from: self.topToolbar.locationView.lockImageView, on: self)
+      BraveCertificateUtils.evaluateTrust(trust, for: webView.url?.host) { error in
+        if let error = error {
+          log.error(error)
+        }
+        
+        // Remove the common-name from the first part of the error message
+        // This is because the certificate viewer already displays it.
+        // If it doesn't match, it won't be removed, so this is fine.
+        var errorDescription = error?.localizedDescription
+        if let range = errorDescription?.range(of: "“\(certificate.subjectName.commonName)” ") ??
+            errorDescription?.range(of: "\"\(certificate.subjectName.commonName)\" ") {
+          errorDescription = errorDescription?.replacingCharacters(in: range, with: "").capitalizeFirstLetter
+        }
+        
+        let certificateViewController = CertificateViewController(certificate: certificate, evaluationError: errorDescription)
+        let popover = PopoverController(contentController: certificateViewController, contentSizeBehavior: .preferredContentSize)
+        popover.addsConvenientDismissalMargins = false
+        popover.present(from: self.topToolbar.locationView.lockImageView, on: self)
+      }
     }
   }
 

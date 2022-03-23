@@ -165,3 +165,34 @@ public extension BraveCertificateUtils {
     }
   }
 }
+
+public extension BraveCertificateUtils {
+  static func evaluateTrust(_ trust: SecTrust, for host: String?, completion: @escaping (_ error: NSError?) -> Void) {
+    let policies = [
+      SecPolicyCreateBasicX509(),
+      SecPolicyCreateSSL(true, host as CFString?),
+    ]
+
+    SecTrustSetPolicies(trust, policies as CFTypeRef)
+    let queue = DispatchQueue.global()
+    queue.async {
+      let result = SecTrustEvaluateAsyncWithError(trust, queue) { _, isTrusted, error in
+        DispatchQueue.main.async {
+          if let error = error {
+            completion(error as Error as NSError)
+          } else {
+            completion(nil)
+          }
+        }
+      }
+      
+      if result != errSecSuccess {
+        DispatchQueue.main.async {
+          completion(NSError(domain: NSOSStatusErrorDomain,
+                             code: -1,
+                             userInfo: [NSLocalizedDescriptionKey: "Trust Evaluation Failed"]))
+        }
+      }
+    }
+  }
+}

@@ -2091,6 +2091,13 @@ extension Strings {
 
 extension Strings {
   public struct CertificateViewer {
+    public static let certificateIsValidTitle =
+      NSLocalizedString(
+        "certificateViewer.certificateIsValidTitle",
+        bundle: .braveShared,
+        value: "This certificate is valid",
+        comment: "The description for when an SSL certificate is valid")
+    
     public static let subjectNameTitle =
       NSLocalizedString(
         "certificateViewer.subjectNameTitle",

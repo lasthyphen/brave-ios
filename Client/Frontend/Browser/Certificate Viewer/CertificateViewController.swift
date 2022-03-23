@@ -13,13 +13,32 @@ import BraveShared
 private struct CertificateTitleView: View {
   let isRootCertificate: Bool
   let commonName: String
+  let evaluationError: String?
 
   var body: some View {
-    HStack(spacing: 15.0) {
-      Image(uiImage: isRootCertificate ? #imageLiteral(resourceName: "Root") : #imageLiteral(resourceName: "Other"))
-      VStack(alignment: .leading, spacing: 10.0) {
-        Text(commonName)
-          .font(.callout.weight(.bold))
+    VStack {
+      Text(commonName)
+        .font(.callout.weight(.bold))
+      HStack(alignment: .firstTextBaseline, spacing: 4.0) {
+        if let evaluationError = evaluationError {
+          Image(systemName: "xmark.circle.fill")
+            .foregroundColor(Color(.braveErrorLabel))
+            .font(.caption)
+          Text(evaluationError)
+            .font(.caption)
+            .foregroundColor(Color(.braveErrorLabel))
+            .lineLimit(nil)
+            .multilineTextAlignment(.center)
+        } else {
+          Image(systemName: "checkmark.seal")
+            .foregroundColor(Color(.braveSuccessLabel))
+            .font(.caption)
+          Text(Strings.CertificateViewer.certificateIsValidTitle)
+            .font(.caption)
+            .foregroundColor(Color(.secondaryBraveLabel))
+            .lineLimit(nil)
+            .multilineTextAlignment(.center)
+        }
       }
     }
     .background(Color(.secondaryBraveGroupedBackground))
@@ -63,14 +82,20 @@ private struct CertificateSectionView<ContentView>: View where ContentView: View
 
 private struct CertificateView: View {
   let model: BraveCertificateModel
+  let evaluationError: String?
 
   var body: some View {
-    VStack {
+    VStack(spacing: 0.0) {
       CertificateTitleView(
         isRootCertificate: model.isRootCertificate,
-        commonName: model.subjectName.commonName
+        commonName: model.subjectName.commonName,
+        evaluationError: evaluationError
       )
       .padding()
+      
+      Divider()
+        .shadow(color: Color.black.opacity(0.1),
+                radius: 5.0)
 
       List {
         content
@@ -323,10 +348,11 @@ struct CertificateView_Previews: PreviewProvider {
 
 class CertificateViewController: UIViewController, PopoverContentComponent {
 
-  init(certificate: BraveCertificateModel) {
+  init(certificate: BraveCertificateModel, evaluationError: String?) {
     super.init(nibName: nil, bundle: nil)
 
-    let rootView = CertificateView(model: certificate)
+    let rootView = CertificateView(model: certificate,
+                                   evaluationError: evaluationError)
     let controller = UIHostingController(rootView: rootView)
 
     addChild(controller)
