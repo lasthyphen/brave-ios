@@ -13,7 +13,9 @@ extension BrowserViewController: NSFetchedResultsControllerDelegate {
   }
 
   func updateWidgetFavoritesData() {
-    guard let frc = widgetBookmarksFRC else { return }
+    guard let frc = widgetBookmarksFRC else {
+      return
+    }
     try? frc.performFetch()
 
     if let favs = frc.fetchedObjects {
@@ -44,8 +46,8 @@ extension BrowserViewController: NSFetchedResultsControllerDelegate {
         // we add index number to each item then use it to sort it back.
         let sortedData =
           favData
-          .sorted { $0.key < $1.key }
-          .map { $0.value }
+            .sorted { $0.key < $1.key }
+            .map(\.value)
 
         FavoritesWidgetData.updateWidgetData(sortedData)
       }

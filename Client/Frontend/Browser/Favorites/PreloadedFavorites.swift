@@ -66,7 +66,7 @@ struct PreloadedFavorites {
     var preloadedFavorites = [FavoriteSite]()
 
     // Locale consists of language and region, region makes more sense when it comes to setting preloaded websites imo.
-    let region = Locale.current.regionCode ?? ""  // Empty string will go to the default switch case
+    let region = Locale.current.regionCode ?? "" // Empty string will go to the default switch case
     log.debug("Preloading favorites, current region: \(region)")
 
     switch region {
@@ -76,7 +76,6 @@ struct PreloadedFavorites {
 
       // try? list.append(FavoriteSite(url: "https://allegro.pl/".asURL(), title: "Allegro"))
       preloadedFavorites += appendPopularEnglishWebsites()
-      break
     case "JP":
       preloadedFavorites += appendJapaneseWebsites()
     default:

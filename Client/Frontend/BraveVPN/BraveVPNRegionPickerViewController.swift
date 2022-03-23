@@ -37,7 +37,9 @@ class BraveVPNRegionPickerViewController: UIViewController {
       // Prevent dismissing the modal by swipe when the VPN is being configured
       navigationController?.isModalInPresentation = isLoading
 
-      if !isLoading { return }
+      if !isLoading {
+        return
+      }
 
       let overlay = UIView().then {
         $0.backgroundColor = UIColor.black.withAlphaComponent(0.5)
@@ -61,7 +63,7 @@ class BraveVPNRegionPickerViewController: UIViewController {
   init(serverList: [VPNRegion]) {
     self.regionList =
       serverList
-      .sorted { $0.namePretty < $1.namePretty }
+        .sorted { $0.namePretty < $1.namePretty }
 
     if #available(iOS 14, *) {
       tableView = UITableView(frame: .zero, style: .insetGrouped)
@@ -84,7 +86,8 @@ class BraveVPNRegionPickerViewController: UIViewController {
 
     NotificationCenter.default.addObserver(
       self, selector: #selector(vpnConfigChanged(notification:)),
-      name: .NEVPNStatusDidChange, object: nil)
+      name: .NEVPNStatusDidChange, object: nil
+    )
 
     view.addSubview(tableView)
     tableView.snp.makeConstraints {
@@ -93,7 +96,9 @@ class BraveVPNRegionPickerViewController: UIViewController {
   }
 
   @objc private func vpnConfigChanged(notification: NSNotification) {
-    guard let connection = notification.object as? NEVPNConnection else { return }
+    guard let connection = notification.object as? NEVPNConnection else {
+      return
+    }
 
     if connection.status == .connected {
       dispatchGroup?.leave()
@@ -137,7 +142,9 @@ extension BraveVPNRegionPickerViewController: UITableViewDelegate, UITableViewDa
         cell.accessoryType = .checkmark
       }
     case Section.regionList.rawValue:
-      guard let server = regionList[safe: indexPath.row] else { return cell }
+      guard let server = regionList[safe: indexPath.row] else {
+        return cell
+      }
       cell.textLabel?.text = server.namePretty
       if server.name == Preferences.VPN.vpnRegionOverride.value {
         cell.accessoryType = .checkmark
@@ -151,7 +158,9 @@ extension BraveVPNRegionPickerViewController: UITableViewDelegate, UITableViewDa
 
   func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
     tableView.deselectRow(at: indexPath, animated: true)
-    guard let region = regionList[safe: indexPath.row] else { return }
+    guard let region = regionList[safe: indexPath.row] else {
+      return
+    }
 
     // Tapped on the same cell, do nothing
     if (region.name == Preferences.VPN.vpnRegionOverride.value)
@@ -171,15 +180,18 @@ extension BraveVPNRegionPickerViewController: UITableViewDelegate, UITableViewDa
 
     self.dispatchGroup = DispatchGroup()
 
-    BraveVPN.reconfigureVPN() { [weak self] success in
-      guard let self = self else { return }
+    BraveVPN.reconfigureVPN { [weak self] success in
+      guard let self = self else {
+        return
+      }
 
       func _showError() {
         DispatchQueue.main.async {
           let alert = AlertController(
             title: Strings.VPN.regionPickerErrorTitle,
             message: Strings.VPN.regionPickerErrorMessage,
-            preferredStyle: .alert)
+            preferredStyle: .alert
+          )
           let okAction = UIAlertAction(title: Strings.OKString, style: .default) { _ in
             self.dismiss(animated: true)
           }
@@ -206,9 +218,10 @@ extension BraveVPNRegionPickerViewController: UITableViewDelegate, UITableViewDa
       }
 
       self.dispatchGroup?.notify(queue: .main) { [weak self] in
-        guard let self = self else { return }
+        guard let self = self else {
+          return
+        }
         if self.vpnRegionChangeSuccess {
-
           self.dismiss(animated: true) {
             self.showSuccessAlert()
           }
@@ -230,7 +243,8 @@ extension BraveVPNRegionPickerViewController: UITableViewDelegate, UITableViewDa
       imageView: animation,
       title: Strings.VPN.regionSwitchSuccessPopupText, message: "",
       titleWeight: .semibold, titleSize: 18,
-      dismissHandler: { true })
+      dismissHandler: { true }
+    )
 
     popup.showWithType(showType: .flyUp, autoDismissTime: 1.5)
   }
@@ -240,6 +254,7 @@ private class VPNRegionCell: UITableViewCell, TableViewReusable {
   override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
     super.init(style: .value1, reuseIdentifier: reuseIdentifier)
   }
+
   @available(*, unavailable)
   required init(coder: NSCoder) {
     fatalError()

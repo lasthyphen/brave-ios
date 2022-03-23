@@ -12,6 +12,7 @@ extension UIStackView {
     /// Set a custom space after the last item in the stack view
     case customSpace(CGFloat)
   }
+
   /// Adds a set of stack view items to make static UI creation a bit easier
   public func addStackViewItems(_ items: StackViewItem...) {
     items.forEach {

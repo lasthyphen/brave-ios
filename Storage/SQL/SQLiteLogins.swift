@@ -9,11 +9,12 @@ import XCGLogger
 private let log = Logger.syncLogger
 
 open class SQLiteLogins: BrowserLogins {
-
   fileprivate let db: BrowserDB
-  fileprivate static let mainColumns: String = "guid, username, password, hostname, httpRealm, formSubmitURL, usernameField, passwordField"
+  fileprivate static let mainColumns: String =
+    "guid, username, password, hostname, httpRealm, formSubmitURL, usernameField, passwordField"
   fileprivate static let mainWithLastUsedColumns: String = mainColumns + ", timeLastUsed, timesUsed"
-  fileprivate static let loginColumns: String = mainColumns + ", timeCreated, timeLastUsed, timePasswordChanged, timesUsed"
+  fileprivate static let loginColumns: String = mainColumns +
+    ", timeCreated, timeLastUsed, timePasswordChanged, timesUsed"
 
   public init(db: BrowserDB) {
     self.db = db
@@ -26,9 +27,9 @@ open class SQLiteLogins: BrowserLogins {
     login.guid = row["guid"] as! String
 
     if let timeCreated = row.getTimestamp("timeCreated"),
-      let timeLastUsed = row.getTimestamp("timeLastUsed"),
-      let timePasswordChanged = row.getTimestamp("timePasswordChanged"),
-      let timesUsed = row["timesUsed"] as? Int {
+       let timeLastUsed = row.getTimestamp("timeLastUsed"),
+       let timePasswordChanged = row.getTimestamp("timePasswordChanged"),
+       let timesUsed = row["timesUsed"] as? Int {
       login.timeCreated = timeCreated
       login.timeLastUsed = timeLastUsed
       login.timePasswordChanged = timePasswordChanged
@@ -40,7 +41,8 @@ open class SQLiteLogins: BrowserLogins {
     let credential = URLCredential(
       user: row["username"] as? String ?? "",
       password: row["password"] as! String,
-      persistence: .none)
+      persistence: .none
+    )
 
     // There was a bug in previous versions of the app where we saved only the hostname and not the
     // scheme and port in the DB. To work with these scheme-less hostnames, we try to extract the scheme and
@@ -69,7 +71,8 @@ open class SQLiteLogins: BrowserLogins {
       port: port,
       protocol: scheme,
       realm: row["httpRealm"] as? String,
-      authenticationMethod: nil)
+      authenticationMethod: nil
+    )
 
     let login = T(credential: credential, protectionSpace: protectionSpace)
     self.populateLogin(login, row: row)
@@ -78,15 +81,15 @@ open class SQLiteLogins: BrowserLogins {
   }
 
   fileprivate class func loginFactory(_ row: SDRow) -> Login {
-    return self.constructLogin(row, c: Login.self)
+    self.constructLogin(row, c: Login.self)
   }
 
   fileprivate class func loginDataFactory(_ row: SDRow) -> LoginData {
-    return loginFactory(row) as LoginData
+    loginFactory(row) as LoginData
   }
 
   fileprivate class func loginUsageDataFactory(_ row: SDRow) -> LoginUsageData {
-    return loginFactory(row) as LoginUsageData
+    loginFactory(row) as LoginUsageData
   }
 
   func notifyLoginDidChange() {
@@ -100,15 +103,15 @@ open class SQLiteLogins: BrowserLogins {
   open func getUsageDataForLoginByGUID(_ guid: GUID) -> Deferred<Maybe<LoginUsageData>> {
     let projection = SQLiteLogins.loginColumns
     let sql = """
-      SELECT \(projection)
-      FROM loginsL
-      WHERE is_deleted = 0 AND guid = ?
-      UNION ALL
-      SELECT \(projection)
-      FROM loginsM
-      WHERE is_overridden = 0 AND guid = ?
-      LIMIT 1
-      """
+    SELECT \(projection)
+    FROM loginsL
+    WHERE is_deleted = 0 AND guid = ?
+    UNION ALL
+    SELECT \(projection)
+    FROM loginsM
+    WHERE is_overridden = 0 AND guid = ?
+    LIMIT 1
+    """
 
     let args: Args = [guid, guid]
     return db.runQuery(sql, args: args, factory: SQLiteLogins.loginUsageDataFactory)
@@ -120,16 +123,16 @@ open class SQLiteLogins: BrowserLogins {
   open func getLoginDataForGUID(_ guid: GUID) -> Deferred<Maybe<Login>> {
     let projection = SQLiteLogins.loginColumns
     let sql = """
-      SELECT \(projection)
-      FROM loginsL
-      WHERE is_deleted = 0 AND guid = ?
-      UNION ALL
-      SELECT \(projection)
-      FROM loginsM
-      WHERE is_overriden IS NOT 1 AND guid = ?
-      ORDER BY hostname ASC
-      LIMIT 1
-      """
+    SELECT \(projection)
+    FROM loginsL
+    WHERE is_deleted = 0 AND guid = ?
+    UNION ALL
+    SELECT \(projection)
+    FROM loginsM
+    WHERE is_overriden IS NOT 1 AND guid = ?
+    ORDER BY hostname ASC
+    LIMIT 1
+    """
 
     let args: Args = [guid, guid]
     return db.runQuery(sql, args: args, factory: SQLiteLogins.loginFactory)
@@ -146,13 +149,13 @@ open class SQLiteLogins: BrowserLogins {
     let projection = SQLiteLogins.mainWithLastUsedColumns
 
     let sql = """
-      SELECT \(projection)
-      FROM loginsL WHERE is_deleted = 0 AND hostname IS ? OR hostname IS ?
-      UNION ALL
-      SELECT \(projection)
-      FROM loginsM WHERE is_overridden = 0 AND hostname IS ? OR hostname IS ?
-      ORDER BY timeLastUsed DESC
-      """
+    SELECT \(projection)
+    FROM loginsL WHERE is_deleted = 0 AND hostname IS ? OR hostname IS ?
+    UNION ALL
+    SELECT \(projection)
+    FROM loginsM WHERE is_overridden = 0 AND hostname IS ? OR hostname IS ?
+    ORDER BY timeLastUsed DESC
+    """
 
     // Since we store hostnames as the full scheme/protocol + host, combine the two to look up in our DB.
     // In the case of https://bugzilla.mozilla.org/show_bug.cgi?id=1238103, there may be hostnames without
@@ -170,7 +173,10 @@ open class SQLiteLogins: BrowserLogins {
   }
 
   // username is really Either<String, NULL>; we explicitly match no username.
-  open func getLoginsForProtectionSpace(_ protectionSpace: URLProtectionSpace, withUsername username: String?) -> Deferred<Maybe<Cursor<LoginData>>> {
+  open func getLoginsForProtectionSpace(
+    _ protectionSpace: URLProtectionSpace,
+    withUsername username: String?
+  ) -> Deferred<Maybe<Cursor<LoginData>>> {
     let projection = SQLiteLogins.mainWithLastUsedColumns
 
     let args: Args
@@ -194,25 +200,25 @@ open class SQLiteLogins: BrowserLogins {
     }
 
     let sql = """
-      SELECT \(projection)
-      FROM loginsL
-      WHERE is_deleted = 0 AND hostname IS ? AND \(usernameMatch) OR hostname IS ?
-      UNION ALL
-      SELECT \(projection)
-      FROM loginsM
-      WHERE is_overridden = 0 AND hostname IS ? AND \(usernameMatch) OR hostname IS ?
-      ORDER BY timeLastUsed DESC
-      """
+    SELECT \(projection)
+    FROM loginsL
+    WHERE is_deleted = 0 AND hostname IS ? AND \(usernameMatch) OR hostname IS ?
+    UNION ALL
+    SELECT \(projection)
+    FROM loginsM
+    WHERE is_overridden = 0 AND hostname IS ? AND \(usernameMatch) OR hostname IS ?
+    ORDER BY timeLastUsed DESC
+    """
 
     return db.runQuery(sql, args: args, factory: SQLiteLogins.loginDataFactory)
   }
 
   open func getAllLogins() -> Deferred<Maybe<Cursor<Login>>> {
-    return searchLoginsWithQuery(nil)
+    searchLoginsWithQuery(nil)
   }
 
   open func getLoginsForQuery(_ query: String) -> Deferred<Maybe<Cursor<Login>>> {
-    return searchLoginsWithQuery(query)
+    searchLoginsWithQuery(query)
   }
 
   open func searchLoginsWithQuery(_ query: String?) -> Deferred<Maybe<Cursor<Login>>> {
@@ -223,7 +229,7 @@ open class SQLiteLogins: BrowserLogins {
       // Add wildcards to change query to 'contains in' and add them to args. We need 6 args because
       // we include the where clause twice: Once for the local table and another for the remote.
       args = (0..<6).map { _ in
-        return "%\(query)%" as String?
+        "%\(query)%" as String?
       }
 
       searchClauses.append("username LIKE ? ")
@@ -233,15 +239,15 @@ open class SQLiteLogins: BrowserLogins {
 
     let whereSearchClause = searchClauses.count > 0 ? "AND (" + searchClauses.joined(separator: "OR") + ") " : ""
     let sql = """
-      SELECT \(projection)
-      FROM loginsL
-      WHERE is_deleted = 0 \(whereSearchClause)
-      UNION ALL
-      SELECT \(projection)
-      FROM loginsM
-      WHERE is_overridden = 0 \(whereSearchClause)
-      ORDER BY hostname ASC
-      """
+    SELECT \(projection)
+    FROM loginsL
+    WHERE is_deleted = 0 \(whereSearchClause)
+    UNION ALL
+    SELECT \(projection)
+    FROM loginsM
+    WHERE is_overridden = 0 \(whereSearchClause)
+    ORDER BY hostname ASC
+    """
 
     return db.runQuery(sql, args: args, factory: SQLiteLogins.loginFactory)
   }
@@ -265,50 +271,52 @@ open class SQLiteLogins: BrowserLogins {
       login.username,
       login.password,
       login.guid,
-      dateMicro,  // timeCreated
-      dateMicro,  // timeLastUsed
-      dateMicro,  // timePasswordChanged
-      dateMilli,  // localModified
+      dateMicro, // timeCreated
+      dateMicro, // timeLastUsed
+      dateMicro, // timePasswordChanged
+      dateMilli, // localModified
     ]
 
     let sql = """
-      INSERT OR IGNORE INTO loginsL (
-          -- Shared fields.
-          hostname,
-          httpRealm,
-          formSubmitURL,
-          usernameField,
-          passwordField,
-          timesUsed,
-          username,
-          password,
-          -- Local metadata.
-          guid,
-          timeCreated,
-          timeLastUsed,
-          timePasswordChanged,
-          local_modified,
-          is_deleted,
-          sync_status
-      )
-      VALUES (?, ?, ?, ?, ?, 1, ?, ?, ?, ?, ?, ?, ?, 0, \(LoginsSchema.SyncStatus.new.rawValue))
-      """
+    INSERT OR IGNORE INTO loginsL (
+        -- Shared fields.
+        hostname,
+        httpRealm,
+        formSubmitURL,
+        usernameField,
+        passwordField,
+        timesUsed,
+        username,
+        password,
+        -- Local metadata.
+        guid,
+        timeCreated,
+        timeLastUsed,
+        timePasswordChanged,
+        local_modified,
+        is_deleted,
+        sync_status
+    )
+    VALUES (?, ?, ?, ?, ?, 1, ?, ?, ?, ?, ?, ?, ?, 0, \(LoginsSchema.SyncStatus.new.rawValue))
+    """
 
     return db.run(sql, withArgs: args)
       >>> effect(self.notifyLoginDidChange)
   }
 
   fileprivate func cloneMirrorToOverlay(whereClause: String?, args: Args?) -> Deferred<Maybe<Int>> {
-    let shared = "guid, hostname, httpRealm, formSubmitURL, usernameField, passwordField, timeCreated, timeLastUsed, timePasswordChanged, timesUsed, username, password "
+    let shared =
+      "guid, hostname, httpRealm, formSubmitURL, usernameField, passwordField, timeCreated, timeLastUsed, timePasswordChanged, timesUsed, username, password "
     let local = ", local_modified, is_deleted, sync_status "
-    let sql = "INSERT OR IGNORE INTO loginsL (\(shared)\(local)) SELECT \(shared), NULL AS local_modified, 0 AS is_deleted, 0 AS sync_status FROM loginsM \(whereClause ?? "")"
+    let sql =
+      "INSERT OR IGNORE INTO loginsL (\(shared)\(local)) SELECT \(shared), NULL AS local_modified, 0 AS is_deleted, 0 AS sync_status FROM loginsM \(whereClause ?? "")"
     return self.db.write(sql, withArgs: args)
   }
 
   /**
-     * Returns success if either a local row already existed, or
-     * one could be copied from the mirror.
-     */
+   * Returns success if either a local row already existed, or
+   * one could be copied from the mirror.
+   */
   fileprivate func ensureLocalOverlayExistsForGUID(_ guid: GUID) -> Success {
     let sql = "SELECT guid FROM loginsL WHERE guid = ?"
     let args: Args = [guid]
@@ -345,15 +353,15 @@ open class SQLiteLogins: BrowserLogins {
   }
 
   /**
-     * Replace the local DB row with the provided GUID.
-     * If no local overlay exists, one is first created.
-     *
-     * If `significant` is `true`, the `sync_status` of the row is bumped to at least `Changed`.
-     * If it's already `New`, it remains marked as `New`.
-     *
-     * This flag allows callers to make minor changes (such as incrementing a usage count)
-     * without triggering an upload or a conflict.
-     */
+   * Replace the local DB row with the provided GUID.
+   * If no local overlay exists, one is first created.
+   *
+   * If `significant` is `true`, the `sync_status` of the row is bumped to at least `Changed`.
+   * If it's already `New`, it remains marked as `New`.
+   *
+   * This flag allows callers to make minor changes (such as incrementing a usage count)
+   * without triggering an upload or a conflict.
+   */
   open func updateLoginByGUID(_ guid: GUID, new: LoginData, significant: Bool) -> Success {
     if let error = new.isValid.failureValue {
       return deferMaybe(error)
@@ -369,9 +377,9 @@ open class SQLiteLogins: BrowserLogins {
     let dateMilli = nowMilli
 
     let args: Args = [
-      dateMilli,  // local_modified
-      dateMicro,  // timeLastUsed
-      dateMicro,  // timePasswordChanged
+      dateMilli, // local_modified
+      dateMicro, // timeLastUsed
+      dateMicro, // timePasswordChanged
       new.httpRealm,
       new.formSubmitURL,
       new.usernameField,
@@ -383,16 +391,16 @@ open class SQLiteLogins: BrowserLogins {
     ]
 
     let update = """
-      UPDATE loginsL SET
-          local_modified = ?, timeLastUsed = ?, timePasswordChanged = ?,
-          httpRealm = ?, formSubmitURL = ?, usernameField = ?,
-          passwordField = ?, timesUsed = timesUsed + 1,
-          password = ?, hostname = ?, username = ?
-          -- We keep rows marked as New in preference to marking them as changed. This allows us to
-          -- delete them immediately if they don't reach the server.
-          \(significant ? ", sync_status = max(sync_status, 1)" : "")
-      WHERE guid = ?
-      """
+    UPDATE loginsL SET
+        local_modified = ?, timeLastUsed = ?, timePasswordChanged = ?,
+        httpRealm = ?, formSubmitURL = ?, usernameField = ?,
+        passwordField = ?, timesUsed = timesUsed + 1,
+        password = ?, hostname = ?, username = ?
+        -- We keep rows marked as New in preference to marking them as changed. This allows us to
+        -- delete them immediately if they don't reach the server.
+        \(significant ? ", sync_status = max(sync_status, 1)" : "")
+    WHERE guid = ?
+    """
 
     return self.ensureLocalOverlayExistsForGUID(guid)
       >>> { self.markMirrorAsOverridden(guid) }
@@ -402,10 +410,10 @@ open class SQLiteLogins: BrowserLogins {
 
   open func addUseOfLoginByGUID(_ guid: GUID) -> Success {
     let sql = """
-      UPDATE loginsL SET
-          timesUsed = timesUsed + 1, timeLastUsed = ?, local_modified = ?
-      WHERE guid = ? AND is_deleted = 0
-      """
+    UPDATE loginsL SET
+        timesUsed = timesUsed + 1, timeLastUsed = ?, local_modified = ?
+    WHERE guid = ? AND is_deleted = 0
+    """
 
     // For now, mere use is not enough to flip sync_status to Changed.
 
@@ -419,10 +427,13 @@ open class SQLiteLogins: BrowserLogins {
   }
 
   open func removeLoginByGUID(_ guid: GUID) -> Success {
-    return removeLoginsWithGUIDs([guid])
+    removeLoginsWithGUIDs([guid])
   }
 
-  fileprivate func getDeletionStatementsForGUIDs(_ guids: ArraySlice<GUID>, nowMillis: Timestamp) -> [(sql: String, args: Args?)] {
+  fileprivate func getDeletionStatementsForGUIDs(
+    _ guids: ArraySlice<GUID>,
+    nowMillis: Timestamp
+  ) -> [(sql: String, args: Args?)] {
     let inClause = BrowserDB.varlist(guids.count)
 
     // Immediately delete anything that's marked as new -- i.e., it's never reached
@@ -432,28 +443,28 @@ open class SQLiteLogins: BrowserLogins {
 
     // Otherwise, mark it as changed.
     let update = """
-      UPDATE loginsL SET
-          local_modified = \(nowMillis),
-          sync_status = \(LoginsSchema.SyncStatus.changed.rawValue),
-          is_deleted = 1,
-          password = '',
-          hostname = '',
-          username = ''
-      WHERE guid IN \(inClause)
-      """
+    UPDATE loginsL SET
+        local_modified = \(nowMillis),
+        sync_status = \(LoginsSchema.SyncStatus.changed.rawValue),
+        is_deleted = 1,
+        password = '',
+        hostname = '',
+        username = ''
+    WHERE guid IN \(inClause)
+    """
 
     let markMirrorAsOverridden =
       "UPDATE loginsM SET is_overridden = 1 WHERE guid IN \(inClause)"
 
     let insert = """
-      INSERT OR IGNORE INTO loginsL (
-          guid, local_modified, is_deleted, sync_status, hostname, timeCreated, timePasswordChanged, password, username
-      )
-      SELECT
-          guid, \(nowMillis), 1, \(LoginsSchema.SyncStatus.changed.rawValue), '', timeCreated, \(nowMillis)000, '', ''
-      FROM loginsM
-      WHERE guid IN \(inClause)
-      """
+    INSERT OR IGNORE INTO loginsL (
+        guid, local_modified, is_deleted, sync_status, hostname, timeCreated, timePasswordChanged, password, username
+    )
+    SELECT
+        guid, \(nowMillis), 1, \(LoginsSchema.SyncStatus.changed.rawValue), '', timeCreated, \(nowMillis)000, '', ''
+    FROM loginsM
+    WHERE guid IN \(inClause)
+    """
 
     let args: Args = guids.map { $0 }
     return [(delete, args), (update, args), (markMirrorAsOverridden, args), (insert, args)]
@@ -464,7 +475,8 @@ open class SQLiteLogins: BrowserLogins {
     return db.run(
       chunk(guids, by: BrowserDB.maxVariableNumber).flatMap {
         self.getDeletionStatementsForGUIDs($0, nowMillis: timestamp)
-      }) >>> effect(self.notifyLoginDidChange)
+      }
+    ) >>> effect(self.notifyLoginDidChange)
   }
 
   open func removeAll() -> Success {
@@ -483,13 +495,13 @@ open class SQLiteLogins: BrowserLogins {
     // OR IGNORE will cause conflicts due to non-unique guids to be dropped, preserving
     // anything we already deleted.
     let insert = """
-      INSERT OR IGNORE INTO loginsL (
-          guid, local_modified, is_deleted, sync_status, hostname, timeCreated, timePasswordChanged, password, username
-      )
-      SELECT
-          guid, \(nowMillis), 1, \(LoginsSchema.SyncStatus.changed.rawValue), '', timeCreated, \(nowMillis)000, '', ''
-      FROM loginsM
-      """
+    INSERT OR IGNORE INTO loginsL (
+        guid, local_modified, is_deleted, sync_status, hostname, timeCreated, timePasswordChanged, password, username
+    )
+    SELECT
+        guid, \(nowMillis), 1, \(LoginsSchema.SyncStatus.changed.rawValue), '', timeCreated, \(nowMillis)000, '', ''
+    FROM loginsM
+    """
 
     // After that, we mark all of the mirror rows as overridden.
     return self.db.run(delete)
@@ -505,14 +517,15 @@ class NoSuchRecordError: MaybeErrorType {
   init(guid: GUID) {
     self.guid = guid
   }
+
   var description: String {
-    return "No such record: \(guid)."
+    "No such record: \(guid)."
   }
 }
 
 extension SDRow {
   func getTimestamp(_ column: String) -> Timestamp? {
-    return (self[column] as? NSNumber)?.uint64Value
+    (self[column] as? NSNumber)?.uint64Value
   }
 
   func getBoolean(_ column: String) -> Bool {

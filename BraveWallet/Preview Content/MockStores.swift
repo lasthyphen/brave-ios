@@ -47,7 +47,17 @@ extension NetworkStore {
   
   static var previewStoreWithCustomNetworkAdded: NetworkStore {
     let store = NetworkStore.previewStore
-    store.addCustomNetwork(.init(chainId: "0x100", chainName: "MockChain", blockExplorerUrls: ["https://mockchainscan.com"], iconUrls: [], rpcUrls: ["https://rpc.mockchain.com"], symbol: "MOCK", symbolName: "MOCK", decimals: 18, isEip1559: false)) { _, _ in }
+    store.addCustomNetwork(.init(
+      chainId: "0x100",
+      chainName: "MockChain",
+      blockExplorerUrls: ["https://mockchainscan.com"],
+      iconUrls: [],
+      rpcUrls: ["https://rpc.mockchain.com"],
+      symbol: "MOCK",
+      symbolName: "MOCK",
+      decimals: 18,
+      isEip1559: false
+    )) { _, _ in }
     return store
   }
 }
@@ -56,6 +66,7 @@ extension KeyringStore {
   static var previewStore: KeyringStore {
     .init(keyringService: MockKeyringService())
   }
+
   static var previewStoreWithWalletCreated: KeyringStore {
     let store = KeyringStore(keyringService: MockKeyringService())
     store.createWallet(password: "password")

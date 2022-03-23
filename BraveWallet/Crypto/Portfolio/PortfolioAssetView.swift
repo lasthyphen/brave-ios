@@ -49,8 +49,8 @@ struct PortfolioAssetView_Previews: PreviewProvider {
       amount: "$10,402.22",
       quantity: "10303"
     )
-    .previewLayout(.sizeThatFits)
-    .previewColorSchemes()
+      .previewLayout(.sizeThatFits)
+      .previewColorSchemes()
   }
 }
 #endif

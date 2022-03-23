@@ -9,11 +9,10 @@ import Shared
 private let log = Logger.browserLogger
 
 public final class Domain: NSManagedObject, CRUD {
-
   @NSManaged public var url: String?
   @NSManaged public var visits: Int32
-  @NSManaged public var topsite: Bool  // not currently used. Should be used once proper frecency code is in.
-  @NSManaged public var blockedFromTopSites: Bool  // don't show ever on top sites
+  @NSManaged public var topsite: Bool // not currently used. Should be used once proper frecency code is in.
+  @NSManaged public var blockedFromTopSites: Bool // don't show ever on top sites
   @NSManaged public var favicon: FaviconMO?
 
   @NSManaged public var shield_allOff: NSNumber?
@@ -32,7 +31,7 @@ public final class Domain: NSManagedObject, CRUD {
   @NSManaged public var wallet_permittedAccounts: String?
 
   private var urlComponents: URLComponents? {
-    return URLComponents(string: url ?? "")
+    URLComponents(string: url ?? "")
   }
 
   /// A domain can be created in many places,
@@ -116,9 +115,13 @@ public final class Domain: NSManagedObject, CRUD {
       }
 
       for domain in httpDomains {
-        guard var urlComponents = domain.urlComponents else { continue }
+        guard var urlComponents = domain.urlComponents else {
+          continue
+        }
         urlComponents.scheme = "https"
-        guard let httpsUrl = urlComponents.url?.absoluteString else { continue }
+        guard let httpsUrl = urlComponents.url?.absoluteString else {
+          continue
+        }
         if let httpsDomain = Domain.first(where: NSPredicate(format: "url == %@", httpsUrl), context: context) {
           httpsDomain.shield_allOff = domain.shield_allOff
           httpsDomain.shield_adblockAndTp = domain.shield_adblockAndTp
@@ -156,7 +159,7 @@ public final class Domain: NSManagedObject, CRUD {
 extension Domain {
   // Currently required, because not `syncable`
   static func entity(_ context: NSManagedObjectContext) -> NSEntityDescription {
-    return NSEntityDescription.entity(forEntityName: "Domain", in: context)!
+    NSEntityDescription.entity(forEntityName: "Domain", in: context)!
   }
 
   /// Returns a Domain for given URL or creates a new object if it doesn't exist.
@@ -204,7 +207,6 @@ extension Domain {
     context: NSManagedObjectContext,
     _ completionOnMain: @escaping () -> Void
   ) {
-
     let fetchRequest = NSFetchRequest<Domain>()
     fetchRequest.entity = Domain.entity(context)
     do {
@@ -235,12 +237,18 @@ extension Domain {
 
   // MARK: Shields
 
-  class func setBraveShieldInternal(forUrl url: URL, shield: BraveShield, isOn: Bool?, context: WriteContext = .new(inMemory: false)) {
+  class func setBraveShieldInternal(
+    forUrl url: URL,
+    shield: BraveShield,
+    isOn: Bool?,
+    context: WriteContext = .new(inMemory: false)
+  ) {
     DataController.perform(context: context) { context in
       // Not saving here, save happens in `perform` method.
       let domain = Domain.getOrCreateInternal(
         url, context: context,
-        saveStrategy: .delayedPersistentStore)
+        saveStrategy: .delayedPersistentStore
+      )
       domain.setBraveShield(shield: shield, isOn: isOn, context: context)
     }
   }
@@ -249,7 +257,6 @@ extension Domain {
     shield: BraveShield, isOn: Bool?,
     context: NSManagedObjectContext
   ) {
-
     let setting = (isOn == shield.globalPreference ? nil : isOn) as NSNumber?
     switch shield {
     case .AllOff: shield_allOff = setting
@@ -278,8 +285,9 @@ extension Domain {
 
   /// Returns `url` but switches the scheme from `http` <-> `https`
   private func domainForInverseHttpScheme(context: NSManagedObjectContext) -> Domain? {
-
-    guard var urlComponents = self.urlComponents else { return nil }
+    guard var urlComponents = self.urlComponents else {
+      return nil
+    }
 
     // Flip the scheme if valid
 
@@ -289,7 +297,9 @@ extension Domain {
     default: return nil
     }
 
-    guard let url = urlComponents.url else { return nil }
+    guard let url = urlComponents.url else {
+      return nil
+    }
 
     // Return the flipped scheme version of `url`.
     // Not saving here, save happens in at higher level in `perform` method.
@@ -298,12 +308,18 @@ extension Domain {
 
   // MARK: Wallet
 
-  class func setWalletDappPermission(forUrl url: URL, account: String, grant: Bool, context: WriteContext = .new(inMemory: false)) {
+  class func setWalletDappPermission(
+    forUrl url: URL,
+    account: String,
+    grant: Bool,
+    context: WriteContext = .new(inMemory: false)
+  ) {
     DataController.perform(context: context) { context in
       // Not saving here, save happens in `perform` method.
       let domain = Domain.getOrCreateInternal(
         url, context: context,
-        saveStrategy: .persistentStore)
+        saveStrategy: .persistentStore
+      )
       domain.setWalletDappPermission(account: account, grant: grant, context: context)
     }
   }
@@ -324,7 +340,7 @@ extension Domain {
       }
     } else {
       if var accounts = wallet_permittedAccounts?.components(separatedBy: ","),
-        let index = accounts.firstIndex(of: account) {
+         let index = accounts.firstIndex(of: account) {
         accounts.remove(at: index)
         wallet_permittedAccounts = accounts.joined(separator: ",")
       }

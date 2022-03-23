@@ -17,7 +17,7 @@ class PrintHelper: TabContentScript {
   private var currentDomain: String?
 
   class func name() -> String {
-    return "PrintHelper"
+    "PrintHelper"
   }
 
   required init(browserController: BrowserViewController, tab: Tab) {
@@ -26,10 +26,14 @@ class PrintHelper: TabContentScript {
   }
 
   func scriptMessageHandlerName() -> String? {
-    return "printHandler"
+    "printHandler"
   }
 
-  func userContentController(_ userContentController: WKUserContentController, didReceiveScriptMessage message: WKScriptMessage, replyHandler: (Any?, String?) -> Void) {
+  func userContentController(
+    _ userContentController: WKUserContentController,
+    didReceiveScriptMessage message: WKScriptMessage,
+    replyHandler: (Any?, String?) -> Void
+  ) {
     defer { replyHandler(nil, nil) }
     guard let body = message.body as? [String: AnyObject] else {
       return
@@ -62,28 +66,38 @@ class PrintHelper: TabContentScript {
           animated: true,
           completionHandler: { _, _, _ in
             self?.isPresentingController = false
-          })
+          }
+        )
       }
 
       printCounter += 1
 
       if printCounter > 1 {
         // Show confirm alert here.
-        let suppressSheet = UIAlertController(title: nil, message: Strings.suppressAlertsActionMessage, preferredStyle: .actionSheet)
+        let suppressSheet = UIAlertController(
+          title: nil,
+          message: Strings.suppressAlertsActionMessage,
+          preferredStyle: .actionSheet
+        )
         suppressSheet.addAction(
           UIAlertAction(
             title: Strings.suppressAlertsActionTitle, style: .destructive,
             handler: { [weak self] _ in
               self?.isBlocking = true
-            }))
+            }
+          )
+        )
 
         suppressSheet.addAction(
           UIAlertAction(
             title: Strings.cancelButtonTitle, style: .cancel,
             handler: { _ in
               showPrintSheet()
-            }))
-        if UIDevice.current.userInterfaceIdiom == .pad, let popoverController = suppressSheet.popoverPresentationController {
+            }
+          )
+        )
+        if UIDevice.current.userInterfaceIdiom == .pad,
+           let popoverController = suppressSheet.popoverPresentationController {
           popoverController.sourceView = webView
           popoverController.sourceRect = CGRect(x: webView.bounds.midX, y: webView.bounds.midY, width: 0, height: 0)
           popoverController.permittedArrowDirections = []

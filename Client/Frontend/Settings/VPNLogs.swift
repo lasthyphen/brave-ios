@@ -4,7 +4,6 @@ import UIKit
 import SnapKit
 
 public class VPNLogsViewController: UIViewController {
-
   public override func viewDidLoad() {
     super.viewDidLoad()
 

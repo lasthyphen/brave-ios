@@ -7,7 +7,6 @@ import Shared
 import BraveShared
 
 class QRCodePopupView: PopupView {
-
   var qrCodeShareHandler: ((URL) -> Void)?
 
   private let barcodeSize: CGFloat = 200.0
@@ -61,7 +60,7 @@ class QRCodePopupView: PopupView {
 
     shareButton.layer.borderColor =
       UIColor.braveOrange
-      .resolvedColor(with: traitCollection).cgColor
+        .resolvedColor(with: traitCollection).cgColor
 
     [qrCodeImage, title, shareButton, closeButton].forEach(contentView.addSubview(_:))
 
@@ -120,7 +119,7 @@ class QRCodePopupView: PopupView {
     if traitCollection.hasDifferentColorAppearance(comparedTo: previousTraitCollection) {
       shareButton.layer.borderColor =
         UIColor.braveOrange
-        .resolvedColor(with: traitCollection).cgColor
+          .resolvedColor(with: traitCollection).cgColor
     }
   }
 }

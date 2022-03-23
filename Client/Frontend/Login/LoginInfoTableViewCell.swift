@@ -20,7 +20,6 @@ protocol LoginInfoTableViewCellDelegate: AnyObject {
 }
 
 class LoginInfoTableViewCell: UITableViewCell, TableViewReusable {
-
   // MARK: UX
 
   public struct UX {
@@ -71,7 +70,7 @@ class LoginInfoTableViewCell: UITableViewCell, TableViewReusable {
   }
 
   override var canBecomeFirstResponder: Bool {
-    return true
+    true
   }
 
   weak var delegate: LoginInfoTableViewCellDelegate?
@@ -86,6 +85,7 @@ class LoginInfoTableViewCell: UITableViewCell, TableViewReusable {
     configureLayout()
   }
 
+  @available(*, unavailable)
   required init?(coder aDecoder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }
@@ -103,7 +103,7 @@ class LoginInfoTableViewCell: UITableViewCell, TableViewReusable {
   }
 
   override func canPerformAction(_ action: Selector, withSender sender: Any?) -> Bool {
-    return delegate?.canPerform(action: action, for: self) == true
+    delegate?.canPerform(action: action, for: self) == true
   }
 
   // MARK: Internal
@@ -163,7 +163,6 @@ class LoginInfoTableViewCell: UITableViewCell, TableViewReusable {
 // MARK: MenuHelperInterface
 
 extension LoginInfoTableViewCell: MenuHelperInterface {
-
   func menuHelperReveal() {
     if delegate?.didSelectReveal(self) == true {
       displayDescriptionAsPassword = false
@@ -179,7 +178,8 @@ extension LoginInfoTableViewCell: MenuHelperInterface {
 
     UIPasteboard.general.setItems(
       [[UIPasteboard.typeAutomatic: descriptionTextField.text ?? ""]],
-      options: [UIPasteboard.OptionsKey.expirationDate: expireDate])
+      options: [UIPasteboard.OptionsKey.expirationDate: expireDate]
+    )
   }
 
   func menuHelperOpenWebsite() {
@@ -190,9 +190,8 @@ extension LoginInfoTableViewCell: MenuHelperInterface {
 // MARK: UITextFieldDelegate
 
 extension LoginInfoTableViewCell: UITextFieldDelegate {
-
   func textFieldShouldReturn(_ textField: UITextField) -> Bool {
-    return self.delegate?.shouldReturnAfterEditingTextField(self) ?? true
+    self.delegate?.shouldReturnAfterEditingTextField(self) ?? true
   }
 
   func textFieldShouldBeginEditing(_ textField: UITextField) -> Bool {

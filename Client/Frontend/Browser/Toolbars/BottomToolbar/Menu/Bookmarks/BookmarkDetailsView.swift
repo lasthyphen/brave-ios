@@ -8,7 +8,6 @@ import Shared
 import Data
 
 class BookmarkDetailsView: AddEditHeaderView, BookmarkFormFieldsProtocol {
-
   // MARK: BookmarkFormFieldsProtocol
 
   weak var delegate: BookmarkDetailsViewDelegate?
@@ -57,7 +56,9 @@ class BookmarkDetailsView: AddEditHeaderView, BookmarkFormFieldsProtocol {
 
     backgroundColor = .secondaryBraveGroupedBackground
 
-    guard let urlTextField = urlTextField else { fatalError("Url text field must be set up") }
+    guard let urlTextField = urlTextField else {
+      fatalError("Url text field must be set up")
+    }
 
     [UIView.separatorLine, contentStackView, UIView.separatorLine]
       .forEach(mainStackView.addArrangedSubview)
@@ -102,11 +103,13 @@ class BookmarkDetailsView: AddEditHeaderView, BookmarkFormFieldsProtocol {
   }
 
   private func validateTitle(_ title: String?) -> Bool {
-    guard let title = title else { return false }
+    guard let title = title else {
+      return false
+    }
     return !title.isEmpty
   }
 
   private func validateCodeFields() -> Bool {
-    return BookmarkValidation.validateBookmarklet(title: titleTextField.text, url: urlTextField?.text)
+    BookmarkValidation.validateBookmarklet(title: titleTextField.text, url: urlTextField?.text)
   }
 }

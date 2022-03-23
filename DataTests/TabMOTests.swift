@@ -11,7 +11,7 @@ class TabMOTests: CoreDataTestCase {
   let fetchRequest = NSFetchRequest<TabMO>(entityName: String(describing: TabMO.self))
 
   private func entity(for context: NSManagedObjectContext) -> NSEntityDescription {
-    return NSEntityDescription.entity(forEntityName: String(describing: TabMO.self), in: context)!
+    NSEntityDescription.entity(forEntityName: String(describing: TabMO.self), in: context)!
   }
 
   func testCreate() {
@@ -34,7 +34,6 @@ class TabMOTests: CoreDataTestCase {
     XCTAssertNil(object.screenshotUUID)
     XCTAssertNil(object.url)
     XCTAssertNil(object.urlHistorySnapshot)
-
   }
 
   func testUpdate() {
@@ -49,7 +48,8 @@ class TabMOTests: CoreDataTestCase {
 
     let tabData = SavedTab(
       id: object.syncUUID!, title: newTitle, url: newUrl, isSelected: true, order: 10,
-      screenshot: UIImage.sampleImage(), history: ["history1", "history2"], historyIndex: 20, isPrivate: false)
+      screenshot: UIImage.sampleImage(), history: ["history1", "history2"], historyIndex: 20, isPrivate: false
+    )
 
     backgroundSaveAndWaitForExpectation {
       TabMO.update(tabData: tabData)
@@ -90,7 +90,8 @@ class TabMOTests: CoreDataTestCase {
 
     let tabData = SavedTab(
       id: wrongId, title: newTitle, url: newUrl, isSelected: true, order: 10,
-      screenshot: UIImage.sampleImage(), history: ["history1", "history2"], historyIndex: 20, isPrivate: false)
+      screenshot: UIImage.sampleImage(), history: ["history1", "history2"], historyIndex: 20, isPrivate: false
+    )
 
     TabMO.update(tabData: tabData)
     // We can't wait for context save here, wrong id is being passed, let's fake it by waiting one second
@@ -156,11 +157,11 @@ class TabMOTests: CoreDataTestCase {
 
     let tabData = SavedTab(
       id: object.syncUUID!, title: "title\(order)", url: "url\(order)", isSelected: false, order: Int16(order),
-      screenshot: nil, history: [], historyIndex: 0, isPrivate: false)
+      screenshot: nil, history: [], historyIndex: 0, isPrivate: false
+    )
     backgroundSaveAndWaitForExpectation {
       TabMO.update(tabData: tabData)
     }
-
   }
 
   func testGetAll() {
@@ -270,8 +271,8 @@ class TabMOTests: CoreDataTestCase {
   }
 }
 
-private extension UIImage {
-  class func sampleImage() -> UIImage {
+extension UIImage {
+  fileprivate class func sampleImage() -> UIImage {
     let color = UIColor.blue
     let rect = CGRect(origin: CGPoint(x: 0, y: 0), size: CGSize(width: 1, height: 1))
     UIGraphicsBeginImageContext(rect.size)

@@ -27,7 +27,7 @@ public class PrivateCDN {
       return nil
     }
     let length = data.withUnsafeBytes {
-      return UInt32(bigEndian: $0.load(as: UInt32.self)).hostEndian
+      UInt32(bigEndian: $0.load(as: UInt32.self)).hostEndian
     }
     guard data.count >= length + 4, length != 0 else {
       // Payload shorter than expected length, incorrect or malformed
@@ -49,7 +49,9 @@ public class PrivateCDN {
   ///  - `padding`: a variable-length string of uppercase `P` characters of
   ///               the length required to pad the file to its final size
   public static func unpadded(data: Data) -> Data? {
-    guard let length = payloadLength(for: data) else { return nil }
+    guard let length = payloadLength(for: data) else {
+      return nil
+    }
     let startIndex = data.startIndex.advanced(by: 4)
     let endIndex = startIndex.advanced(by: Int(length))
     return data.subdata(in: startIndex..<endIndex)
@@ -59,19 +61,28 @@ public class PrivateCDN {
 /// A custom SDWebImageCoder that will decode padded images that come from the Private CDN
 public class PrivateCDNImageCoder: NSObject, SDImageCoder {
   public func canDecode(from data: Data?) -> Bool {
-    guard let data = data else { return false }
+    guard let data = data else {
+      return false
+    }
     return PrivateCDN.payloadLength(for: data) != nil
   }
+
   public func decodedImage(with data: Data?, options: [SDImageCoderOption: Any]? = nil) -> UIImage? {
     guard let paddedData = data, let unpaddedData = PrivateCDN.unpadded(data: paddedData) else {
       return nil
     }
     return SDImageCodersManager.shared.decodedImage(with: unpaddedData)
   }
+
   public func canEncode(to format: SDImageFormat) -> Bool {
-    return false
+    false
   }
-  public func encodedData(with image: UIImage?, format: SDImageFormat, options: [SDImageCoderOption: Any]? = nil) -> Data? {
+
+  public func encodedData(
+    with image: UIImage?,
+    format: SDImageFormat,
+    options: [SDImageCoderOption: Any]? = nil
+  ) -> Data? {
     SDImageCodersManager.shared.encodedData(with: image, format: format)
   }
 }

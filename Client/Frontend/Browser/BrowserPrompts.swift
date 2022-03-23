@@ -15,11 +15,16 @@ import Shared
 /// need to invoke the completionHandler passed to us from the WKWebView delegate or else
 /// a runtime exception is thrown.
 class JSPromptAlertController: UIAlertController {
-
   var info: JSAlertInfo?
   var showsCancel: Bool = false
 
-  convenience init(title: String?, message: String?, preferredStyle: UIAlertController.Style = .alert, info: JSAlertInfo, showCancel: Bool = true) {
+  convenience init(
+    title: String?,
+    message: String?,
+    preferredStyle: UIAlertController.Style = .alert,
+    info: JSAlertInfo,
+    showCancel: Bool = true
+  ) {
     self.init(title: title, message: message, preferredStyle: preferredStyle)
     self.info = info
     self.showsCancel = showCancel
@@ -33,7 +38,9 @@ class JSPromptAlertController: UIAlertController {
           title: Strings.suppressAlertsActionTitle, style: .default,
           handler: { _ in
             handler(true)
-          }))
+          }
+        )
+      )
     }
     if showsCancel {
       self.addAction(
@@ -41,7 +48,9 @@ class JSPromptAlertController: UIAlertController {
           title: Strings.cancelButtonTitle, style: .cancel,
           handler: { _ in
             self.info?.cancel()
-          }))
+          }
+        )
+      )
     }
   }
 
@@ -78,11 +87,13 @@ struct MessageAlert: JSAlertInfo {
       title: titleForJavaScriptPanelInitiatedByFrame(frame),
       message: message,
       info: self,
-      showCancel: false)
+      showCancel: false
+    )
     alertController.addAction(
       UIAlertAction(title: Strings.OKString, style: .default) { _ in
         self.completionHandler()
-      })
+      }
+    )
     return alertController
   }
 
@@ -102,11 +113,13 @@ struct ConfirmPanelAlert: JSAlertInfo {
     let alertController = JSPromptAlertController(
       title: titleForJavaScriptPanelInitiatedByFrame(frame),
       message: message,
-      info: self)
+      info: self
+    )
     alertController.addAction(
       UIAlertAction(title: Strings.OKString, style: .default) { _ in
         self.completionHandler(true)
-      })
+      }
+    )
     return alertController
   }
 
@@ -126,7 +139,8 @@ struct TextInputAlert: JSAlertInfo {
     let alertController = JSPromptAlertController(
       title: titleForJavaScriptPanelInitiatedByFrame(frame),
       message: message,
-      info: self)
+      info: self
+    )
     var input: UITextField!
     alertController.addTextField(configurationHandler: { (textField: UITextField) in
       input = textField
@@ -135,7 +149,8 @@ struct TextInputAlert: JSAlertInfo {
     alertController.addAction(
       UIAlertAction(title: Strings.OKString, style: .default) { _ in
         self.completionHandler(input.text)
-      })
+      }
+    )
     return alertController
   }
 

@@ -33,7 +33,7 @@ class PartnerCardView: FeedCardBackgroundButton, FeedCardContent {
         self?.actionHandler?(0, .opened())
       },
       menu: { [weak self] in
-        return self?.contextMenu?.menu?(0)
+        self?.contextMenu?.menu?(0)
       }
     )
     addInteraction(UIContextMenuInteraction(delegate: contextMenuDelegate))

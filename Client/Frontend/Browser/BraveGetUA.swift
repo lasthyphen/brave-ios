@@ -15,18 +15,22 @@ class BraveGetUA: TabContentScript {
   }
 
   static func name() -> String {
-    return "BraveGetUA"
+    "BraveGetUA"
   }
 
   func scriptMessageHandlerName() -> String? {
-    return BraveGetUA.name()
+    BraveGetUA.name()
   }
 
-  func userContentController(_ userContentController: WKUserContentController, didReceiveScriptMessage message: WKScriptMessage, replyHandler: (Any?, String?) -> Void) {
+  func userContentController(
+    _ userContentController: WKUserContentController,
+    didReceiveScriptMessage message: WKScriptMessage,
+    replyHandler: (Any?, String?) -> Void
+  ) {
     // 🙀 😭 🏃‍♀️💨
   }
 
   static var isActivated: Bool {
-    return true
+    true
   }
 }

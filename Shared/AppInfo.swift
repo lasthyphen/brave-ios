@@ -20,19 +20,19 @@ open class AppInfo {
   }
 
   public static var displayName: String {
-    return applicationBundle.infoDictionaryString(forKey: "CFBundleDisplayName")
+    applicationBundle.infoDictionaryString(forKey: "CFBundleDisplayName")
   }
 
   public static var appVersion: String {
-    return applicationBundle.infoDictionaryString(forKey: "CFBundleShortVersionString")
+    applicationBundle.infoDictionaryString(forKey: "CFBundleShortVersionString")
   }
 
   public static var buildNumber: String {
-    return applicationBundle.infoDictionaryString(forKey: String(kCFBundleVersionKey))
+    applicationBundle.infoDictionaryString(forKey: String(kCFBundleVersionKey))
   }
 
   public static var majorAppVersion: String {
-    return appVersion.components(separatedBy: ".").first!
+    appVersion.components(separatedBy: ".").first!
   }
 
   /// Return the shared container identifier (also known as the app group) to be used with for example background
@@ -77,6 +77,6 @@ open class AppInfo {
 
   // Return whether the currently executing code is running in an Application
   public static var isApplication: Bool {
-    return Bundle.main.infoDictionaryString(forKey: "CFBundlePackageType") == "APPL"
+    Bundle.main.infoDictionaryString(forKey: "CFBundlePackageType") == "APPL"
   }
 }

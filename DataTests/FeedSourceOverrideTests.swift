@@ -9,11 +9,10 @@ import Shared
 @testable import Data
 
 class FeedSourceOverrideTests: CoreDataTestCase {
-
   let fetchRequest = NSFetchRequest<FeedSourceOverride>(entityName: String(describing: FeedSourceOverride.self))
 
   private func entity(for context: NSManagedObjectContext) -> NSEntityDescription {
-    return NSEntityDescription.entity(forEntityName: String(describing: FeedSourceOverride.self), in: context)!
+    NSEntityDescription.entity(forEntityName: String(describing: FeedSourceOverride.self), in: context)!
   }
 
   func testSimpleInsert() throws {
@@ -47,7 +46,6 @@ class FeedSourceOverrideTests: CoreDataTestCase {
     enabled: Bool = true,
     publisherID: String = "BravePub"
   ) throws -> FeedSourceOverride {
-
     backgroundSaveAndWaitForExpectation {
       FeedSourceOverride.insertInternal(publisherID: publisherID, enabled: enabled)
     }

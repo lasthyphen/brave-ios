@@ -12,18 +12,19 @@ import Shared
 // MARK: - HistoryV2FetchResultsDelegate
 
 protocol HistoryV2FetchResultsDelegate: AnyObject {
-
   func controllerWillChangeContent(_ controller: HistoryV2FetchResultsController)
 
   func controllerDidChangeContent(_ controller: HistoryV2FetchResultsController)
 
   func controller(
     _ controller: HistoryV2FetchResultsController, didChange anObject: Any,
-    at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?)
+    at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?
+  )
 
   func controller(
     _ controller: HistoryV2FetchResultsController, didChange sectionInfo: NSFetchedResultsSectionInfo,
-    atSectionIndex sectionIndex: Int, for type: NSFetchedResultsChangeType)
+    atSectionIndex sectionIndex: Int, for type: NSFetchedResultsChangeType
+  )
 
   func controllerDidReloadContents(_ controller: HistoryV2FetchResultsController)
 }
@@ -31,7 +32,6 @@ protocol HistoryV2FetchResultsDelegate: AnyObject {
 // MARK: - HistoryV2FetchResultsController
 
 protocol HistoryV2FetchResultsController {
-
   var delegate: HistoryV2FetchResultsDelegate? { get set }
 
   var fetchedObjects: [HistoryNode]? { get }
@@ -47,13 +47,11 @@ protocol HistoryV2FetchResultsController {
   func objectCount(for section: Int) -> Int
 
   func titleHeader(for section: Int) -> String
-
 }
 
 // MARK: - Historyv2Fetcher
 
 class Historyv2Fetcher: NSObject, HistoryV2FetchResultsController {
-
   // MARK: Section
 
   enum Section: Int, CaseIterable {
@@ -93,12 +91,15 @@ class Historyv2Fetcher: NSObject, HistoryV2FetchResultsController {
 
     self.historyServiceListener = historyAPI.add(
       HistoryServiceStateObserver { [weak self] _ in
-        guard let self = self else { return }
+        guard let self = self else {
+          return
+        }
 
         DispatchQueue.main.async {
           self.delegate?.controllerDidReloadContents(self)
         }
-      })
+      }
+    )
   }
 
   // MARK: Internal
@@ -114,7 +115,7 @@ class Historyv2Fetcher: NSObject, HistoryV2FetchResultsController {
   }
 
   var sectionCount: Int {
-    return sectionDetails.elements.filter { $0.value > 0 }.count
+    sectionDetails.elements.filter { $0.value > 0 }.count
   }
 
   func performFetch(withQuery: String, _ completion: @escaping () -> Void) {
@@ -123,11 +124,13 @@ class Historyv2Fetcher: NSObject, HistoryV2FetchResultsController {
     historyAPI?.search(
       withQuery: withQuery, maxCount: 200,
       completion: { [weak self] historyNodeList in
-        guard let self = self else { return }
+        guard let self = self else {
+          return
+        }
 
         self.historyList = historyNodeList.map { [unowned self] historyItem in
           if let section = self.fetchHistoryTimePeriod(dateAdded: historyItem.dateAdded),
-            let numOfItemInSection = self.sectionDetails[section] {
+             let numOfItemInSection = self.sectionDetails[section] {
             self.sectionDetails.updateValue(numOfItemInSection + 1, forKey: section)
           }
 
@@ -135,7 +138,8 @@ class Historyv2Fetcher: NSObject, HistoryV2FetchResultsController {
         }
 
         completion()
-      })
+      }
+    )
   }
 
   func object(at indexPath: IndexPath) -> HistoryNode? {
@@ -197,14 +201,16 @@ class Historyv2Fetcher: NSObject, HistoryV2FetchResultsController {
   private func getDate(_ dayOffset: Int) -> Date {
     let calendar = Calendar(identifier: Calendar.Identifier.gregorian)
     let nowComponents = calendar.dateComponents(
-      [Calendar.Component.year, Calendar.Component.month, Calendar.Component.day], from: Date())
+      [Calendar.Component.year, Calendar.Component.month, Calendar.Component.day], from: Date()
+    )
 
     guard let today = calendar.date(from: nowComponents) else {
       return Date()
     }
 
     return (calendar as NSCalendar).date(
-      byAdding: NSCalendar.Unit.day, value: dayOffset, to: today, options: []) ?? Date()
+      byAdding: NSCalendar.Unit.day, value: dayOffset, to: today, options: []
+    ) ?? Date()
   }
 
   private func clearHistoryData() {
@@ -214,5 +220,4 @@ class Historyv2Fetcher: NSObject, HistoryV2FetchResultsController {
       sectionDetails.updateValue(0, forKey: key)
     }
   }
-
 }

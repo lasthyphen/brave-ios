@@ -48,19 +48,27 @@ class RollingFileLoggerTests: XCTestCase {
     let dirURL = URL(fileURLWithPath: logDir)
     let prefix = "test"
     let expectedPath = createNewLogFileWithSize(sizeLimit + 1)
-    sleep(1)  // Wait a second to ensure written file is closed before checking its size
+    sleep(1) // Wait a second to ensure written file is closed before checking its size
 
     let directorySize = try! manager.getAllocatedSizeOfDirectoryAtURL(dirURL, forFilesPrefixedWith: prefix)
 
     // Pre-condition: Folder needs to be larger than the size limit
     XCTAssertGreaterThan(directorySize, Int64(sizeLimit), "Log folder should be larger than size limit")
 
-    let exceedsSmaller = try! manager.allocatedSizeOfDirectoryAtURL(dirURL, forFilesPrefixedWith: prefix, isLargerThanBytes: directorySize - 1)
-    let doesNotExceedLarger = try! manager.allocatedSizeOfDirectoryAtURL(dirURL, forFilesPrefixedWith: prefix, isLargerThanBytes: Int64(sizeLimit + 2))
+    let exceedsSmaller = try! manager.allocatedSizeOfDirectoryAtURL(
+      dirURL,
+      forFilesPrefixedWith: prefix,
+      isLargerThanBytes: directorySize - 1
+    )
+    let doesNotExceedLarger = try! manager.allocatedSizeOfDirectoryAtURL(
+      dirURL,
+      forFilesPrefixedWith: prefix,
+      isLargerThanBytes: Int64(sizeLimit + 2)
+    )
     XCTAssertTrue(exceedsSmaller)
     XCTAssertTrue(doesNotExceedLarger)
 
-    let newDate = Date().addingTimeInterval(60 * 60)  // Create a log file using a date an hour ahead
+    let newDate = Date().addingTimeInterval(60 * 60) // Create a log file using a date an hour ahead
     let newExpected = "\(prefix).\(formatter.string(from: newDate)).log"
     let newExpectedPath = "\(logDir)/\(newExpected)"
     logger.newLogWithDate(newDate)
@@ -77,7 +85,8 @@ class RollingFileLoggerTests: XCTestCase {
     let prefix = "test"
 
     // Create 5 log files with spread out over 5 hours and reorder paths so oldest is first
-    let logFilePaths = [0, 1, 2, 3, 4].map { self.createNewLogFileWithSize(200, withDate: Date().addingTimeInterval(60 * 60 * $0)) }
+    let logFilePaths = [0, 1, 2, 3, 4]
+      .map { self.createNewLogFileWithSize(200, withDate: Date().addingTimeInterval(60 * 60 * $0)) }
       .sorted { $0 < $1 }
 
     let directorySize = try! manager.getAllocatedSizeOfDirectoryAtURL(dirURL, forFilesPrefixedWith: prefix)
@@ -85,7 +94,7 @@ class RollingFileLoggerTests: XCTestCase {
     // Pre-condition: Folder needs to be larger than the size limit
     XCTAssertGreaterThan(directorySize, Int64(sizeLimit), "Log folder should be larger than size limit")
 
-    let newDate = Date().addingTimeInterval(60 * 60 * 5)  // Create a log file using a date an hour ahead
+    let newDate = Date().addingTimeInterval(60 * 60 * 5) // Create a log file using a date an hour ahead
     let newExpected = "\(prefix).\(formatter.string(from: newDate)).log"
     let newExpectedPath = "\(logDir)/\(newExpected)"
     logger.newLogWithDate(newDate)
@@ -97,12 +106,12 @@ class RollingFileLoggerTests: XCTestCase {
   }
 
   /**
-    Create a log file using the test logger and returns the path to that log file
+   Create a log file using the test logger and returns the path to that log file
 
-    - parameter size: Size to make the log file
+   - parameter size: Size to make the log file
 
-    - returns: Path to log file
-    */
+   - returns: Path to log file
+   */
   fileprivate func createNewLogFileWithSize(_ size: Int, withDate date: Date = Date()) -> String {
     let expected = "test.\(formatter.string(from: date)).log"
     let expectedPath = "\(logDir)/\(expected)"

@@ -18,19 +18,18 @@ public protocol RepresentableOptionType: Equatable {
 // Default to no images
 extension RepresentableOptionType {
   public var image: UIImage? {
-    return nil
+    nil
   }
 }
 
 /// Automatically infer `key` and equality when Self already provides a rawValue (mostly String enum's)
 extension RepresentableOptionType where Self: RawRepresentable, Self.RawValue: Equatable {
-
   public var key: String {
-    return String(describing: rawValue)
+    String(describing: rawValue)
   }
 
   public static func == (lhs: Self, rhs: Self) -> Bool {
-    return lhs.rawValue == rhs.rawValue
+    lhs.rawValue == rhs.rawValue
   }
 }
 
@@ -85,7 +84,8 @@ class OptionSelectionViewController<OptionType: RepresentableOptionType>: TableV
               self.selectedOption = o
               self.updateRowsForSelectedOption()
               self.navigationController?.popViewController(animated: true)
-            }, image: o.image, accessory: o == selectedOption ? .checkmark : .none)
+            }, image: o.image, accessory: o == selectedOption ? .checkmark : .none
+          )
         }
       )
     ]

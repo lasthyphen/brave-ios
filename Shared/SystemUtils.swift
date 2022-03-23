@@ -8,13 +8,12 @@ import Foundation
  *  System helper methods written in Swift.
  */
 public struct SystemUtils {
-
   /**
-     Returns an accurate version of the system uptime even while the device is asleep.
-     http://stackoverflow.com/questions/12488481/getting-ios-system-uptime-that-doesnt-pause-when-asleep
+   Returns an accurate version of the system uptime even while the device is asleep.
+   http://stackoverflow.com/questions/12488481/getting-ios-system-uptime-that-doesnt-pause-when-asleep
 
-     - returns: Time interval since last reboot.
-     */
+   - returns: Time interval since last reboot.
+   */
   public static func systemUptime() -> TimeInterval {
     var boottime = timeval()
     var mib = [CTL_KERN, KERN_BOOTTIME]
@@ -45,11 +44,16 @@ extension SystemUtils {
       return
     }
     let contents = "Device is unlocked".data(using: .utf8)
-    fm.createFile(atPath: lockFile, contents: contents, attributes: [FileAttributeKey(rawValue: FileAttributeKey.protectionKey.rawValue): FileProtectionType.complete])
+    fm.createFile(
+      atPath: lockFile,
+      contents: contents,
+      attributes: [FileAttributeKey(rawValue: FileAttributeKey.protectionKey.rawValue): FileProtectionType.complete]
+    )
   }
 
   private static var lockedDeviceURL: URL? {
-    let directoryURL = FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: AppInfo.sharedContainerIdentifier)
+    let directoryURL = FileManager.default
+      .containerURL(forSecurityApplicationGroupIdentifier: AppInfo.sharedContainerIdentifier)
     return directoryURL?.appendingPathComponent("security.dummy")
   }
 

@@ -9,7 +9,6 @@ import Shared
 import BraveShared
 
 class NTPDownloaderTests: XCTestCase {
-
   func testIsSuperReferralCampaignEnded() throws {
     XCTAssert(NTPDownloader.isSuperReferralCampaignEnded(data: emptyJson.asData))
     XCTAssert(NTPDownloader.isSuperReferralCampaignEnded(data: schemaKeyJson.asData))
@@ -363,8 +362,8 @@ class NTPDownloaderTests: XCTestCase {
     """
 }
 
-private extension String {
-  var asData: Data {
+extension String {
+  fileprivate var asData: Data {
     Data(self.utf8)
   }
 }

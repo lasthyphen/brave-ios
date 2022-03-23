@@ -8,7 +8,9 @@ import Shared
 class PrivateModeButton: InsetButton {
   override var isSelected: Bool {
     didSet {
-      accessibilityValue = isSelected ? Strings.tabPrivateModeToggleAccessibilityValueOn : Strings.tabPrivateModeToggleAccessibilityValueOff
+      accessibilityValue = isSelected
+        ? Strings.tabPrivateModeToggleAccessibilityValueOn
+        : Strings.tabPrivateModeToggleAccessibilityValueOff
       backgroundColor = isSelected ? selectedBackgroundColor : .clear
       setTitleColor(isSelected ? .white : .braveLabel, for: .normal)
     }
@@ -35,6 +37,7 @@ class PrivateModeButton: InsetButton {
     selectedBackgroundColor = .braveOrange
   }
 
+  @available(*, unavailable)
   required init?(coder aDecoder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }

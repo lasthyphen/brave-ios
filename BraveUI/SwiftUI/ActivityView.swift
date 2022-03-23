@@ -15,10 +15,13 @@ public struct ActivityView: UIViewControllerRepresentable {
   }
 
   public func makeUIViewController(context: UIViewControllerRepresentableContext<ActivityView>) -> UIViewController {
-    return UIViewController()
+    UIViewController()
   }
 
-  public func updateUIViewController(_ uiViewController: UIViewController, context: UIViewControllerRepresentableContext<ActivityView>) {
+  public func updateUIViewController(
+    _ uiViewController: UIViewController,
+    context: UIViewControllerRepresentableContext<ActivityView>
+  ) {
     if isPresented {
       if uiViewController.presentedViewController != nil {
         return

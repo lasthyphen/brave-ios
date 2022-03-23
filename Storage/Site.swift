@@ -10,14 +10,19 @@ public protocol Identifiable: Equatable {
 }
 
 public func == <T>(lhs: T, rhs: T) -> Bool where T: Identifiable {
-  return lhs.id == rhs.id
+  lhs.id == rhs.id
 }
 
 public enum IconType: Int {
-  case icon, appleIcon, appleIconPrecomposed, guess, local, noneFound
+  case icon
+  case appleIcon
+  case appleIconPrecomposed
+  case guess
+  case local
+  case noneFound
 
   public func isPreferredTo(_ other: IconType) -> Bool {
-    return rank > other.rank
+    rank > other.rank
   }
 
   fileprivate var rank: Int {
@@ -62,7 +67,7 @@ open class Site: Identifiable, Hashable {
   var guid: String?
 
   open var tileURL: URL {
-    return URL(string: url)?.domainURL ?? URL(string: "about:blank")!
+    URL(string: url)?.domainURL ?? URL(string: "about:blank")!
   }
 
   public let url: String

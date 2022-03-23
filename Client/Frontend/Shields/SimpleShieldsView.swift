@@ -8,7 +8,6 @@ import BraveShared
 import BraveUI
 
 class SimpleShieldsView: UIView {
-
   let faviconImageView = UIImageView().then {
     $0.snp.makeConstraints {
       $0.size.equalTo(24)
@@ -42,7 +41,6 @@ class SimpleShieldsView: UIView {
   // Shields Up
 
   class BlockCountView: UIView {
-
     private struct UX {
       static let descriptionEdgeInset = UIEdgeInsets(top: 13, left: 16, bottom: 13, right: 16)
       static let iconEdgeInset = UIEdgeInsets(top: 22, left: 14, bottom: 22, right: 14)
@@ -161,7 +159,7 @@ class SimpleShieldsView: UIView {
           .compactMap { $0 }
           .joined(separator: " ")
       }
-      set { assertionFailure() }  // swiftlint:disable:this unused_setter_value
+      set { assertionFailure() } // swiftlint:disable:this unused_setter_value
     }
 
     override func accessibilityActivate() -> Bool {
@@ -234,13 +232,15 @@ class SimpleShieldsView: UIView {
           $0.alignment = .center
           $0.layoutMargins = UIEdgeInsets(top: 0, left: 0, bottom: 20, right: 0)
           $0.isLayoutMarginsRelativeArrangement = true
-        }),
+        }
+      ),
       .view(shieldsSwitch),
       .view(
         UIStackView(arrangedSubviews: [braveShieldsLabel, statusLabel]).then {
           $0.spacing = 4
           $0.alignment = .center
-        }),
+        }
+      ),
       .customSpace(32),
       .view(blockCountView),
       .view(footerLabel),
@@ -257,9 +257,7 @@ class SimpleShieldsView: UIView {
 // MARK: - ShieldsStackView
 
 extension SimpleShieldsView {
-
   class ShieldsStackView: UIStackView {
-
     init(edgeInsets: UIEdgeInsets) {
       super.init(frame: .zero)
 

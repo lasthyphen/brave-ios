@@ -19,6 +19,7 @@ import Foundation
       self.closure = closure
     }
   }
+
   private var observers = NSMapTable<AnyObject, Observer>.weakToStrongObjects()
 
   mutating func observe(
@@ -35,7 +36,9 @@ import Foundation
 
   var wrappedValue: ValueType {
     didSet {
-      guard let iterator = observers.objectEnumerator() else { return }
+      guard let iterator = observers.objectEnumerator() else {
+        return
+      }
       let newValue = wrappedValue
       for observer in iterator {
         if let observer = observer as? Observer {

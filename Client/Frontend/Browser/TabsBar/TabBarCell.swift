@@ -7,7 +7,6 @@ import BraveShared
 import Combine
 
 class TabBarCell: UICollectionViewCell {
-
   lazy var titleLabel: UILabel = {
     let label = UILabel()
     label.textAlignment = .center
@@ -38,6 +37,7 @@ class TabBarCell: UICollectionViewCell {
       isSelected = currentIndex == tabManager?.currentDisplayedIndex
     }
   }
+
   weak var tab: Tab?
   weak var tabManager: TabManager?
 
@@ -56,7 +56,8 @@ class TabBarCell: UICollectionViewCell {
     super.init(frame: frame)
     backgroundColor = .urlBarBackground
 
-    [deselectedOverlayView, closeButton, titleLabel, separatorLine, separatorLineRight].forEach { contentView.addSubview($0) }
+    [deselectedOverlayView, closeButton, titleLabel, separatorLine, separatorLineRight]
+      .forEach { contentView.addSubview($0) }
     initConstraints()
 
     isSelected = false
@@ -77,6 +78,7 @@ class TabBarCell: UICollectionViewCell {
     }
   }
 
+  @available(*, unavailable)
   required init?(coder aDecoder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }
@@ -138,7 +140,9 @@ class TabBarCell: UICollectionViewCell {
   }
 
   @objc func closeTab() {
-    guard let tab = tab else { return }
+    guard let tab = tab else {
+      return
+    }
     closeTabCallback?(tab)
   }
 
@@ -149,7 +153,9 @@ class TabBarCell: UICollectionViewCell {
     }
     titleUpdateScheduled = true
     DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) { [weak self] in
-      guard let strongSelf = self else { return }
+      guard let strongSelf = self else {
+        return
+      }
       strongSelf.titleUpdateScheduled = false
       strongSelf.titleLabel.text = tab.displayTitle
     }

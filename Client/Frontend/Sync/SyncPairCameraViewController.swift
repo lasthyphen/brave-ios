@@ -122,7 +122,7 @@ class SyncPairCameraViewController: SyncViewController {
 
     edgesForExtendedLayout = UIRectEdge()
 
-    cameraView.snp.makeConstraints { (make) in
+    cameraView.snp.makeConstraints { make in
       if UIDevice.current.userInterfaceIdiom == .pad {
         make.size.equalTo(400)
       } else {
@@ -141,7 +141,8 @@ class SyncPairCameraViewController: SyncViewController {
 
   override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
     coordinator.animate(alongsideTransition: nil) { _ in
-      self.cameraView.videoPreviewLayer?.connection?.videoOrientation = AVCaptureVideoOrientation(ui: UIApplication.shared.statusBarOrientation)
+      self.cameraView.videoPreviewLayer?.connection?
+        .videoOrientation = AVCaptureVideoOrientation(ui: UIApplication.shared.statusBarOrientation)
     }
   }
 
@@ -154,7 +155,9 @@ class SyncPairCameraViewController: SyncViewController {
 
   private func onQRCodeScanned(data: String) {
     // Guard against multi-scanning
-    if cameraLocked { return }
+    if cameraLocked {
+      return
+    }
     cameraLocked = true
 
     // Pause scanning
@@ -166,7 +169,9 @@ class SyncPairCameraViewController: SyncViewController {
 
     // Forced timeout
     let task = DispatchWorkItem { [weak self] in
-      guard let self = self else { return }
+      guard let self = self else {
+        return
+      }
       self.cameraLocked = false
       self.cameraView.cameraOverlayError()
     }
@@ -179,16 +184,21 @@ class SyncPairCameraViewController: SyncViewController {
       let alert = UIAlertController(
         title: Strings.syncNoConnectionTitle,
         message: Strings.syncNoConnectionBody,
-        preferredStyle: .alert)
+        preferredStyle: .alert
+      )
       alert.addAction(
         UIAlertAction(
           title: Strings.OKString, style: .default,
           handler: { [weak self] _ in
-            guard let self = self else { return }
+            guard let self = self else {
+              return
+            }
             self.cameraLocked = false
             self.cameraView.cameraOverlayNormal()
             self.cameraView.startRunning()
-          }))
+          }
+        )
+      )
       present(alert, animated: true)
       return
     }
@@ -245,17 +255,22 @@ class SyncPairCameraViewController: SyncViewController {
     let alert = UIAlertController(
       title: Strings.syncUnableCreateGroup,
       message: errorMessage(error),
-      preferredStyle: .alert)
+      preferredStyle: .alert
+    )
 
     alert.addAction(
       UIAlertAction(
         title: Strings.OKString, style: .default,
         handler: { [weak self] _ in
-          guard let self = self else { return }
+          guard let self = self else {
+            return
+          }
           self.cameraLocked = false
           self.cameraView.cameraOverlayNormal()
           self.cameraView.startRunning()
-        }))
+        }
+      )
+    )
     present(alert, animated: true)
   }
 }
@@ -276,14 +291,13 @@ extension SyncPairCameraViewController: NavigationPrevention {
 
 extension AVCaptureVideoOrientation {
   var uiInterfaceOrientation: UIInterfaceOrientation {
-    get {
-      switch self {
-      case .landscapeLeft: return .landscapeLeft
-      case .landscapeRight: return .landscapeRight
-      case .portrait: return .portrait
-      case .portraitUpsideDown: return .portraitUpsideDown
-      @unknown default: assertionFailure(); return .portrait
-      }
+    switch self {
+    case .landscapeLeft: return .landscapeLeft
+    case .landscapeRight: return .landscapeRight
+    case .portrait: return .portrait
+    case .portraitUpsideDown: return .portraitUpsideDown
+    @unknown default: assertionFailure()
+      return .portrait
     }
   }
 

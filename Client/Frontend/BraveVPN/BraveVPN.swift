@@ -12,7 +12,6 @@ private let log = Logger.browserLogger
 
 /// A static class to handle all things related to the Brave VPN service.
 class BraveVPN {
-
   private static let housekeepingApi = GRDHousekeepingAPI()
   private static let helper = GRDVPNHelper()
   private static let serverManager = GRDServerManager()
@@ -40,7 +39,7 @@ class BraveVPN {
       }
 
       // We validate the current receipt at the start to know if the subscription has expirerd.
-      BraveVPN.validateReceipt() { expired in
+      BraveVPN.validateReceipt { expired in
         if expired == true {
           BraveVPN.clearConfiguration()
           logAndStoreError("Receipt expired")
@@ -138,7 +137,9 @@ class BraveVPN {
     // User hasn't bought or restored the vpn yet.
     // If vpn plan expired, this preference is not set to nil but the date is set to year 1970
     // to force the UI to show expired state.
-    if Preferences.VPN.expirationDate.value == nil { return .notPurchased }
+    if Preferences.VPN.expirationDate.value == nil {
+      return .notPurchased
+    }
 
     if hasExpired == true {
       return .expired(enabled: NEVPNManager.shared().isEnabled)
@@ -152,7 +153,9 @@ class BraveVPN {
 
     // No VPN config set means the user could buy the vpn but hasn't gone through the second screen
     // to install the vpn and connect to a server.
-    if NEVPNManager.shared().connection.status == .invalid { return .purchased }
+    if NEVPNManager.shared().connection.status == .invalid {
+      return .purchased
+    }
 
     return .installed(enabled: isConnected)
   }
@@ -172,14 +175,18 @@ class BraveVPN {
   /// Whether the vpn subscription has expired.
   /// Returns nil if there has been no subscription yet (user never bought the vpn).
   static var hasExpired: Bool? {
-    guard let expirationDate = Preferences.VPN.expirationDate.value else { return nil }
+    guard let expirationDate = Preferences.VPN.expirationDate.value else {
+      return nil
+    }
 
     return expirationDate < Date()
   }
 
   /// Location of last used server for the vpn configuration.
   static var serverLocation: String? {
-    guard let serverHostname = hostname else { return nil }
+    guard let serverHostname = hostname else {
+      return nil
+    }
     return Preferences.VPN.vpnHostDisplayName.value
       ?? GRDVPNHelper.serverLocation(forHostname: serverHostname)
   }
@@ -188,7 +195,7 @@ class BraveVPN {
   static var subscriptionName: String {
     guard
       let credentialString =
-        GRDKeychain.getPasswordString(forAccount: kKeychainStr_SubscriberCredential)
+      GRDKeychain.getPasswordString(forAccount: kKeychainStr_SubscriberCredential)
     else {
       logAndStoreError("subscriptionName: failed to retrieve subscriber credentials")
       return ""
@@ -241,7 +248,7 @@ class BraveVPN {
 
     guard
       let credentialString =
-        GRDKeychain.getPasswordString(forAccount: kKeychainStr_SubscriberCredential)
+      GRDKeychain.getPasswordString(forAccount: kKeychainStr_SubscriberCredential)
     else {
       reconnectPending = false
       logAndStoreError("reconnect: failed to retrieve subscriber credentials")
@@ -337,9 +344,9 @@ class BraveVPN {
       }
 
       guard let validSubscriptions = validSubscriptions as? [[String: Any]],
-        let data = try? JSONSerialization.data(withJSONObject: validSubscriptions, options: []),
-        let receipts = try? JSONDecoder().decode([_Receipt].self, from: data),
-        let newestReceipt = receipts.sorted(by: { $0.expireDate > $1.expireDate }).first
+            let data = try? JSONSerialization.data(withJSONObject: validSubscriptions, options: []),
+            let receipts = try? JSONDecoder().decode([_Receipt].self, from: data),
+            let newestReceipt = receipts.sorted(by: { $0.expireDate > $1.expireDate }).first
       else {
         // Setting super old date to force expiration logic in the UI.
         Preferences.VPN.expirationDate.value = Date(timeIntervalSince1970: 1)
@@ -362,7 +369,9 @@ class BraveVPN {
   /// Use `resetConfiguration` if you want to reconfigure the vpn for an existing user.
   /// If IAP is restored we treat it as first user configuration as well.
   static func configureFirstTimeUser(completion: ((VPNUserCreationStatus) -> Void)?) {
-    if firstTimeUserConfigPending { return }
+    if firstTimeUserConfigPending {
+      return
+    }
     firstTimeUserConfigPending = true
 
     // Make sure region override is nil on new user creation.
@@ -390,7 +399,6 @@ class BraveVPN {
     for hostname: String,
     completion: @escaping ((VPNUserCreationStatus) -> Void)
   ) {
-
     housekeepingApi.createNewSubscriberCredential(with: .ValidationMethodAppStoreReceipt) {
       jwtCredential, success, error in
 
@@ -401,7 +409,6 @@ class BraveVPN {
       }
 
       if let jwtCredential = jwtCredential {
-
         helper.createFreshUser(withSubscriberCredential: jwtCredential) { status, createError in
           if status != .success {
             logAndStoreError("createFreshUser provisioning problems")
@@ -425,7 +432,8 @@ class BraveVPN {
   private static func saveJwtCredential(_ credential: String) -> Bool {
     let status = GRDKeychain.storePassword(
       credential, forAccount: kKeychainStr_SubscriberCredential,
-      retry: true)
+      retry: true
+    )
 
     return status == errSecSuccess
   }
@@ -439,7 +447,7 @@ class BraveVPN {
       case .success:
         completion(.success)
       case .doesNeedMigration:
-        reconfigureVPN() { success in
+        reconfigureVPN { success in
           if success {
             completion(.success)
           } else {
@@ -448,8 +456,8 @@ class BraveVPN {
           }
         }
       case .api_AuthenticationError, .api_ProvisioningError, .app_VpnPrefsLoadError,
-        .app_VpnPrefsSaveError, .coudNotReachAPIError, .fail,
-        .networkConnectionError, .migrating:
+           .app_VpnPrefsSaveError, .coudNotReachAPIError, .fail,
+           .networkConnectionError, .migrating:
         logAndStoreError("connectOrMigrateToNewNode error: \(status.rawValue)")
         completion(.error(type: .loadConfigError))
       @unknown default:
@@ -502,15 +510,15 @@ class BraveVPN {
               completion?(success)
             }
           }
-
         }
-      })
+      }
+    )
   }
 
   private static func reconfigure(with host: String, location: String?, completion: ((Bool) -> Void)? = nil) {
     guard
       let credentialString =
-        GRDKeychain.getPasswordString(forAccount: kKeychainStr_SubscriberCredential)
+      GRDKeychain.getPasswordString(forAccount: kKeychainStr_SubscriberCredential)
     else {
       logAndStoreError("reconfigureVPN failed to retrieve subscriber credentials")
       completion?(false)
@@ -558,7 +566,6 @@ class BraveVPN {
   }
 
   static func sendVPNWorksInBackgroundNotification() {
-
     switch vpnState {
     case .expired, .notPurchased, .purchased:
       break
@@ -595,7 +602,8 @@ class BraveVPN {
           // Empty `UNNotificationTrigger` sends the notification right away.
           let request = UNNotificationRequest(
             identifier: notificationId, content: content,
-            trigger: nil)
+            trigger: nil
+          )
 
           center.add(request) { error in
             if let error = error {
@@ -628,9 +636,10 @@ class BraveVPN {
       }
 
       guard let regionList = regionList,
-        let data = try? JSONSerialization.data(
-          withJSONObject: regionList,
-          options: .fragmentsAllowed)
+            let data = try? JSONSerialization.data(
+              withJSONObject: regionList,
+              options: .fragmentsAllowed
+            )
       else {
         logAndStoreError("failed to deserialize server regions data")
         completion(nil)

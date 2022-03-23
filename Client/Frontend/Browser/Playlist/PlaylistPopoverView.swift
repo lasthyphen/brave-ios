@@ -72,7 +72,8 @@ struct PlaylistPopoverView: View {
         top: 22.0,
         leading: 30.0,
         bottom: 22.0,
-        trailing: 30.0)
+        trailing: 30.0
+      )
     )
     .background(Color(.braveBackground))
   }
@@ -136,7 +137,8 @@ struct PlaylistPopoverView: View {
         top: 22.0,
         leading: 30.0,
         bottom: 22.0,
-        trailing: 30.0)
+        trailing: 30.0
+      )
     )
     .background(Color(.braveBackground))
   }
@@ -156,11 +158,11 @@ struct PlaylistPopoverView_Previews: PreviewProvider {
 #endif
 
 class PlaylistPopoverViewController: UIHostingController<PlaylistPopoverView> & PopoverContentComponent {
-
   init(state: PlaylistPopoverState) {
     super.init(rootView: PlaylistPopoverView(state: state))
   }
 
+  @available(*, unavailable)
   @objc required dynamic init?(coder aDecoder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }

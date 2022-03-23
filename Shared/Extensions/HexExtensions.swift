@@ -13,7 +13,7 @@ extension String {
     }
 
     var result = Data(capacity: (cString.count - 1) / 2)
-    for i in stride(from: 0, to: (cString.count - 1), by: 2) {
+    for i in stride(from: 0, to: cString.count - 1, by: 2) {
       guard let l = hexCharToByte(cString[i]), let r = hexCharToByte(cString[i + 1]) else {
         return Data()
       }
@@ -24,13 +24,13 @@ extension String {
   }
 
   private func hexCharToByte(_ c: CChar) -> UInt8? {
-    if c >= 48 && c <= 57 {  // 0 - 9
+    if c >= 48 && c <= 57 { // 0 - 9
       return UInt8(c - 48)
     }
-    if c >= 97 && c <= 102 {  // a - f
+    if c >= 97 && c <= 102 { // a - f
       return UInt8(10) + UInt8(c - 97)
     }
-    if c >= 65 && c <= 70 {  // A - F
+    if c >= 65 && c <= 70 { // A - F
       return UInt8(10) + UInt8(c - 65)
     }
     return nil
@@ -56,6 +56,6 @@ extension Data {
 
 extension Data {
   public var base64EncodedString: String {
-    return self.base64EncodedString(options: [])
+    self.base64EncodedString(options: [])
   }
 }

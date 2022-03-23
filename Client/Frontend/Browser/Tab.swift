@@ -17,7 +17,11 @@ private let log = Logger.browserLogger
 protocol TabContentScript {
   static func name() -> String
   func scriptMessageHandlerName() -> String?
-  func userContentController(_ userContentController: WKUserContentController, didReceiveScriptMessage message: WKScriptMessage, replyHandler: @escaping (Any?, String?) -> Void)
+  func userContentController(
+    _ userContentController: WKUserContentController,
+    didReceiveScriptMessage message: WKScriptMessage,
+    replyHandler: @escaping (Any?, String?) -> Void
+  )
 }
 
 @objc
@@ -61,7 +65,7 @@ class Tab: NSObject {
   var redirectURLs = [URL]()
 
   var isPrivate: Bool {
-    return type.isPrivate
+    type.isPrivate
   }
 
   var secureContentState: TabSecureContentState = .unknown
@@ -72,7 +76,7 @@ class Tab: NSObject {
 
   var canonicalURL: URL? {
     if let string = pageMetadata?.siteURL,
-      let siteURL = URL(string: string) {
+       let siteURL = URL(string: string) {
       return siteURL
     }
     return self.url
@@ -85,7 +89,9 @@ class Tab: NSObject {
   /// also ensuring single page applications which don't update their canonical URLs on navigation share
   /// the current pages URL
   var shareURL: URL? {
-    guard let url = url else { return nil }
+    guard let url = url else {
+      return nil
+    }
     if let canonicalURL = canonicalURL, canonicalURL.baseDomain != url.baseDomain {
       return canonicalURL
     }
@@ -96,7 +102,7 @@ class Tab: NSObject {
 
   var webView: BraveWebView?
   var tabDelegate: TabDelegate?
-  weak var urlDidChangeDelegate: URLChangeDelegate?  // TODO: generalize this.
+  weak var urlDidChangeDelegate: URLChangeDelegate? // TODO: generalize this.
   var bars = [SnackBar]()
   var favicons = [Favicon]()
   var lastExecutedTime: Timestamp?
@@ -111,6 +117,7 @@ class Tab: NSObject {
       }
     }
   }
+
   var lastKnownUrl: URL? {
     // Tab url can be nil when user cold starts the app
     // thus we check session data for last known url
@@ -119,6 +126,7 @@ class Tab: NSObject {
     }
     return self.url
   }
+
   var mimeType: String?
   var isEditing: Bool = false
   var shouldClassifyLoadsForAds = true
@@ -137,7 +145,9 @@ class Tab: NSObject {
   }
 
   private func deleteNewTabPageController() {
-    guard let controller = newTabPageViewController, controller.parent != nil else { return }
+    guard let controller = newTabPageViewController, controller.parent != nil else {
+      return
+    }
     controller.willMove(toParent: nil)
     controller.removeFromParent()
     controller.view.removeFromSuperview()
@@ -159,7 +169,7 @@ class Tab: NSObject {
 
   // Use computed property so @available can be used to guard `noImageMode`.
   var noImageMode: Bool {
-    get { return _noImageMode }
+    get { _noImageMode }
     set {
       if newValue == _noImageMode {
         return
@@ -296,7 +306,8 @@ class Tab: NSObject {
         isPaymentRequestEnabled: webView.hasOnlySecureContent,
         isWebCompatibilityMediaSourceAPIEnabled: Preferences.Playlist.webMediaSourceCompatibility.value,
         isMediaBackgroundPlaybackEnabled: Preferences.General.mediaAutoBackgrounding.value,
-        isNightModeEnabled: Preferences.General.nightModeEnabled.value)
+        isNightModeEnabled: Preferences.General.nightModeEnabled.value
+      )
       tabDelegate?.tab?(self, didCreateWebView: webView)
 
       nightMode = Preferences.General.nightModeEnabled.value
@@ -311,7 +322,7 @@ class Tab: NSObject {
 
   func clearHistory(config: WKWebViewConfiguration) {
     guard let webView = webView,
-      let tabID = id
+          let tabID = id
     else {
       return
     }
@@ -320,12 +331,12 @@ class Tab: NSObject {
     TabMO.removeHistory(with: tabID)
 
     /*
-         * Clear selector is used on WKWebView backForwardList because backForwardList list is only exposed with a getter
-         * and this method Removes all items except the current one in the tab list so when another url is added it will add the list properly
-         * This approach is chosen to achieve removing tab history in the event of removing  browser history
-         * Best way perform this is to clear the backforward list and in our case there is no drawback to clear the list
-         * And alternative would be to reload webpages which will be costly and also can cause unexpected results
-         */
+     * Clear selector is used on WKWebView backForwardList because backForwardList list is only exposed with a getter
+     * and this method Removes all items except the current one in the tab list so when another url is added it will add the list properly
+     * This approach is chosen to achieve removing tab history in the event of removing  browser history
+     * Best way perform this is to clear the backforward list and in our case there is no drawback to clear the list
+     * And alternative would be to reload webpages which will be costly and also can cause unexpected results
+     */
     let argument: [Any] = ["_c", "lea", "r"]
 
     let method = argument.compactMap { $0 as? String }.joined()
@@ -348,7 +359,9 @@ class Tab: NSObject {
 
       var urls = [String]()
       for url in sessionData.history {
-        guard let url = URL(string: url) else { continue }
+        guard let url = URL(string: url) else {
+          continue
+        }
         urls.append(url.absoluteString)
       }
 
@@ -371,7 +384,6 @@ class Tab: NSObject {
     } else {
       log.warning("creating webview with no lastRequest and no session data: \(String(describing: self.url))")
     }
-
   }
 
   func deleteWebView() {
@@ -391,30 +403,30 @@ class Tab: NSObject {
   }
 
   var loading: Bool {
-    return webView?.isLoading ?? false
+    webView?.isLoading ?? false
   }
 
   var estimatedProgress: Double {
-    return webView?.estimatedProgress ?? 0
+    webView?.estimatedProgress ?? 0
   }
 
   var backList: [WKBackForwardListItem]? {
-    return webView?.backForwardList.backList
+    webView?.backForwardList.backList
   }
 
   var forwardList: [WKBackForwardListItem]? {
-    return webView?.backForwardList.forwardList
+    webView?.backForwardList.forwardList
   }
 
   var historyList: [URL] {
-    func listToUrl(_ item: WKBackForwardListItem) -> URL { return item.url }
+    func listToUrl(_ item: WKBackForwardListItem) -> URL { item.url }
     var tabs = self.backList?.map(listToUrl) ?? [URL]()
     tabs.append(self.url!)
     return tabs
   }
 
   var title: String? {
-    return webView?.title
+    webView?.title
   }
 
   var displayTitle: String {
@@ -429,7 +441,8 @@ class Tab: NSObject {
     }
 
     // lets double check the sessionData in case this is a non-restored new tab
-    if let firstURL = sessionData?.urls.first, sessionData?.urls.count == 1, InternalURL(firstURL)?.isAboutHomeURL ?? false {
+    if let firstURL = sessionData?.urls.first, sessionData?.urls.count == 1,
+       InternalURL(firstURL)?.isAboutHomeURL ?? false {
       return Strings.newTabTitle
     }
 
@@ -452,20 +465,22 @@ class Tab: NSObject {
   }
 
   var currentInitialURL: URL? {
-    return self.webView?.backForwardList.currentItem?.initialURL
+    self.webView?.backForwardList.currentItem?.initialURL
   }
 
   var displayFavicon: Favicon? {
-    if let url = url, InternalURL(url)?.isAboutHomeURL == true { return nil }
+    if let url = url, InternalURL(url)?.isAboutHomeURL == true {
+      return nil
+    }
     return favicons.max { $0.width! < $1.width! }
   }
 
   var canGoBack: Bool {
-    return webView?.canGoBack ?? false
+    webView?.canGoBack ?? false
   }
 
   var canGoForward: Bool {
-    return webView?.canGoForward ?? false
+    webView?.canGoForward ?? false
   }
 
   func goBack() {
@@ -512,7 +527,7 @@ class Tab: NSObject {
 
     defer {
       if let refreshControl = webView?.scrollView.refreshControl,
-        refreshControl.isRefreshing {
+         refreshControl.isRefreshing {
         refreshControl.endRefreshing()
       }
     }
@@ -535,7 +550,9 @@ class Tab: NSObject {
   }
 
   func updateUserAgent(_ webView: WKWebView, newURL: URL) {
-    guard let baseDomain = newURL.baseDomain else { return }
+    guard let baseDomain = newURL.baseDomain else {
+      return
+    }
 
     let desktopMode = userAgentOverrides[baseDomain] ?? UserAgent.shouldUseDesktopMode
     webView.customUserAgent = desktopMode ? UserAgent.desktop : UserAgent.mobile
@@ -546,7 +563,7 @@ class Tab: NSObject {
   }
 
   func getContentScript(name: String) -> TabContentScript? {
-    return contentScriptManager.getContentScript(name)
+    contentScriptManager.getContentScript(name)
   }
 
   func hideContent(_ animated: Bool = false) {
@@ -556,7 +573,8 @@ class Tab: NSObject {
         withDuration: 0.25,
         animations: { () -> Void in
           self.webView?.alpha = 0.0
-        })
+        }
+      )
     } else {
       webView?.alpha = 0.0
     }
@@ -569,7 +587,8 @@ class Tab: NSObject {
         withDuration: 0.25,
         animations: { () -> Void in
           self.webView?.alpha = 1.0
-        })
+        }
+      )
     } else {
       webView?.alpha = 1.0
     }
@@ -638,9 +657,14 @@ class Tab: NSObject {
     }
   }
 
-  override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey: Any]?, context: UnsafeMutableRawPointer?) {
+  override func observeValue(
+    forKeyPath keyPath: String?,
+    of object: Any?,
+    change: [NSKeyValueChangeKey: Any]?,
+    context: UnsafeMutableRawPointer?
+  ) {
     guard let webView = object as? BraveWebView, webView == self.webView,
-      let path = keyPath, path == KVOConstants.URL.rawValue
+          let path = keyPath, path == KVOConstants.URL.rawValue
     else {
       return assertionFailure("Unhandled KVO key: \(keyPath ?? "nil")")
     }
@@ -654,21 +678,36 @@ class Tab: NSObject {
   }
 
   func updatePullToRefreshVisibility() {
-    guard let url = webView?.url, let webView = webView else { return }
-    webView.scrollView.refreshControl = url.isLocalUtility || !Preferences.General.enablePullToRefresh.value ? nil : refreshControl
+    guard let url = webView?.url, let webView = webView else {
+      return
+    }
+    webView.scrollView.refreshControl = url.isLocalUtility || !Preferences.General.enablePullToRefresh.value
+      ? nil
+      : refreshControl
   }
 
   func isDescendentOf(_ ancestor: Tab) -> Bool {
-    return sequence(first: parent) { $0?.parent }.contains { $0 == ancestor }
+    sequence(first: parent) { $0?.parent }.contains { $0 == ancestor }
   }
 
-  func injectUserScriptWith(fileName: String, type: String = "js", injectionTime: WKUserScriptInjectionTime = .atDocumentEnd, mainFrameOnly: Bool = true, contentWorld: WKContentWorld) {
+  func injectUserScriptWith(
+    fileName: String,
+    type: String = "js",
+    injectionTime: WKUserScriptInjectionTime = .atDocumentEnd,
+    mainFrameOnly: Bool = true,
+    contentWorld: WKContentWorld
+  ) {
     guard let webView = self.webView else {
       return
     }
     if let path = Bundle.main.path(forResource: fileName, ofType: type),
-      let source = try? String(contentsOfFile: path) {
-      let userScript = WKUserScript.create(source: source, injectionTime: injectionTime, forMainFrameOnly: mainFrameOnly, in: contentWorld)
+       let source = try? String(contentsOfFile: path) {
+      let userScript = WKUserScript.create(
+        source: source,
+        injectionTime: injectionTime,
+        forMainFrameOnly: mainFrameOnly,
+        in: contentWorld
+      )
       webView.configuration.userContentController.addUserScript(userScript)
     }
   }
@@ -711,11 +750,19 @@ private class TabContentScriptManager: NSObject, WKScriptMessageHandlerWithReply
     }
   }
 
-  @objc func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage, replyHandler: @escaping (Any?, String?) -> Void) {
+  @objc func userContentController(
+    _ userContentController: WKUserContentController,
+    didReceive message: WKScriptMessage,
+    replyHandler: @escaping (Any?, String?) -> Void
+  ) {
     for helper in helpers.values {
       if let scriptMessageHandlerName = helper.scriptMessageHandlerName() {
         if scriptMessageHandlerName == message.name {
-          helper.userContentController(userContentController, didReceiveScriptMessage: message, replyHandler: replyHandler)
+          helper.userContentController(
+            userContentController,
+            didReceiveScriptMessage: message,
+            replyHandler: replyHandler
+          )
           return
         }
       }
@@ -733,15 +780,23 @@ private class TabContentScriptManager: NSObject, WKScriptMessageHandlerWithReply
     // receives all messages and then dispatches them to the right TabHelper.
     if let scriptMessageHandlerName = helper.scriptMessageHandlerName() {
       if #available(iOS 14.3, *) {
-        tab.webView?.configuration.userContentController.addScriptMessageHandler(self, contentWorld: contentWorld, name: scriptMessageHandlerName)
+        tab.webView?.configuration.userContentController.addScriptMessageHandler(
+          self,
+          contentWorld: contentWorld,
+          name: scriptMessageHandlerName
+        )
       } else {
-        tab.webView?.configuration.userContentController.addScriptMessageHandler(self, contentWorld: .page, name: scriptMessageHandlerName)
+        tab.webView?.configuration.userContentController.addScriptMessageHandler(
+          self,
+          contentWorld: .page,
+          name: scriptMessageHandlerName
+        )
       }
     }
   }
 
   func getContentScript(_ name: String) -> TabContentScript? {
-    return helpers[name]
+    helpers[name]
   }
 }
 
@@ -756,12 +811,14 @@ class TabWebView: BraveWebView, MenuHelperInterface {
   fileprivate weak var delegate: TabWebViewDelegate?
 
   override func canPerformAction(_ action: Selector, withSender sender: Any?) -> Bool {
-    return super.canPerformAction(action, withSender: sender) || action == MenuHelper.selectorFindInPage
+    super.canPerformAction(action, withSender: sender) || action == MenuHelper.selectorFindInPage
   }
 
   @objc func menuHelperFindInPage() {
     getCurrentSelectedText { [weak self] selectedText in
-      guard let self = self else { return }
+      guard let self = self else {
+        return
+      }
       guard let selectedText = selectedText else {
         assertionFailure("Impossible to trigger this without selected text")
         return
@@ -773,7 +830,9 @@ class TabWebView: BraveWebView, MenuHelperInterface {
 
   @objc func menuHelperSearchWithBrave() {
     getCurrentSelectedText { [weak self] selectedText in
-      guard let self = self else { return }
+      guard let self = self else {
+        return
+      }
       guard let selectedText = selectedText else {
         assertionFailure("Impossible to trigger this without selected text")
         return
@@ -819,10 +878,11 @@ class TabWebView: BraveWebView, MenuHelperInterface {
 class TabWebViewMenuHelper: UIView {
   @objc func swizzledMenuHelperFindInPage() {
     if let tabWebView = superview?.superview as? TabWebView {
-      tabWebView.evaluateSafeJavaScript(functionName: "getSelection().toString", contentWorld: .defaultClient) { result, _ in
-        let selection = result as? String ?? ""
-        tabWebView.delegate?.tabWebView(tabWebView, didSelectFindInPageForSelection: selection)
-      }
+      tabWebView
+        .evaluateSafeJavaScript(functionName: "getSelection().toString", contentWorld: .defaultClient) { result, _ in
+          let selection = result as? String ?? ""
+          tabWebView.delegate?.tabWebView(tabWebView, didSelectFindInPageForSelection: selection)
+        }
     }
   }
 }
@@ -860,8 +920,8 @@ extension Tab {
         var queryResult = "null"
 
         if let url = self.webView?.url,
-          BraveSearchManager.isValidURL(url),
-          let result = self.braveSearchManager?.fallbackQueryResult {
+           BraveSearchManager.isValidURL(url),
+           let result = self.braveSearchManager?.fallbackQueryResult {
           queryResult = result
         }
 
@@ -869,7 +929,8 @@ extension Tab {
           functionName: "window.onFetchedBackupResults",
           args: [queryResult],
           contentWorld: .page,
-          escapeArgs: false)
+          escapeArgs: false
+        )
 
         // Cleanup
         self.braveSearchManager = nil

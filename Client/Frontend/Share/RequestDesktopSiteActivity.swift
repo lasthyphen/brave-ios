@@ -19,7 +19,10 @@ class RequestDesktopSiteActivity: UIActivity {
   }
 
   override var activityImage: UIImage? {
-    tab?.isDesktopSite == true ? #imageLiteral(resourceName: "shareRequestMobileSite") : #imageLiteral(resourceName: "shareRequestDesktopSite")
+    tab?
+      .isDesktopSite == true
+      ? #imageLiteral(resourceName: "shareRequestMobileSite")
+      : #imageLiteral(resourceName: "shareRequestDesktopSite")
   }
 
   override func perform() {
@@ -28,6 +31,6 @@ class RequestDesktopSiteActivity: UIActivity {
   }
 
   override func canPerform(withActivityItems activityItems: [Any]) -> Bool {
-    return true
+    true
   }
 }

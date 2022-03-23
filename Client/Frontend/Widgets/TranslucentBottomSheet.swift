@@ -71,7 +71,6 @@ class TranslucentBottomSheet: UIViewController {
       self.closeHandler?()
       self.view.removeFromSuperview()
       self.removeFromParent()
-
     }
   }
 }

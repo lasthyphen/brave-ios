@@ -17,7 +17,7 @@ class SiteTableViewHeader: UITableViewHeaderFooterView {
   let titleLabel = UILabel()
 
   override var textLabel: UILabel? {
-    return titleLabel
+    titleLabel
   }
 
   override init(reuseIdentifier: String?) {
@@ -33,12 +33,13 @@ class SiteTableViewHeader: UITableViewHeaderFooterView {
     titleLabel.snp.makeConstraints { make in
       make.left.equalTo(contentView).offset(SiteTableViewControllerUX.headerTextMargin).priority(999)
       make.right.equalTo(contentView).offset(-SiteTableViewControllerUX.headerTextMargin).priority(999)
-      make.left.greaterThanOrEqualTo(contentView)  // Fallback for when the left space constraint breaks
-      make.right.lessThanOrEqualTo(contentView)  // Fallback for when the right space constraint breaks
+      make.left.greaterThanOrEqualTo(contentView) // Fallback for when the left space constraint breaks
+      make.right.lessThanOrEqualTo(contentView) // Fallback for when the right space constraint breaks
       make.centerY.equalTo(contentView)
     }
   }
 
+  @available(*, unavailable)
   required init?(coder aDecoder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }
@@ -66,7 +67,6 @@ class SiteTableViewController: LoadingViewController, UITableViewDelegate, UITab
     view.addSubview(tableView)
     tableView.snp.makeConstraints { make in
       make.edges.equalTo(self.view)
-      return
     }
 
     tableView.do {
@@ -103,7 +103,7 @@ class SiteTableViewController: LoadingViewController, UITableViewDelegate, UITab
   }
 
   func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-    return data.count
+    data.count
   }
 
   func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -115,19 +115,19 @@ class SiteTableViewController: LoadingViewController, UITableViewDelegate, UITab
   }
 
   func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
-    return tableView.dequeueReusableHeaderFooterView(withIdentifier: HeaderIdentifier)
+    tableView.dequeueReusableHeaderFooterView(withIdentifier: HeaderIdentifier)
   }
 
   func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-    return SiteTableViewControllerUX.headerHeight
+    SiteTableViewControllerUX.headerHeight
   }
 
   func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-    return SiteTableViewControllerUX.rowHeight
+    SiteTableViewControllerUX.rowHeight
   }
 
   func tableView(_ tableView: UITableView, hasFullWidthSeparatorForRowAtIndexPath indexPath: IndexPath) -> Bool {
-    return false
+    false
   }
 
   func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
@@ -136,7 +136,6 @@ class SiteTableViewController: LoadingViewController, UITableViewDelegate, UITab
 }
 
 class LoadingViewController: UIViewController {
-
   let spinner = UIActivityIndicatorView().then {
     $0.snp.makeConstraints { make in
       make.size.equalTo(24)

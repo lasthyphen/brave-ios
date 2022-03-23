@@ -22,7 +22,8 @@ public struct WidgetFavorite: Codable {
 
 public class FavoritesWidgetData {
   private static var widgetDataRoot: URL? {
-    FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: AppInfo.sharedContainerIdentifier)?.appendingPathComponent("widget_data")
+    FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: AppInfo.sharedContainerIdentifier)?
+      .appendingPathComponent("widget_data")
   }
 
   private static var widgetDataPath: URL? {
@@ -30,12 +31,16 @@ public class FavoritesWidgetData {
   }
 
   public static var dataExists: Bool {
-    guard let url = widgetDataPath else { return false }
+    guard let url = widgetDataPath else {
+      return false
+    }
     return FileManager.default.fileExists(atPath: url.path)
   }
 
   public static func loadWidgetData() -> [WidgetFavorite]? {
-    guard let dataPath = widgetDataPath else { return nil }
+    guard let dataPath = widgetDataPath else {
+      return nil
+    }
     do {
       let jsonData = try Data(contentsOf: dataPath)
       return try JSONDecoder().decode([WidgetFavorite].self, from: jsonData)
@@ -46,7 +51,9 @@ public class FavoritesWidgetData {
   }
 
   public static func updateWidgetData(_ favs: [WidgetFavorite]) {
-    guard let rootPath = widgetDataRoot, let dataPath = widgetDataPath else { return }
+    guard let rootPath = widgetDataRoot, let dataPath = widgetDataPath else {
+      return
+    }
     do {
       let widgetData = try JSONEncoder().encode(favs)
       try FileManager.default.createDirectory(atPath: rootPath.path, withIntermediateDirectories: true)

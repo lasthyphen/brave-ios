@@ -9,7 +9,6 @@ import BraveCore
 import BraveShared
 
 class WalletTransferCompleteViewController: UIViewController {
-
   private let status: Ledger.DrainStatus?
 
   init(status: Ledger.DrainStatus?) {
@@ -27,7 +26,7 @@ class WalletTransferCompleteViewController: UIViewController {
   }
 
   private var transferCompleteView: WalletTransferCompleteView {
-    view as! WalletTransferCompleteView  // swiftlint:disable:this force_cast
+    view as! WalletTransferCompleteView // swiftlint:disable:this force_cast
   }
 
   override func loadView() {
@@ -38,7 +37,11 @@ class WalletTransferCompleteViewController: UIViewController {
     super.viewDidLoad()
 
     navigationItem.hidesBackButton = true
-    navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(tappedDone))
+    navigationItem.rightBarButtonItem = UIBarButtonItem(
+      barButtonSystemItem: .done,
+      target: self,
+      action: #selector(tappedDone)
+    )
     title = Strings.Rewards.walletTransferTitle
 
     if let status = status {

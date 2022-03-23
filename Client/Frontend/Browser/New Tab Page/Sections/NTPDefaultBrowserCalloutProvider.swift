@@ -37,7 +37,6 @@ class NTPDefaultBrowserCalloutProvider: NSObject, NTPObservableSectionProvider {
     cell.view.closeHaandler = { [weak self] in
       Preferences.General.defaultBrowserCalloutDismissed.value = true
       self?.sectionDidChange?()
-
     }
     return cell
   }
@@ -47,14 +46,17 @@ class NTPDefaultBrowserCalloutProvider: NSObject, NTPObservableSectionProvider {
     layout collectionViewLayout: UICollectionViewLayout,
     sizeForItemAt indexPath: IndexPath
   ) -> CGSize {
-
     var size = fittingSizeForCollectionView(collectionView, section: indexPath.section)
     size.height = defaultCalloutView.systemLayoutSizeFitting(size).height
 
     return size
   }
 
-  func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
+  func collectionView(
+    _ collectionView: UICollectionView,
+    layout collectionViewLayout: UICollectionViewLayout,
+    insetForSectionAt section: Int
+  ) -> UIEdgeInsets {
     if !Self.shouldShowCallout {
       return .zero
     }
@@ -73,7 +75,6 @@ class NTPDefaultBrowserCalloutProvider: NSObject, NTPObservableSectionProvider {
 }
 
 private class DefaultBrowserCalloutView: SpringButton {
-
   var closeHaandler: (() -> Void)?
 
   private let closeButton = UIButton().then {
@@ -120,5 +121,4 @@ private class DefaultBrowserCalloutView: SpringButton {
   @objc func closeTab() {
     closeHaandler?()
   }
-
 }

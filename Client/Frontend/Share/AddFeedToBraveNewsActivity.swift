@@ -14,11 +14,11 @@ class AddFeedToBraveNewsActivity: UIActivity {
   }
 
   override var activityTitle: String? {
-    return Strings.BraveNews.addSourceShareTitle
+    Strings.BraveNews.addSourceShareTitle
   }
 
   override var activityImage: UIImage? {
-    return #imageLiteral(resourceName: "settings-brave-today")
+    #imageLiteral(resourceName: "settings-brave-today")
   }
 
   override func perform() {
@@ -27,6 +27,6 @@ class AddFeedToBraveNewsActivity: UIActivity {
   }
 
   override func canPerform(withActivityItems activityItems: [Any]) -> Bool {
-    return true
+    true
   }
 }

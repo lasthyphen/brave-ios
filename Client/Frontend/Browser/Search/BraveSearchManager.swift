@@ -65,8 +65,10 @@ class BraveSearchManager: NSObject {
 
     // Check if the request has a valid query string to check against.
     guard let components = URLComponents(url: url, resolvingAgainstBaseURL: false),
-      let queryItem = components.valueForQuery("q")
-    else { return nil }
+          let queryItem = components.valueForQuery("q")
+    else {
+      return nil
+    }
 
     self.profile = profile
     self.url = url
@@ -86,7 +88,7 @@ class BraveSearchManager: NSObject {
   func shouldUseFallback(completion: @escaping (BackupQuery?) -> Void) {
     guard
       var canAnswerURLComponents =
-        URLComponents(string: url.domainURL.absoluteString)
+      URLComponents(string: url.domainURL.absoluteString)
     else {
       completion(nil)
       return
@@ -104,7 +106,8 @@ class BraveSearchManager: NSObject {
     var request = URLRequest(
       url: url,
       cachePolicy: .reloadIgnoringLocalAndRemoteCacheData,
-      timeoutInterval: 5)
+      timeoutInterval: 5
+    )
 
     let cookieStorage = HTTPCookieStorage()
     domainCookies.forEach { cookieStorage.setCookie($0) }
@@ -134,7 +137,7 @@ class BraveSearchManager: NSObject {
         }
 
         guard let response = output.response as? HTTPURLResponse,
-          response.statusCode >= 200 && response.statusCode < 300
+              response.statusCode >= 200 && response.statusCode < 300
         else {
           throw "Invalid response"
         }
@@ -170,8 +173,9 @@ class BraveSearchManager: NSObject {
     with backupQuery: BackupQuery,
     completion: @escaping (String) -> Void
   ) {
-
-    guard var components = URLComponents(string: fallbackProviderURLString) else { return }
+    guard var components = URLComponents(string: fallbackProviderURLString) else {
+      return
+    }
 
     var queryItems: [URLQueryItem] = [
       .init(name: "q", value: query.addingPercentEncoding(withAllowedCharacters: .urlHostAllowed))
@@ -187,7 +191,9 @@ class BraveSearchManager: NSObject {
 
     components.queryItems = queryItems
 
-    guard let url = components.url else { return }
+    guard let url = components.url else {
+      return
+    }
     var request = URLRequest(url: url, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: 5)
 
     // Must be set, without it the fallback results may be not retrieved correctly.
@@ -195,7 +201,8 @@ class BraveSearchManager: NSObject {
 
     request.addValue(
       "text/html;charset=UTF-8, text/plain;charset=UTF-8",
-      forHTTPHeaderField: "Accept")
+      forHTTPHeaderField: "Accept"
+    )
 
     var timer: PerformanceTimer?
     if callbackLog != nil {
@@ -212,13 +219,13 @@ class BraveSearchManager: NSObject {
         }
 
         guard let response = output.response as? HTTPURLResponse,
-          response.statusCode >= 200 && response.statusCode < 300
+              response.statusCode >= 200 && response.statusCode < 300
         else {
           throw "Invalid response"
         }
 
         guard let stringFromData = String(data: output.data, encoding: .utf8),
-          let escapedString = stringFromData.javaScriptEscapedString
+              let escapedString = stringFromData.javaScriptEscapedString
         else {
           throw "Failed to decode string from data"
         }
@@ -251,8 +258,11 @@ class BraveSearchManager: NSObject {
 // The BraveSearch feature can be hidden behind an authentication system.
 // This code helps passing all auth info to the requests we make.
 extension BraveSearchManager: URLSessionDataDelegate {
-
-  private func findLoginsForProtectionSpace(profile: Profile, challenge: URLAuthenticationChallenge, completion: @escaping (URLCredential?) -> Void) {
+  private func findLoginsForProtectionSpace(
+    profile: Profile,
+    challenge: URLAuthenticationChallenge,
+    completion: @escaping (URLCredential?) -> Void
+  ) {
     profile.logins.getLoginsForProtectionSpace(challenge.protectionSpace) >>== { cursor in
       guard cursor.count >= 1 else {
         completion(nil)
@@ -277,9 +287,14 @@ extension BraveSearchManager: URLSessionDataDelegate {
     }
   }
 
-  func urlSession(_ session: URLSession, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
-
-    guard challenge.protectionSpace.authenticationMethod == NSURLAuthenticationMethodHTTPBasic || challenge.protectionSpace.authenticationMethod == NSURLAuthenticationMethodHTTPDigest || challenge.protectionSpace.authenticationMethod == NSURLAuthenticationMethodNTLM else {
+  func urlSession(
+    _ session: URLSession,
+    didReceive challenge: URLAuthenticationChallenge,
+    completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void
+  ) {
+    guard challenge.protectionSpace.authenticationMethod == NSURLAuthenticationMethodHTTPBasic || challenge
+      .protectionSpace.authenticationMethod == NSURLAuthenticationMethodHTTPDigest || challenge.protectionSpace
+      .authenticationMethod == NSURLAuthenticationMethodNTLM else {
       completionHandler(.performDefaultHandling, nil)
       return
     }
@@ -303,8 +318,8 @@ extension BraveSearchManager: URLSessionDataDelegate {
     }
 
     if let proposedCredential = challenge.proposedCredential,
-      !(proposedCredential.user?.isEmpty ?? true),
-      challenge.previousFailureCount == 0 {
+       !(proposedCredential.user?.isEmpty ?? true),
+       challenge.previousFailureCount == 0 {
       completionHandler(.useCredential, proposedCredential)
       return
     }
@@ -322,12 +337,16 @@ extension BraveSearchManager: URLSessionDataDelegate {
         }
 
         completionHandler(.rejectProtectionSpace, nil)
-      })
-    return
+      }
+    )
   }
 
-  func urlSession(_ session: URLSession, task: URLSessionTask, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
-
+  func urlSession(
+    _ session: URLSession,
+    task: URLSessionTask,
+    didReceive challenge: URLAuthenticationChallenge,
+    completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void
+  ) {
     urlSession(session, didReceive: challenge, completionHandler: completionHandler)
   }
 }

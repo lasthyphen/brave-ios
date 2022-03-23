@@ -93,7 +93,8 @@ public final class Favorite: NSManagedObject, WebsitePresentable, CRUD {
 
     return NSFetchedResultsController(
       fetchRequest: fetchRequest, managedObjectContext: context,
-      sectionNameKeyPath: nil, cacheName: nil)
+      sectionNameKeyPath: nil, cacheName: nil
+    )
   }
 
   public class func contains(url: URL) -> Bool {
@@ -103,12 +104,14 @@ public final class Favorite: NSManagedObject, WebsitePresentable, CRUD {
   }
 
   public class var hasFavorites: Bool {
-    guard let favoritesCount = count(predicate: isFavoritePredicate) else { return false }
+    guard let favoritesCount = count(predicate: isFavoritePredicate) else {
+      return false
+    }
     return favoritesCount > 0
   }
 
   public class var allFavorites: [Favorite] {
-    return all(where: isFavoritePredicate) ?? []
+    all(where: isFavoritePredicate) ?? []
   }
 
   public class func get(with objectID: NSManagedObjectID) -> Favorite? {
@@ -118,13 +121,15 @@ public final class Favorite: NSManagedObject, WebsitePresentable, CRUD {
   // MARK: Update
 
   public func update(customTitle: String?, url: String?) {
-    if !hasTitle(customTitle) { return }
+    if !hasTitle(customTitle) {
+      return
+    }
     updateInternal(customTitle: customTitle, url: url)
   }
 
   // Title can't be empty.
   private func hasTitle(_ title: String?) -> Bool {
-    return title?.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty == false
+    title?.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty == false
   }
 
   /// WARNING: This method deletes all current favorites and replaces them with new one from the array.
@@ -135,7 +140,8 @@ public final class Favorite: NSManagedObject, WebsitePresentable, CRUD {
       favorites.forEach {
         addInternal(
           url: $0.url, title: $0.title, isFavorite: true,
-          context: .existing(context))
+          context: .existing(context)
+        )
       }
     }
   }
@@ -199,7 +205,7 @@ extension Favorite {
   /// Favorites are named `Bookmark` due to legacy reasons.
   /// Pre sync-v2 we used this class for both bookmarks and favorites
   static func entity(context: NSManagedObjectContext) -> NSEntityDescription {
-    return NSEntityDescription.entity(forEntityName: "Bookmark", in: context)!
+    NSEntityDescription.entity(forEntityName: "Bookmark", in: context)!
   }
 
   // MARK: Create
@@ -214,7 +220,6 @@ extension Favorite {
     save: Bool = true,
     context: WriteContext = .new(inMemory: false)
   ) {
-
     DataController.perform(
       context: context, save: save,
       task: { context in
@@ -232,7 +237,8 @@ extension Favorite {
         if let location = location, let url = URL(string: location) {
           bk.domain = Domain.getOrCreateInternal(
             url, context: context,
-            saveStrategy: .delayedPersistentStore)
+            saveStrategy: .delayedPersistentStore
+          )
         }
 
         let favorites = getAllFavorites(context: context)
@@ -241,7 +247,8 @@ extension Favorite {
         if favorites.count > 1, let lastOrder = favorites.map(\.order).max() {
           bk.order = lastOrder + 1
         }
-      })
+      }
+    )
   }
 
   // MARK: Update
@@ -250,9 +257,10 @@ extension Favorite {
     customTitle: String?, url: String?, save: Bool = true,
     context: WriteContext = .new(inMemory: false)
   ) {
-
     DataController.perform(context: context) { context in
-      guard let bookmarkToUpdate = context.object(with: self.objectID) as? Favorite else { return }
+      guard let bookmarkToUpdate = context.object(with: self.objectID) as? Favorite else {
+        return
+      }
 
       // See if there has been any change
       if bookmarkToUpdate.customTitle == customTitle && bookmarkToUpdate.url == url {
@@ -268,7 +276,8 @@ extension Favorite {
           bookmarkToUpdate.domain =
             Domain.getOrCreateInternal(
               theURL, context: context,
-              saveStrategy: .delayedPersistentStore)
+              saveStrategy: .delayedPersistentStore
+            )
         } else {
           bookmarkToUpdate.domain = nil
         }
@@ -294,7 +303,9 @@ extension Favorite {
       }
     }
 
-    if isFavorite { deleteFromStore(context: context) }
+    if isFavorite {
+      deleteFromStore(context: context)
+    }
     deleteFromStore(context: context)
   }
 }
@@ -302,6 +313,6 @@ extension Favorite {
 // MARK: - Comparable
 extension Favorite: Comparable {
   public static func < (lhs: Favorite, rhs: Favorite) -> Bool {
-    return lhs.order < rhs.order
+    lhs.order < rhs.order
   }
 }

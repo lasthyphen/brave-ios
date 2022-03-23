@@ -69,10 +69,10 @@ class ReadabilityOperation: Operation {
           try readerModeCache.put(url, readabilityResult)
         } catch let error as NSError {
           print("Failed to store readability results in the cache: \(error.localizedDescription)")
-          // TODO Fail
+          // TODO: Fail
         }
-      case .error(_):
-        // TODO Not entitely sure what to do on error. Needs UX discussion and followup bug.
+      case .error:
+        // TODO: Not entitely sure what to do on error. Needs UX discussion and followup bug.
         break
       }
     }
@@ -91,7 +91,10 @@ extension ReadabilityOperation: WKNavigationDelegate {
   }
 
   func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
-    webView.evaluateSafeJavaScript(functionName: "\(ReaderModeNamespace).checkReadability", contentWorld: .defaultClient)
+    webView.evaluateSafeJavaScript(
+      functionName: "\(ReaderModeNamespace).checkReadability",
+      contentWorld: .defaultClient
+    )
   }
 }
 
@@ -102,7 +105,11 @@ extension ReadabilityOperation: ReaderModeDelegate {
   func readerMode(_ readerMode: ReaderMode, didDisplayReaderizedContentForTab tab: Tab) {
   }
 
-  func readerMode(_ readerMode: ReaderMode, didParseReadabilityResult readabilityResult: ReadabilityResult, forTab tab: Tab) {
+  func readerMode(
+    _ readerMode: ReaderMode,
+    didParseReadabilityResult readabilityResult: ReadabilityResult,
+    forTab tab: Tab
+  ) {
     guard tab == self.tab else {
       return
     }
@@ -114,7 +121,7 @@ extension ReadabilityOperation: ReaderModeDelegate {
 
 class ReadabilityService {
   class var sharedInstance: ReadabilityService {
-    return ReadabilityServiceSharedInstance
+    ReadabilityServiceSharedInstance
   }
 
   private var queue: OperationQueue

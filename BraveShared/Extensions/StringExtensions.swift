@@ -8,8 +8,8 @@ extension String {
   /// The first URL found within this String, or nil if no URL is found
   public var firstURL: URL? {
     if let detector = try? NSDataDetector(types: NSTextCheckingResult.CheckingType.link.rawValue),
-      let match = detector.firstMatch(in: self, options: [], range: NSRange(location: 0, length: self.count)),
-      let range = Range(match.range, in: self) {
+       let match = detector.firstMatch(in: self, options: [], range: NSRange(location: 0, length: self.count)),
+       let range = Range(match.range, in: self) {
       return URL(string: String(self[range]))
     }
     return nil
@@ -21,7 +21,7 @@ extension String {
     enumerateSubstrings(
       in: startIndex..<endIndex,
       options: .byWords
-    ) { (word, _, _, _) in
+    ) { word, _, _, _ in
       if let word = word {
         words.append(word)
       }
@@ -31,6 +31,6 @@ extension String {
 
   /// Encode a String to Base64
   public func toBase64() -> String {
-    return Data(self.utf8).base64EncodedString()
+    Data(self.utf8).base64EncodedString()
   }
 }

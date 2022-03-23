@@ -15,7 +15,6 @@ import BraveCore
 /// This controller may be presented in an isolated environment outside of the main settings pages from the
 /// Brave News header on the NTP
 class BraveNewsSettingsViewController: TableViewController {
-
   private let feedDataSource: FeedDataSource
   private let rewards: BraveRewards?
 
@@ -108,10 +107,13 @@ class BraveNewsSettingsViewController: TableViewController {
               .init(
                 title: Strings.BraveNews.deleteUserSourceTitle, style: .destructive,
                 selection: { [unowned self] indexPath in
-                  guard let location = feedDataSource.rssFeedLocations[safe: indexPath.row] else { return }
+                  guard let location = feedDataSource.rssFeedLocations[safe: indexPath.row] else {
+                    return
+                  }
                   self.feedDataSource.removeRSSFeed(location)
                   self.reloadSections()
-                })
+                }
+              )
             ]
           )
         } + [
@@ -130,7 +132,8 @@ class BraveNewsSettingsViewController: TableViewController {
                 container.modalPresentationStyle = idiom == .phone ? .fullScreen : .formSheet
               }
               self.present(container, animated: true)
-            }, image: nil, accessory: .disclosureIndicator)
+            }, image: nil, accessory: .disclosureIndicator
+          )
         ]
       ),
     ]
@@ -145,7 +148,8 @@ class BraveNewsSettingsViewController: TableViewController {
               selection: { [unowned self] in
                 let controller = FeedSourceListViewController(dataSource: self.feedDataSource, category: nil)
                 self.navigationController?.pushViewController(controller, animated: true)
-              }, accessory: .disclosureIndicator)
+              }, accessory: .disclosureIndicator
+            )
           ] + categoryRows
         )
       )
@@ -155,7 +159,8 @@ class BraveNewsSettingsViewController: TableViewController {
             text: Strings.BraveNews.resetSourceSettingsButtonTitle,
             selection: { [unowned self] in
               self.feedDataSource.resetSourcesToDefault()
-            }, cellClass: ButtonCell.self)
+            }, cellClass: ButtonCell.self
+          )
         ])
       )
     }
@@ -171,7 +176,8 @@ class BraveNewsSettingsViewController: TableViewController {
         selection: {
           let controller = FeedSourceListViewController(dataSource: self.feedDataSource, category: category)
           self.navigationController?.pushViewController(controller, animated: true)
-        }, accessory: .disclosureIndicator)
+        }, accessory: .disclosureIndicator
+      )
     }
     if categories.contains(topNewsCategory) {
       categories.remove(topNewsCategory)
@@ -179,7 +185,7 @@ class BraveNewsSettingsViewController: TableViewController {
     }
     rows.append(
       contentsOf:
-        categories
+      categories
         .filter { !$0.isEmpty }
         .sorted()
         .map(row(for:))

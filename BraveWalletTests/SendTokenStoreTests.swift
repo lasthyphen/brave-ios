@@ -33,7 +33,10 @@ class SendTokenStoreTests: XCTestCase {
       ethTxManagerProxy: MockEthTxManagerProxy(),
       prefilledToken: .previewToken
     )
-    XCTAssertEqual(store.selectedSendToken?.symbol.lowercased(), BraveWallet.BlockchainToken.previewToken.symbol.lowercased())
+    XCTAssertEqual(
+      store.selectedSendToken?.symbol.lowercased(),
+      BraveWallet.BlockchainToken.previewToken.symbol.lowercased()
+    )
   }
 
   func testFetchAssets() {
@@ -48,7 +51,7 @@ class SendTokenStoreTests: XCTestCase {
       prefilledToken: nil
     )
     let ex = expectation(description: "fetch-assets")
-    XCTAssertNil(store.selectedSendToken)  // Initial state
+    XCTAssertNil(store.selectedSendToken) // Initial state
     store.$selectedSendToken.dropFirst().sink { token in
       defer { ex.fulfill() }
       guard let token = token else {
@@ -122,7 +125,18 @@ class SendTokenStoreTests: XCTestCase {
       ethTxManagerProxy: MockEthTxManagerProxy(),
       prefilledToken: nil
     )
-    let token: BraveWallet.BlockchainToken = .init(contractAddress: "0x0d8775f648430679a709e98d2b0cb6250d2887ef", name: "Basic Attention Token", logo: "", isErc20: true, isErc721: false, symbol: batSymbol, decimals: 18, visible: true, tokenId: "", coingeckoId: "")
+    let token: BraveWallet.BlockchainToken = .init(
+      contractAddress: "0x0d8775f648430679a709e98d2b0cb6250d2887ef",
+      name: "Basic Attention Token",
+      logo: "",
+      isErc20: true,
+      isErc721: false,
+      symbol: batSymbol,
+      decimals: 18,
+      visible: true,
+      tokenId: "",
+      coingeckoId: ""
+    )
     store.selectedSendToken = token
     store.setUpTest()
 

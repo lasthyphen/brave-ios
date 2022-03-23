@@ -6,7 +6,6 @@ import UIKit
 import Shared
 
 class FolderDetailsViewTableViewCell: AddEditHeaderView, BookmarkFormFieldsProtocol {
-
   // MARK: BookmarkFormFieldsProtocol
 
   weak var delegate: BookmarkDetailsViewDelegate?

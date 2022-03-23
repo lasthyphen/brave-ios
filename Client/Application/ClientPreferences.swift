@@ -15,7 +15,9 @@ enum TabBarVisibility: Int, CaseIterable {
 extension Preferences {
   enum AutoCloseTabsOption: Int, CaseIterable, RepresentableOptionType {
     case manually
-    case oneDay, oneWeek, oneMonth
+    case oneDay
+    case oneWeek
+    case oneMonth
 
     var displayString: String {
       switch self {
@@ -61,25 +63,38 @@ extension Preferences {
     /// Whether or not to block popups from websites automaticaly
     static let blockPopups = Option<Bool>(key: "general.block-popups", default: true)
     /// Controls how the tab bar should be shown (or not shown)
-    static let tabBarVisibility = Option<Int>(key: "general.tab-bar-visiblity", default: TabBarVisibility.always.rawValue)
+    static let tabBarVisibility = Option<Int>(
+      key: "general.tab-bar-visiblity",
+      default: TabBarVisibility.always.rawValue
+    )
     /// After what time unused tabs should be auto-removed at app launch.
     static let autocloseTabs = Option<Int>(
       key: "general.autoclose-tabs",
-      default: AutoCloseTabsOption.manually.rawValue)
+      default: AutoCloseTabsOption.manually.rawValue
+    )
     /// Defines the user's normal browsing theme
     /// `system`, follows the current OS display mode
     static let themeNormalMode = Option<String>(key: "general.normal-mode-theme", default: DefaultTheme.system.rawValue)
     /// Specifies If Night Mode is enabled
     static let nightModeEnabled = Option<Bool>(key: "general.night-mode-enabled", default: false)
     /// Specifies whether the bookmark button is present on toolbar
-    static let showBookmarkToolbarShortcut = Option<Bool>(key: "general.show-bookmark-toolbar-shortcut", default: UIDevice.isIpad)
+    static let showBookmarkToolbarShortcut = Option<Bool>(
+      key: "general.show-bookmark-toolbar-shortcut",
+      default: UIDevice.isIpad
+    )
     /// Sets Desktop UA for iPad by default (iOS 13+ & iPad only).
     /// Do not read it directly, prefer to use `UserAgent.shouldUseDesktopMode` instead.
-    static let alwaysRequestDesktopSite = Option<Bool>(key: "general.always-request-desktop-site", default: UIDevice.isIpad)
+    static let alwaysRequestDesktopSite = Option<Bool>(
+      key: "general.always-request-desktop-site",
+      default: UIDevice.isIpad
+    )
     /// Controls whether or not media should continue playing in the background
     static let mediaAutoBackgrounding = Option<Bool>(key: "general.media-auto-backgrounding", default: false)
     /// Controls whether or not to show the last visited bookmarks folder
-    static let showLastVisitedBookmarksFolder = Option<Bool>(key: "general.bookmarks-show-last-visited-bookmarks-folder", default: true)
+    static let showLastVisitedBookmarksFolder = Option<Bool>(
+      key: "general.bookmarks-show-last-visited-bookmarks-folder",
+      default: true
+    )
 
     /// Whether or not to show the clipboard bar when the user has a URL in their pasteboard on launch
     ///
@@ -90,16 +105,24 @@ extension Preferences {
     /// If user kills the app before completing onboarding, it should be treated as unfinished.
     static let basicOnboardingCompleted = Option<Int>(
       key: "general.basic-onboarding-completed",
-      default: OnboardingState.undetermined.rawValue)
+      default: OnboardingState.undetermined.rawValue
+    )
     /// The time until the next on-boarding shows
     static let basicOnboardingNextOnboardingPrompt = Option<Date?>(
       key: "general.basic-onboarding-days",
-      default: nil)
+      default: nil
+    )
 
     /// The progress the user has made with onboarding
-    static let basicOnboardingProgress = Option<Int>(key: "general.basic-onboarding-progress", default: OnboardingProgress.none.rawValue)
+    static let basicOnboardingProgress = Option<Int>(
+      key: "general.basic-onboarding-progress",
+      default: OnboardingProgress.none.rawValue
+    )
     /// The preference for determining whether or not to show the adblock onboarding popup
-    static let onboardingAdblockPopoverShown = Option<Bool>(key: "general.basic-onboarding-adblock-popover-shown", default: false)
+    static let onboardingAdblockPopoverShown = Option<Bool>(
+      key: "general.basic-onboarding-adblock-popover-shown",
+      default: false
+    )
 
     /// Whether or not link preview upon long press action should be shown.
     static let enableLinkPreview = Option<Bool>(key: "general.night-mode", default: true)
@@ -165,14 +188,20 @@ extension Preferences {
     /// Whether or not to show recent searches
     static let shouldShowRecentSearches = Option<Bool>(key: "search.should-show-recent-searches", default: false)
     /// Whether or not to show recent searches opt-in
-    static let shouldShowRecentSearchesOptIn = Option<Bool>(key: "search.should-show-recent-searches.opt-in", default: true)
+    static let shouldShowRecentSearchesOptIn = Option<Bool>(
+      key: "search.should-show-recent-searches.opt-in",
+      default: true
+    )
     /// How many times Brave Search websites has asked the user to check whether Brave Search can be set as a default
     static let braveSearchDefaultBrowserPromptCount =
       Option<Int>(key: "search.brave-search-default-website-prompt", default: 0)
     /// Determines Yahoo Search Engine is migration is done
-    static let yahooEngineMigrationCompleted = Option<Bool>(key: "search-yahoo-engine-migration-completed", default: false)
-
+    static let yahooEngineMigrationCompleted = Option<Bool>(
+      key: "search-yahoo-engine-migration-completed",
+      default: false
+    )
   }
+
   final class Privacy {
     static let lockWithPasscode = Option<Bool>(key: "privacy.lock-with-passcode", default: false)
     /// Forces all private tabs
@@ -182,6 +211,7 @@ extension Preferences {
     /// The toggles states for clear private data screen
     static let clearPrivateDataToggles = Option<[Bool]>(key: "privacy.clear-data-toggles", default: [])
   }
+
   final class NewTabPage {
     /// Whether bookmark image are enabled / shown
     static let backgroundImages = Option<Bool>(key: "newtabpage.background-images", default: true)
@@ -191,12 +221,14 @@ extension Preferences {
     /// At least one notification must show before we lock showing subsequent notifications.
     static let atleastOneNTPNotificationWasShowed = Option<Bool>(
       key: "newtabpage.one-notificaiton-showed",
-      default: false)
+      default: false
+    )
 
     /// Whether the callout to use branded image was shown.
     static let brandedImageShowed = Option<Bool>(
       key: "newtabpage.branded-image-callout-showed",
-      default: false)
+      default: false
+    )
 
     /// When true, a notification on new tab page will be shown that an ad grant can be claimed(if rewards and grant are available).
     /// This value is reseted on each app launch,
@@ -278,14 +310,20 @@ extension Preferences {
     /// When cosmetic filters CSS was last time updated on the device.
     static let lastCosmeticFiltersCSSUpdate = Option<Date?>(key: "last-cosmetic-filters-css-update", default: nil)
     /// When cosmetic filters Scriptlets were last time updated on the device.
-    static let lastCosmeticFiltersScripletsUpdate = Option<Date?>(key: "last-cosmetic-filters-scriptlets-update", default: nil)
+    static let lastCosmeticFiltersScripletsUpdate = Option<Date?>(
+      key: "last-cosmetic-filters-scriptlets-update",
+      default: nil
+    )
   }
 
   final class Playlist {
     /// The Option to show video list left or right side
     static let listViewSide = Option<String>(key: "playlist.listViewSide", default: PlayListSide.left.rawValue)
     /// The count of how many times  Add to Playlist URL-Bar onboarding has been shown
-    static let addToPlaylistURLBarOnboardingCount = Option<Int>(key: "playlist.addToPlaylistURLBarOnboardingCount", default: 0)
+    static let addToPlaylistURLBarOnboardingCount = Option<Int>(
+      key: "playlist.addToPlaylistURLBarOnboardingCount",
+      default: 0
+    )
     /// The last played item url
     static let lastPlayedItemUrl = Option<String?>(key: "playlist.last.played.item.url", default: nil)
     /// The last played item time
@@ -293,9 +331,15 @@ extension Preferences {
     /// Whether to play the video when controller loaded
     static let firstLoadAutoPlay = Option<Bool>(key: "playlist.firstLoadAutoPlay", default: false)
     /// The Option to download video yes / no / only wi-fi
-    static let autoDownloadVideo = Option<String>(key: "playlist.autoDownload", default: PlayListDownloadType.on.rawValue)
+    static let autoDownloadVideo = Option<String>(
+      key: "playlist.autoDownload",
+      default: PlayListDownloadType.on.rawValue
+    )
     /// The Option to disable playlist MediaSource web-compatibility
-    static let webMediaSourceCompatibility = Option<Bool>(key: "playlist.webMediaSourceCompatibility", default: UIDevice.isIpad)
+    static let webMediaSourceCompatibility = Option<Bool>(
+      key: "playlist.webMediaSourceCompatibility",
+      default: UIDevice.isIpad
+    )
     /// The option to start the playback where user left-off
     static let playbackLeftOff = Option<Bool>(key: "playlist.playbackLeftOff", default: true)
     /// The option to disable long-press-to-add-to-playlist gesture.

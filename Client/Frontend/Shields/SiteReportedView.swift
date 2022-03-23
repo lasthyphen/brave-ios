@@ -8,7 +8,6 @@ import Shared
 import BraveShared
 
 class SiteReportedView: UIStackView {
-
   let titleLabel = UILabel().then {
     $0.text = Strings.Shields.siteReportedTitle
     $0.font = .systemFont(ofSize: 24)
@@ -41,10 +40,12 @@ class SiteReportedView: UIStackView {
               UIImageView(image: UIImage(imageLiteralResourceName: "check-circle")).then {
                 $0.setContentHuggingPriority(.required, for: .horizontal)
                 $0.setContentHuggingPriority(.required, for: .vertical)
-              }),
+              }
+            ),
             .view(titleLabel)
           )
-        }),
+        }
+      ),
       .view(bodyLabel)
     )
   }

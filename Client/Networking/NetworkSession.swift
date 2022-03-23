@@ -21,7 +21,8 @@ extension URLSession: NetworkSession {
       url: url,
       statusCode: code,
       httpVersion: "HTTP/1.1",
-      headerFields: [:])!
+      headerFields: [:]
+    )!
   }
 
   func dataRequest(with url: URL) async throws -> NetworkSessionDataResponse {

@@ -12,14 +12,14 @@ import Intents
 enum DeepLink: Equatable {
   init?(urlString: String) {
     // Currently unused for now
-    return nil
+    nil
   }
 }
 
 extension URLComponents {
   // Return the first query parameter that matches
   func valueForQuery(_ param: String) -> String? {
-    return self.queryItems?.first { $0.name == param }?.value
+    self.queryItems?.first { $0.name == param }?.value
   }
 }
 
@@ -42,7 +42,7 @@ enum NavigationPath: Equatable {
     }
 
     guard let urlTypes = Bundle.main.object(forInfoDictionaryKey: "CFBundleURLTypes") as? [AnyObject],
-      let urlSchemes = urlTypes.first?["CFBundleURLSchemes"] as? [String]
+          let urlSchemes = urlTypes.first?["CFBundleURLSchemes"] as? [String]
     else {
       // Something very strange has happened; org.mozilla.Client should be the zeroeth URL type.
       return nil
@@ -52,12 +52,14 @@ enum NavigationPath: Equatable {
       return nil
     }
 
-    if urlString.starts(with: "\(scheme)://deep-link"), let deepURL = components.valueForQuery("url"), let link = DeepLink(urlString: deepURL) {
+    if urlString.starts(with: "\(scheme)://deep-link"), let deepURL = components.valueForQuery("url"),
+       let link = DeepLink(urlString: deepURL) {
       self = .deepLink(link)
     } else if urlString.starts(with: "\(scheme)://open-url") {
       let urlText = components.valueForQuery("url")
       let url = URIFixup.getURL(urlText ?? "") ?? urlText?.asURL
-      let forcedPrivate = Preferences.Privacy.privateBrowsingOnly.value || PrivateBrowsingManager.shared.isPrivateBrowsing
+      let forcedPrivate = Preferences.Privacy.privateBrowsingOnly.value || PrivateBrowsingManager.shared
+        .isPrivateBrowsing
       let isPrivate = Bool(components.valueForQuery("private") ?? "") ?? forcedPrivate
       self = .url(webURL: url, isPrivate: isPrivate)
     } else if urlString.starts(with: "\(scheme)://open-text") {
@@ -67,9 +69,9 @@ enum NavigationPath: Equatable {
       let text = components.valueForQuery("q")
       self = .text(text ?? "")
     } else if urlString.starts(with: "\(scheme)://shortcut"),
-      let valueString = components.valueForQuery("path"),
-      let value = WidgetShortcut.RawValue(valueString),
-      let path = WidgetShortcut(rawValue: value) {
+              let valueString = components.valueForQuery("path"),
+              let value = WidgetShortcut.RawValue(valueString),
+              let path = WidgetShortcut(rawValue: value) {
       self = .widgetShortcutURL(path)
     } else {
       return nil
@@ -102,7 +104,8 @@ enum NavigationPath: Equatable {
     bvc.openBlankNewTab(
       attemptLocationFieldFocus: true,
       isPrivate: PrivateBrowsingManager.shared.isPrivateBrowsing,
-      searchFor: text)
+      searchFor: text
+    )
   }
 
   private static func handleWidgetShortcut(_ path: WidgetShortcut, with bvc: BrowserViewController) {
@@ -119,7 +122,7 @@ enum NavigationPath: Equatable {
     case .history:
       bvc.navigationHelper.openHistory()
     case .downloads:
-      bvc.navigationHelper.openDownloads() { success in
+      bvc.navigationHelper.openDownloads { success in
         if !success {
           bvc.displayOpenDownloadsError()
         }
@@ -128,7 +131,6 @@ enum NavigationPath: Equatable {
       bvc.navigationHelper.openPlaylist()
     @unknown default:
       assertionFailure()
-      break
     }
   }
 }

@@ -5,7 +5,6 @@
 import Foundation
 
 enum TabType: Int, CustomDebugStringConvertible {
-
   /// Regular browsing.
   case regular
 
@@ -37,7 +36,6 @@ enum TabType: Int, CustomDebugStringConvertible {
   /// - parameter tab: An object representing a Tab.
   /// - returns: A Tab type.
   static func of(_ tab: Tab?) -> TabType {
-    return tab?.type ?? .regular
+    tab?.type ?? .regular
   }
-
 }

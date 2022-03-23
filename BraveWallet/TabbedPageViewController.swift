@@ -41,8 +41,10 @@ class TabbedPageViewController: UIViewController {
           vc.publisher(for: \.navigationItem.title)
             .merge(with: vc.publisher(for: \.title))
             .map({ (vc, $0) })
-            .sink { [weak self] (vc, title) in
-              guard let self = self else { return }
+            .sink { [weak self] vc, title in
+              guard let self = self else {
+                return
+              }
               var snapshot = self.tabsBar.dataSource.snapshot()
               if let index = snapshot.itemIdentifiers.firstIndex(where: { $0.viewController === vc }) {
                 let item = snapshot.itemIdentifiers[index]
@@ -50,7 +52,8 @@ class TabbedPageViewController: UIViewController {
                 self.tabsBar.dataSource.apply(snapshot, animatingDifferences: false)
               }
             },
-          forKey: vc)
+          forKey: vc
+        )
       }
 
       updateTabsBarSelectionIndicator(pageIndex: 0)
@@ -145,7 +148,9 @@ class TabbedPageViewController: UIViewController {
 
   /// Updates the tabs bar selection indicator to display under the tab at a given page index
   private func updateTabsBarSelectionIndicator(pageIndex: Int) {
-    guard pageIndex < pages.count else { return }
+    guard pageIndex < pages.count else {
+      return
+    }
     view.setNeedsLayout()
     view.layoutIfNeeded()
     let layout = tabsBar.collectionView.collectionViewLayout
@@ -164,7 +169,9 @@ class TabbedPageViewController: UIViewController {
   /// Updates the tabs bar selection indicator based on the content offset of the
   /// `UIPageViewController`s internal scroll view
   private func updateTabsBarSelectionIndicator(contentOffset: CGPoint) {
-    guard let pageTransitionContext = pageTransitionContext else { return }
+    guard let pageTransitionContext = pageTransitionContext else {
+      return
+    }
     let contentSizeWidth = tabsBar.collectionView.contentSize.width
     if contentSizeWidth.isZero {
       return
@@ -211,7 +218,9 @@ class TabbedPageViewController: UIViewController {
 
   /// Moves to a given page and adjusts the tabs bar accordingly
   private func moveToPage(at indexPath: IndexPath) {
-    guard let currentIndex = currentIndex, indexPath.item < pages.count else { return }
+    guard let currentIndex = currentIndex, indexPath.item < pages.count else {
+      return
+    }
     let vc = pages[indexPath.item]
     let direction: UIPageViewController.NavigationDirection =
       currentIndex < indexPath.item ? .forward : .reverse
@@ -251,7 +260,7 @@ extension TabbedPageViewController: UIPageViewControllerDelegate {
   /// `UIPageViewController`
   private var currentIndex: Int? {
     if let currentController = pageViewController.viewControllers?.first,
-      let currentIndex = pages.firstIndex(of: currentController) {
+       let currentIndex = pages.firstIndex(of: currentController) {
       return currentIndex
     }
     return nil
@@ -262,9 +271,11 @@ extension TabbedPageViewController: UIPageViewControllerDelegate {
     willTransitionTo pendingViewControllers: [UIViewController]
   ) {
     guard let currentIndex = currentIndex,
-      let pendingController = pendingViewControllers.first,
-      let pendingIndex = pages.firstIndex(of: pendingController)
-    else { return }
+          let pendingController = pendingViewControllers.first,
+          let pendingIndex = pages.firstIndex(of: pendingController)
+    else {
+      return
+    }
     self.pageTransitionContext = .init(
       currentIndex: currentIndex,
       targetIndex: pendingIndex
@@ -291,7 +302,6 @@ extension TabbedPageViewController: UIPageViewControllerDelegate {
 }
 
 private class TabsBarView: UIView, UICollectionViewDelegate {
-
   fileprivate struct TabItem: Hashable {
     var id: UUID
     var viewController: UIViewController
@@ -367,9 +377,14 @@ private class TabsBarView: UIView, UICollectionViewDelegate {
   override func layoutSubviews() {
     super.layoutSubviews()
 
-    guard bounds.width != 0 && collectionView.numberOfItems(inSection: 0) != 0 else { return }
+    guard bounds.width != 0 && collectionView.numberOfItems(inSection: 0) != 0 else {
+      return
+    }
     (collectionView.collectionViewLayout as? UICollectionViewFlowLayout)?
-      .itemSize = CGSize(width: (bounds.width - 32) / CGFloat(collectionView.numberOfItems(inSection: 0)), height: tabBarHeight)
+      .itemSize = CGSize(
+        width: (bounds.width - 32) / CGFloat(collectionView.numberOfItems(inSection: 0)),
+        height: tabBarHeight
+      )
   }
 
   override init(frame: CGRect) {

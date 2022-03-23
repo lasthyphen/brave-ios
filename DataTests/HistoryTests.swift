@@ -10,7 +10,7 @@ class HistoryTests: CoreDataTestCase {
   let fetchRequest = NSFetchRequest<History>(entityName: String(describing: History.self))
 
   private func entity(for context: NSManagedObjectContext) -> NSEntityDescription {
-    return NSEntityDescription.entity(forEntityName: String(describing: History.self), in: context)!
+    NSEntityDescription.entity(forEntityName: String(describing: History.self), in: context)!
   }
 
   func testAdd() {

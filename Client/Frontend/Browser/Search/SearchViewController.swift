@@ -23,7 +23,6 @@ protocol SearchViewControllerDelegate: AnyObject {
 // MARK: - SearchViewController
 
 class SearchViewController: SiteTableViewController, LoaderListener {
-
   // MARK: SearchViewControllerUX
 
   private struct SearchViewControllerUX {
@@ -72,16 +71,18 @@ class SearchViewController: SiteTableViewController, LoaderListener {
       $0.leading.trailing.equalTo(scrollView.frameLayoutGuide)
     }
   }
+
   private let searchEngineScrollViewContent = UIView().then {
     $0.backgroundColor = .braveBackground
   }
 
-  private lazy var bookmarkedBadge: UIImage = {
-    return #imageLiteral(resourceName: "bookmarked_passive")
-  }()
+  private lazy var bookmarkedBadge: UIImage = #imageLiteral(resourceName: "bookmarked_passive")
 
   private var suggestions = [String]()
-  private lazy var suggestionLongPressGesture = UILongPressGestureRecognizer(target: self, action: #selector(onSuggestionLongPressed(_:)))
+  private lazy var suggestionLongPressGesture = UILongPressGestureRecognizer(
+    target: self,
+    action: #selector(onSuggestionLongPressed(_:))
+  )
 
   static var userAgent: String?
   var searchDelegate: SearchViewControllerDelegate?
@@ -109,7 +110,9 @@ class SearchViewController: SiteTableViewController, LoaderListener {
   }
 
   private var quickSearchEngines: [OpenSearchEngine] {
-    guard let searchEngines = searchEngines?.quickSearchEngines else { return [] }
+    guard let searchEngines = searchEngines?.quickSearchEngines else {
+      return []
+    }
     return searchEngines
   }
 
@@ -156,6 +159,7 @@ class SearchViewController: SiteTableViewController, LoaderListener {
     super.init(nibName: nil, bundle: nil)
   }
 
+  @available(*, unavailable)
   required init?(coder aDecoder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }
@@ -190,7 +194,12 @@ class SearchViewController: SiteTableViewController, LoaderListener {
       $0.register(SuggestionCell.self, forCellReuseIdentifier: SuggestionCell.identifier)
       $0.register(UITableViewCell.self, forCellReuseIdentifier: "default")
     }
-    NotificationCenter.default.addObserver(self, selector: #selector(dynamicFontChanged), name: .dynamicFontChanged, object: nil)
+    NotificationCenter.default.addObserver(
+      self,
+      selector: #selector(dynamicFontChanged),
+      name: .dynamicFontChanged,
+      object: nil
+    )
   }
 
   override func viewWillAppear(_ animated: Bool) {
@@ -205,7 +214,8 @@ class SearchViewController: SiteTableViewController, LoaderListener {
     coordinator.animate(
       alongsideTransition: { _ in
         self.tableView.reloadData()
-      }, completion: nil)
+      }, completion: nil
+    )
   }
 
   private func animateSearchEnginesWithKeyboard(_ keyboardState: KeyboardState) {
@@ -226,7 +236,9 @@ class SearchViewController: SiteTableViewController, LoaderListener {
   // MARK: Internal
 
   private func setupSearchEngineScrollViewIfNeeded() {
-    if !hasQuickSearchEngines { return }
+    if !hasQuickSearchEngines {
+      return
+    }
 
     view.addSubview(searchEngineScrollView)
     searchEngineScrollView.addSubview(searchEngineScrollViewContent)
@@ -247,7 +259,9 @@ class SearchViewController: SiteTableViewController, LoaderListener {
   }
 
   private func layoutSearchEngineScrollView() {
-    if !hasQuickSearchEngines { return }
+    if !hasQuickSearchEngines {
+      return
+    }
 
     let keyboardHeight = KeyboardHelper.defaultHelper.currentState?.intersectionHeightForView(view) ?? 0
 
@@ -293,7 +307,6 @@ class SearchViewController: SiteTableViewController, LoaderListener {
 
     searchButton.imageView?.snp.makeConstraints { make in
       make.width.height.equalTo(SearchViewControllerUX.searchImageWidth)
-      return
     }
 
     searchEngineScrollViewContent.addSubview(searchButton)
@@ -317,7 +330,6 @@ class SearchViewController: SiteTableViewController, LoaderListener {
 
       engineButton.imageView?.snp.makeConstraints { make in
         make.width.height.equalTo(SearchViewControllerUX.faviconSize)
-        return
       }
 
       searchEngineScrollViewContent.addSubview(engineButton)
@@ -339,7 +351,8 @@ class SearchViewController: SiteTableViewController, LoaderListener {
     suggestClient?.cancelPendingRequest()
 
     let localSearchQuery = searchQuery.lowercased()
-    if localSearchQuery.isEmpty || searchEngines?.shouldShowSearchSuggestionsOptIn == true || localSearchQuery.looksLikeAURL() {
+    if localSearchQuery.isEmpty || searchEngines?.shouldShowSearchSuggestionsOptIn == true || localSearchQuery
+      .looksLikeAURL() {
       suggestions = []
       tableView.reloadData()
       return
@@ -348,7 +361,9 @@ class SearchViewController: SiteTableViewController, LoaderListener {
     suggestClient?.query(
       localSearchQuery,
       callback: { [weak self] suggestions, error in
-        guard let self = self else { return }
+        guard let self = self else {
+          return
+        }
 
         self.tableView.reloadData()
 
@@ -378,7 +393,8 @@ class SearchViewController: SiteTableViewController, LoaderListener {
 
         // Reload the tableView to show the new list of search suggestions.
         self.tableView.reloadData()
-      })
+      }
+    )
   }
 
   func loader(dataLoaded data: [Site]) {
@@ -416,7 +432,9 @@ class SearchViewController: SiteTableViewController, LoaderListener {
   // MARK: UITableViewDelegate, UITableViewDataSource
 
   func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-    guard let section = availableSections[safe: indexPath.section] else { return }
+    guard let section = availableSections[safe: indexPath.section] else {
+      return
+    }
 
     switch section {
     case .quickBar:
@@ -472,14 +490,18 @@ class SearchViewController: SiteTableViewController, LoaderListener {
   }
 
   func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-    guard let searchSection = availableSections[safe: section] else { return nil }
+    guard let searchSection = availableSections[safe: section] else {
+      return nil
+    }
 
     switch searchSection {
     case .quickBar: return nil
     case .searchSuggestionsOptIn: return nil
     case .searchSuggestions:
       if let defaultSearchEngine = searchEngines?.defaultEngine() {
-        if defaultSearchEngine.shortName.contains(Strings.searchSuggestionSectionTitleNoSearchFormat) || defaultSearchEngine.shortName.lowercased().contains("search") {
+        if defaultSearchEngine.shortName
+          .contains(Strings.searchSuggestionSectionTitleNoSearchFormat) || defaultSearchEngine.shortName.lowercased()
+          .contains("search") {
           return defaultSearchEngine.displayName
         }
         return String(format: Strings.searchSuggestionSectionTitleFormat, defaultSearchEngine.displayName)
@@ -497,7 +519,9 @@ class SearchViewController: SiteTableViewController, LoaderListener {
   }
 
   override func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-    guard let searchSection = availableSections[safe: section] else { return 0 }
+    guard let searchSection = availableSections[safe: section] else {
+      return 0
+    }
     let headerHeight: CGFloat = 22
 
     switch searchSection {
@@ -517,11 +541,13 @@ class SearchViewController: SiteTableViewController, LoaderListener {
   }
 
   func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
-    return UIView()
+    UIView()
   }
 
   func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
-    guard let searchSection = availableSections[safe: section] else { return 0 }
+    guard let searchSection = availableSections[safe: section] else {
+      return 0
+    }
     let footerHeight: CGFloat = 10.0
 
     switch searchSection {
@@ -557,7 +583,9 @@ class SearchViewController: SiteTableViewController, LoaderListener {
       if let promptCell = cell as? SearchSuggestionPromptCell {
         promptCell.selectionStyle = .none
         promptCell.onOptionSelected = { [weak self] option in
-          guard let self = self else { return }
+          guard let self = self else {
+            return
+          }
 
           self.searchEngines?.shouldShowSearchSuggestions = option
           self.searchEngines?.shouldShowSearchSuggestionsOptIn = false
@@ -574,9 +602,16 @@ class SearchViewController: SiteTableViewController, LoaderListener {
       let cell = tableView.dequeueReusableCell(withIdentifier: SuggestionCell.identifier, for: indexPath)
       if let suggestionCell = cell as? SuggestionCell {
         suggestionCell.setTitle(suggestions[indexPath.row])
-        suggestionCell.separatorInset = UIEdgeInsets(top: 0.0, left: view.bounds.width, bottom: 0.0, right: -view.bounds.width)
+        suggestionCell.separatorInset = UIEdgeInsets(
+          top: 0.0,
+          left: view.bounds.width,
+          bottom: 0.0,
+          right: -view.bounds.width
+        )
         suggestionCell.openButtonActionHandler = { [weak self] in
-          guard let self = self else { return }
+          guard let self = self else {
+            return
+          }
 
           let suggestion = self.suggestions[indexPath.row]
           self.searchDelegate?.searchViewController(self, didLongPressSuggestion: suggestion)
@@ -625,8 +660,12 @@ class SearchViewController: SiteTableViewController, LoaderListener {
     case .searchSuggestionsOptIn:
       return 1
     case .searchSuggestions:
-      guard let shouldShowSuggestions = searchEngines?.shouldShowSearchSuggestions else { return 0 }
-      return shouldShowSuggestions && !searchQuery.looksLikeAURL() && !tabType.isPrivate ? min(suggestions.count, SearchViewControllerUX.maxSearchSuggestions) : 0
+      guard let shouldShowSuggestions = searchEngines?.shouldShowSearchSuggestions else {
+        return 0
+      }
+      return shouldShowSuggestions && !searchQuery.looksLikeAURL() && !tabType.isPrivate
+        ? min(suggestions.count, SearchViewControllerUX.maxSearchSuggestions)
+        : 0
     case .bookmarksAndHistory:
       return data.count
     case .findInPage:
@@ -638,7 +677,7 @@ class SearchViewController: SiteTableViewController, LoaderListener {
   }
 
   func numberOfSections(in tableView: UITableView) -> Int {
-    return availableSections.count
+    availableSections.count
   }
 
   func tableView(_ tableView: UITableView, didHighlightRowAt indexPath: IndexPath) {
@@ -683,7 +722,9 @@ extension SearchViewController {
 
     let nextSection: Int
     let nextItem: Int
-    guard let input = sender.input else { return }
+    guard let input = sender.input else {
+      return
+    }
 
     switch input {
     case UIKeyCommand.inputUpArrow:
@@ -721,7 +762,9 @@ extension SearchViewController {
       return
     }
 
-    guard nextItem >= 0 else { return }
+    guard nextItem >= 0 else {
+      return
+    }
 
     let next = IndexPath(item: nextItem, section: nextSection)
     tableView(tableView, didHighlightRowAt: next)
@@ -734,9 +777,9 @@ extension SearchViewController {
     if gestureRecognizer.state == .began {
       let location = gestureRecognizer.location(in: self.tableView)
       if let indexPath = tableView.indexPathForRow(at: location),
-        let section = availableSections[safe: indexPath.section],
-        let suggestion = suggestions[safe: indexPath.row],
-        section == .searchSuggestions {
+         let section = availableSections[safe: indexPath.section],
+         let suggestion = suggestions[safe: indexPath.row],
+         section == .searchSuggestions {
         searchDelegate?.searchViewController(self, didLongPressSuggestion: suggestion)
       }
     }
@@ -748,12 +791,12 @@ extension SearchViewController {
 /**
  * Private extension containing string operations specific to this view controller
  */
-private extension String {
-  func looksLikeAURL() -> Bool {
+extension String {
+  fileprivate func looksLikeAURL() -> Bool {
     // The assumption here is that if the user is typing in a forward slash and there are no spaces
     // involved, it's going to be a URL. If we type a space, any url would be invalid.
     // See https://bugzilla.mozilla.org/show_bug.cgi?id=1192155 for additional details.
-    return self.contains("/") && !self.contains(" ")
+    self.contains("/") && !self.contains(" ")
   }
 }
 
@@ -762,6 +805,6 @@ private extension String {
  */
 private class ButtonScrollView: UIScrollView {
   fileprivate override func touchesShouldCancel(in view: UIView) -> Bool {
-    return true
+    true
   }
 }

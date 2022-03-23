@@ -6,7 +6,6 @@ import Foundation
 
 // MARK: - NSAttributedString
 extension NSAttributedString {
-
   /// Add Line Spacing to Text
   func withLineSpacing(_ spacing: CGFloat) -> NSAttributedString {
     let paragraphStyle = NSMutableParagraphStyle()
@@ -16,7 +15,8 @@ extension NSAttributedString {
     attributedString.addAttribute(
       .paragraphStyle,
       value: paragraphStyle,
-      range: NSRange(location: 0, length: string.count))
+      range: NSRange(location: 0, length: string.count)
+    )
 
     return attributedString
   }

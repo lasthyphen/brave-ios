@@ -22,11 +22,17 @@ enum BrandedImageCalloutState {
     // If any of remaining callouts were shown once, we skip showing any other state.
     let wasCalloutShowed = Preferences.NewTabPage.brandedImageShowed.value
 
-    if wasCalloutShowed { return .dontShow }
+    if wasCalloutShowed {
+      return .dontShow
+    }
 
-    if !adsAvailableInRegion { return .dontShow }
+    if !adsAvailableInRegion {
+      return .dontShow
+    }
 
-    if adsEnabled && isSponsoredImage { return .brandedImageSupport }
+    if adsEnabled && isSponsoredImage {
+      return .brandedImageSupport
+    }
 
     return .dontShow
   }

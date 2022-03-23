@@ -5,12 +5,10 @@
 import Foundation
 
 struct ImageCacheOptions: OptionSet {
-
   let rawValue: Int
 
   /*
-     * Low priority download.
-     */
+   * Low priority download.
+   */
   static let lowPriority = ImageCacheOptions(rawValue: 1 << 0)
-
 }

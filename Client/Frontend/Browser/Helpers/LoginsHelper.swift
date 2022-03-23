@@ -22,11 +22,11 @@ class LoginsHelper: TabContentScript {
 
   // Used while handling authentication challenge
   var logins: BrowserLogins {
-    return profile.logins
+    profile.logins
   }
 
   class func name() -> String {
-    return "LoginsHelper"
+    "LoginsHelper"
   }
 
   required init(tab: Tab, profile: Profile, passwordAPI: BravePasswordAPI) {
@@ -36,10 +36,14 @@ class LoginsHelper: TabContentScript {
   }
 
   func scriptMessageHandlerName() -> String? {
-    return "loginsManagerMessageHandler"
+    "loginsManagerMessageHandler"
   }
 
-  func userContentController(_ userContentController: WKUserContentController, didReceiveScriptMessage message: WKScriptMessage, replyHandler: (Any?, String?) -> Void) {
+  func userContentController(
+    _ userContentController: WKUserContentController,
+    didReceiveScriptMessage message: WKScriptMessage,
+    replyHandler: (Any?, String?) -> Void
+  ) {
     defer { replyHandler(nil, nil) }
     guard let body = message.body as? [String: AnyObject] else {
       return
@@ -50,8 +54,12 @@ class LoginsHelper: TabContentScript {
       return
     }
 
-    guard let res = body["data"] as? [String: AnyObject] else { return }
-    guard let type = res["type"] as? String else { return }
+    guard let res = body["data"] as? [String: AnyObject] else {
+      return
+    }
+    guard let type = res["type"] as? String else {
+      return
+    }
 
     // Check to see that we're in the foreground before trying to check the logins. We want to
     // make sure we don't try accessing the logins database while we're backgrounded to avoid
@@ -69,14 +77,17 @@ class LoginsHelper: TabContentScript {
       // to avoid XSS attacks.
       if type == "request" {
         passwordAPI.getSavedLogins(for: url, formScheme: .typeHtml) { [weak self] logins in
-          guard let self = self else { return }
+          guard let self = self else {
+            return
+          }
 
           if let requestId = res["requestId"] as? String {
             self.autoFillRequestedCredentials(
               formSubmitURL: res["formSubmitURL"] as? String ?? "",
               logins: logins,
               requestId: requestId,
-              frameInfo: message.frameInfo)
+              frameInfo: message.frameInfo
+            )
           }
         }
       } else if type == "submit" {
@@ -132,12 +143,17 @@ class LoginsHelper: TabContentScript {
     }
 
     snackBar = TimerSnackBar(text: promptMessage, img: #imageLiteral(resourceName: "shields-menu-icon"))
-    let dontSave = SnackButton(title: Strings.loginsHelperDontSaveButtonTitle, accessibilityIdentifier: "SaveLoginPrompt.dontSaveButton") { bar in
+    let dontSave = SnackButton(
+      title: Strings.loginsHelperDontSaveButtonTitle,
+      accessibilityIdentifier: "SaveLoginPrompt.dontSaveButton"
+    ) { bar in
       self.tab?.removeSnackbar(bar)
       self.snackBar = nil
-      return
     }
-    let save = SnackButton(title: Strings.loginsHelperSaveLoginButtonTitle, accessibilityIdentifier: "SaveLoginPrompt.saveLoginButton") { bar in
+    let save = SnackButton(
+      title: Strings.loginsHelperSaveLoginButtonTitle,
+      accessibilityIdentifier: "SaveLoginPrompt.saveLoginButton"
+    ) { bar in
       self.tab?.removeSnackbar(bar)
       self.snackBar = nil
       self.profile.logins.addLogin(login)
@@ -166,12 +182,17 @@ class LoginsHelper: TabContentScript {
     }
 
     snackBar = TimerSnackBar(text: formatted, img: #imageLiteral(resourceName: "key"))
-    let dontSave = SnackButton(title: Strings.loginsHelperDontUpdateButtonTitle, accessibilityIdentifier: "UpdateLoginPrompt.donttUpdateButton") { bar in
+    let dontSave = SnackButton(
+      title: Strings.loginsHelperDontUpdateButtonTitle,
+      accessibilityIdentifier: "UpdateLoginPrompt.donttUpdateButton"
+    ) { bar in
       self.tab?.removeSnackbar(bar)
       self.snackBar = nil
-      return
     }
-    let update = SnackButton(title: Strings.loginsHelperUpdateButtonTitle, accessibilityIdentifier: "UpdateLoginPrompt.updateButton") { bar in
+    let update = SnackButton(
+      title: Strings.loginsHelperUpdateButtonTitle,
+      accessibilityIdentifier: "UpdateLoginPrompt.updateButton"
+    ) { bar in
       self.tab?.removeSnackbar(bar)
       self.snackBar = nil
       self.profile.logins.updateLoginByGUID(guid, new: new, significant: new.isSignificantlyDifferentFrom(old))
@@ -183,10 +204,10 @@ class LoginsHelper: TabContentScript {
 
   private func updateORSaveCredentials(for url: URL, script: [String: Any]) {
     guard let scriptCredentials = passwordAPI.fetchFromScript(url, script: script),
-      let username = scriptCredentials.usernameValue,
-      scriptCredentials.usernameElement != nil,
-      let password = scriptCredentials.passwordValue,
-      scriptCredentials.passwordElement != nil
+          let username = scriptCredentials.usernameValue,
+          scriptCredentials.usernameElement != nil,
+          let password = scriptCredentials.passwordValue,
+          scriptCredentials.passwordElement != nil
     else {
       log.debug("Missing Credentials from script")
       return
@@ -198,7 +219,9 @@ class LoginsHelper: TabContentScript {
     }
 
     passwordAPI.getSavedLogins(for: url, formScheme: .typeHtml) { [weak self] logins in
-      guard let self = self else { return }
+      guard let self = self else {
+        return
+      }
 
       for login in logins {
         guard let usernameLogin = login.usernameValue else {
@@ -224,7 +247,9 @@ class LoginsHelper: TabContentScript {
 
   private func showAddPrompt(for login: PasswordForm) {
     addSnackBarForPrompt(for: login, isUpdating: false) { [weak self] in
-      guard let self = self else { return }
+      guard let self = self else {
+        return
+      }
 
       DispatchQueue.main.async {
         self.passwordAPI.addLogin(login)
@@ -234,7 +259,9 @@ class LoginsHelper: TabContentScript {
 
   private func showUpdatePrompt(from old: PasswordForm, to new: PasswordForm) {
     addSnackBarForPrompt(for: new, isUpdating: true) { [weak self] in
-      guard let self = self else { return }
+      guard let self = self else {
+        return
+      }
 
       self.passwordAPI.updateLogin(new, oldPasswordForm: old)
     }
@@ -252,11 +279,13 @@ class LoginsHelper: TabContentScript {
 
     let promptMessage = String(
       format: isUpdating ? Strings.updateLoginUsernamePrompt : Strings.saveLoginUsernamePrompt, username,
-      login.url.origin ?? login.signOnRealm)
+      login.url.origin ?? login.signOnRealm
+    )
 
     snackBar = TimerSnackBar(
       text: promptMessage,
-      img: isUpdating ? #imageLiteral(resourceName: "key") : #imageLiteral(resourceName: "shields-menu-icon"))
+      img: isUpdating ? #imageLiteral(resourceName: "key") : #imageLiteral(resourceName: "shields-menu-icon")
+    )
 
     let dontSaveORUpdate = SnackButton(
       title: isUpdating ? Strings.loginsHelperDontUpdateButtonTitle : Strings.loginsHelperDontSaveButtonTitle,
@@ -264,7 +293,6 @@ class LoginsHelper: TabContentScript {
     ) { [unowned self] bar in
       self.tab?.removeSnackbar(bar)
       self.snackBar = nil
-      return
     }
 
     let saveORUpdate = SnackButton(
@@ -285,7 +313,12 @@ class LoginsHelper: TabContentScript {
     }
   }
 
-  private func autoFillRequestedCredentials(formSubmitURL: String, logins: [PasswordForm], requestId: String, frameInfo: WKFrameInfo) {
+  private func autoFillRequestedCredentials(
+    formSubmitURL: String,
+    logins: [PasswordForm],
+    requestId: String,
+    frameInfo: WKFrameInfo
+  ) {
     let securityOrigin = frameInfo.securityOrigin
 
     var jsonObj = [String: Any]()
@@ -299,11 +332,12 @@ class LoginsHelper: TabContentScript {
       // Check for current tab has a url to begin with
       // and the frame is not modified
       guard let currentURL = tab?.webView?.url,
-        LoginsHelper.checkIsSameFrame(
-          url: currentURL,
-          frameScheme: securityOrigin.protocol,
-          frameHost: securityOrigin.host,
-          framePort: securityOrigin.port)
+            LoginsHelper.checkIsSameFrame(
+              url: currentURL,
+              frameScheme: securityOrigin.protocol,
+              frameHost: securityOrigin.host,
+              framePort: securityOrigin.port
+            )
       else {
         return nil
       }
@@ -330,7 +364,7 @@ class LoginsHelper: TabContentScript {
       args: [jsonString],
       contentWorld: .defaultClient,
       escapeArgs: false
-    ) { (object, error) -> Void in
+    ) { object, error -> Void in
       if error != nil {
         log.error(error)
       }
@@ -339,7 +373,6 @@ class LoginsHelper: TabContentScript {
 }
 
 extension LoginsHelper {
-
   /// Helper method for checking if frame security origin elements are same as url from the webview
   /// - Parameters:
   ///   - url: url of the webview / tab

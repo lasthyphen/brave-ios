@@ -38,6 +38,7 @@ extension View {
   ) -> some View {
     modifier(PreviewColorSchemeIteratorModifier(schemes: schemes))
   }
+
   /// Creates a preview for each size category provided. Defaults to previewing `small`, `large` and
   /// `accessibilityLarge` categories.
   public func previewSizeCategories(

@@ -60,6 +60,7 @@ class CustomNetworkModel: ObservableObject, Identifiable {
       }
     }
   }
+
   @Published var networkName = NetworkInputItem(input: "") {
     didSet {
       if networkName.input != oldValue.input {
@@ -71,6 +72,7 @@ class CustomNetworkModel: ObservableObject, Identifiable {
       }
     }
   }
+
   @Published var networkSymbolName = NetworkInputItem(input: "") {
     didSet {
       if networkSymbolName.input != oldValue.input {
@@ -82,6 +84,7 @@ class CustomNetworkModel: ObservableObject, Identifiable {
       }
     }
   }
+
   @Published var networkSymbol = NetworkInputItem(input: "") {
     didSet {
       if networkSymbol.input != oldValue.input {
@@ -93,6 +96,7 @@ class CustomNetworkModel: ObservableObject, Identifiable {
       }
     }
   }
+
   @Published var networkDecimals = NetworkInputItem(input: "") {
     didSet {
       if networkDecimals.input != oldValue.input {
@@ -114,7 +118,7 @@ class CustomNetworkModel: ObservableObject, Identifiable {
         // validate every entry except the last new entry if there is one
         var hasNewEntry = false
         for (index, item) in rpcUrls.enumerated() {
-          if item.input.isEmpty && item.error == nil {  // no validation on new entry
+          if item.input.isEmpty && item.error == nil { // no validation on new entry
             hasNewEntry = true
           } else {
             if URIFixup.getURL(item.input) == nil {
@@ -125,12 +129,13 @@ class CustomNetworkModel: ObservableObject, Identifiable {
           }
         }
         // Only insert a new entry when all existed entries pass validation
-        if rpcUrls.compactMap({ $0.error }).isEmpty && !hasNewEntry {
+        if rpcUrls.compactMap(\.error).isEmpty && !hasNewEntry {
           rpcUrls.append(NetworkInputItem(input: ""))
         }
       }
     }
   }
+
   @Published var iconUrls = [NetworkInputItem(input: "")] {
     didSet {
       // we only care the set on each item's `input`
@@ -138,7 +143,7 @@ class CustomNetworkModel: ObservableObject, Identifiable {
         // validate every entry except the last new entry if there is one
         var hasNewEntry = false
         for (index, item) in iconUrls.enumerated() {
-          if item.input.isEmpty && item.error == nil {  // no validation on new entry
+          if item.input.isEmpty && item.error == nil { // no validation on new entry
             hasNewEntry = true
           } else {
             if URIFixup.getURL(item.input) == nil {
@@ -149,12 +154,13 @@ class CustomNetworkModel: ObservableObject, Identifiable {
           }
         }
         // Only insert a new entry when all existed entries pass validation and there is no new entry
-        if iconUrls.compactMap({ $0.error }).isEmpty && !hasNewEntry {
+        if iconUrls.compactMap(\.error).isEmpty && !hasNewEntry {
           iconUrls.append(NetworkInputItem(input: ""))
         }
       }
     }
   }
+
   @Published var blockUrls = [NetworkInputItem(input: "")] {
     didSet {
       // we only care the set on each item's `input`
@@ -162,7 +168,7 @@ class CustomNetworkModel: ObservableObject, Identifiable {
         // validate every entry except the last new entry if there is one
         var hasNewEntry = false
         for (index, item) in blockUrls.enumerated() {
-          if item.input.isEmpty && item.error == nil {  // no validation on new entry
+          if item.input.isEmpty && item.error == nil { // no validation on new entry
             hasNewEntry = true
           } else {
             if URIFixup.getURL(item.input) == nil {
@@ -173,7 +179,7 @@ class CustomNetworkModel: ObservableObject, Identifiable {
           }
         }
         // Only insert a new entry when all existed entries pass validation and there is no new entry
-        if blockUrls.compactMap({ $0.error }).isEmpty && !hasNewEntry {
+        if blockUrls.compactMap(\.error).isEmpty && !hasNewEntry {
           blockUrls.append(NetworkInputItem(input: ""))
         }
       }
@@ -185,7 +191,8 @@ class CustomNetworkModel: ObservableObject, Identifiable {
     self.isEditMode = true
 
     let chainIdInDecimal: String
-    if let intValue = Int(network.chainId.removingHexPrefix, radix: 16) {  // BraveWallet.EthereumChain.chainId should always in hex
+    if let intValue = Int(network.chainId.removingHexPrefix, radix: 16) {
+      // BraveWallet.EthereumChain.chainId should always in hex
       chainIdInDecimal = "\(intValue)"
     } else {
       chainIdInDecimal = network.chainId
@@ -256,7 +263,7 @@ struct CustomNetworkDetailsView: View {
         header: WalletListHeaderView(title: Text(Strings.Wallet.customNetworkChainIdTitle))
           .osAvailabilityModifiers { content in
             if #available(iOS 15.0, *) {
-              content  // padding already exists in 15
+              content // padding already exists in 15
             } else {
               content.padding(.top)
             }
@@ -266,8 +273,8 @@ struct CustomNetworkDetailsView: View {
           placeholder: Strings.Wallet.customNetworkChainIdPlaceholder,
           item: $model.networkId
         )
-        .keyboardType(.numberPad)
-        .disabled(model.isEditMode)
+          .keyboardType(.numberPad)
+          .disabled(model.isEditMode)
       }
       .listRowBackground(Color(.secondaryBraveGroupedBackground))
       Section(
@@ -304,7 +311,7 @@ struct CustomNetworkDetailsView: View {
           placeholder: Strings.Wallet.customNetworkCurrencyDecimalPlaceholder,
           item: $model.networkDecimals
         )
-        .keyboardType(.numberPad)
+          .keyboardType(.numberPad)
       }
       .listRowBackground(Color(.secondaryBraveGroupedBackground))
       Section(
@@ -341,7 +348,11 @@ struct CustomNetworkDetailsView: View {
       }
       .listRowBackground(Color(.secondaryBraveGroupedBackground))
     }
-    .navigationBarTitle(model.isEditMode ? Strings.Wallet.editfCustomNetworkTitle : Strings.Wallet.customNetworkDetailsTitle)
+    .navigationBarTitle(
+      model.isEditMode
+        ? Strings.Wallet.editfCustomNetworkTitle
+        : Strings.Wallet.customNetworkDetailsTitle
+    )
     .navigationBarTitleDisplayMode(.inline)
     .toolbar {
       ToolbarItemGroup(placement: .confirmationAction) {
@@ -375,7 +386,8 @@ struct CustomNetworkDetailsView: View {
               message: Text(error.errorDescription),
               dismissButton: .default(Text(Strings.OKString))
             )
-          })
+          }
+        )
     )
   }
 
@@ -384,14 +396,16 @@ struct CustomNetworkDetailsView: View {
       model.networkId.error = Strings.Wallet.customNetworkEmptyErrMsg
     }
     model.networkName.error = model.networkName.input.isEmpty ? Strings.Wallet.customNetworkEmptyErrMsg : nil
-    model.networkSymbolName.error = model.networkSymbolName.input.isEmpty ? Strings.Wallet.customNetworkEmptyErrMsg : nil
+    model.networkSymbolName.error = model.networkSymbolName.input.isEmpty
+      ? Strings.Wallet.customNetworkEmptyErrMsg
+      : nil
     model.networkSymbol.error = model.networkSymbol.input.isEmpty ? Strings.Wallet.customNetworkEmptyErrMsg : nil
     if model.networkDecimals.input.isEmpty {
       model.networkDecimals.error = Strings.Wallet.customNetworkEmptyErrMsg
     }
-    if model.rpcUrls.first(where: { !$0.input.isEmpty && $0.error == nil }) == nil {  // has no valid url
-      if let index = model.rpcUrls.firstIndex(where: { $0.input.isEmpty }) {  // find the first empty entry
-        model.rpcUrls[index].error = Strings.Wallet.customNetworkEmptyErrMsg  // set the empty err msg
+    if model.rpcUrls.first(where: { !$0.input.isEmpty && $0.error == nil }) == nil { // has no valid url
+      if let index = model.rpcUrls.firstIndex(where: { $0.input.isEmpty }) { // find the first empty entry
+        model.rpcUrls[index].error = Strings.Wallet.customNetworkEmptyErrMsg // set the empty err msg
       }
     }
 
@@ -408,7 +422,9 @@ struct CustomNetworkDetailsView: View {
   }
 
   private func addCustomNetwork() {
-    guard validateAllFields() else { return }
+    guard validateAllFields() else {
+      return
+    }
 
     var chainIdInHex = ""
     if let idValue = Int(model.networkId.input) {
@@ -416,7 +432,7 @@ struct CustomNetworkDetailsView: View {
     }
     // Check if input chain id already existed for non-edit mode
     if !model.isEditMode,
-      networkStore.ethereumChains.contains(where: { $0.id == chainIdInHex }) {
+       networkStore.ethereumChains.contains(where: { $0.id == chainIdInHex }) {
       customNetworkError = .duplicateId
       return
     }
@@ -451,7 +467,8 @@ struct CustomNetworkDetailsView: View {
       symbol: model.networkSymbol.input,
       symbolName: model.networkSymbol.input,
       decimals: Int32(model.networkDecimals.input) ?? 18,
-      isEip1559: false)
+      isEip1559: false
+    )
     networkStore.addCustomNetwork(network) { accepted, errMsg in
       guard accepted else {
         customNetworkError = .failed(errMsg: errMsg)

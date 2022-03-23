@@ -18,11 +18,12 @@ class UniversalLinkManagerTests: XCTestCase {
       "https://vpn.brave.com/dl/test/123": true,
       "https://vpn.brave.com/path/does/not/matter": false,
     ]
-    .forEach {
-      XCTAssertEqual(
-        ULM.LinkType.buyVPN,
-        ULM.universalLinkType(for: URL(string: $0.key)!, checkPath: $0.value))
-    }
+      .forEach {
+        XCTAssertEqual(
+          ULM.LinkType.buyVPN,
+          ULM.universalLinkType(for: URL(string: $0.key)!, checkPath: $0.value)
+        )
+      }
 
     // Bad cases
     [
@@ -33,8 +34,8 @@ class UniversalLinkManagerTests: XCTestCase {
       "https://vpn.brave.com/dl": true,
       "https://vpn.brave.com/dlonger/test": true,
     ]
-    .forEach {
-      XCTAssertNil(ULM.universalLinkType(for: URL(string: $0.key)!, checkPath: $0.value))
-    }
+      .forEach {
+        XCTAssertNil(ULM.universalLinkType(for: URL(string: $0.key)!, checkPath: $0.value))
+      }
   }
 }

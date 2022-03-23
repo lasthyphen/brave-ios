@@ -14,7 +14,6 @@ import SwiftUI
 // MARK: - TopToolbarDelegate
 
 extension BrowserViewController: TopToolbarDelegate {
-
   func showTabTray() {
     if tabManager.tabsForCurrentMode.isEmpty {
       return
@@ -50,18 +49,24 @@ extension BrowserViewController: TopToolbarDelegate {
   }
 
   func topToolbarDidLongPressReloadButton(_ topToolbar: TopToolbarView, from button: UIButton) {
-    guard let tab = tabManager.selectedTab, let url = tab.url, !url.isLocal, !url.isReaderModeURL else { return }
+    guard let tab = tabManager.selectedTab, let url = tab.url, !url.isLocal, !url.isReaderModeURL else {
+      return
+    }
 
     let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
     alert.addAction(UIAlertAction(title: Strings.cancelButtonTitle, style: .cancel, handler: nil))
 
-    let toggleActionTitle = tab.isDesktopSite == true ? Strings.appMenuViewMobileSiteTitleString : Strings.appMenuViewDesktopSiteTitleString
+    let toggleActionTitle = tab.isDesktopSite == true
+      ? Strings.appMenuViewMobileSiteTitleString
+      : Strings.appMenuViewDesktopSiteTitleString
     alert.addAction(
       UIAlertAction(
         title: toggleActionTitle, style: .default,
         handler: { _ in
           tab.switchUserAgent()
-        }))
+        }
+      )
+    )
 
     UIImpactFeedbackGenerator(style: .heavy).bzzt()
     if UIDevice.current.userInterfaceIdiom == .pad {
@@ -93,7 +98,7 @@ extension BrowserViewController: TopToolbarDelegate {
 
   func topToolbarDidLongPressReaderMode(_ topToolbar: TopToolbarView) -> Bool {
     // Maybe we want to add something here down the road
-    return false
+    false
   }
 
   func topToolbarDidPressPlaylistButton(_ urlBar: TopToolbarView) {
@@ -179,7 +184,7 @@ extension BrowserViewController: TopToolbarDelegate {
   }
 
   func topToolbarDidEnterOverlayMode(_ topToolbar: TopToolbarView) {
-    if .blankPage == NewTabAccessors.getNewTabPage() {
+    if NewTabAccessors.getNewTabPage() == .blankPage {
       UIAccessibility.post(notification: .screenChanged, argument: nil)
     } else {
       if let toast = clipboardBarDisplayHandler?.clipboardToast {
@@ -207,8 +212,11 @@ extension BrowserViewController: TopToolbarDelegate {
   }
 
   func presentBraveShieldsViewController() {
-    guard let selectedTab = tabManager.selectedTab, var url = selectedTab.url else { return }
-    if let internalUrl = InternalURL(url), internalUrl.isErrorPage, let originalURL = internalUrl.originalURLFromErrorPage {
+    guard let selectedTab = tabManager.selectedTab, var url = selectedTab.url else {
+      return
+    }
+    if let internalUrl = InternalURL(url), internalUrl.isErrorPage,
+       let originalURL = internalUrl.originalURLFromErrorPage {
       url = originalURL
     }
 
@@ -286,12 +294,16 @@ extension BrowserViewController: TopToolbarDelegate {
   }
 
   private func showSearchController() {
-    if searchController != nil { return }
+    if searchController != nil {
+      return
+    }
 
     let tabType = TabType.of(tabManager.selectedTab)
     searchController = SearchViewController(forTabType: tabType)
 
-    guard let searchController = searchController else { return }
+    guard let searchController = searchController else {
+      return
+    }
 
     searchController.searchEngines = profile.searchEngines
     searchController.searchDelegate = self
@@ -308,7 +320,6 @@ extension BrowserViewController: TopToolbarDelegate {
     searchController.view.snp.makeConstraints { make in
       make.top.equalTo(self.topToolbar.snp.bottom)
       make.left.right.bottom.equalTo(self.view)
-      return
     }
 
     searchController.didMove(toParent: self)
@@ -323,7 +334,9 @@ extension BrowserViewController: TopToolbarDelegate {
           self?.handleFavoriteAction(favorite: bookmark, action: action)
         },
         recentSearchAction: { [weak self] recentSearch, shouldSubmitSearch in
-          guard let self = self else { return }
+          guard let self = self else {
+            return
+          }
 
           let submitSearch = { [weak self] (text: String) in
             if let fixupURL = URIFixup.getURL(text) {
@@ -335,7 +348,7 @@ extension BrowserViewController: TopToolbarDelegate {
           }
 
           if let recentSearch = recentSearch,
-            let searchType = RecentSearchType(rawValue: recentSearch.searchType) {
+             let searchType = RecentSearchType(rawValue: recentSearch.searchType) {
             if shouldSubmitSearch {
               recentSearch.update(dateAdded: Date())
             }
@@ -377,8 +390,7 @@ extension BrowserViewController: TopToolbarDelegate {
               }
             }
           } else if UIPasteboard.general.hasStrings || UIPasteboard.general.hasURLs,
-            let searchQuery = UIPasteboard.general.string ?? UIPasteboard.general.url?.absoluteString {
-
+                    let searchQuery = UIPasteboard.general.string ?? UIPasteboard.general.url?.absoluteString {
             self.topToolbar.setLocation(searchQuery, search: false)
             self.topToolbar(self.topToolbar, didEnterText: searchQuery)
 
@@ -386,7 +398,8 @@ extension BrowserViewController: TopToolbarDelegate {
               submitSearch(searchQuery)
             }
           }
-        })
+        }
+      )
       self.favoritesController = favoritesController
 
       addChild(favoritesController)
@@ -398,7 +411,9 @@ extension BrowserViewController: TopToolbarDelegate {
         $0.bottom.equalTo(view)
       }
     }
-    guard let favoritesController = favoritesController else { return }
+    guard let favoritesController = favoritesController else {
+      return
+    }
     favoritesController.view.alpha = 0.0
     let animator = UIViewPropertyAnimator(duration: 0.2, dampingRatio: 1.0) {
       favoritesController.view.alpha = 1
@@ -411,7 +426,9 @@ extension BrowserViewController: TopToolbarDelegate {
   }
 
   private func hideFavoritesController() {
-    guard let controller = favoritesController else { return }
+    guard let controller = favoritesController else {
+      return
+    }
     self.favoritesController = nil
     UIView.animate(
       withDuration: 0.1, delay: 0, options: [.beginFromCurrentState],
@@ -424,13 +441,14 @@ extension BrowserViewController: TopToolbarDelegate {
         controller.removeFromParent()
         self.webViewContainer.accessibilityElementsHidden = false
         UIAccessibility.post(notification: .screenChanged, argument: nil)
-      })
+      }
+    )
   }
 
   func openAddBookmark() {
     guard let selectedTab = tabManager.selectedTab,
-      let selectedUrl = selectedTab.url,
-      !(selectedUrl.isLocal || selectedUrl.isReaderModeURL)
+          let selectedUrl = selectedTab.url,
+          !(selectedUrl.isLocal || selectedUrl.isReaderModeURL)
     else {
       return
     }
@@ -450,12 +468,14 @@ extension BrowserViewController: TopToolbarDelegate {
     let cancelBarbutton = UIBarButtonItem(
       barButtonSystemItem: .cancel,
       target: navigationController,
-      action: #selector(SettingsNavigationController.done))
+      action: #selector(SettingsNavigationController.done)
+    )
 
     let doneBarbutton = UIBarButtonItem(
       barButtonSystemItem: .done,
       target: navigationController,
-      action: #selector(SettingsNavigationController.done))
+      action: #selector(SettingsNavigationController.done)
+    )
 
     navigationController.navigationBar.topItem?.leftBarButtonItem = cancelEnabled ? cancelBarbutton : nil
 
@@ -489,15 +509,25 @@ extension BrowserViewController: ToolbarDelegate {
 
   func tabToolbarDidPressMenu(_ tabToolbar: ToolbarProtocol) {
     let selectedTabURL: URL? = {
-      guard let url = tabManager.selectedTab?.url else { return nil }
+      guard let url = tabManager.selectedTab?.url else {
+        return nil
+      }
 
-      if (InternalURL.isValid(url: url) || url.isLocal) && !url.isReaderModeURL { return nil }
+      if (InternalURL.isValid(url: url) || url.isLocal) && !url.isReaderModeURL {
+        return nil
+      }
 
       return url
     }()
     var activities: [UIActivity] = []
     if let url = selectedTabURL, let tab = tabManager.selectedTab {
-      activities = makeShareActivities(for: url, tab: tab, sourceView: view, sourceRect: self.view.convert(self.topToolbar.menuButton.frame, from: self.topToolbar.menuButton.superview), arrowDirection: .up)
+      activities = makeShareActivities(
+        for: url,
+        tab: tab,
+        sourceView: view,
+        sourceRect: self.view.convert(self.topToolbar.menuButton.frame, from: self.topToolbar.menuButton.superview),
+        arrowDirection: .up
+      )
     }
     let initialHeight: CGFloat = selectedTabURL != nil ? 470 : 500
     let menuController = MenuViewController(
@@ -518,7 +548,8 @@ extension BrowserViewController: ToolbarDelegate {
           }
         }
         .navigationBarHidden(true)
-      })
+      }
+    )
     presentPanModal(menuController, sourceView: tabToolbar.menuButton, sourceRect: tabToolbar.menuButton.bounds)
     if menuController.modalPresentationStyle == .popover {
       menuController.popoverPresentationController?.popoverLayoutMargins = .init(equalInset: 4)
@@ -552,7 +583,10 @@ extension BrowserViewController: ToolbarDelegate {
 
   func tabToolbarDidSwipeToChangeTabs(_ tabToolbar: ToolbarProtocol, direction: UISwipeGestureRecognizer.Direction) {
     let tabs = tabManager.tabsForCurrentMode
-    guard let selectedTab = tabManager.selectedTab, let index = tabs.firstIndex(where: { $0 === selectedTab }) else { return }
+    guard let selectedTab = tabManager.selectedTab,
+          let index = tabs.firstIndex(where: { $0 === selectedTab }) else {
+      return
+    }
     let newTabIndex = index + (direction == .left ? -1 : 1)
     if newTabIndex >= 0 && newTabIndex < tabs.count {
       tabManager.selectTab(tabs[newTabIndex])
@@ -561,8 +595,11 @@ extension BrowserViewController: ToolbarDelegate {
 }
 
 extension BrowserViewController: UIContextMenuInteractionDelegate {
-  func contextMenuInteraction(_ interaction: UIContextMenuInteraction, configurationForMenuAtLocation location: CGPoint) -> UIContextMenuConfiguration? {
-    return UIContextMenuConfiguration(identifier: nil, previewProvider: nil) { [unowned self] _ in
+  func contextMenuInteraction(
+    _ interaction: UIContextMenuInteraction,
+    configurationForMenuAtLocation location: CGPoint
+  ) -> UIContextMenuConfiguration? {
+    UIContextMenuConfiguration(identifier: nil, previewProvider: nil) { [unowned self] _ in
       var actionMenuChildren: [UIAction] = []
 
       let pasteGoAction = UIAction(
@@ -572,7 +609,8 @@ extension BrowserViewController: UIContextMenuInteractionDelegate {
           if let pasteboardContents = UIPasteboard.general.string {
             self.topToolbar(self.topToolbar, didSubmitText: pasteboardContents)
           }
-        })
+        }
+      )
 
       let pasteAction = UIAction(
         title: Strings.pasteTitle,
@@ -582,7 +620,8 @@ extension BrowserViewController: UIContextMenuInteractionDelegate {
             // Enter overlay mode and make the search controller appear.
             self.topToolbar.enterOverlayMode(pasteboardContents, pasted: true, search: true)
           }
-        })
+        }
+      )
 
       let copyAction = UIAction(
         title: Strings.copyAddressTitle,
@@ -591,7 +630,8 @@ extension BrowserViewController: UIContextMenuInteractionDelegate {
           if let url = self.topToolbar.currentURL {
             UIPasteboard.general.url = url as URL
           }
-        })
+        }
+      )
 
       if UIPasteboard.general.hasStrings || UIPasteboard.general.hasURLs {
         actionMenuChildren = [pasteGoAction, pasteAction, copyAction]

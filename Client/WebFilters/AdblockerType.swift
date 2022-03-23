@@ -8,7 +8,9 @@ import Shared
 private let log = Logger.browserLogger
 
 enum FileType: String {
-  case dat, json, tgz
+  case dat
+  case json
+  case tgz
 }
 
 enum AdblockerType {
@@ -23,7 +25,7 @@ enum AdblockerType {
     }
   }
 
-  var associatedFiles: [FileType] { return [.json, fileForStatsLibrary] }
+  var associatedFiles: [FileType] { [.json, fileForStatsLibrary] }
 
   private var fileForStatsLibrary: FileType {
     switch self {

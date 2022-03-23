@@ -46,6 +46,7 @@ class SuggestionCell: UITableViewCell {
     openButton.addTarget(self, action: #selector(onOpenButtonPressed), for: .touchUpInside)
   }
 
+  @available(*, unavailable)
   required init?(coder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }

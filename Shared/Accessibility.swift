@@ -18,24 +18,24 @@ open class AccessibleAction: NSObject {
   }
 }
 
-extension AccessibleAction {  // UIAccessibilityCustomAction
+extension AccessibleAction { // UIAccessibilityCustomAction
   @objc private func performAccessibilityAction() -> Bool {
-    return handler()
+    handler()
   }
 
   public var accessibilityCustomAction: UIAccessibilityCustomAction {
-    return UIAccessibilityCustomAction(name: name, target: self, selector: #selector(performAccessibilityAction))
+    UIAccessibilityCustomAction(name: name, target: self, selector: #selector(performAccessibilityAction))
   }
 }
 
-extension AccessibleAction {  // UIAlertAction
+extension AccessibleAction { // UIAlertAction
   private var alertActionHandler: (UIAlertAction?) -> Void {
-    return { (_: UIAlertAction?) -> Void in
+    { (_: UIAlertAction?) -> Void in
       _ = self.handler()
     }
   }
 
   public func alertAction(style: UIAlertAction.Style) -> UIAlertAction {
-    return UIAlertAction(title: name, style: style, handler: alertActionHandler)
+    UIAlertAction(title: name, style: style, handler: alertActionHandler)
   }
 }

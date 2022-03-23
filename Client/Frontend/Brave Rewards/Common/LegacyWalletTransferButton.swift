@@ -8,7 +8,6 @@ import BraveUI
 import Shared
 
 class LegacyWalletTransferButton: UIControl {
-
   let dismissButton = BraveButton(type: .system).then {
     $0.setImage(UIImage(imageLiteralResourceName: "close-medium").template, for: .normal)
     $0.tintColor = .white
@@ -66,7 +65,8 @@ class LegacyWalletTransferButton: UIControl {
             .view(titleLabel),
             .view(subtitleLabel)
           )
-        })
+        }
+      )
     )
 
     accessibilityLabel = titleLabel.text

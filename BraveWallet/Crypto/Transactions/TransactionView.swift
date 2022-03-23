@@ -45,11 +45,16 @@ struct TransactionView: View {
     let limit = info.ethTxGasLimit
     let formatter = WeiFormatter(decimalFormatStyle: .gasFee(limit: limit.removingHexPrefix, radix: .hex))
     let hexFee = isEIP1559Transaction ? (info.txDataUnion.ethTxData1559?.maxFeePerGas ?? "") : info.ethTxGasPrice
-    if let value = formatter.decimalString(for: hexFee.removingHexPrefix, radix: .hex, decimals: Int(networkStore.selectedChain.decimals)) {
+    if let value = formatter.decimalString(
+      for: hexFee.removingHexPrefix,
+      radix: .hex,
+      decimals: Int(networkStore.selectedChain.decimals)
+    ) {
       return (
         value,
         {
-          guard let doubleValue = Double(value), let assetRatio = assetRatios[networkStore.selectedChain.symbol.lowercased()] else {
+          guard let doubleValue = Double(value),
+                let assetRatio = assetRatios[networkStore.selectedChain.symbol.lowercased()] else {
             return "$0.00"
           }
           return numberFormatter.string(from: NSNumber(value: doubleValue * assetRatio)) ?? "$0.00"
@@ -65,22 +70,53 @@ struct TransactionView: View {
     case .erc20Approve:
       let contractAddress = info.txDataUnion.ethTxData1559?.baseData.to ?? ""
       if let value = info.txArgs[safe: 1], let token = token(for: contractAddress) {
-        Text(String.localizedStringWithFormat(Strings.Wallet.transactionApproveSymbolTitle, formatter.decimalString(for: value.removingHexPrefix, radix: .hex, decimals: Int(token.decimals)) ?? "", token.symbol))
+        Text(String.localizedStringWithFormat(
+          Strings.Wallet.transactionApproveSymbolTitle,
+          formatter.decimalString(for: value.removingHexPrefix, radix: .hex, decimals: Int(token.decimals)) ?? "",
+          token.symbol
+        ))
       } else {
         Text(Strings.Wallet.transactionUnknownApprovalTitle)
       }
     case .ethSend, .other:
-      let amount = formatter.decimalString(for: info.ethTxValue.removingHexPrefix, radix: .hex, decimals: Int(networkStore.selectedChain.decimals)) ?? ""
-      let fiat = numberFormatter.string(from: NSNumber(value: assetRatios[networkStore.selectedChain.symbol.lowercased(), default: 0] * (Double(amount) ?? 0))) ?? "$0.00"
+      let amount = formatter.decimalString(
+        for: info.ethTxValue.removingHexPrefix,
+        radix: .hex,
+        decimals: Int(networkStore.selectedChain.decimals)
+      ) ?? ""
+      let fiat = numberFormatter
+        .string(from: NSNumber(
+          value: assetRatios[networkStore.selectedChain.symbol.lowercased(), default: 0] *
+            (Double(amount) ?? 0)
+        )) ?? "$0.00"
       if info.isSwap {
-        Text(String.localizedStringWithFormat(Strings.Wallet.transactionSwapTitle, amount, networkStore.selectedChain.symbol, fiat))
+        Text(
+          String
+            .localizedStringWithFormat(
+              Strings.Wallet.transactionSwapTitle,
+              amount,
+              networkStore.selectedChain.symbol,
+              fiat
+            )
+        )
       } else {
-        Text(String.localizedStringWithFormat(Strings.Wallet.transactionSendTitle, amount, networkStore.selectedChain.symbol, fiat))
+        Text(
+          String
+            .localizedStringWithFormat(
+              Strings.Wallet.transactionSendTitle,
+              amount,
+              networkStore.selectedChain.symbol,
+              fiat
+            )
+        )
       }
     case .erc20Transfer:
       if let value = info.txArgs[safe: 1], let token = token(for: info.ethTxToAddress) {
-        let amount = formatter.decimalString(for: value.removingHexPrefix, radix: .hex, decimals: Int(token.decimals)) ?? ""
-        let fiat = numberFormatter.string(from: NSNumber(value: assetRatios[token.symbol.lowercased(), default: 0] * (Double(amount) ?? 0))) ?? "$0.00"
+        let amount = formatter
+          .decimalString(for: value.removingHexPrefix, radix: .hex, decimals: Int(token.decimals)) ?? ""
+        let fiat = numberFormatter
+          .string(from: NSNumber(value: assetRatios[token.symbol.lowercased(), default: 0] * (Double(amount) ?? 0))) ??
+          "$0.00"
         Text(String.localizedStringWithFormat(Strings.Wallet.transactionSendTitle, amount, token.symbol, fiat))
       } else {
         Text(Strings.Wallet.send)
@@ -124,7 +160,7 @@ struct TransactionView: View {
         toAddress: info.ethTxToAddress,
         alignVisuallyCentered: false
       )
-      .accessibilityHidden(true)
+        .accessibilityHidden(true)
       VStack(alignment: .leading, spacing: 4) {
         title
           .font(.footnote.weight(.semibold))
@@ -135,7 +171,8 @@ struct TransactionView: View {
             Text(
               String.localizedStringWithFormat(
                 Strings.Wallet.transactionSummaryFee,
-                fee, networkStore.selectedChain.symbol, fiat)
+                fee, networkStore.selectedChain.symbol, fiat
+              )
             )
           }
           .accessibilityElement(children: .combine)
@@ -187,6 +224,7 @@ extension BraveWallet.TransactionStatus {
       return Strings.Wallet.transactionStatusUnknown
     }
   }
+
   var color: Color {
     switch self {
     case .confirmed, .approved:

@@ -49,7 +49,9 @@ class AdblockResourceDownloader {
       Task.detached(priority: .userInitiated) {
         do {
           try await withThrowingTaskGroup(of: Void.self) { [weak self] group in
-            guard let self = self else { return }
+            guard let self = self else {
+              return
+            }
             group.addTask { try await self.regionalAdblockResourcesSetup() }
             group.addTask { try await self.generalAdblockResourcesSetup() }
             try await group.waitForAll()
@@ -69,7 +71,8 @@ class AdblockResourceDownloader {
 
     try await downloadResources(
       type: .regional(locale: locale),
-      queueName: "Regional adblock setup")
+      queueName: "Regional adblock setup"
+    )
     log.debug("Regional blocklists download and setup completed.")
     Preferences.Debug.lastRegionalAdblockUpdate.value = Date()
   }
@@ -77,7 +80,8 @@ class AdblockResourceDownloader {
   func generalAdblockResourcesSetup() async throws {
     try await downloadResources(
       type: .general,
-      queueName: "General adblock setup")
+      queueName: "General adblock setup"
+    )
     log.debug("General blocklists download and setup completed.")
     Preferences.Debug.lastGeneralAdblockUpdate.value = Date()
   }
@@ -89,42 +93,47 @@ class AdblockResourceDownloader {
     // file name of which the file will be saved on disk
     let fileName = type.identifier
 
-    async let completedDownloads = type.associatedFiles.asyncConcurrentCompactMap { [weak self] fileType -> AdBlockNetworkResource? in
-      guard let self = self else { return nil }
+    async let completedDownloads = type.associatedFiles
+      .asyncConcurrentCompactMap { [weak self] fileType -> AdBlockNetworkResource? in
+        guard let self = self else {
+          return nil
+        }
 
-      let fileExtension = fileType.rawValue
-      let etagExtension = fileExtension + ".etag"
+        let fileExtension = fileType.rawValue
+        let etagExtension = fileExtension + ".etag"
 
-      guard let resourceName = type.resourceName(for: fileType),
-        var url = URL(string: AdblockResourceDownloader.endpoint)
-      else {
-        return nil
+        guard let resourceName = type.resourceName(for: fileType),
+              var url = URL(string: AdblockResourceDownloader.endpoint)
+        else {
+          return nil
+        }
+
+        url.appendPathComponent(resourceName)
+        url.appendPathExtension(fileExtension)
+
+        var headers = [String: String]()
+        if let servicesKeyValue = Bundle.main.getPlistString(for: self.servicesKeyName) {
+          headers[self.servicesKeyHeaderValue] = servicesKeyValue
+        }
+
+        let etag = self.fileFromDocumentsAsString("\(fileName).\(etagExtension)", inFolder: folderName)
+        let resource = try await nm.downloadResource(
+          with: url,
+          resourceType: .cached(etag: etag),
+          checkLastServerSideModification: !AppConstants.buildChannel.isPublic,
+          customHeaders: headers
+        )
+
+        if resource.data.isEmpty {
+          return nil
+        }
+
+        return AdBlockNetworkResource(
+          resource: resource,
+          fileType: fileType,
+          type: type
+        )
       }
-
-      url.appendPathComponent(resourceName)
-      url.appendPathExtension(fileExtension)
-
-      var headers = [String: String]()
-      if let servicesKeyValue = Bundle.main.getPlistString(for: self.servicesKeyName) {
-        headers[self.servicesKeyHeaderValue] = servicesKeyValue
-      }
-
-      let etag = self.fileFromDocumentsAsString("\(fileName).\(etagExtension)", inFolder: folderName)
-      let resource = try await nm.downloadResource(
-        with: url,
-        resourceType: .cached(etag: etag),
-        checkLastServerSideModification: !AppConstants.buildChannel.isPublic,
-        customHeaders: headers)
-
-      if resource.data.isEmpty {
-        return nil
-      }
-
-      return AdBlockNetworkResource(
-        resource: resource,
-        fileType: fileType,
-        type: type)
-    }
 
     // json to content rules compilation happens first, otherwise it makes no sense to proceed further
     // and overwrite old files that were working before.
@@ -141,14 +150,18 @@ class AdblockResourceDownloader {
     }
 
     let fileUrl = folderUrl.appendingPathComponent(name)
-    guard let data = FileManager.default.contents(atPath: fileUrl.path) else { return nil }
+    guard let data = FileManager.default.contents(atPath: fileUrl.path) else {
+      return nil
+    }
     return String(data: data, encoding: .utf8)
   }
 
   private func compileContentBlocker(resources: [AdBlockNetworkResource]) async {
     await resources.filter { $0.fileType == .json }
       .asyncConcurrentForEach { res in
-        guard let blockList = res.type.blockListName else { return }
+        guard let blockList = res.type.blockListName else {
+          return
+        }
         await blockList.compile(data: res.resource.data)
       }
   }
@@ -163,25 +176,30 @@ class AdblockResourceDownloader {
       fileSaveCompletions.append(
         fm.writeToDiskInFolder(
           $0.resource.data, fileName: fileName,
-          folderName: folderName))
+          folderName: folderName
+        )
+      )
 
       if let etag = $0.resource.etag, let data = etag.data(using: .utf8) {
         let etagFileName = fileName + ".etag"
         fileSaveCompletions.append(
           fm.writeToDiskInFolder(
             data, fileName: etagFileName,
-            folderName: folderName))
+            folderName: folderName
+          )
+        )
       }
 
       if let lastModified = $0.resource.lastModifiedTimestamp,
-        let data = String(lastModified).data(using: .utf8) {
+         let data = String(lastModified).data(using: .utf8) {
         let lastModifiedFileName = fileName + ".lastmodified"
         fileSaveCompletions.append(
           fm.writeToDiskInFolder(
             data, fileName: lastModifiedFileName,
-            folderName: folderName))
+            folderName: folderName
+          )
+        )
       }
-
     }
 
     // Returning true if all file saves completed succesfully
@@ -194,13 +212,14 @@ class AdblockResourceDownloader {
       case .dat:
         try await AdBlockStats.shared.setDataFile(
           data: $0.resource.data,
-          id: $0.type.identifier)
+          id: $0.type.identifier
+        )
       case .json:
         if compileJsonRules {
           await self.compileContentBlocker(resources: resources)
         }
       case .tgz:
-        break  // TODO: Add downloadable httpse list
+        break // TODO: Add downloadable httpse list
       }
     }
   }

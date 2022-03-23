@@ -41,14 +41,14 @@ struct PortfolioView: View {
             dismissedBackupBannerThisSession = true
           }
         )
-        .buttonStyle(PlainButtonStyle())
-        .padding([.top, .leading, .trailing], 12)
-        .sheet(isPresented: $isPresentingBackup) {
-          NavigationView {
-            BackupRecoveryPhraseView(keyringStore: keyringStore)
+          .buttonStyle(PlainButtonStyle())
+          .padding([.top, .leading, .trailing], 12)
+          .sheet(isPresented: $isPresentingBackup) {
+            NavigationView {
+              BackupRecoveryPhraseView(keyringStore: keyringStore)
+            }
+            .environment(\.modalPresentationMode, $isPresentingBackup)
           }
-          .environment(\.modalPresentationMode, $isPresentingBackup)
-        }
       }
       BalanceHeaderView(
         balance: portfolioStore.balance,
@@ -68,8 +68,8 @@ struct PortfolioView: View {
     List {
       Section(
         header:
-          listHeader
-          .padding(.horizontal, tableInset)  // inset grouped layout margins workaround
+        listHeader
+          .padding(.horizontal, tableInset) // inset grouped layout margins workaround
           .resetListHeaderStyle()
       ) {
       }
@@ -84,7 +84,8 @@ struct PortfolioView: View {
               image: AssetIconView(token: asset.token),
               title: asset.token.name,
               symbol: asset.token.symbol,
-              amount: currencyFormatter.string(from: NSNumber(value: (Double(asset.price) ?? 0) * asset.decimalBalance)) ?? "",
+              amount: currencyFormatter
+                .string(from: NSNumber(value: (Double(asset.price) ?? 0) * asset.decimalBalance)) ?? "",
               quantity: String(format: "%.04f", asset.decimalBalance)
             )
           }
@@ -108,7 +109,9 @@ struct PortfolioView: View {
       NavigationLink(
         isActive: Binding(
           get: { selectedToken != nil },
-          set: { if !$0 { selectedToken = nil } }
+          set: { if !$0 {
+            selectedToken = nil
+          } }
         ),
         destination: {
           if let token = selectedToken {
@@ -117,14 +120,15 @@ struct PortfolioView: View {
               keyringStore: keyringStore,
               networkStore: cryptoStore.networkStore
             )
-            .onDisappear {
-              cryptoStore.closeAssetDetailStore(for: token)
-            }
+              .onDisappear {
+                cryptoStore.closeAssetDetailStore(for: token)
+              }
           }
         },
         label: {
           EmptyView()
-        })
+        }
+      )
     )
     .animation(.default, value: portfolioStore.userVisibleAssets)
     .listStyle(InsetGroupedListStyle())
@@ -235,7 +239,7 @@ struct PortfolioViewController_Previews: PreviewProvider {
         networkStore: .previewStore,
         portfolioStore: CryptoStore.previewStore.portfolioStore
       )
-      .navigationBarTitleDisplayMode(.inline)
+        .navigationBarTitleDisplayMode(.inline)
     }
     .previewColorSchemes()
   }

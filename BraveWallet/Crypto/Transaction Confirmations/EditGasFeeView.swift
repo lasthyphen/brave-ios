@@ -42,7 +42,7 @@ struct EditGasFeeView: View {
   private func save() {
     // Gas limit is already in Gwei, so doesn't need additional conversion other than to hex
     guard let limit = BDouble(gasLimit)?.rounded().asString(radix: 16),
-      let gasFeeInWei = WeiFormatter.gweiToWei(perGasPrice, radix: .decimal, outputRadix: .hex)
+          let gasFeeInWei = WeiFormatter.gweiToWei(perGasPrice, radix: .decimal, outputRadix: .hex)
     else {
       return
     }
@@ -64,7 +64,7 @@ struct EditGasFeeView: View {
 
   private var isSaveButtonDisabled: Bool {
     guard let gasPrice = BDouble(perGasPrice), gasPrice > 0,
-      let limit = BDouble(gasLimit), limit > 0
+          let limit = BDouble(gasLimit), limit > 0
     else {
       return true
     }
@@ -77,7 +77,7 @@ struct EditGasFeeView: View {
         header: WalletListHeaderView(title: Text(Strings.Wallet.perGasPriceTitle))
           .osAvailabilityModifiers { content in
             if #available(iOS 15.0, *) {
-              content  // Padding already applied
+              content // Padding already applied
             } else {
               content.padding(.top)
             }

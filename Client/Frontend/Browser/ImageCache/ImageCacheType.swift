@@ -5,7 +5,6 @@
 import Foundation
 
 enum ImageCacheType: Int, CustomDebugStringConvertible {
-
   /// The image was not available in the cache, but was downloaded from the web.
   case none
 
@@ -27,5 +26,4 @@ enum ImageCacheType: Int, CustomDebugStringConvertible {
       return "Image was obtained from the disk cache"
     }
   }
-
 }

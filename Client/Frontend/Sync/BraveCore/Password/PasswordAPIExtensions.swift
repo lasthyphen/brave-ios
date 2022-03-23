@@ -16,7 +16,7 @@ typealias Credential = (username: String, password: String)
 
 extension PasswordForm {
   func toDict(formSubmitURL: String, httpRealm: String = "") -> [String: String] {
-    return [
+    [
       "hostname": signOnRealm,
       "formSubmitURL": formSubmitURL,
       "httpRealm": httpRealm,
@@ -30,17 +30,16 @@ extension PasswordForm {
   var displayURLString: String {
     self.url.origin ?? self.signOnRealm
   }
-
 }
 
 extension BravePasswordAPI {
   func fetchFromScript(_ url: URL, script: [String: Any]) -> PasswordForm? {
     guard let signOnRealm = url.origin,
-      let formURL = URL(string: signOnRealm),
-      let username = script["username"] as? String,
-      let usernameElement = script["usernameField"] as? String,
-      let password = script["password"] as? String,
-      let passwordElement = script["passwordField"] as? String
+          let formURL = URL(string: signOnRealm),
+          let username = script["username"] as? String,
+          let usernameElement = script["usernameField"] as? String,
+          let password = script["password"] as? String,
+          let passwordElement = script["passwordField"] as? String
     else {
       return nil
     }
@@ -56,7 +55,8 @@ extension BravePasswordAPI {
       passwordElement: passwordElement,
       passwordValue: password,
       isBlockedByUser: false,
-      scheme: .typeHtml)
+      scheme: .typeHtml
+    )
 
     return loginForm
   }

@@ -37,14 +37,14 @@ struct TokenList<Content: View>: View {
         header: WalletListHeaderView(
           title: Text(Strings.Wallet.assetsTitle)
         )
-        .osAvailabilityModifiers { content in
-          if #available(iOS 15.0, *) {
-            content  // Padding already applied
-          } else {
-            content
-              .padding(.top)
+          .osAvailabilityModifiers { content in
+            if #available(iOS 15.0, *) {
+              content // Padding already applied
+            } else {
+              content
+                .padding(.top)
+            }
           }
-        }
       ) {
         if filteredTokens.isEmpty {
           Text(Strings.Wallet.assetSearchEmpty)

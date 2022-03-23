@@ -14,7 +14,7 @@ public final class DataSaved: NSManagedObject, CRUD {
   @NSManaged public var amount: String
 
   public class func get(with savedUrl: String) -> DataSaved? {
-    return getInternal(with: savedUrl)
+    getInternal(with: savedUrl)
   }
 
   public class func all() -> [DataSaved] {

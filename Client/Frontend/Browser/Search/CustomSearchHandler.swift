@@ -13,15 +13,19 @@ class CustomSearchHelper: TabContentScript {
   }
 
   func scriptMessageHandlerName() -> String? {
-    return "customSearchHelper"
+    "customSearchHelper"
   }
 
-  func userContentController(_ userContentController: WKUserContentController, didReceiveScriptMessage message: WKScriptMessage, replyHandler: (Any?, String?) -> Void) {
+  func userContentController(
+    _ userContentController: WKUserContentController,
+    didReceiveScriptMessage message: WKScriptMessage,
+    replyHandler: (Any?, String?) -> Void
+  ) {
     replyHandler(nil, nil)
     // We don't listen to messages because the BVC calls the searchHelper script by itself.
   }
 
   class func name() -> String {
-    return "CustomSearchHelper"
+    "CustomSearchHelper"
   }
 }

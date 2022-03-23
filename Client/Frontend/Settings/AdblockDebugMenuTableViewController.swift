@@ -11,7 +11,6 @@ import BraveShared
 private let log = Logger.browserLogger
 
 class AdblockDebugMenuTableViewController: TableViewController {
-
   private let fm = FileManager.default
 
   override func viewDidLoad() {
@@ -19,7 +18,9 @@ class AdblockDebugMenuTableViewController: TableViewController {
 
     ContentBlockerHelper.ruleStore.getAvailableContentRuleListIdentifiers { lists in
       let listNames = lists ?? []
-      if listNames.isEmpty { return }
+      if listNames.isEmpty {
+        return
+      }
 
       self.dataSource.sections = [
         self.actionsSection,
@@ -46,14 +47,18 @@ class AdblockDebugMenuTableViewController: TableViewController {
               self?.present(alert, animated: true)
             }
           }
-        }, cellClass: ButtonCell.self)
+        }, cellClass: ButtonCell.self
+      )
     ]
 
     return section
   }
 
   private var fetchSection: Section {
-    var section = Section(footer: "Last time we pinged the server for new data. If adblock list hasn't changed `Last Time Updated` section does not update.")
+    var section =
+      Section(
+        footer: "Last time we pinged the server for new data. If adblock list hasn't changed `Last Time Updated` section does not update."
+      )
     let dateFormatter = DateFormatter().then {
       $0.dateStyle = .short
       $0.timeStyle = .short
@@ -63,11 +68,13 @@ class AdblockDebugMenuTableViewController: TableViewController {
       .init(
         text: "Last fetch time (adblock)",
         detailText:
-          dateFormatter.string(from: AdblockResourceDownloader.shared.lastFetchDate)),
+        dateFormatter.string(from: AdblockResourceDownloader.shared.lastFetchDate)
+      ),
       .init(
         text: "Last fetch time (cosmetic-filters)",
         detailText:
-          dateFormatter.string(from: CosmeticFiltersResourceDownloader.shared.lastFetchDate)),
+        dateFormatter.string(from: CosmeticFiltersResourceDownloader.shared.lastFetchDate)
+      ),
     ]
 
     return section
@@ -76,7 +83,8 @@ class AdblockDebugMenuTableViewController: TableViewController {
   private var datesSection: Section {
     var section = Section(
       header: "Last time updated",
-      footer: "When the lists were last time updated on the device")
+      footer: "When the lists were last time updated on the device"
+    )
     var rows = [Row]()
 
     let dateFormatter = DateFormatter().then {
@@ -115,15 +123,21 @@ class AdblockDebugMenuTableViewController: TableViewController {
   private func bundledListsSection(names: [String]) -> Section {
     var section = Section(
       header: "Preinstalled lists",
-      footer: "Lists bundled within the iOS app.")
+      footer: "Lists bundled within the iOS app."
+    )
 
     var rows = [Row]()
 
     names.forEach {
       if let bundlePath = Bundle.main.path(forResource: $0, ofType: "json") {
         guard let jsonData = fm.contents(atPath: bundlePath),
-          let json = try? JSONSerialization.jsonObject(with: jsonData, options: JSONSerialization.ReadingOptions.allowFragments) as? [[String: Any]]
-        else { return }
+              let json = try? JSONSerialization.jsonObject(
+                with: jsonData,
+                options: JSONSerialization.ReadingOptions.allowFragments
+              ) as? [[String: Any]]
+        else {
+          return
+        }
 
         var text = $0 + ".json"
 
@@ -138,10 +152,11 @@ class AdblockDebugMenuTableViewController: TableViewController {
       }
 
       if $0 == "block-ads",
-        let bundlePath = Bundle.main.path(
-          forResource: "ABPFilterParserData",
-          ofType: "dat"),
-        let data = fm.contents(atPath: bundlePath) {
+         let bundlePath = Bundle.main.path(
+           forResource: "ABPFilterParserData",
+           ofType: "dat"
+         ),
+         let data = fm.contents(atPath: bundlePath) {
         let hashText = "sha1: \(data.sha1.hexEncodedString)"
         rows.append(.init(text: "ABPFilterParserData.dat", detailText: hashText, cellClass: ShrinkingSubtitleCell.self))
       }
@@ -154,14 +169,17 @@ class AdblockDebugMenuTableViewController: TableViewController {
   private func downloadedListsSection(names: [String]) -> Section {
     var section = Section(
       header: "Downloaded lists",
-      footer: "Lists downloaded from the internet at app launch.")
+      footer: "Lists downloaded from the internet at app launch."
+    )
 
     func getEtag(name: String, folder: String) -> String? {
       guard let folderUrl = fm.getOrCreateFolder(name: folder) else {
         return nil
       }
       let etagUrl = folderUrl.appendingPathComponent(name + ".etag")
-      guard let data = fm.contents(atPath: etagUrl.path) else { return nil }
+      guard let data = fm.contents(atPath: etagUrl.path) else {
+        return nil
+      }
       return String(data: data, encoding: .utf8)
     }
 
@@ -177,8 +195,10 @@ class AdblockDebugMenuTableViewController: TableViewController {
       }
       let etagUrl = folderUrl.appendingPathComponent(name + ".lastmodified")
       guard let data = fm.contents(atPath: etagUrl.path),
-        let stringData = String(data: data, encoding: .utf8)
-      else { return nil }
+            let stringData = String(data: data, encoding: .utf8)
+      else {
+        return nil
+      }
 
       let timeInterval = (stringData as NSString).doubleValue
       let date = Date(timeIntervalSince1970: timeInterval)
@@ -187,12 +207,17 @@ class AdblockDebugMenuTableViewController: TableViewController {
     }
 
     func createRows(folderName: String, names: [String]) -> [Row] {
-      guard let folderUrl = fm.getOrCreateFolder(name: folderName) else { return [] }
+      guard let folderUrl = fm.getOrCreateFolder(name: folderName) else {
+        return []
+      }
 
       var rows = [Row]()
       names.forEach {
         if let data = fm.contents(atPath: folderUrl.appendingPathComponent($0 + ".json").path),
-          let json = try? JSONSerialization.jsonObject(with: data, options: JSONSerialization.ReadingOptions.allowFragments) as? [[String: Any]] {
+           let json = try? JSONSerialization.jsonObject(
+             with: data,
+             options: JSONSerialization.ReadingOptions.allowFragments
+           ) as? [[String: Any]] {
           let text = "\($0).json: \(json.count) rules"
           let name = $0 + ".json"
 
@@ -225,20 +250,24 @@ class AdblockDebugMenuTableViewController: TableViewController {
 
     var rows = [Row]()
     rows.append(contentsOf: createRows(folderName: AdblockResourceDownloader.folderName, names: names))
-    rows.append(contentsOf: createRows(folderName: CosmeticFiltersResourceDownloader.folderName, names: cosmeticFilterNames))
+    rows
+      .append(contentsOf: createRows(
+        folderName: CosmeticFiltersResourceDownloader.folderName,
+        names: cosmeticFilterNames
+      ))
     section.rows = rows
     return section
   }
 }
 
-fileprivate class ShrinkingSubtitleCell: SubtitleCell {
-
+private class ShrinkingSubtitleCell: SubtitleCell {
   override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
     super.init(style: style, reuseIdentifier: reuseIdentifier)
     textLabel?.adjustsFontSizeToFitWidth = true
     detailTextLabel?.adjustsFontSizeToFitWidth = true
   }
 
+  @available(*, unavailable)
   required init?(coder aDecoder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }

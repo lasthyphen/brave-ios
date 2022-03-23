@@ -13,12 +13,11 @@ struct HomePageConstants {
 }
 
 class HomePageHelper {
-
   let prefs: Prefs
 
   var currentURL: URL? {
     get {
-      return HomePageAccessors.getHomePage(prefs)
+      HomePageAccessors.getHomePage(prefs)
     }
     set {
       if let url = newValue, url.isWebPage(includeDataURIs: false) && !InternalURL.isValid(url: url) {
@@ -29,7 +28,7 @@ class HomePageHelper {
     }
   }
 
-  var isHomePageAvailable: Bool { return currentURL != nil }
+  var isHomePageAvailable: Bool { currentURL != nil }
 
   init(prefs: Prefs) {
     self.prefs = prefs
@@ -56,12 +55,14 @@ class HomePageHelper {
     let alertController = UIAlertController(
       title: Strings.setHomePageDialogTitle,
       message: Strings.setHomePageDialogMessage,
-      preferredStyle: .alert)
+      preferredStyle: .alert
+    )
     alertController.addAction(UIAlertAction(title: Strings.setHomePageDialogNo, style: .cancel, handler: nil))
     alertController.addAction(
       UIAlertAction(title: Strings.setHomePageDialogYes, style: .default) { _ in
         self.currentURL = tab.url as URL?
-      })
+      }
+    )
     viewController?.present(alertController, animated: true, completion: nil)
   }
 }

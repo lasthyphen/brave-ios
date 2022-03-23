@@ -33,7 +33,8 @@ final public class RecentSearch: NSManagedObject, CRUD {
 
     return NSFetchedResultsController(
       fetchRequest: fetchRequest, managedObjectContext: context,
-      sectionNameKeyPath: nil, cacheName: nil)
+      sectionNameKeyPath: nil, cacheName: nil
+    )
   }
 
   public func update(dateAdded: Date) {
@@ -54,7 +55,7 @@ final public class RecentSearch: NSManagedObject, CRUD {
 
   public static func addItem(type: RecentSearchType, text: String?, websiteUrl: String?) {
     let isNullOrEmpty = { (string: String?) in
-      return (string ?? "").trimmingCharacters(in: CharacterSet.whitespacesAndNewlines).isEmpty
+      (string ?? "").trimmingCharacters(in: CharacterSet.whitespacesAndNewlines).isEmpty
     }
 
     // If both are empty, do NOT add it to Recent Searches
@@ -97,7 +98,11 @@ final public class RecentSearch: NSManagedObject, CRUD {
   }
 
   public static func removeItem(query: String) {
-    RecentSearch.deleteAll(predicate: NSPredicate(format: "text == %@ OR websiteUrl == %@", query, query), context: .new(inMemory: false), includesPropertyValues: false)
+    RecentSearch.deleteAll(
+      predicate: NSPredicate(format: "text == %@ OR websiteUrl == %@", query, query),
+      context: .new(inMemory: false),
+      includesPropertyValues: false
+    )
   }
 
   public static func removeAll() {

@@ -6,30 +6,32 @@ import Foundation
 import Shared
 
 class ThirdPartySearchAlerts: UIAlertController {
-
   /**
-    Allows the keyboard to pop back up after an alertview.
-    **/
+   Allows the keyboard to pop back up after an alertview.
+   **/
   override var canBecomeFirstResponder: Bool {
-    return false
+    false
   }
 
   /**
-     Builds the Alert view that asks if the users wants to add a third party search engine.
+   Builds the Alert view that asks if the users wants to add a third party search engine.
 
-     - parameter engine: To add engine details to alert
+   - parameter engine: To add engine details to alert
 
-     - parameter completion: Okay option handler.
+   - parameter completion: Okay option handler.
 
-     - returns: UIAlertController for asking the user to add a search engine
-     **/
+   - returns: UIAlertController for asking the user to add a search engine
+   **/
 
-  static func addThirdPartySearchEngine(_ engine: OpenSearchEngine, completion: @escaping (UIAlertAction) -> Void) -> UIAlertController {
+  static func addThirdPartySearchEngine(
+    _ engine: OpenSearchEngine,
+    completion: @escaping (UIAlertAction) -> Void
+  ) -> UIAlertController {
     let alertMessage = """
-      \n\(engine.displayName)
-      \(engine.searchTemplate)
-      \n\(Strings.CustomSearchEngine.thirdPartySearchEngineAddAlertDescription)
-      """
+    \n\(engine.displayName)
+    \(engine.searchTemplate)
+    \n\(Strings.CustomSearchEngine.thirdPartySearchEngineAddAlertDescription)
+    """
     let alert = ThirdPartySearchAlerts(
       title: Strings.CustomSearchEngine.thirdPartySearchEngineAddAlertTitle,
       message: alertMessage,
@@ -55,39 +57,44 @@ class ThirdPartySearchAlerts: UIAlertController {
   }
 
   /**
-     Builds the Alert view that shows the user an error in case a search engine could not be added.
+   Builds the Alert view that shows the user an error in case a search engine could not be added.
 
-     - returns: UIAlertController with an error dialog
-     **/
+   - returns: UIAlertController with an error dialog
+   **/
 
   static func failedToAddThirdPartySearch() -> UIAlertController {
-    return searchAlertWithOK(
+    searchAlertWithOK(
       title: Strings.CustomSearchEngine.thirdPartySearchEngineAddErrorTitle,
-      message: Strings.CustomSearchEngine.thirdPartySearchEngineAddErrorDescription)
+      message: Strings.CustomSearchEngine.thirdPartySearchEngineAddErrorDescription
+    )
   }
 
   static func missingInfoToAddThirdPartySearch() -> UIAlertController {
-    return searchAlertWithOK(
+    searchAlertWithOK(
       title: Strings.CustomSearchEngine.thirdPartySearchEngineAddErrorTitle,
-      message: Strings.CustomSearchEngine.thirdPartySearchEngineMissingInfoErrorDescription)
+      message: Strings.CustomSearchEngine.thirdPartySearchEngineMissingInfoErrorDescription
+    )
   }
 
   static func incorrectCustomEngineForm() -> UIAlertController {
-    return searchAlertWithOK(
+    searchAlertWithOK(
       title: Strings.CustomSearchEngine.thirdPartySearchEngineIncorrectFormErrorTitle,
-      message: Strings.CustomSearchEngine.thirdPartySearchEngineIncorrectFormErrorDescription)
+      message: Strings.CustomSearchEngine.thirdPartySearchEngineIncorrectFormErrorDescription
+    )
   }
 
   static func duplicateCustomEngine() -> UIAlertController {
-    return searchAlertWithOK(
+    searchAlertWithOK(
       title: Strings.CustomSearchEngine.thirdPartySearchEngineAddErrorTitle,
-      message: Strings.CustomSearchEngine.thirdPartySearchEngineDuplicateErrorDescription)
+      message: Strings.CustomSearchEngine.thirdPartySearchEngineDuplicateErrorDescription
+    )
   }
 
   static func insecureURLEntryThirdPartySearch() -> UIAlertController {
-    return searchAlertWithOK(
+    searchAlertWithOK(
       title: Strings.CustomSearchEngine.thirdPartySearchEngineAddErrorTitle,
-      message: Strings.CustomSearchEngine.thirdPartySearchEngineInsecureURLErrorDescription)
+      message: Strings.CustomSearchEngine.thirdPartySearchEngineInsecureURLErrorDescription
+    )
   }
 
   private static func searchAlertWithOK(title: String, message: String) -> UIAlertController {
@@ -106,5 +113,4 @@ class ThirdPartySearchAlerts: UIAlertController {
     alert.addAction(okayOption)
     return alert
   }
-
 }

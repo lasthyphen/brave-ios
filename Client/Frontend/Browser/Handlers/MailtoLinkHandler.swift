@@ -5,7 +5,6 @@
 import UIKit
 
 open class MailtoLinkHandler {
-
   lazy var mailSchemeProviders: [String: MailProvider] = self.fetchMailSchemeProviders()
 
   func launchMailClientForScheme(_ scheme: String, metadata: MailToMetadata, defaultMailtoURL: URL) {
@@ -23,7 +22,8 @@ open class MailtoLinkHandler {
 
   func fetchMailSchemeProviders() -> [String: MailProvider] {
     var providerDict = [String: MailProvider]()
-    if let path = Bundle.main.path(forResource: "MailSchemes", ofType: "plist"), let dictRoot = NSArray(contentsOfFile: path) {
+    if let path = Bundle.main.path(forResource: "MailSchemes", ofType: "plist"),
+       let dictRoot = NSArray(contentsOfFile: path) {
       dictRoot.forEach({ dict in
         if let schemeDict = dict as? [String: Any], let scheme = schemeDict["scheme"] as? String {
           if scheme == "readdle-spark://" {

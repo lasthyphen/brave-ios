@@ -49,7 +49,7 @@ class FindInPageBar: UIView {
 
   var text: String? {
     get {
-      return searchText.text
+      searchText.text
     }
 
     set {
@@ -143,6 +143,7 @@ class FindInPageBar: UIView {
     }
   }
 
+  @available(*, unavailable)
   required init?(coder aDecoder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }

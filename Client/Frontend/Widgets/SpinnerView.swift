@@ -8,7 +8,6 @@ import UIKit
 import Shared
 
 class SpinnerView: UIView {
-
   struct DefaultUX {
     static let backgroundColor = UIColor.black.withAlphaComponent(0.25)
     static let spinnerBackgroundColor = UIColor.black.withAlphaComponent(0.60)
@@ -69,6 +68,7 @@ class SpinnerView: UIView {
     container.addArrangedSubview(textLabel)
   }
 
+  @available(*, unavailable)
   required init?(coder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }
@@ -103,6 +103,7 @@ class SpinnerView: UIView {
       },
       completion: { _ in
         self.removeFromSuperview()
-      })
+      }
+    )
   }
 }

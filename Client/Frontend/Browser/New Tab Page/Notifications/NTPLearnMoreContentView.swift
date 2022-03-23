@@ -16,7 +16,6 @@ extension NTPLearnMoreViewController {
   }
 
   class NTPLearnMoreContentView: UIStackView {
-
     weak var delegate: NTPLearnMoreViewDelegate?
 
     private let looseSpacing: CGFloat = 16
@@ -76,7 +75,7 @@ extension NTPLearnMoreViewController {
 
     private lazy var tos = detailLinkLabel(
       with:
-        String(format: Strings.NTP.turnRewardsTos, tosString)
+      String(format: Strings.NTP.turnRewardsTos, tosString)
     ).then {
       $0.setURLInfo([tosString: "tos"])
     }

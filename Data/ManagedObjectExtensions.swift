@@ -5,13 +5,13 @@
 import Foundation
 import CoreData
 
-public extension NSManagedObject {
+extension NSManagedObject {
   /// Returns true if the object still exists in the persistent store.
-  func existsInPersistentStore() -> Bool {
+  public func existsInPersistentStore() -> Bool {
     // `isDeleted` is set to true if the object is going to be deleted
     // on the next context save.
     // After the save happens, managedObjectContext is set to nil.
     // This conditional should catch both deletion states.
-    return !isDeleted && managedObjectContext != nil
+    !isDeleted && managedObjectContext != nil
   }
 }

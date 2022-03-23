@@ -9,7 +9,7 @@ import SDWebImage
 import class Data.FaviconMO
 
 class FaviconHandler {
-  static let maximumFaviconSize = 1 * 1024 * 1024  // 1 MiB file size limit
+  static let maximumFaviconSize = 1 * 1024 * 1024 // 1 MiB file size limit
 
   private var tabObservers: TabObservers!
   private let backgroundQueue = OperationQueue()
@@ -39,10 +39,12 @@ class FaviconHandler {
       }
     }
 
-    let onSuccess: (Favicon, Data?) -> Void = { [weak tab] (favicon, data) -> Void in
+    let onSuccess: (Favicon, Data?) -> Void = { [weak tab] favicon, data -> Void in
       defer { deferred.fill(Maybe(success: (favicon, data))) }
 
-      guard let tab = tab else { return }
+      guard let tab = tab else {
+        return
+      }
 
       tab.favicons.append(favicon)
       FaviconMO.add(favicon, forSiteUrl: currentURL, persistent: !tab.isPrivate)
@@ -52,7 +54,7 @@ class FaviconHandler {
       let favicon = Favicon(url: url.absoluteString, date: Date(), type: type)
 
       guard let image = image,
-        let imageData = data
+            let imageData = data
       else {
         favicon.width = 0
         favicon.height = 0
@@ -62,9 +64,9 @@ class FaviconHandler {
       }
 
       if let header = "%PDF".data(using: .utf8),
-        imageData.count >= header.count,
-        let range = imageData.range(of: header),
-        range.lowerBound.distance(to: imageData.startIndex) < 8 {
+         imageData.count >= header.count,
+         let range = imageData.range(of: header),
+         range.lowerBound.distance(to: imageData.startIndex) < 8 {
         // strict PDF parsing. Otherwise index <= (1024 - header.count)
         // ^8 is the best range because some PDF's can contain a UTF-8 BOM (Byte-Order Mark)
 
@@ -85,7 +87,12 @@ class FaviconHandler {
         // If we failed to download a page-level icon, try getting the domain-level icon
         // instead before ultimately failing.
         let siteIconURL = currentURL.domainURL.appendingPathComponent("favicon.ico")
-        imageOperation = webImageCache.load(from: siteIconURL, options: [.lowPriority], progress: onProgress, completion: onCompletedSiteFavicon)
+        imageOperation = webImageCache.load(
+          from: siteIconURL,
+          options: [.lowPriority],
+          progress: onProgress,
+          completion: onCompletedSiteFavicon
+        )
         return
       }
 
@@ -96,7 +103,12 @@ class FaviconHandler {
       onSuccess(favicon, data)
     }
 
-    imageOperation = webImageCache.load(from: iconURL, options: [.lowPriority], progress: onProgress, completion: onCompletedPageFavicon)
+    imageOperation = webImageCache.load(
+      from: iconURL,
+      options: [.lowPriority],
+      progress: onProgress,
+      completion: onCompletedPageFavicon
+    )
 
     return deferred
   }
@@ -106,11 +118,11 @@ extension FaviconHandler: TabEventHandler {
   func tab(_ tab: Tab, didLoadPageMetadata metadata: PageMetadata) {
     tab.favicons.removeAll(keepingCapacity: false)
     if let iconURL = metadata.largeIconURL {
-      loadFaviconURL(iconURL, type: .appleIcon, forTab: tab) >>== { (favicon, data) in
+      loadFaviconURL(iconURL, type: .appleIcon, forTab: tab) >>== { favicon, data in
         TabEvent.post(.didLoadFavicon(favicon, with: data), for: tab)
       }
     } else if let iconURL = metadata.faviconURL {
-      loadFaviconURL(iconURL, type: .icon, forTab: tab) >>== { (favicon, data) in
+      loadFaviconURL(iconURL, type: .icon, forTab: tab) >>== { favicon, data in
         TabEvent.post(.didLoadFavicon(favicon, with: data), for: tab)
       }
     }
@@ -118,15 +130,16 @@ extension FaviconHandler: TabEventHandler {
     else if let baseURL = tab.url?.domainURL {
       loadFaviconURL(
         baseURL.appendingPathComponent("favicon.ico").absoluteString,
-        type: .icon, forTab: tab) >>== { (favicon, data) in
-          TabEvent.post(.didLoadFavicon(favicon, with: data), for: tab)
-        }
+        type: .icon, forTab: tab
+      ) >>== { favicon, data in
+        TabEvent.post(.didLoadFavicon(favicon, with: data), for: tab)
+      }
     }
   }
 }
 
 class FaviconError: MaybeErrorType {
   internal var description: String {
-    return "No Image Loaded"
+    "No Image Loaded"
   }
 }

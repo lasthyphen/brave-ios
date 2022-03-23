@@ -46,7 +46,11 @@ extension NTPSectionProvider {
     let sectionInset: UIEdgeInsets
     if let flowLayout = collectionView.collectionViewLayout as? UICollectionViewFlowLayout {
       if let flowLayoutDelegate = collectionView.delegate as? UICollectionViewDelegateFlowLayout {
-        sectionInset = flowLayoutDelegate.collectionView?(collectionView, layout: collectionView.collectionViewLayout, insetForSectionAt: section) ?? flowLayout.sectionInset
+        sectionInset = flowLayoutDelegate.collectionView?(
+          collectionView,
+          layout: collectionView.collectionViewLayout,
+          insetForSectionAt: section
+        ) ?? flowLayout.sectionInset
       } else {
         sectionInset = flowLayout.sectionInset
       }
@@ -54,7 +58,8 @@ extension NTPSectionProvider {
       sectionInset = .zero
     }
     return CGSize(
-      width: collectionView.bounds.width - collectionView.safeAreaInsets.left - collectionView.safeAreaInsets.right - sectionInset.left - sectionInset.right,
+      width: collectionView.bounds.width - collectionView.safeAreaInsets.left - collectionView.safeAreaInsets
+        .right - sectionInset.left - sectionInset.right,
       height: 1000
     )
   }
@@ -85,7 +90,8 @@ class NewTabPageViewController: UIViewController {
       return nil
     }
 
-    if let cell = collectionView.cellForItem(at: IndexPath(item: 0, section: section)) as? NewTabCollectionViewCell<BraveShieldStatsView> {
+    if let cell = collectionView
+      .cellForItem(at: IndexPath(item: 0, section: section)) as? NewTabCollectionViewCell<BraveShieldStatsView> {
       return cell.contentView.convert(cell.contentView.frame, to: view)
     }
     return nil
@@ -132,7 +138,8 @@ class NewTabPageViewController: UIViewController {
         },
         legacyLongPressAction: { [weak self] alertController in
           self?.present(alertController, animated: true)
-        }),
+        }
+      ),
       FavoritesOverflowSectionProvider(action: { [weak self] in
         self?.delegate?.focusURLBar()
       }),
@@ -174,7 +181,12 @@ class NewTabPageViewController: UIViewController {
     feedDataSource.observeState(from: self) { [weak self] in
       self?.handleFeedStateChange($0, $1)
     }
-    NotificationCenter.default.addObserver(self, selector: #selector(checkForUpdatedFeed), name: UIApplication.didBecomeActiveNotification, object: nil)
+    NotificationCenter.default.addObserver(
+      self,
+      selector: #selector(checkForUpdatedFeed),
+      name: UIApplication.didBecomeActiveNotification,
+      object: nil
+    )
     #endif
   }
 
@@ -196,11 +208,23 @@ class NewTabPageViewController: UIViewController {
 
     collectionView.backgroundView = backgroundButtonsView
 
-    feedOverlayView.headerView.settingsButton.addTarget(self, action: #selector(tappedBraveNewsSettings), for: .touchUpInside)
+    feedOverlayView.headerView.settingsButton.addTarget(
+      self,
+      action: #selector(tappedBraveNewsSettings),
+      for: .touchUpInside
+    )
     if !AppConstants.buildChannel.isPublic {
-      feedOverlayView.headerView.settingsButton.addGestureRecognizer(UILongPressGestureRecognizer(target: self, action: #selector(longPressedBraveNewsSettingsButton)))
+      feedOverlayView.headerView.settingsButton
+        .addGestureRecognizer(UILongPressGestureRecognizer(
+          target: self,
+          action: #selector(longPressedBraveNewsSettingsButton)
+        ))
     }
-    feedOverlayView.newContentAvailableButton.addTarget(self, action: #selector(tappedNewContentAvailable), for: .touchUpInside)
+    feedOverlayView.newContentAvailableButton.addTarget(
+      self,
+      action: #selector(tappedNewContentAvailable),
+      for: .touchUpInside
+    )
 
     backgroundButtonsView.tappedActiveButton = { [weak self] sender in
       self?.tappedActiveBackgroundButton(sender)
@@ -217,7 +241,7 @@ class NewTabPageViewController: UIViewController {
       $0.edges.equalToSuperview()
     }
 
-    sections.enumerated().forEach { (index, provider) in
+    sections.enumerated().forEach { index, provider in
       provider.registerCells(to: collectionView)
       if let observableProvider = provider as? NTPObservableSectionProvider {
         observableProvider.sectionDidChange = { [weak self] in
@@ -304,9 +328,11 @@ class NewTabPageViewController: UIViewController {
           backgroundButtonsView.activeButton = .none
         }
       case .withBrandLogo(let logo):
-        guard let logo = logo else { break }
+        guard let logo = logo else {
+          break
+        }
         backgroundButtonsView.activeButton = .brandLogo(logo)
-      case .withQRCode(_):
+      case .withQRCode:
         backgroundButtonsView.activeButton = .QRCode
       }
     } else {
@@ -371,7 +397,9 @@ class NewTabPageViewController: UIViewController {
   }
 
   private func calculateBackgroundCenterPoints() {
-    guard let image = backgroundView.imageView.image else { return }
+    guard let image = backgroundView.imageView.image else {
+      return
+    }
 
     // Need to calculate the sizing difference between `image` and `imageView` to determine the pixel difference ratio
     let sizeRatio = backgroundView.imageView.frame.size.width / image.size.width
@@ -399,8 +427,8 @@ class NewTabPageViewController: UIViewController {
 
   private func reportSponsoredImageBackgroundEvent(_ event: Ads.NewTabPageAdEventType) {
     guard let backgroundType = background.currentBackground?.type,
-      case .withBrandLogo = backgroundType,
-      let creativeInstanceId = background.currentBackground?.wallpaper.creativeInstanceId
+          case .withBrandLogo = backgroundType,
+          let creativeInstanceId = background.currentBackground?.wallpaper.creativeInstanceId
     else {
       return
     }
@@ -442,9 +470,13 @@ class NewTabPageViewController: UIViewController {
 
     switch notification {
     case .brandedImages(let state):
-      if Preferences.NewTabPage.atleastOneNTPNotificationWasShowed.value { return }
+      if Preferences.NewTabPage.atleastOneNTPNotificationWasShowed.value {
+        return
+      }
 
-      guard let notificationVC = NTPNotificationViewController(state: state, rewards: rewards) else { return }
+      guard let notificationVC = NTPNotificationViewController(state: state, rewards: rewards) else {
+        return
+      }
 
       notificationVC.closeHandler = { [weak self] in
         self?.notificationController = nil
@@ -457,12 +489,16 @@ class NewTabPageViewController: UIViewController {
       vc = notificationVC
     }
 
-    guard let viewController = vc else { return }
+    guard let viewController = vc else {
+      return
+    }
     notificationController = viewController
     visibleNotification = notification
 
     DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { [weak self] in
-      guard let self = self else { return }
+      guard let self = self else {
+        return
+      }
 
       if case .brandedImages = notification {
         Preferences.NewTabPage.atleastOneNTPNotificationWasShowed.value = true
@@ -474,7 +510,9 @@ class NewTabPageViewController: UIViewController {
   }
 
   private func hideNotification() {
-    guard let controller = notificationController else { return }
+    guard let controller = notificationController else {
+      return
+    }
     controller.willMove(toParent: nil)
     controller.removeFromParent()
     controller.view.removeFromSuperview()
@@ -496,9 +534,9 @@ class NewTabPageViewController: UIViewController {
       // However we saw it crashing in XCode logs, see #4202.
       let firstItemIndexPath = IndexPath(item: 0, section: 0)
       if let itemCount = collectionView.dataSource?.collectionView(collectionView, numberOfItemsInSection: 0),
-        itemCount > 0,  // Only scroll if the section has items, otherwise it will crash.
-        collectionView.dataSource?
-          .collectionView(collectionView, cellForItemAt: firstItemIndexPath) != nil {
+         itemCount > 0, // Only scroll if the section has items, otherwise it will crash.
+         collectionView.dataSource?
+           .collectionView(collectionView, cellForItemAt: firstItemIndexPath) != nil {
         collectionView.scrollToItem(at: firstItemIndexPath, at: .top, animated: true)
       } else {
         // Cannot scorll to deleted item index.
@@ -513,7 +551,11 @@ class NewTabPageViewController: UIViewController {
         self.backgroundButtonsView.alpha = 1.0
       }
     case .optInCardAction(.learnMoreButtonTapped):
-      delegate?.navigateToInput(BraveUX.braveNewsPrivacyURL.absoluteString, inNewTab: false, switchingToPrivateMode: false)
+      delegate?.navigateToInput(
+        BraveUX.braveNewsPrivacyURL.absoluteString,
+        inNewTab: false,
+        switchingToPrivateMode: false
+      )
     case .optInCardAction(.turnOnBraveNewsButtonTapped):
       preventReloadOnBraveNewsEnabledChange = true
       Preferences.BraveNews.userOptedIn.value = true
@@ -540,10 +582,12 @@ class NewTabPageViewController: UIViewController {
         switchingToPrivateMode: false
       )
     case .itemAction(.opened(let inNewTab, let switchingToPrivateMode), let context):
-      guard let url = context.item.content.url else { return }
+      guard let url = context.item.content.url else {
+        return
+      }
       let item = context.item
       if !switchingToPrivateMode, item.content.contentType == .partner,
-        let creativeInstanceID = item.content.creativeInstanceID {
+         let creativeInstanceID = item.content.creativeInstanceID {
         rewards.ads.reportPromotedContentAdEvent(
           item.content.urlHash,
           creativeInstanceId: creativeInstanceID,
@@ -572,7 +616,9 @@ class NewTabPageViewController: UIViewController {
         alert.present(on: self)
       }
     case .inlineContentAdAction(.opened(let inNewTab, let switchingToPrivateMode), let ad):
-      guard let url = ad.targetURL.asURL else { return }
+      guard let url = ad.targetURL.asURL else {
+        return
+      }
       if !switchingToPrivateMode {
         rewards.ads.reportInlineContentAdEvent(
           ad.uuid,
@@ -601,7 +647,9 @@ class NewTabPageViewController: UIViewController {
     _ oldValue: FeedDataSource.State,
     _ newValue: FeedDataSource.State
   ) {
-    guard let section = layout.braveNewsSection else { return }
+    guard let section = layout.braveNewsSection else {
+      return
+    }
 
     func _completeLoading() {
       UIView.animate(
@@ -613,7 +661,8 @@ class NewTabPageViewController: UIViewController {
           self.feedOverlayView.loaderView.stop()
           self.feedOverlayView.loaderView.alpha = 1.0
           self.feedOverlayView.loaderView.isHidden = true
-        })
+        }
+      )
       if collectionView.contentOffset.y == collectionView.contentInset.top {
         collectionView.reloadData()
         collectionView.layoutIfNeeded()
@@ -623,10 +672,12 @@ class NewTabPageViewController: UIViewController {
         cells.forEach { cell in
           cell.transform = .init(translationX: 0, y: 200)
           UIView.animate(
-            withDuration: 0.5, delay: 0, usingSpringWithDamping: 1.0, initialSpringVelocity: 0, options: [.beginFromCurrentState],
+            withDuration: 0.5, delay: 0, usingSpringWithDamping: 1.0, initialSpringVelocity: 0,
+            options: [.beginFromCurrentState],
             animations: {
               cell.transform = .identity
-            }, completion: nil)
+            }, completion: nil
+          )
         }
       } else {
         collectionView.reloadSections(IndexSet(integer: section))
@@ -647,13 +698,15 @@ class NewTabPageViewController: UIViewController {
       .loading(.failure(let error1 as NSError)),
       .failure(let error2 as NSError)
     ) where error1 == error2:
-      if let cell = collectionView.cellForItem(at: IndexPath(item: 0, section: section)) as? FeedCardCell<BraveNewsErrorView> {
+      if let cell = collectionView
+        .cellForItem(at: IndexPath(item: 0, section: section)) as? FeedCardCell<BraveNewsErrorView> {
         cell.content.refreshButton.isLoading = false
       } else {
         _completeLoading()
       }
     case (_, .loading):
-      if collectionView.contentOffset.y == collectionView.contentInset.top || collectionView.numberOfItems(inSection: section) == 0 {
+      if collectionView.contentOffset.y == collectionView.contentInset.top || collectionView
+        .numberOfItems(inSection: section) == 0 {
         feedOverlayView.loaderView.isHidden = false
         feedOverlayView.loaderView.start()
 
@@ -675,7 +728,9 @@ class NewTabPageViewController: UIViewController {
 
   @objc private func checkForUpdatedFeed() {
     #if !NO_BRAVE_NEWS
-    if !isBraveNewsVisible || Preferences.BraveNews.isShowingOptIn.value { return }
+    if !isBraveNewsVisible || Preferences.BraveNews.isShowingOptIn.value {
+      return
+    }
     if collectionView.contentOffset.y == collectionView.contentInset.top {
       // Reload contents if the user is not currently scrolled into the feed
       loadFeedContents()
@@ -710,7 +765,9 @@ class NewTabPageViewController: UIViewController {
     newContentAvailableDismissTimer = nil
     feedOverlayView.newContentAvailableButton.isLoading = true
     loadFeedContents { [weak self] in
-      guard let self = self else { return }
+      guard let self = self else {
+        return
+      }
       self.feedOverlayView.hideNewContentAvailableButton()
       DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
         self.collectionView.setContentOffset(CGPoint(x: 0, y: todayStart), animated: true)
@@ -725,12 +782,16 @@ class NewTabPageViewController: UIViewController {
   }
 
   private func tappedActiveBackgroundButton(_ sender: UIControl) {
-    guard let background = background.currentBackground else { return }
+    guard let background = background.currentBackground else {
+      return
+    }
     switch background.type {
     case .regular:
       presentImageCredit(sender)
     case .withBrandLogo(let logo):
-      guard let logo = logo else { break }
+      guard let logo = logo else {
+        break
+      }
       tappedSponsorButton(logo)
     case .withQRCode(let code):
       tappedQRCode(code)
@@ -750,7 +811,9 @@ class NewTabPageViewController: UIViewController {
       .appendingPathComponent("r")
       .appendingPathComponent(code)
 
-    guard let url = refUrl else { return }
+    guard let url = refUrl else {
+      return
+    }
     delegate?.tappedQRCodeButton(url: url)
   }
 
@@ -759,7 +822,9 @@ class NewTabPageViewController: UIViewController {
   }
 
   private func presentImageCredit(_ button: UIControl) {
-    guard let credit = background.currentBackground?.wallpaper.credit else { return }
+    guard let credit = background.currentBackground?.wallpaper.credit else {
+      return
+    }
 
     let alert = UIAlertController(title: credit.name, message: nil, preferredStyle: .actionSheet)
 
@@ -768,7 +833,8 @@ class NewTabPageViewController: UIViewController {
       alert.addAction(
         UIAlertAction(title: websiteTitle, style: .default) { [weak self] _ in
           self?.delegate?.navigateToInput(creditWebsite, inNewTab: false, switchingToPrivateMode: false)
-        })
+        }
+      )
     }
 
     alert.popoverPresentationController?.sourceView = button
@@ -782,7 +848,8 @@ class NewTabPageViewController: UIViewController {
   @objc private func longPressedBraveNewsSettingsButton() {
     assert(
       !AppConstants.buildChannel.isPublic,
-      "Debug settings are not accessible on public builds")
+      "Debug settings are not accessible on public builds"
+    )
     let settings = BraveNewsDebugSettingsController(dataSource: feedDataSource)
     let container = UINavigationController(rootViewController: settings)
     present(container, animated: true)
@@ -809,17 +876,24 @@ extension NewTabPageViewController {
     #if NO_BRAVE_NEWS
     return false
     #else
-    return !PrivateBrowsingManager.shared.isPrivateBrowsing && (Preferences.BraveNews.isEnabled.value || Preferences.BraveNews.isShowingOptIn.value)
+    return !PrivateBrowsingManager.shared
+      .isPrivateBrowsing && (Preferences.BraveNews.isEnabled.value || Preferences.BraveNews.isShowingOptIn.value)
     #endif
   }
+
   func scrollViewDidScroll(_ scrollView: UIScrollView) {
     for section in sections {
       section.scrollViewDidScroll?(scrollView)
     }
-    guard isBraveNewsVisible, let newsSection = layout.braveNewsSection else { return }
+    guard isBraveNewsVisible, let newsSection = layout.braveNewsSection else {
+      return
+    }
     if collectionView.numberOfItems(inSection: newsSection) > 0 {
       // Hide the buttons as Brave News feeds appear
-      backgroundButtonsView.alpha = 1.0 - max(0.0, min(1.0, (scrollView.contentOffset.y - scrollView.contentInset.top) / 16))
+      backgroundButtonsView.alpha = 1.0 - max(
+        0.0,
+        min(1.0, (scrollView.contentOffset.y - scrollView.contentInset.top) / 16)
+      )
       // Show the header as Brave News feeds appear
       // Offset of where Brave News starts
       let todayStart = collectionView.frame.height - feedOverlayView.headerView.bounds.height - 32 - 16
@@ -841,7 +915,9 @@ extension NewTabPageViewController {
               timeInterval: 4,
               repeats: false
             ) { [weak self] _ in
-              guard let self = self else { return }
+              guard let self = self else {
+                return
+              }
               self.feedOverlayView.hideNewContentAvailableButton()
               self.newContentAvailableDismissTimer = nil
             }
@@ -868,17 +944,33 @@ extension NewTabPageViewController: UICollectionViewDelegateFlowLayout {
   func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
     sections[indexPath.section].collectionView?(collectionView, didSelectItemAt: indexPath)
   }
-  func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-    sections[indexPath.section].collectionView?(collectionView, layout: collectionViewLayout, sizeForItemAt: indexPath) ?? .zero
+
+  func collectionView(
+    _ collectionView: UICollectionView,
+    layout collectionViewLayout: UICollectionViewLayout,
+    sizeForItemAt indexPath: IndexPath
+  ) -> CGSize {
+    sections[indexPath.section]
+      .collectionView?(collectionView, layout: collectionViewLayout, sizeForItemAt: indexPath) ?? .zero
   }
-  func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
+
+  func collectionView(
+    _ collectionView: UICollectionView,
+    layout collectionViewLayout: UICollectionViewLayout,
+    insetForSectionAt section: Int
+  ) -> UIEdgeInsets {
     let sectionProvider = sections[section]
-    var inset = sectionProvider.collectionView?(collectionView, layout: collectionViewLayout, insetForSectionAt: section) ?? .zero
+    var inset = sectionProvider.collectionView?(
+      collectionView,
+      layout: collectionViewLayout,
+      insetForSectionAt: section
+    ) ?? .zero
     if sectionProvider.landscapeBehavior == .halfWidth {
       let isIphone = UIDevice.isPhone
       let isLandscape = view.frame.width > view.frame.height
       if isLandscape {
-        let availableWidth = collectionView.bounds.width - collectionView.safeAreaInsets.left - collectionView.safeAreaInsets.right
+        let availableWidth = collectionView.bounds.width - collectionView.safeAreaInsets.left - collectionView
+          .safeAreaInsets.right
         if isIphone {
           inset.left = availableWidth / 2.0
         } else {
@@ -888,23 +980,50 @@ extension NewTabPageViewController: UICollectionViewDelegateFlowLayout {
     }
     return inset
   }
-  func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
-    sections[section].collectionView?(collectionView, layout: collectionViewLayout, minimumLineSpacingForSectionAt: section) ?? 0
+
+  func collectionView(
+    _ collectionView: UICollectionView,
+    layout collectionViewLayout: UICollectionViewLayout,
+    minimumLineSpacingForSectionAt section: Int
+  ) -> CGFloat {
+    sections[section]
+      .collectionView?(collectionView, layout: collectionViewLayout, minimumLineSpacingForSectionAt: section) ?? 0
   }
-  func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {
-    sections[section].collectionView?(collectionView, layout: collectionViewLayout, minimumInteritemSpacingForSectionAt: section) ?? 0
+
+  func collectionView(
+    _ collectionView: UICollectionView,
+    layout collectionViewLayout: UICollectionViewLayout,
+    minimumInteritemSpacingForSectionAt section: Int
+  ) -> CGFloat {
+    sections[section]
+      .collectionView?(collectionView, layout: collectionViewLayout, minimumInteritemSpacingForSectionAt: section) ?? 0
   }
-  func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
-    sections[section].collectionView?(collectionView, layout: collectionViewLayout, referenceSizeForHeaderInSection: section) ?? .zero
+
+  func collectionView(
+    _ collectionView: UICollectionView,
+    layout collectionViewLayout: UICollectionViewLayout,
+    referenceSizeForHeaderInSection section: Int
+  ) -> CGSize {
+    sections[section]
+      .collectionView?(collectionView, layout: collectionViewLayout, referenceSizeForHeaderInSection: section) ?? .zero
   }
 }
 
 // MARK: - UICollectionViewDelegate
 extension NewTabPageViewController: UICollectionViewDelegate {
-  func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
+  func collectionView(
+    _ collectionView: UICollectionView,
+    willDisplay cell: UICollectionViewCell,
+    forItemAt indexPath: IndexPath
+  ) {
     sections[indexPath.section].collectionView?(collectionView, willDisplay: cell, forItemAt: indexPath)
   }
-  func collectionView(_ collectionView: UICollectionView, didEndDisplaying cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
+
+  func collectionView(
+    _ collectionView: UICollectionView,
+    didEndDisplaying cell: UICollectionViewCell,
+    forItemAt indexPath: IndexPath
+  ) {
     sections[indexPath.section].collectionView?(collectionView, didEndDisplaying: cell, forItemAt: indexPath)
   }
 }
@@ -914,43 +1033,80 @@ extension NewTabPageViewController: UICollectionViewDataSource {
   func numberOfSections(in collectionView: UICollectionView) -> Int {
     sections.count
   }
+
   func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
     sections[section].collectionView(collectionView, numberOfItemsInSection: section)
   }
+
   func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
     sections[indexPath.section].collectionView(collectionView, cellForItemAt: indexPath)
   }
-  func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
-    sections[indexPath.section].collectionView?(collectionView, viewForSupplementaryElementOfKind: kind, at: indexPath) ?? UICollectionReusableView()
+
+  func collectionView(
+    _ collectionView: UICollectionView,
+    viewForSupplementaryElementOfKind kind: String,
+    at indexPath: IndexPath
+  ) -> UICollectionReusableView {
+    sections[indexPath.section]
+      .collectionView?(collectionView, viewForSupplementaryElementOfKind: kind, at: indexPath) ??
+      UICollectionReusableView()
   }
-  func collectionView(_ collectionView: UICollectionView, contextMenuConfigurationForItemAt indexPath: IndexPath, point: CGPoint) -> UIContextMenuConfiguration? {
-    sections[indexPath.section].collectionView?(collectionView, contextMenuConfigurationForItemAt: indexPath, point: point)
+
+  func collectionView(
+    _ collectionView: UICollectionView,
+    contextMenuConfigurationForItemAt indexPath: IndexPath,
+    point: CGPoint
+  ) -> UIContextMenuConfiguration? {
+    sections[indexPath.section]
+      .collectionView?(collectionView, contextMenuConfigurationForItemAt: indexPath, point: point)
   }
-  func collectionView(_ collectionView: UICollectionView, previewForHighlightingContextMenuWithConfiguration configuration: UIContextMenuConfiguration) -> UITargetedPreview? {
+
+  func collectionView(
+    _ collectionView: UICollectionView,
+    previewForHighlightingContextMenuWithConfiguration configuration: UIContextMenuConfiguration
+  ) -> UITargetedPreview? {
     guard let indexPath = configuration.identifier as? IndexPath else {
       return nil
     }
-    return sections[indexPath.section].collectionView?(collectionView, previewForHighlightingContextMenuWithConfiguration: configuration)
+    return sections[indexPath.section]
+      .collectionView?(collectionView, previewForHighlightingContextMenuWithConfiguration: configuration)
   }
-  func collectionView(_ collectionView: UICollectionView, previewForDismissingContextMenuWithConfiguration configuration: UIContextMenuConfiguration) -> UITargetedPreview? {
+
+  func collectionView(
+    _ collectionView: UICollectionView,
+    previewForDismissingContextMenuWithConfiguration configuration: UIContextMenuConfiguration
+  ) -> UITargetedPreview? {
     guard let indexPath = configuration.identifier as? IndexPath else {
       return nil
     }
-    return sections[indexPath.section].collectionView?(collectionView, previewForHighlightingContextMenuWithConfiguration: configuration)
+    return sections[indexPath.section]
+      .collectionView?(collectionView, previewForHighlightingContextMenuWithConfiguration: configuration)
   }
-  func collectionView(_ collectionView: UICollectionView, willPerformPreviewActionForMenuWith configuration: UIContextMenuConfiguration, animator: UIContextMenuInteractionCommitAnimating) {
+
+  func collectionView(
+    _ collectionView: UICollectionView,
+    willPerformPreviewActionForMenuWith configuration: UIContextMenuConfiguration,
+    animator: UIContextMenuInteractionCommitAnimating
+  ) {
     guard let indexPath = configuration.identifier as? IndexPath else {
       return
     }
-    sections[indexPath.section].collectionView?(collectionView, willPerformPreviewActionForMenuWith: configuration, animator: animator)
+    sections[indexPath.section].collectionView?(
+      collectionView,
+      willPerformPreviewActionForMenuWith: configuration,
+      animator: animator
+    )
   }
 }
 
 // MARK: - UICollectionViewDragDelegate & UICollectionViewDropDelegate
 
 extension NewTabPageViewController: UICollectionViewDragDelegate, UICollectionViewDropDelegate {
-
-  func collectionView(_ collectionView: UICollectionView, itemsForBeginning session: UIDragSession, at indexPath: IndexPath) -> [UIDragItem] {
+  func collectionView(
+    _ collectionView: UICollectionView,
+    itemsForBeginning session: UIDragSession,
+    at indexPath: IndexPath
+  ) -> [UIDragItem] {
     // Check If the item that is dragged is a favourite item
     guard sections[indexPath.section] is FavoritesSectionProvider else {
       return []
@@ -969,8 +1125,13 @@ extension NewTabPageViewController: UICollectionViewDragDelegate, UICollectionVi
     return [dragItem]
   }
 
-  func collectionView(_ collectionView: UICollectionView, performDropWith coordinator: UICollectionViewDropCoordinator) {
-    guard let sourceIndexPath = coordinator.items.first?.sourceIndexPath else { return }
+  func collectionView(
+    _ collectionView: UICollectionView,
+    performDropWith coordinator: UICollectionViewDropCoordinator
+  ) {
+    guard let sourceIndexPath = coordinator.items.first?.sourceIndexPath else {
+      return
+    }
     let destinationIndexPath: IndexPath
 
     if let indexPath = coordinator.destinationIndexPath {
@@ -981,10 +1142,14 @@ extension NewTabPageViewController: UICollectionViewDragDelegate, UICollectionVi
       destinationIndexPath = IndexPath(row: max(row - 1, 0), section: section)
     }
 
-    guard sourceIndexPath.section == destinationIndexPath.section else { return }
+    guard sourceIndexPath.section == destinationIndexPath.section else {
+      return
+    }
 
     if coordinator.proposal.operation == .move {
-      guard let item = coordinator.items.first else { return }
+      guard let item = coordinator.items.first else {
+        return
+      }
 
       Favorite.reorder(
         sourceIndexPath: sourceIndexPath,
@@ -992,14 +1157,17 @@ extension NewTabPageViewController: UICollectionViewDragDelegate, UICollectionVi
         isInteractiveDragReorder: true
       )
       _ = coordinator.drop(item.dragItem, toItemAt: destinationIndexPath)
-
     }
   }
 
-  func collectionView(_ collectionView: UICollectionView, dropSessionDidUpdate session: UIDropSession, withDestinationIndexPath destinationIndexPath: IndexPath?) -> UICollectionViewDropProposal {
+  func collectionView(
+    _ collectionView: UICollectionView,
+    dropSessionDidUpdate session: UIDropSession,
+    withDestinationIndexPath destinationIndexPath: IndexPath?
+  ) -> UICollectionViewDropProposal {
     guard let destinationIndexSection = destinationIndexPath?.section,
-      let favouriteSection = sections[destinationIndexSection] as? FavoritesSectionProvider,
-      favouriteSection.hasMoreThanOneFavouriteItems
+          let favouriteSection = sections[destinationIndexSection] as? FavoritesSectionProvider,
+          favouriteSection.hasMoreThanOneFavouriteItems
     else {
       return .init(operation: .cancel)
     }
@@ -1007,16 +1175,25 @@ extension NewTabPageViewController: UICollectionViewDragDelegate, UICollectionVi
     return .init(operation: .move, intent: .insertAtDestinationIndexPath)
   }
 
-  func collectionView(_ collectionView: UICollectionView, dragPreviewParametersForItemAt indexPath: IndexPath) -> UIDragPreviewParameters? {
+  func collectionView(
+    _ collectionView: UICollectionView,
+    dragPreviewParametersForItemAt indexPath: IndexPath
+  ) -> UIDragPreviewParameters? {
     fetchInteractionPreviewParameters(at: indexPath)
   }
 
-  func collectionView(_ collectionView: UICollectionView, dropPreviewParametersForItemAt indexPath: IndexPath) -> UIDragPreviewParameters? {
+  func collectionView(
+    _ collectionView: UICollectionView,
+    dropPreviewParametersForItemAt indexPath: IndexPath
+  ) -> UIDragPreviewParameters? {
     fetchInteractionPreviewParameters(at: indexPath)
   }
 
-  func collectionView(_ collectionView: UICollectionView, dragSessionIsRestrictedToDraggingApplication session: UIDragSession) -> Bool {
-    return true
+  func collectionView(
+    _ collectionView: UICollectionView,
+    dragSessionIsRestrictedToDraggingApplication session: UIDragSession
+  ) -> Bool {
+    true
   }
 
   private func fetchInteractionPreviewParameters(at indexPath: IndexPath) -> UIDragPreviewParameters {
@@ -1050,12 +1227,14 @@ extension NewTabPageViewController {
       // Drag should be enabled to rearrange favourite
       dragInteractionEnabled = true
     }
+
     @available(*, unavailable)
     required init(coder: NSCoder) {
       fatalError()
     }
+
     override func touchesShouldCancel(in view: UIView) -> Bool {
-      return true
+      true
     }
   }
 }

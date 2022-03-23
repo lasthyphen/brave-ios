@@ -19,10 +19,10 @@ extension ContentSizeCategory {
   var isAccessibilityCategory: Bool {
     switch self {
     case .accessibilityExtraExtraExtraLarge,
-      .accessibilityExtraExtraLarge,
-      .accessibilityExtraLarge,
-      .accessibilityLarge,
-      .accessibilityMedium:
+         .accessibilityExtraExtraLarge,
+         .accessibilityExtraLarge,
+         .accessibilityLarge,
+         .accessibilityMedium:
       return true
     default:
       return false

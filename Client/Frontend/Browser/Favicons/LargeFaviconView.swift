@@ -20,7 +20,9 @@ class LargeFaviconView: UIView {
     // domain
     fetcher = FaviconFetcher(siteURL: siteURL, kind: .largeIcon, domain: domain)
     fetcher?.load { [weak self] url, attributes in
-      guard let self = self, url == siteURL else { return }
+      guard let self = self, url == siteURL else {
+        return
+      }
       self.monogramFallbackLabel.isHidden = attributes.image != nil
       self.imageView.image = attributes.image
       self.imageView.contentMode = attributes.contentMode

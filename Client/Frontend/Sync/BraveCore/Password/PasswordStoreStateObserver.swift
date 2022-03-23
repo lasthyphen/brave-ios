@@ -7,7 +7,6 @@ import Foundation
 import BraveCore
 
 class PasswordStoreStateObserver: BraveServiceStateObserver, PasswordStoreObserver {
-
   private let listener: (StateChange) -> Void
 
   enum StateChange {
@@ -26,5 +25,4 @@ class PasswordStoreStateObserver: BraveServiceStateObserver, PasswordStoreObserv
   func passwordFormsRetained(_ retainedFormList: [PasswordForm]) {
     listener(.passwordFormsRetained(retainedFormList))
   }
-
 }

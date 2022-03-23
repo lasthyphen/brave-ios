@@ -8,38 +8,37 @@ import XCTest
 import SwiftKeychainWrapper
 
 class AuthenticationKeychainInfoTests: XCTestCase {
-
   /*
 
-    func testEncodingAndDecoding() {
-        let passcode = "1234"
-        let authInfo = AuthenticationKeychainInfo(passcode: passcode)
-        authInfo.isPasscodeRequiredImmediately = true
-        authInfo.recordValidation()
-        authInfo.recordFailedAttempt() // failed attempt should be 1
-        authInfo.lockOutUser() //lock out a user so a lockoutInterval is set.
-        authInfo.useTouchID = true
+   func testEncodingAndDecoding() {
+       let passcode = "1234"
+       let authInfo = AuthenticationKeychainInfo(passcode: passcode)
+       authInfo.isPasscodeRequiredImmediately = true
+       authInfo.recordValidation()
+       authInfo.recordFailedAttempt() // failed attempt should be 1
+       authInfo.lockOutUser() //lock out a user so a lockoutInterval is set.
+       authInfo.useTouchID = true
 
-        let savedInterval = authInfo.lockOutInterval
+       let savedInterval = authInfo.lockOutInterval
 
-        KeychainWrapper.sharedAppContainerKeychain.setAuthenticationInfo(authInfo) //Save to disk
-        let decodedAuthInfo = KeychainWrapper.sharedAppContainerKeychain.authenticationInfo()! //Fetch from disk
+       KeychainWrapper.sharedAppContainerKeychain.setAuthenticationInfo(authInfo) //Save to disk
+       let decodedAuthInfo = KeychainWrapper.sharedAppContainerKeychain.authenticationInfo()! //Fetch from disk
 
-        XCTAssertEqual(savedInterval, decodedAuthInfo.lockOutInterval)
-        XCTAssertEqual(passcode, decodedAuthInfo.passcode)
-        XCTAssertEqual(1, decodedAuthInfo.failedAttempts, "We performed a recordFailedAttempt. This should be 1.")
-        XCTAssertTrue(decodedAuthInfo.useTouchID)
-        XCTAssertEqual(true, decodedAuthInfo.isPasscodeRequiredImmediately)
-    }
+       XCTAssertEqual(savedInterval, decodedAuthInfo.lockOutInterval)
+       XCTAssertEqual(passcode, decodedAuthInfo.passcode)
+       XCTAssertEqual(1, decodedAuthInfo.failedAttempts, "We performed a recordFailedAttempt. This should be 1.")
+       XCTAssertTrue(decodedAuthInfo.useTouchID)
+       XCTAssertEqual(true, decodedAuthInfo.isPasscodeRequiredImmediately)
+   }
 
-    func testNilIntervalsArentZero() {
-        let passcode = "1234"
-        let authInfo = AuthenticationKeychainInfo(passcode: passcode)
+   func testNilIntervalsArentZero() {
+       let passcode = "1234"
+       let authInfo = AuthenticationKeychainInfo(passcode: passcode)
 
-        KeychainWrapper.sharedAppContainerKeychain.setAuthenticationInfo(authInfo) //Save to disk
-        let decodedAuthInfo = KeychainWrapper.sharedAppContainerKeychain.authenticationInfo()! //Fetch from disk
+       KeychainWrapper.sharedAppContainerKeychain.setAuthenticationInfo(authInfo) //Save to disk
+       let decodedAuthInfo = KeychainWrapper.sharedAppContainerKeychain.authenticationInfo()! //Fetch from disk
 
-        XCTAssertNil(decodedAuthInfo.lockOutInterval, "The lockoutInterval was never used. It should be nil")
-    }
-    */
+       XCTAssertNil(decodedAuthInfo.lockOutInterval, "The lockoutInterval was never used. It should be nil")
+   }
+   */
 }

@@ -7,7 +7,6 @@ import Foundation
 import AVFoundation
 import Combine
 import CoreData
-
 import Shared
 import Data
 import BraveShared
@@ -92,7 +91,10 @@ class PlaylistManager: NSObject {
     onContentDidChange.eraseToAnyPublisher()
   }
 
-  var objectDidChange: AnyPublisher<(object: Any, indexPath: IndexPath?, type: NSFetchedResultsChangeType, newIndexPath: IndexPath?), Never> {
+  var objectDidChange: AnyPublisher<
+    (object: Any, indexPath: IndexPath?, type: NSFetchedResultsChangeType, newIndexPath: IndexPath?),
+    Never
+  > {
     onObjectChange.eraseToAnyPublisher()
   }
 
@@ -100,7 +102,10 @@ class PlaylistManager: NSObject {
     onDownloadProgressUpdate.eraseToAnyPublisher()
   }
 
-  var downloadStateChanged: AnyPublisher<(id: String, state: PlaylistDownloadManager.DownloadState, displayName: String?, error: Error?), Never> {
+  var downloadStateChanged: AnyPublisher<
+    (id: String, state: PlaylistDownloadManager.DownloadState, displayName: String?, error: Error?),
+    Never
+  > {
     onDownloadStateChanged.eraseToAnyPublisher()
   }
 
@@ -153,7 +158,9 @@ class PlaylistManager: NSObject {
         }
       }
 
-      guard let self = self else { return }
+      guard let self = self else {
+        return
+      }
 
       let src = self.frc.object(at: sourceIndexPath)
       objects.remove(at: sourceIndexPath.row)
@@ -188,8 +195,7 @@ class PlaylistManager: NSObject {
   func sizeOfDownloadedItem(for pageSrc: String) -> String? {
     var isDirectory: ObjCBool = false
     if let asset = downloadManager.localAsset(for: pageSrc),
-      FileManager.default.fileExists(atPath: asset.url.path, isDirectory: &isDirectory) {
-
+       FileManager.default.fileExists(atPath: asset.url.path, isDirectory: &isDirectory) {
       let formatter = ByteCountFormatter().then {
         $0.zeroPadsFractionDigits = true
         $0.countStyle = .file
@@ -202,7 +208,8 @@ class PlaylistManager: NSObject {
             at: asset.url,
             includingPropertiesForKeys: properties,
             options: .skipsHiddenFiles,
-            errorHandler: nil)
+            errorHandler: nil
+          )
         else {
           return nil
         }
@@ -211,9 +218,9 @@ class PlaylistManager: NSObject {
           try? ($0 as? URL)?
             .resourceValues(forKeys: Set(properties))
         })
-        .filter({ $0.isRegularFile == true })
-        .compactMap({ $0.totalFileAllocatedSize })
-        .compactMap({ Int64($0) })
+          .filter({ $0.isRegularFile == true })
+          .compactMap(\.totalFileAllocatedSize)
+          .compactMap({ Int64($0) })
 
         return formatter.string(fromByteCount: Int64(sizes.reduce(0, +)))
       }
@@ -237,19 +244,24 @@ class PlaylistManager: NSObject {
     if !didRestoreSession {
       didRestoreSession = true
 
-      downloadManager.restoreSession() { [weak self] in
+      downloadManager.restoreSession { [weak self] in
         self?.reloadData()
       }
     }
   }
 
   func download(item: PlaylistInfo) {
-    guard downloadManager.downloadTask(for: item.pageSrc) == nil, let assetUrl = URL(string: item.src) else { return }
+    guard downloadManager.downloadTask(for: item.pageSrc) == nil, let assetUrl = URL(string: item.src) else {
+      return
+    }
 
     PlaylistMediaStreamer.getMimeType(assetUrl) { [weak self] mimeType in
-      guard let self = self, let mimeType = mimeType?.lowercased() else { return }
+      guard let self = self, let mimeType = mimeType?.lowercased() else {
+        return
+      }
 
-      if mimeType.contains("x-mpegurl") || mimeType.contains("application/vnd.apple.mpegurl") || mimeType.contains("mpegurl") {
+      if mimeType.contains("x-mpegurl") || mimeType.contains("application/vnd.apple.mpegurl") || mimeType
+        .contains("mpegurl") {
         DispatchQueue.main.async {
           self.downloadManager.downloadHLSAsset(assetUrl, for: item)
         }
@@ -280,7 +292,7 @@ class PlaylistManager: NSObject {
       }
 
       if let cacheItem = PlaylistItem.getItem(pageSrc: item.pageSrc),
-        cacheItem.cachedData != nil {
+         cacheItem.cachedData != nil {
         if !deleteCache(item: item) {
           // If we cannot delete an item's cache for any given reason,
           // Do NOT delete the folder containing the item.
@@ -321,7 +333,7 @@ class PlaylistManager: NSObject {
     }
 
     if let cacheItem = PlaylistItem.getItem(pageSrc: item.pageSrc),
-      cacheItem.cachedData != nil {
+       cacheItem.cachedData != nil {
       // Do NOT delete the item if we can't delete it's local cache.
       // That will cause zombie items.
       if deleteCache(item: item) {
@@ -342,8 +354,8 @@ class PlaylistManager: NSObject {
     cancelDownload(item: item)
 
     if let cacheItem = PlaylistItem.getItem(pageSrc: item.pageSrc),
-      let cachedData = cacheItem.cachedData,
-      !cachedData.isEmpty {
+       let cachedData = cacheItem.cachedData,
+       !cachedData.isEmpty {
       var isStale = false
 
       do {
@@ -414,16 +426,18 @@ class PlaylistManager: NSObject {
         let urls = try FileManager.default.contentsOfDirectory(
           at: libraryPath,
           includingPropertiesForKeys: nil,
-          options: [.skipsHiddenFiles])
+          options: [.skipsHiddenFiles]
+        )
         for url in urls where url.absoluteString.contains("com.apple.UserManagedAssets") {
           do {
             let assets = try FileManager.default.contentsOfDirectory(
               at: url,
               includingPropertiesForKeys: nil,
-              options: [.skipsHiddenFiles])
+              options: [.skipsHiddenFiles]
+            )
             assets.forEach({
               if let item = PlaylistItem.cachedItem(cacheURL: $0),
-                let pageSrc = item.pageSrc {
+                 let pageSrc = item.pageSrc {
                 self.cancelDownload(item: PlaylistInfo(item: item))
                 PlaylistItem.updateCache(pageSrc: pageSrc, cachedData: nil)
               }
@@ -472,7 +486,9 @@ class PlaylistManager: NSObject {
 
   private func availableDiskSpace() -> Int64? {
     do {
-      return try URL(fileURLWithPath: NSHomeDirectory() as String).resourceValues(forKeys: [.volumeAvailableCapacityForImportantUsageKey]).volumeAvailableCapacityForImportantUsage
+      return try URL(fileURLWithPath: NSHomeDirectory() as String)
+        .resourceValues(forKeys: [.volumeAvailableCapacityForImportantUsageKey])
+        .volumeAvailableCapacityForImportantUsage
     } catch {
       log.error("Error Retrieving Disk Space: \(error)")
     }
@@ -481,7 +497,8 @@ class PlaylistManager: NSObject {
 
   private func totalDiskSpace() -> Int64? {
     do {
-      if let result = try URL(fileURLWithPath: NSHomeDirectory() as String).resourceValues(forKeys: [.volumeTotalCapacityKey]).volumeTotalCapacity {
+      if let result = try URL(fileURLWithPath: NSHomeDirectory() as String)
+        .resourceValues(forKeys: [.volumeTotalCapacityKey]).volumeTotalCapacity {
         return Int64(result)
       }
     } catch {
@@ -510,14 +527,24 @@ extension PlaylistManager: PlaylistDownloadManagerDelegate {
     onDownloadProgressUpdate.send((id: id, percentComplete: percentComplete))
   }
 
-  func onDownloadStateChanged(id: String, state: PlaylistDownloadManager.DownloadState, displayName: String?, error: Error?) {
+  func onDownloadStateChanged(
+    id: String,
+    state: PlaylistDownloadManager.DownloadState,
+    displayName: String?,
+    error: Error?
+  ) {
     onDownloadStateChanged.send((id: id, state: state, displayName: displayName, error: error))
   }
 }
 
 extension PlaylistManager: NSFetchedResultsControllerDelegate {
-  func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
-
+  func controller(
+    _ controller: NSFetchedResultsController<NSFetchRequestResult>,
+    didChange anObject: Any,
+    at indexPath: IndexPath?,
+    for type: NSFetchedResultsChangeType,
+    newIndexPath: IndexPath?
+  ) {
     onObjectChange.send((object: anObject, indexPath: indexPath, type: type, newIndexPath: newIndexPath))
   }
 
@@ -537,7 +564,9 @@ extension PlaylistManager {
     }
 
     fetchAssetDuration(item: item) { [weak self] duration in
-      guard let self = self else { return }
+      guard let self = self else {
+        return
+      }
 
       if let index = self.assetInformation.firstIndex(where: { $0.itemId == item.pageSrc }) {
         let assetFetcher = self.assetInformation.remove(at: index)
@@ -566,13 +595,13 @@ extension PlaylistManager {
     }
 
     guard let index = index(of: item.pageSrc) else {
-      completion(item.duration)  // Return the database duration
+      completion(item.duration) // Return the database duration
       return
     }
 
     // Attempt to retrieve the duration from the Asset file
     guard let asset = assetAtIndex(index) else {
-      completion(item.duration)  // Return the database duration
+      completion(item.duration) // Return the database duration
       return
     }
 
@@ -586,7 +615,7 @@ extension PlaylistManager {
 
     if trackStatus == .loaded {
       if !asset.tracks.isEmpty,
-        let track = asset.tracks(withMediaType: .video).first ?? asset.tracks(withMediaType: .audio).first {
+         let track = asset.tracks(withMediaType: .video).first ?? asset.tracks(withMediaType: .audio).first {
         if track.timeRange.duration.isIndefinite {
           completion(TimeInterval.infinity)
         } else {
@@ -623,7 +652,7 @@ extension PlaylistManager {
 
     switch Reach().connectionStatus() {
     case .offline, .unknown:
-      completion(item.duration)  // Return the database duration
+      completion(item.duration) // Return the database duration
       return
     case .online:
       break
@@ -696,7 +725,8 @@ extension PlaylistManager {
               duration: duration.seconds,
               detected: item.detected,
               dateAdded: item.dateAdded,
-              tagId: item.tagId)
+              tagId: item.tagId
+            )
 
             PlaylistItem.updateItem(newItem) {
               completion(duration.seconds)
@@ -717,8 +747,10 @@ extension AVAsset {
     var names = ""
     for mediaCharacteristic in availableMediaCharacteristicsWithMediaSelectionOptions {
       guard let mediaSelectionGroup = mediaSelectionGroup(forMediaCharacteristic: mediaCharacteristic),
-        let option = mediaSelection.selectedMediaOption(in: mediaSelectionGroup)
-      else { continue }
+            let option = mediaSelection.selectedMediaOption(in: mediaSelectionGroup)
+      else {
+        continue
+      }
 
       if names.isEmpty {
         names += " " + option.displayName

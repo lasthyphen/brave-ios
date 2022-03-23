@@ -8,19 +8,19 @@ import Shared
 
 class CertificateErrorPageHandler: InterstitialPageHandler {
   func canHandle(error: NSError) -> Bool {
-    return CertificateErrorPageHandler.isValidCertificateError(error: error)
+    CertificateErrorPageHandler.isValidCertificateError(error: error)
   }
 
   func response(for model: ErrorPageModel) -> (URLResponse, Data)? {
     let hasCertificate = model.components.valueForQuery("certerror") != nil
 
     guard let asset = Bundle.main.path(forResource: "CertificateError", ofType: "html") else {
-      assert(false)
+      assertionFailure()
       return nil
     }
 
     guard var html = try? String(contentsOfFile: asset) else {
-      assert(false)
+      assertionFailure()
       return nil
     }
 
@@ -28,7 +28,7 @@ class CertificateErrorPageHandler: InterstitialPageHandler {
 
     // Update the error code domain
     if domain == kCFErrorDomainCFNetwork as String,
-      let code = CFNetworkErrors(rawValue: Int32(model.errorCode)) {
+       let code = CFNetworkErrors(rawValue: Int32(model.errorCode)) {
       domain = GenericErrorPageHandler.CFErrorToName(code)
     } else if domain == NSURLErrorDomain {
       domain = GenericErrorPageHandler.NSURLErrorToName(model.errorCode)
@@ -73,7 +73,7 @@ class CertificateErrorPageHandler: InterstitialPageHandler {
       ]
     }
 
-    variables.forEach { (arg, value) in
+    variables.forEach { arg, value in
       html = html.replacingOccurrences(of: "%\(arg)%", with: value)
     }
 
@@ -89,7 +89,7 @@ class CertificateErrorPageHandler: InterstitialPageHandler {
     func getCert(_ url: URL) -> SecCertificate? {
       let components = URLComponents(url: url, resolvingAgainstBaseURL: false)
       if let encodedCert = components?.queryItems?.filter({ $0.name == "badcert" }).first?.value,
-        let certData = Data(base64Encoded: encodedCert, options: []) {
+         let certData = Data(base64Encoded: encodedCert, options: []) {
         return SecCertificateCreateWithData(nil, certData as CFData)
       }
 
@@ -112,7 +112,7 @@ class CertificateErrorPageHandler: InterstitialPageHandler {
   static func isValidCertificateError(error: NSError) -> Bool {
     // Handle CFNetwork Error
     if error.domain == kCFErrorDomainCFNetwork as String,
-      let code = CFNetworkErrors(rawValue: Int32(error.code)) {
+       let code = CFNetworkErrors(rawValue: Int32(error.code)) {
       return CertificateErrorPageHandler.CFNetworkErrorsCertErrors.contains(code)
     }
 
@@ -167,8 +167,8 @@ class CertificateErrorPageHandler: InterstitialPageHandler {
     errSSLInternal: "SSL_INTERNAL_ERROR",
     errSSLModuleAttach: "SSL_MODULE_ATTACH_ERROR",
     errSSLUnknownRootCert: "SSL_VALID_CERT_CHAIN_UNTRUSTED_ROOT_ERROR",
-    errSSLNoRootCert: "SSL_NO_ROOT_CERT_ERROR",  // SEC_ERROR_UNKNOWN_ISSUER
-    errSSLCertExpired: "SSL_CERTIFICATE_EXPIRED_ERROR",  // SEC_ERROR_EXPIRED_CERTIFICATE
+    errSSLNoRootCert: "SSL_NO_ROOT_CERT_ERROR", // SEC_ERROR_UNKNOWN_ISSUER
+    errSSLCertExpired: "SSL_CERTIFICATE_EXPIRED_ERROR", // SEC_ERROR_EXPIRED_CERTIFICATE
     errSSLCertNotYetValid: "SSL_CERT_IN_CHAIN_NOT_YET_VALID_ERROR",
     errSSLClosedNoNotify: "SSL_SERVER_CLOSED_NO_NOTIFY_ERROR",
     errSSLBufferOverflow: "SSL_BUFFER_OVERFLOW_ERROR",
@@ -197,7 +197,7 @@ class CertificateErrorPageHandler: InterstitialPageHandler {
     errSSLPeerNoRenegotiation: "SSL_PEER_NO_RENEGOTIATION_ALLOWED_ERROR",
     errSSLPeerAuthCompleted: "SSL_PEER_AUTH_COMPLETED_ERROR",
     errSSLClientCertRequested: "SSL_CLIENT_CERT_REQUESTED_ERROR",
-    errSSLHostNameMismatch: "SSL_HOST_NAME_MISMATCH_ERROR",  // SSL_ERROR_BAD_CERT_DOMAIN
+    errSSLHostNameMismatch: "SSL_HOST_NAME_MISMATCH_ERROR", // SSL_ERROR_BAD_CERT_DOMAIN
     errSSLConnectionRefused: "SSL_CONNECTION_REFUSED_ERROR",
     errSSLDecryptionFail: "SSL_DECRYPTION_FAIL_ERROR",
     errSSLBadRecordMac: "SSL_BAD_RECORD_MAC_ERROR",

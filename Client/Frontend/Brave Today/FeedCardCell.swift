@@ -29,7 +29,8 @@ class FeedCardCell<Content: FeedCardContent>: UICollectionViewCell, CollectionVi
     fatalError()
   }
 
-  override func preferredLayoutAttributesFitting(_ layoutAttributes: UICollectionViewLayoutAttributes) -> UICollectionViewLayoutAttributes {
+  override func preferredLayoutAttributesFitting(_ layoutAttributes: UICollectionViewLayoutAttributes)
+  -> UICollectionViewLayoutAttributes {
     // swiftlint:disable:next force_cast
     let attributes = layoutAttributes.copy() as! UICollectionViewLayoutAttributes
     // Let iPads have a bit larger cards since theres more room

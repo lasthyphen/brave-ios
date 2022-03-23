@@ -9,7 +9,6 @@ import Data
 private let log = Logger.browserLogger
 
 class UserScriptManager {
-
   // Scripts can use this to verify the app –not js on the page– is calling into them.
   private static let securityToken = UUID()
 
@@ -17,17 +16,27 @@ class UserScriptManager {
   private static let messageHandlerToken = UUID()
 
   // String representation of messageHandlerToken
-  public static let messageHandlerTokenString = UserScriptManager.messageHandlerToken.uuidString.replacingOccurrences(of: "-", with: "", options: .literal)
+  public static let messageHandlerTokenString = UserScriptManager.messageHandlerToken.uuidString.replacingOccurrences(
+    of: "-",
+    with: "",
+    options: .literal
+  )
 
   // String representation of securityToken
-  public static let securityTokenString = UserScriptManager.securityToken.uuidString.replacingOccurrences(of: "-", with: "", options: .literal)
+  public static let securityTokenString = UserScriptManager.securityToken.uuidString.replacingOccurrences(
+    of: "-",
+    with: "",
+    options: .literal
+  )
 
   private weak var tab: Tab?
 
   /// Whether or not the fingerprinting protection
   var isFingerprintingProtectionEnabled: Bool {
     didSet {
-      if oldValue == isFingerprintingProtectionEnabled { return }
+      if oldValue == isFingerprintingProtectionEnabled {
+        return
+      }
       reloadUserScripts()
     }
   }
@@ -35,7 +44,9 @@ class UserScriptManager {
   /// Whether cookie blocking is enabled
   var isCookieBlockingEnabled: Bool {
     didSet {
-      if oldValue == isCookieBlockingEnabled { return }
+      if oldValue == isCookieBlockingEnabled {
+        return
+      }
       reloadUserScripts()
     }
   }
@@ -43,7 +54,9 @@ class UserScriptManager {
   /// Whether or not the PaymentRequest APIs should be exposed
   var isPaymentRequestEnabled: Bool {
     didSet {
-      if oldValue == isPaymentRequestEnabled { return }
+      if oldValue == isPaymentRequestEnabled {
+        return
+      }
       reloadUserScripts()
     }
   }
@@ -51,7 +64,9 @@ class UserScriptManager {
   /// Whether or not Playlist is enabled
   var isPlaylistEnabled: Bool {
     didSet {
-      if oldValue == isPlaylistEnabled { return }
+      if oldValue == isPlaylistEnabled {
+        return
+      }
       reloadUserScripts()
     }
   }
@@ -59,7 +74,9 @@ class UserScriptManager {
   /// Whether or not the MediaSource API should be disabled for Playlists
   var isWebCompatibilityMediaSourceAPIEnabled: Bool {
     didSet {
-      if oldValue == isWebCompatibilityMediaSourceAPIEnabled { return }
+      if oldValue == isWebCompatibilityMediaSourceAPIEnabled {
+        return
+      }
       reloadUserScripts()
     }
   }
@@ -67,7 +84,9 @@ class UserScriptManager {
   /// Whether or not the Media Background Playback is enabled
   var isMediaBackgroundPlaybackEnabled: Bool {
     didSet {
-      if oldValue == isMediaBackgroundPlaybackEnabled { return }
+      if oldValue == isMediaBackgroundPlaybackEnabled {
+        return
+      }
       reloadUserScripts()
     }
   }
@@ -75,7 +94,9 @@ class UserScriptManager {
   /// Whether night mode is enabled for webview
   var isNightModeEnabled: Bool {
     didSet {
-      if oldValue == isNightModeEnabled { return }
+      if oldValue == isNightModeEnabled {
+        return
+      }
       reloadUserScripts()
     }
   }
@@ -83,7 +104,9 @@ class UserScriptManager {
   /// Stores domain specific scriplet, usually used for webcompat workarounds.
   var domainUserScript: DomainUserScript? {
     didSet {
-      if oldValue == domainUserScript { return }
+      if oldValue == domainUserScript {
+        return
+      }
       reloadUserScripts()
     }
   }
@@ -99,7 +122,8 @@ class UserScriptManager {
     if let shieldType = customDomainUserScript.shieldType {
       let domain = Domain.getOrCreate(
         forUrl: url,
-        persistent: !PrivateBrowsingManager.shared.isPrivateBrowsing)
+        persistent: !PrivateBrowsingManager.shared.isPrivateBrowsing
+      )
 
       if domain.isShieldExpected(shieldType, considerAllShieldsOption: true) {
         domainUserScript = customDomainUserScript
@@ -154,37 +178,50 @@ class UserScriptManager {
       (WKUserScriptInjectionTime.atDocumentEnd, mainFrameOnly: true, sandboxed: true),
     ].compactMap { arg in
       let (injectionTime, mainFrameOnly, sandboxed) = arg
-      let name = (mainFrameOnly ? "MainFrame" : "AllFrames") + "AtDocument" + (injectionTime == .atDocumentStart ? "Start" : "End") + (sandboxed ? "Sandboxed" : "")
+      let name = (mainFrameOnly ? "MainFrame" : "AllFrames") + "AtDocument" + (
+        injectionTime == .atDocumentStart
+          ? "Start"
+          : "End"
+      ) + (sandboxed ? "Sandboxed" : "")
       if let path = Bundle.main.path(forResource: name, ofType: "js"),
-        let source = try? NSString(contentsOfFile: path, encoding: String.Encoding.utf8.rawValue) as String {
-        let wrappedSource = "(function() { const SECURITY_TOKEN = '\(UserScriptManager.messageHandlerTokenString)'; \(source) })()"
+         let source = try? NSString(contentsOfFile: path, encoding: String.Encoding.utf8.rawValue) as String {
+        let wrappedSource =
+          "(function() { const SECURITY_TOKEN = '\(UserScriptManager.messageHandlerTokenString)'; \(source) })()"
 
         return WKUserScript.create(
           source: wrappedSource,
           injectionTime: injectionTime,
           forMainFrameOnly: mainFrameOnly,
-          in: sandboxed ? .defaultClient : .page)
+          in: sandboxed ? .defaultClient : .page
+        )
       }
       return nil
     }
   }()
 
   private let fingerprintingProtectionUserScript: WKUserScript? = {
-    guard let path = Bundle.main.path(forResource: "FingerprintingProtection", ofType: "js"), let source = try? String(contentsOfFile: path) else {
+    guard let path = Bundle.main.path(forResource: "FingerprintingProtection", ofType: "js"),
+          let source = try? String(contentsOfFile: path) else {
       log.error("Failed to load fingerprinting protection user script")
       return nil
     }
     var alteredSource = source
-    alteredSource = alteredSource.replacingOccurrences(of: "$<handler>", with: "FingerprintingProtection\(messageHandlerTokenString)", options: .literal)
+    alteredSource = alteredSource.replacingOccurrences(
+      of: "$<handler>",
+      with: "FingerprintingProtection\(messageHandlerTokenString)",
+      options: .literal
+    )
     return WKUserScript.create(
       source: alteredSource,
       injectionTime: .atDocumentStart,
       forMainFrameOnly: false,
-      in: .page)
+      in: .page
+    )
   }()
 
   private let cookieControlUserScript: WKUserScript? = {
-    guard let path = Bundle.main.path(forResource: "CookieControl", ofType: "js"), let source: String = try? String(contentsOfFile: path) else {
+    guard let path = Bundle.main.path(forResource: "CookieControl", ofType: "js"),
+          let source: String = try? String(contentsOfFile: path) else {
       log.error("Failed to load cookie control user script")
       return nil
     }
@@ -193,51 +230,85 @@ class UserScriptManager {
       source: source,
       injectionTime: .atDocumentStart,
       forMainFrameOnly: false,
-      in: .page)
+      in: .page
+    )
   }()
 
   // PaymentRequestUserScript is injected at document start to handle
   // requests to payment APIs
   private let PaymentRequestUserScript: WKUserScript? = {
-    guard let path = Bundle.main.path(forResource: "PaymentRequest", ofType: "js"), let source = try? String(contentsOfFile: path) else {
+    guard let path = Bundle.main.path(forResource: "PaymentRequest", ofType: "js"),
+          let source = try? String(contentsOfFile: path) else {
       log.error("Failed to load PaymentRequest.js")
       return nil
     }
 
     var alteredSource = source
 
-    alteredSource = alteredSource.replacingOccurrences(of: "$<paymentreq>", with: "PaymentRequest\(securityTokenString)", options: .literal)
-    alteredSource = alteredSource.replacingOccurrences(of: "$<paymentresponse>", with: "PaymentResponse\(securityTokenString)", options: .literal)
-    alteredSource = alteredSource.replacingOccurrences(of: "$<paymentresponsedetails>", with: "PaymentResponseDetails\(securityTokenString)", options: .literal)
-    alteredSource = alteredSource.replacingOccurrences(of: "$<paymentreqcallback>", with: "PaymentRequestCallback\(securityTokenString)", options: .literal)
-    alteredSource = alteredSource.replacingOccurrences(of: "$<handler>", with: "PaymentRequest\(messageHandlerTokenString)", options: .literal)
+    alteredSource = alteredSource.replacingOccurrences(
+      of: "$<paymentreq>",
+      with: "PaymentRequest\(securityTokenString)",
+      options: .literal
+    )
+    alteredSource = alteredSource.replacingOccurrences(
+      of: "$<paymentresponse>",
+      with: "PaymentResponse\(securityTokenString)",
+      options: .literal
+    )
+    alteredSource = alteredSource.replacingOccurrences(
+      of: "$<paymentresponsedetails>",
+      with: "PaymentResponseDetails\(securityTokenString)",
+      options: .literal
+    )
+    alteredSource = alteredSource.replacingOccurrences(
+      of: "$<paymentreqcallback>",
+      with: "PaymentRequestCallback\(securityTokenString)",
+      options: .literal
+    )
+    alteredSource = alteredSource.replacingOccurrences(
+      of: "$<handler>",
+      with: "PaymentRequest\(messageHandlerTokenString)",
+      options: .literal
+    )
 
     return WKUserScript.create(
       source: alteredSource,
       injectionTime: .atDocumentStart,
       forMainFrameOnly: false,
-      in: .page)
+      in: .page
+    )
   }()
 
   private let resourceDownloadManagerUserScript: WKUserScript? = {
-    guard let path = Bundle.main.path(forResource: "ResourceDownloader", ofType: "js"), let source = try? String(contentsOfFile: path) else {
+    guard let path = Bundle.main.path(forResource: "ResourceDownloader", ofType: "js"),
+          let source = try? String(contentsOfFile: path) else {
       log.error("Failed to load ResourceDownloader.js")
       return nil
     }
     var alteredSource: String = source
 
-    alteredSource = alteredSource.replacingOccurrences(of: "$<downloadManager>", with: "D\(securityTokenString)", options: .literal)
-    alteredSource = alteredSource.replacingOccurrences(of: "$<handler>", with: "ResourceDownloadManager\(messageHandlerTokenString)", options: .literal)
+    alteredSource = alteredSource.replacingOccurrences(
+      of: "$<downloadManager>",
+      with: "D\(securityTokenString)",
+      options: .literal
+    )
+    alteredSource = alteredSource.replacingOccurrences(
+      of: "$<handler>",
+      with: "ResourceDownloadManager\(messageHandlerTokenString)",
+      options: .literal
+    )
 
     return WKUserScript.create(
       source: alteredSource,
       injectionTime: .atDocumentEnd,
       forMainFrameOnly: false,
-      in: .defaultClient)
+      in: .defaultClient
+    )
   }()
 
   private let WindowRenderHelperScript: WKUserScript? = {
-    guard let path = Bundle.main.path(forResource: "WindowRenderHelper", ofType: "js"), let source = try? String(contentsOfFile: path) else {
+    guard let path = Bundle.main.path(forResource: "WindowRenderHelper", ofType: "js"),
+          let source = try? String(contentsOfFile: path) else {
       log.error("Failed to load WindowRenderHelper.js")
       return nil
     }
@@ -247,18 +318,28 @@ class UserScriptManager {
     // When the script is called, the token is provided in order to access teh script variable.
     var alteredSource = source
 
-    alteredSource = alteredSource.replacingOccurrences(of: "$<windowRenderer>", with: "W\(securityTokenString)", options: .literal)
-    alteredSource = alteredSource.replacingOccurrences(of: "$<handler>", with: "WindowRenderHelper\(messageHandlerTokenString)", options: .literal)
+    alteredSource = alteredSource.replacingOccurrences(
+      of: "$<windowRenderer>",
+      with: "W\(securityTokenString)",
+      options: .literal
+    )
+    alteredSource = alteredSource.replacingOccurrences(
+      of: "$<handler>",
+      with: "WindowRenderHelper\(messageHandlerTokenString)",
+      options: .literal
+    )
 
     return WKUserScript.create(
       source: alteredSource,
       injectionTime: .atDocumentStart,
       forMainFrameOnly: false,
-      in: .defaultClient)
+      in: .defaultClient
+    )
   }()
 
   private let FullscreenHelperScript: WKUserScript? = {
-    guard let path = Bundle.main.path(forResource: "FullscreenHelper", ofType: "js"), let source = try? String(contentsOfFile: path) else {
+    guard let path = Bundle.main.path(forResource: "FullscreenHelper", ofType: "js"),
+          let source = try? String(contentsOfFile: path) else {
       log.error("Failed to load FullscreenHelper.js")
       return nil
     }
@@ -267,12 +348,13 @@ class UserScriptManager {
       source: source,
       injectionTime: .atDocumentStart,
       forMainFrameOnly: false,
-      in: .page)
+      in: .page
+    )
   }()
 
   private let PlaylistSwizzlerScript: WKUserScript? = {
     guard let path = Bundle.main.path(forResource: "PlaylistSwizzler", ofType: "js"),
-      let source = try? String(contentsOfFile: path)
+          let source = try? String(contentsOfFile: path)
     else {
       log.error("Failed to load PlaylistSwizzler.js")
       return nil
@@ -282,11 +364,13 @@ class UserScriptManager {
       source: source,
       injectionTime: .atDocumentStart,
       forMainFrameOnly: false,
-      in: .page)
+      in: .page
+    )
   }()
 
   private let PlaylistHelperScript: WKUserScript? = {
-    guard let path = Bundle.main.path(forResource: "Playlist", ofType: "js"), let source = try? String(contentsOfFile: path) else {
+    guard let path = Bundle.main.path(forResource: "Playlist", ofType: "js"),
+          let source = try? String(contentsOfFile: path) else {
       log.error("Failed to load Playlist.js")
       return nil
     }
@@ -328,11 +412,13 @@ class UserScriptManager {
       source: alteredSource,
       injectionTime: .atDocumentStart,
       forMainFrameOnly: false,
-      in: .page)
+      in: .page
+    )
   }()
 
   private let MediaBackgroundingScript: WKUserScript? = {
-    guard let path = Bundle.main.path(forResource: "MediaBackgrounding", ofType: "js"), let source = try? String(contentsOfFile: path) else {
+    guard let path = Bundle.main.path(forResource: "MediaBackgrounding", ofType: "js"),
+          let source = try? String(contentsOfFile: path) else {
       log.error("Failed to load MediaBackgrounding.js")
       return nil
     }
@@ -353,16 +439,16 @@ class UserScriptManager {
       source: alteredSource,
       injectionTime: .atDocumentStart,
       forMainFrameOnly: false,
-      in: .page)
+      in: .page
+    )
   }()
 
-  private let NightModeScript: WKUserScript? = {
-    return WKUserScript.create(
-      source: "window.__firefox__.NightMode.setEnabled(true);",
-      injectionTime: .atDocumentStart,
-      forMainFrameOnly: true,
-      in: .defaultClient)
-  }()
+  private let NightModeScript: WKUserScript? = WKUserScript.create(
+    source: "window.__firefox__.NightMode.setEnabled(true);",
+    injectionTime: .atDocumentStart,
+    forMainFrameOnly: true,
+    in: .defaultClient
+  )
 
   private func reloadUserScripts() {
     tab?.webView?.configuration.userContentController.do {

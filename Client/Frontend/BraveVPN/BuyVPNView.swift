@@ -11,7 +11,6 @@ import BraveUI
 
 extension BuyVPNViewController {
   class View: UIView {
-
     private let checkmarkViewStrings =
       [
         Strings.VPN.checkboxBlockAds,
@@ -90,7 +89,7 @@ extension BuyVPNViewController {
         contentStackView,
         UIView.spacer(.horizontal, amount: 24),
       ]
-      .forEach(stackView.addArrangedSubview(_:))
+        .forEach(stackView.addArrangedSubview(_:))
     }
 
     private static var subscriptionButtonHeight: CGFloat {
@@ -98,7 +97,9 @@ extension BuyVPNViewController {
       let biggerSize: CGFloat = 100
 
       // Showing bigger buttons for taller phones(iPhone X and taller).
-      if UIDevice.current.userInterfaceIdiom != .phone { return normalSize }
+      if UIDevice.current.userInterfaceIdiom != .phone {
+        return normalSize
+      }
       let heightInPoints = UIScreen.main.nativeBounds.height / UIScreen.main.nativeScale
 
       return heightInPoints < 800 ? normalSize : biggerSize
@@ -160,14 +161,14 @@ extension BuyVPNViewController {
         verticalFlexibleSpace(maxHeight: 48, priority: 100),
         vpnPlansStackView,
       ]
-      .forEach(contentStackView.addArrangedSubview(_:))
+        .forEach(contentStackView.addArrangedSubview(_:))
 
       [
         UIView.spacer(.vertical, amount: 1),
         contentStackView,
         UIView.spacer(.vertical, amount: 1),
       ]
-      .forEach(mainStackView.addArrangedSubview(_:))
+        .forEach(mainStackView.addArrangedSubview(_:))
 
       scrollView.snp.makeConstraints {
         $0.edges.equalToSuperview()
@@ -202,7 +203,9 @@ extension BuyVPNViewController {
     override func layoutSubviews() {
       super.layoutSubviews()
 
-      if frame == .zero { return }
+      if frame == .zero {
+        return
+      }
 
       checkmarksStackView.subviews
         .filter { $0 is CheckmarksView }
@@ -215,7 +218,10 @@ extension BuyVPNViewController {
       checkmarksStackView.setNeedsLayout()
       checkmarksStackView.layoutIfNeeded()
 
-      checkmarksStackView.bounds = CGRect(origin: .zero, size: checkmarksStackView.systemLayoutSizeFitting(UIView.layoutFittingCompressedSize))
+      checkmarksStackView.bounds = CGRect(
+        origin: .zero,
+        size: checkmarksStackView.systemLayoutSizeFitting(UIView.layoutFittingCompressedSize)
+      )
     }
 
     private let checkmarksStackView = UIStackView().then {
@@ -225,7 +231,8 @@ extension BuyVPNViewController {
     @objc func pageControlTapped(_ sender: UIPageControl) {
       featuresScrollView.setContentOffset(
         CGPoint(x: self.featuresScrollView.frame.width * CGFloat(sender.currentPage), y: 0),
-        animated: true)
+        animated: true
+      )
     }
   }
 }
@@ -283,7 +290,9 @@ private class CheckmarksView: UIView {
           BraveVPNCommonUI.Views.checkmarkView(
             string: checkmark,
             textColor: .white,
-            font: .systemFont(ofSize: fontSize, weight: .semibold), useShieldAsCheckmark: true))
+            font: .systemFont(ofSize: fontSize, weight: .semibold), useShieldAsCheckmark: true
+          )
+        )
       }
     }
 
@@ -317,7 +326,6 @@ private class CheckmarksView: UIView {
 
 extension BuyVPNViewController {
   class SubscriptionButton: UIControl {
-
     private struct UX {
       static let disclaimerColor = #colorLiteral(red: 0.07058823529, green: 0.6392156863, blue: 0.4705882353, alpha: 1)
       static let primaryTextColor = #colorLiteral(red: 1, green: 1, blue: 0.9411764706, alpha: 1)
@@ -340,8 +348,8 @@ extension BuyVPNViewController {
         detail = Strings.VPN.monthlySubDetail
 
         guard let product = VPNProductInfo.monthlySubProduct,
-          let formattedPrice = product.price
-            .frontSymbolCurrencyFormatted(with: product.priceLocale)
+              let formattedPrice = product.price
+                .frontSymbolCurrencyFormatted(with: product.priceLocale)
         else {
           break
         }
@@ -352,11 +360,11 @@ extension BuyVPNViewController {
         disclaimer = Strings.VPN.yearlySubDisclaimer
 
         guard let monthlyProduct = VPNProductInfo.monthlySubProduct,
-          let discountFormattedPrice = monthlyProduct.price.multiplying(by: 12)
-            .frontSymbolCurrencyFormatted(with: monthlyProduct.priceLocale),
-          let yearlyProduct = VPNProductInfo.yearlySubProduct,
-          let formattedYearlyPrice =
-            yearlyProduct.price.frontSymbolCurrencyFormatted(with: yearlyProduct.priceLocale)
+              let discountFormattedPrice = monthlyProduct.price.multiplying(by: 12)
+                .frontSymbolCurrencyFormatted(with: monthlyProduct.priceLocale),
+                let yearlyProduct = VPNProductInfo.yearlySubProduct,
+                let formattedYearlyPrice =
+                yearlyProduct.price.frontSymbolCurrencyFormatted(with: yearlyProduct.priceLocale)
         else {
           break
         }
@@ -463,7 +471,8 @@ extension BuyVPNViewController {
             let strikeThroughText = NSMutableAttributedString(string: priceDiscount).then {
               $0.addAttribute(
                 NSAttributedString.Key.strikethroughStyle, value: 2,
-                range: NSRange(location: 0, length: $0.length))
+                range: NSRange(location: 0, length: $0.length)
+              )
             }
 
             $0.attributedText = strikeThroughText
@@ -510,6 +519,7 @@ private class DisclaimerLabel: BraveVPNCommonUI.Views.ShrinkableLabel {
     let size = super.intrinsicContentSize
     return CGSize(
       width: size.width + insetAmount * 2,
-      height: size.height)
+      height: size.height
+    )
   }
 }

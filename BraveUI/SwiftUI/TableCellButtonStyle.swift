@@ -12,7 +12,7 @@ public struct TableCellButtonStyle: ButtonStyle {
   public init() {}
   public func makeBody(configuration: Configuration) -> some View {
     configuration.label
-      .contentShape(Rectangle())  // Needed or taps don't activate on empty space
+      .contentShape(Rectangle()) // Needed or taps don't activate on empty space
       .background(
         Color(colorScheme == .dark ? .white : .black)
           .opacity(configuration.isPressed ? 0.1 : 0.0)

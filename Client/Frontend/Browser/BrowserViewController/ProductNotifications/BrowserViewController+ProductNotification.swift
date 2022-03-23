@@ -13,7 +13,6 @@ private let log = Logger.browserLogger
 // MARK: - ProductNotification
 
 extension BrowserViewController {
-
   // MARK: BenchmarkTrackerCountTier
 
   enum BenchmarkTrackerCountTier: Int, Equatable, CaseIterable {
@@ -48,7 +47,9 @@ extension BrowserViewController {
     // after receiving notification from Global Stats
     // Second the popover notification will be shown after page loaded
     DispatchQueue.main.asyncAfter(deadline: .now() + 1) { [weak self] in
-      guard let self = self else { return }
+      guard let self = self else {
+        return
+      }
 
       self.presentOnboardingAdblockNotifications()
       self.presentEducationalProductNotifications()
@@ -56,24 +57,26 @@ extension BrowserViewController {
   }
 
   private func presentOnboardingAdblockNotifications() {
-    if Preferences.DebugFlag.skipEduPopups == true { return }
+    if Preferences.DebugFlag.skipEduPopups == true {
+      return
+    }
 
     var isAboutHomeUrl = false
     if let selectedTab = tabManager.selectedTab,
-      let url = selectedTab.url,
-      let internalURL = InternalURL(url) {
+       let url = selectedTab.url,
+       let internalURL = InternalURL(url) {
       isAboutHomeUrl = internalURL.isAboutHomeURL
     }
 
     guard let selectedTab = tabManager.selectedTab,
-      !Preferences.General.onboardingAdblockPopoverShown.value,
-      !benchmarkNotificationPresented,
-      !Preferences.AppState.backgroundedCleanly.value,
-      Preferences.General.isNewRetentionUser.value == true,
-      !topToolbar.inOverlayMode,
-      !isTabTrayActive,
-      selectedTab.webView?.scrollView.isDragging == false,
-      isAboutHomeUrl == false
+          !Preferences.General.onboardingAdblockPopoverShown.value,
+          !benchmarkNotificationPresented,
+          !Preferences.AppState.backgroundedCleanly.value,
+          Preferences.General.isNewRetentionUser.value == true,
+          !topToolbar.inOverlayMode,
+          !isTabTrayActive,
+          selectedTab.webView?.scrollView.isDragging == false,
+          isAboutHomeUrl == false
     else {
       return
     }
@@ -107,32 +110,33 @@ extension BrowserViewController {
   }
 
   private func presentEducationalProductNotifications() {
-    if Preferences.DebugFlag.skipEduPopups == true { return }
+    if Preferences.DebugFlag.skipEduPopups == true {
+      return
+    }
 
     var isAboutHomeUrl = false
     if let selectedTab = tabManager.selectedTab,
-      let url = selectedTab.url,
-      let internalURL = InternalURL(url) {
+       let url = selectedTab.url,
+       let internalURL = InternalURL(url) {
       isAboutHomeUrl = internalURL.isAboutHomeURL
     }
 
     guard let selectedTab = tabManager.selectedTab,
-      presentedViewController == nil,
-      !benchmarkNotificationPresented,
-      !isOnboardingOrFullScreenCalloutPresented,
-      !Preferences.AppState.backgroundedCleanly.value,
-      !topToolbar.inOverlayMode,
-      !isTabTrayActive,
-      selectedTab.webView?.scrollView.isDragging == false,
-      isAboutHomeUrl == false
+          presentedViewController == nil,
+          !benchmarkNotificationPresented,
+          !isOnboardingOrFullScreenCalloutPresented,
+          !Preferences.AppState.backgroundedCleanly.value,
+          !topToolbar.inOverlayMode,
+          !isTabTrayActive,
+          selectedTab.webView?.scrollView.isDragging == false,
+          isAboutHomeUrl == false
     else {
       return
     }
 
     // Step 1: Load a video on a streaming site
     if !Preferences.ProductNotificationBenchmarks.videoAdBlockShown.value,
-      selectedTab.url?.isVideoSteamingSiteURL == true {
-
+       selectedTab.url?.isVideoSteamingSiteURL == true {
       notifyVideoAdsBlocked()
       Preferences.ProductNotificationBenchmarks.videoAdBlockShown.value = true
 
@@ -156,7 +160,8 @@ extension BrowserViewController {
         if numOfTrackerAds > firstExistingTier.value {
           notifyTrackerAdsCount(
             firstExistingTier.value,
-            description: Strings.ShieldEducation.benchmarkAnyTierTitle)
+            description: Strings.ShieldEducation.benchmarkAnyTierTitle
+          )
         }
       }
     }
@@ -165,10 +170,10 @@ extension BrowserViewController {
     // Data Saved Pop-Over only exist in JP locale
     if Locale.current.regionCode == "JP" {
       if !benchmarkNotificationPresented,
-        !Preferences.ProductNotificationBenchmarks.showingSpecificDataSavedEnabled.value {
+         !Preferences.ProductNotificationBenchmarks.showingSpecificDataSavedEnabled.value {
         guard let currentURL = selectedTab.url,
-          DataSaved.get(with: currentURL.absoluteString) == nil,
-          let domainFetchedSiteSavings = benchmarkBlockingDataSource?.fetchDomainFetchedSiteSavings(currentURL)
+              DataSaved.get(with: currentURL.absoluteString) == nil,
+              let domainFetchedSiteSavings = benchmarkBlockingDataSource?.fetchDomainFetchedSiteSavings(currentURL)
         else {
           return
         }
@@ -177,7 +182,8 @@ extension BrowserViewController {
 
         DataSaved.insert(
           savedUrl: currentURL.absoluteString,
-          amount: domainFetchedSiteSavings)
+          amount: domainFetchedSiteSavings
+        )
         return
       }
     }
@@ -191,11 +197,14 @@ extension BrowserViewController {
   }
 
   private func notifyTrackerAdsCount(_ count: Int, description: String) {
-    let shareTrackersViewController = ShareTrackersController(trackingType: .trackerCountShare(count: count, description: description))
+    let shareTrackersViewController =
+      ShareTrackersController(trackingType: .trackerCountShare(count: count, description: description))
     dismiss(animated: true)
 
     shareTrackersViewController.actionHandler = { [weak self] action in
-      guard let self = self, action == .shareTheNewsTapped else { return }
+      guard let self = self, action == .shareTheNewsTapped else {
+        return
+      }
 
       self.showShareScreen()
     }
@@ -204,11 +213,14 @@ extension BrowserViewController {
   }
 
   private func notifyDomainSpecificDataSaved(_ dataSaved: String) {
-    let shareTrackersViewController = ShareTrackersController(trackingType: .domainSpecificDataSaved(dataSaved: dataSaved))
+    let shareTrackersViewController =
+      ShareTrackersController(trackingType: .domainSpecificDataSaved(dataSaved: dataSaved))
     dismiss(animated: true)
 
     shareTrackersViewController.actionHandler = { [weak self] action in
-      guard let self = self, action == .dontShowAgainTapped else { return }
+      guard let self = self, action == .dontShowAgainTapped else {
+        return
+      }
 
       Preferences.ProductNotificationBenchmarks.showingSpecificDataSavedEnabled.value = true
       self.dismiss(animated: true)
@@ -217,7 +229,7 @@ extension BrowserViewController {
     showBenchmarkNotificationPopover(controller: shareTrackersViewController)
   }
 
-  private func showBenchmarkNotificationPopover(controller: (UIViewController & PopoverContentComponent)) {
+  private func showBenchmarkNotificationPopover(controller: UIViewController & PopoverContentComponent) {
     benchmarkNotificationPresented = true
 
     let popover = PopoverController(contentController: controller, contentSizeBehavior: .autoLayout)
@@ -229,7 +241,8 @@ extension BrowserViewController {
       icon: topToolbar.locationView.shieldsButton.imageView?.image,
       from: topToolbar.locationView.shieldsButton,
       on: popover,
-      browser: self)
+      browser: self
+    )
     popover.popoverDidDismiss = { _ in
       pulseAnimation.removeFromSuperview()
     }
@@ -245,7 +258,8 @@ extension BrowserViewController {
 
       globalShieldsActivityController.popoverPresentationController?.sourceRect = self.view.convert(
         self.topToolbar.locationView.shieldsButton.frame,
-        from: self.topToolbar.locationView.shieldsButton.superview)
+        from: self.topToolbar.locationView.shieldsButton.superview
+      )
       globalShieldsActivityController.popoverPresentationController?.permittedArrowDirections = [.up]
 
       self.present(globalShieldsActivityController, animated: true, completion: nil)

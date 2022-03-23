@@ -8,7 +8,6 @@ import BraveShared
 import BraveUI
 
 class SearchSuggestionPromptCell: UITableViewCell {
-
   static let identifier = "SearchSuggestionPromptCell"
 
   struct DesignUX {
@@ -43,12 +42,14 @@ class SearchSuggestionPromptCell: UITableViewCell {
       top: -DesignUX.paddingY,
       left: -DesignUX.paddingX,
       bottom: -DesignUX.paddingY,
-      right: -DesignUX.paddingX)
+      right: -DesignUX.paddingX
+    )
     $0.contentEdgeInsets = UIEdgeInsets(
       top: DesignUX.paddingY,
       left: DesignUX.paddingX,
       bottom: DesignUX.paddingY,
-      right: DesignUX.paddingX)
+      right: DesignUX.paddingX
+    )
     $0.backgroundColor = .braveBlurple
   }
 
@@ -64,12 +65,14 @@ class SearchSuggestionPromptCell: UITableViewCell {
       top: -DesignUX.paddingY,
       left: -DesignUX.paddingX,
       bottom: -DesignUX.paddingY,
-      right: -DesignUX.paddingX)
+      right: -DesignUX.paddingX
+    )
     $0.contentEdgeInsets = UIEdgeInsets(
       top: DesignUX.paddingY,
       left: DesignUX.paddingX,
       bottom: DesignUX.paddingY,
-      right: DesignUX.paddingX)
+      right: DesignUX.paddingX
+    )
     $0.backgroundColor = .clear
   }
 

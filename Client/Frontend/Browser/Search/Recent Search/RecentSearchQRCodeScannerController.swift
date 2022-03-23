@@ -9,13 +9,13 @@ import Shared
 import BraveShared
 
 class RecentSearchQRCodeScannerController: UIViewController {
-
   private let scannerView = ScannerView()
   private var didScan: Bool = false
   private var onDidScan: (_ string: String) -> Void
 
   public static var hasCameraSupport: Bool {
-    !AVCaptureDevice.DiscoverySession(deviceTypes: [.builtInWideAngleCamera], mediaType: .video, position: .back).devices.isEmpty
+    !AVCaptureDevice.DiscoverySession(deviceTypes: [.builtInWideAngleCamera], mediaType: .video, position: .back)
+      .devices.isEmpty
   }
 
   public static var hasCameraPermissions: Bool {
@@ -29,6 +29,7 @@ class RecentSearchQRCodeScannerController: UIViewController {
     super.init(nibName: nil, bundle: nil)
   }
 
+  @available(*, unavailable)
   required init?(coder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }
@@ -37,7 +38,11 @@ class RecentSearchQRCodeScannerController: UIViewController {
     super.viewDidLoad()
 
     title = Strings.recentSearchScannerTitle
-    navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(tappedDone))
+    navigationItem.rightBarButtonItem = UIBarButtonItem(
+      barButtonSystemItem: .done,
+      target: self,
+      action: #selector(tappedDone)
+    )
 
     view.addSubview(scannerView)
     scannerView.snp.makeConstraints {
@@ -45,7 +50,9 @@ class RecentSearchQRCodeScannerController: UIViewController {
     }
 
     scannerView.cameraView.scanCallback = { [weak self] string in
-      guard let self = self, !string.isEmpty, !self.didScan else { return }
+      guard let self = self, !string.isEmpty, !self.didScan else {
+        return
+      }
       self.didScan = true
       self.onDidScan(string)
       self.dismiss(animated: true, completion: nil)

@@ -40,9 +40,9 @@ class WelcomeViewSearchView: UIView {
         $0.width.equalTo(DesignUX.scrollViewWidth + 2 * DesignUX.padding)
       }
     }
-
   }
 
+  @available(*, unavailable)
   required init?(coder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }
@@ -54,7 +54,9 @@ class WelcomeViewSearchView: UIView {
           identifier: .init(rawValue: "primary.action"),
           handler: { _ in
             action()
-          }), for: .primaryActionTriggered)
+          }
+        ), for: .primaryActionTriggered
+      )
     }
 
     contentView.addArrangedSubview(button)
@@ -77,7 +79,8 @@ private class SearchEngineButton: RoundInterfaceButton {
       top: DesignUX.contentPaddingY,
       left: DesignUX.contentPaddingX,
       bottom: DesignUX.contentPaddingY,
-      right: DesignUX.contentPaddingX)
+      right: DesignUX.contentPaddingX
+    )
     $0.isUserInteractionEnabled = false
     $0.isLayoutMarginsRelativeArrangement = true
   }
@@ -133,6 +136,7 @@ private class SearchEngineButton: RoundInterfaceButton {
     }
   }
 
+  @available(*, unavailable)
   required init?(coder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }
@@ -151,7 +155,8 @@ private class SearchEngineButton: RoundInterfaceButton {
             byRoundingCorners: .allCorners,
             cornerRadii: CGSize(
               width: DesignUX.cornerRadius,
-              height: DesignUX.cornerRadius)
+              height: DesignUX.cornerRadius
+            )
           ).cgPath
       }
     }

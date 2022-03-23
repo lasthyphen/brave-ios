@@ -8,7 +8,6 @@ import BraveUI
 import Shared
 
 class TabCell: UICollectionViewCell {
-
   struct UX {
     static let cornerRadius = 6.0
     static let defaultBorderWidth = 1.0 / UIScreen.main.scale
@@ -67,9 +66,12 @@ class TabCell: UICollectionViewCell {
       WebImageCacheManager.shared.load(
         from: url,
         completion: { [weak self] image, _, _, _, loadedURL in
-          guard url == loadedURL else { return }
+          guard url == loadedURL else {
+            return
+          }
           self?.favicon.image = image ?? FaviconFetcher.defaultFaviconImage
-        })
+        }
+      )
     } else if let url = tab.url, !url.isLocal, !InternalURL.isValid(url: url) {
       favicon.loadFavicon(for: url)
     } else {
@@ -128,22 +130,30 @@ class TabCell: UICollectionViewCell {
     titleBackgroundView.addSubview(self.favicon)
 
     self.accessibilityCustomActions = [
-      UIAccessibilityCustomAction(name: Strings.tabAccessibilityCloseActionLabel, target: self.animator, selector: #selector(SwipeAnimator.closeWithoutGesture))
+      UIAccessibilityCustomAction(
+        name: Strings.tabAccessibilityCloseActionLabel,
+        target: self.animator,
+        selector: #selector(SwipeAnimator.closeWithoutGesture)
+      )
     ]
   }
 
   func setTabSelected(_ tab: Tab) {
     layer.shadowColor = UIColor.braveInfoBorder.resolvedColor(with: traitCollection).cgColor
     layer.shadowOpacity = 1
-    layer.shadowRadius = 0  // A 0 radius creates a solid border instead of a gradient blur
+    layer.shadowRadius = 0 // A 0 radius creates a solid border instead of a gradient blur
     layer.masksToBounds = false
     // create a frame that is "BorderWidth" size bigger than the cell
     layer.shadowOffset = CGSize(width: -TabCell.borderWidth, height: -TabCell.borderWidth)
-    let shadowPath = CGRect(width: layer.frame.width + (TabCell.borderWidth * 2), height: layer.frame.height + (TabCell.borderWidth * 2))
+    let shadowPath = CGRect(
+      width: layer.frame.width + (TabCell.borderWidth * 2),
+      height: layer.frame.height + (TabCell.borderWidth * 2)
+    )
     layer.shadowPath = UIBezierPath(roundedRect: shadowPath, cornerRadius: UX.cornerRadius + TabCell.borderWidth).cgPath
     layer.borderWidth = 0.0
   }
 
+  @available(*, unavailable)
   required init?(coder aDecoder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }
@@ -177,7 +187,10 @@ class TabCell: UICollectionViewCell {
       make.centerY.equalTo(favicon)
     }
 
-    let shadowPath = CGRect(width: layer.frame.width + (TabCell.borderWidth * 2), height: layer.frame.height + (TabCell.borderWidth * 2))
+    let shadowPath = CGRect(
+      width: layer.frame.width + (TabCell.borderWidth * 2),
+      height: layer.frame.height + (TabCell.borderWidth * 2)
+    )
     layer.shadowPath = UIBezierPath(roundedRect: shadowPath, cornerRadius: UX.cornerRadius + TabCell.borderWidth).cgPath
   }
 

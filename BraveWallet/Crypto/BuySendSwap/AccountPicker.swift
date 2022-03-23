@@ -85,24 +85,27 @@ struct AccountPicker: View {
         }
         // Context Menus are not supported inside `List`/`Form` section headers/footers so we must replace
         // this with a long press gesture + action sheet on iOS 14
-        .simultaneousGesture(
-          LongPressGesture(minimumDuration: 0.3)
-            .onEnded { _ in
-              isPresentingCopyAddressActionSheet = true
-            }
-        )
-        .actionSheet(isPresented: $isPresentingCopyAddressActionSheet) {
-          .init(
-            title: Text(keyringStore.selectedAccount.address), message: nil,
-            buttons: [
-              .default(Text(Strings.Wallet.copyAddressButtonTitle), action: copyAddress),
-              .cancel(),
-            ])
-        }
+          .simultaneousGesture(
+            LongPressGesture(minimumDuration: 0.3)
+              .onEnded { _ in
+                isPresentingCopyAddressActionSheet = true
+              }
+          )
+          .actionSheet(isPresented: $isPresentingCopyAddressActionSheet) {
+            .init(
+              title: Text(keyringStore.selectedAccount.address), message: nil,
+              buttons: [
+                .default(Text(Strings.Wallet.copyAddressButtonTitle), action: copyAddress),
+                .cancel(),
+              ]
+            )
+          }
       }
     }
     .accessibilityLabel(Strings.Wallet.selectedAccountAccessibilityLabel)
-    .accessibilityValue("\(keyringStore.selectedAccount.name), \(keyringStore.selectedAccount.address.truncatedAddress)")
+    .accessibilityValue(
+      "\(keyringStore.selectedAccount.name), \(keyringStore.selectedAccount.address.truncatedAddress)"
+    )
   }
 
   private var networkPickerView: some View {
@@ -170,9 +173,9 @@ struct AccountPicker_Previews: PreviewProvider {
       keyringStore: .previewStoreWithWalletCreated,
       networkStore: .previewStore
     )
-    .padding()
-    .previewLayout(.sizeThatFits)
-    .previewSizeCategories()
+      .padding()
+      .previewLayout(.sizeThatFits)
+      .previewSizeCategories()
   }
 }
 #endif

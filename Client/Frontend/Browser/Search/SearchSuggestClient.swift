@@ -16,11 +16,11 @@ let SearchSuggestClientErrorInvalidResponse = 1
  * Query callbacks that must run even if they are cancelled should wrap their contents in `withExtendendLifetime`.
  */
 class SearchSuggestClient {
-  fileprivate let searchEngine: OpenSearchEngine
-  fileprivate var request: URLSessionDataTask?
-  fileprivate let userAgent: String
+  private let searchEngine: OpenSearchEngine
+  private var request: URLSessionDataTask?
+  private let userAgent: String
 
-  lazy fileprivate var session: URLSession = {
+  lazy private var session: URLSession = {
     let configuration = URLSessionConfiguration.ephemeral
     configuration.httpAdditionalHeaders = ["User-Agent": self.userAgent]
     return URLSession(configuration: configuration, delegate: nil, delegateQueue: .main)
@@ -34,7 +34,11 @@ class SearchSuggestClient {
   func query(_ query: String, callback: @escaping (_ response: [String]?, _ error: NSError?) -> Void) {
     let url = searchEngine.suggestURLForQuery(query)
     if url == nil {
-      let error = NSError(domain: SearchSuggestClientErrorDomain, code: SearchSuggestClientErrorInvalidEngine, userInfo: nil)
+      let error = NSError(
+        domain: SearchSuggestClientErrorDomain,
+        code: SearchSuggestClientErrorInvalidEngine,
+        userInfo: nil
+      )
       callback(nil, error)
       return
     }
@@ -46,7 +50,11 @@ class SearchSuggestClient {
           return callback(nil, error as NSError?)
         }
 
-        let responseError = NSError(domain: SearchSuggestClientErrorDomain, code: SearchSuggestClientErrorInvalidResponse, userInfo: nil)
+        let responseError = NSError(
+          domain: SearchSuggestClientErrorDomain,
+          code: SearchSuggestClientErrorInvalidResponse,
+          userInfo: nil
+        )
 
         if let response = response as? HTTPURLResponse {
           if !(200..<300).contains(response.statusCode) {
@@ -81,7 +89,8 @@ class SearchSuggestClient {
         } catch {
           return callback(nil, error as NSError?)
         }
-      })
+      }
+    )
     request?.resume()
   }
 

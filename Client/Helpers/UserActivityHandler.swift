@@ -24,7 +24,8 @@ class UserActivityHandler {
       .didLoadPageMetadata,
       // .didLoadFavicon, // TODO: Bug 1390294
       .didClose,
-      queue: .main)
+      queue: .main
+    )
   }
 
   deinit {
@@ -35,7 +36,7 @@ class UserActivityHandler {
     searchableIndex.deleteAllSearchableItems(completionHandler: completionHandler)
   }
 
-  fileprivate func setUserActivityForTab(_ tab: Tab, url: URL) {
+  private func setUserActivityForTab(_ tab: Tab, url: URL) {
     guard !tab.isPrivate, url.isWebPage(includeDataURIs: false), !InternalURL.isValid(url: url) else {
       tab.userActivity?.resignCurrent()
       tab.userActivity = nil

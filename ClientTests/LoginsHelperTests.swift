@@ -6,12 +6,10 @@
 import Foundation
 import XCTest
 import BraveCore
-
 @testable import Client
 import WebKit
 
 class LoginsHelperTests: XCTestCase {
-
   func testFrameOriginModified() {
     let testFrameInfo1 = (scheme: "https", host: "www.test.com", port: 0)
     let testFrameInfo2 = (scheme: "https", host: "www.test.com", port: 8080)
@@ -48,31 +46,36 @@ class LoginsHelperTests: XCTestCase {
       url: testTabURL1,
       frameScheme: testFrameInfo1.scheme,
       frameHost: testFrameInfo1.host,
-      framePort: testFrameInfo1.port)
+      framePort: testFrameInfo1.port
+    )
 
     let modifiedFrameCheck2 = LoginsHelper.checkIsSameFrame(
       url: testTabURL2,
       frameScheme: testFrameInfo2.scheme,
       frameHost: testFrameInfo2.host,
-      framePort: testFrameInfo2.port)
+      framePort: testFrameInfo2.port
+    )
 
     let modifiedFrameCheck3 = LoginsHelper.checkIsSameFrame(
       url: testTabURL3,
       frameScheme: testFrameInfo3.scheme,
       frameHost: testFrameInfo3.host,
-      framePort: testFrameInfo3.port)
+      framePort: testFrameInfo3.port
+    )
 
     let modifiedFrameCheck4 = LoginsHelper.checkIsSameFrame(
       url: testTabURL4,
       frameScheme: testFrameInfo4.scheme,
       frameHost: testFrameInfo4.host,
-      framePort: testFrameInfo4.port)
+      framePort: testFrameInfo4.port
+    )
 
     let modifiedFrameCheck5 = LoginsHelper.checkIsSameFrame(
       url: testTabURL5,
       frameScheme: testFrameInfo5.scheme,
       frameHost: testFrameInfo5.host,
-      framePort: testFrameInfo5.port)
+      framePort: testFrameInfo5.port
+    )
 
     XCTAssertTrue(modifiedFrameCheck1, "Same host, same scheme, no port")
     XCTAssertTrue(modifiedFrameCheck2, "Same host, same scheme, same port")

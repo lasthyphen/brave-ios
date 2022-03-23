@@ -32,7 +32,7 @@ class AdCardView: FeedCardBackgroundButton, FeedCardContent {
         self?.actionHandler?(0, .opened())
       },
       menu: { [weak self] in
-        return self?.contextMenu?.menu?(0)
+        self?.contextMenu?.menu?(0)
       }
     )
     addInteraction(UIContextMenuInteraction(delegate: contextMenuDelegate))
@@ -84,7 +84,8 @@ private class BraveAdCalloutView: UIView {
           $0.snp.makeConstraints {
             $0.size.equalTo(14)
           }
-        }),
+        }
+      ),
       .view(
         UILabel().then {
           $0.text = "Ad"
@@ -96,13 +97,15 @@ private class BraveAdCalloutView: UIView {
             return metrics.scaledFont(for: font)
           }()
           $0.adjustsFontForContentSizeCategory = true
-        })
+        }
+      )
     )
     addSubview(stackView)
     stackView.snp.makeConstraints {
       $0.edges.equalToSuperview()
     }
   }
+
   @available(*, unavailable)
   required init(coder: NSCoder) {
     fatalError()

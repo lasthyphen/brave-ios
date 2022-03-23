@@ -8,7 +8,6 @@ import UIKit
 /// `NSAttachmentAttributeName` and `ViewTextAttachment` in the assigned
 /// attributed string.
 public class ViewLabel: UITextView, NSLayoutManagerDelegate {
-
   public init() {
     super.init(frame: .zero, textContainer: nil)
 
@@ -65,7 +64,10 @@ public class ViewLabel: UITextView, NSLayoutManagerDelegate {
       viewAttachment.view.frame = CGRect(
         origin: CGPoint(
           x: round((lineFragmentRect.minX + location.x) * scale) / scale,
-          y: round((lineFragmentRect.minY + location.y - size.height - ((size.height - lineFragmentRect.height) / 2.0)) * scale) / scale
+          y: round(
+            (lineFragmentRect.minY + location.y - size.height - ((size.height - lineFragmentRect.height) / 2.0)) *
+              scale
+          ) / scale
         ),
         size: size
       )
@@ -74,7 +76,11 @@ public class ViewLabel: UITextView, NSLayoutManagerDelegate {
 
   // MARK: - NSLayoutManagerDelegate
 
-  public func layoutManager(_ layoutManager: NSLayoutManager, didCompleteLayoutFor textContainer: NSTextContainer?, atEnd layoutFinishedFlag: Bool) {
+  public func layoutManager(
+    _ layoutManager: NSLayoutManager,
+    didCompleteLayoutFor textContainer: NSTextContainer?,
+    atEnd layoutFinishedFlag: Bool
+  ) {
     if layoutFinishedFlag {
       layoutViewAttachments()
     }
@@ -105,7 +111,12 @@ public class ViewTextAttachment: NSTextAttachment {
     fatalError()
   }
 
-  override public func attachmentBounds(for textContainer: NSTextContainer?, proposedLineFragment lineFrag: CGRect, glyphPosition position: CGPoint, characterIndex charIndex: Int) -> CGRect {
+  override public func attachmentBounds(
+    for textContainer: NSTextContainer?,
+    proposedLineFragment lineFrag: CGRect,
+    glyphPosition position: CGPoint,
+    characterIndex charIndex: Int
+  ) -> CGRect {
     switch attachmentSize {
     case .intrinsicContentSize:
       return CGRect(origin: .zero, size: view.intrinsicContentSize)
@@ -114,7 +125,11 @@ public class ViewTextAttachment: NSTextAttachment {
     }
   }
 
-  override public func image(forBounds imageBounds: CGRect, textContainer: NSTextContainer?, characterIndex charIndex: Int) -> UIImage? {
-    return nil
+  override public func image(
+    forBounds imageBounds: CGRect,
+    textContainer: NSTextContainer?,
+    characterIndex charIndex: Int
+  ) -> UIImage? {
+    nil
   }
 }

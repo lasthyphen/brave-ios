@@ -74,7 +74,9 @@ enum FeedCard: Equatable {
   ///
   /// If `item` is not being displayed by this card this function returns itself
   func replacing(item: FeedItem, with replacementItem: FeedItem) -> Self {
-    if !items.contains(item) { return self }
+    if !items.contains(item) {
+      return self
+    }
     switch self {
     case .headline:
       return .headline(replacementItem)

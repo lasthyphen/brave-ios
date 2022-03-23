@@ -11,9 +11,7 @@ import Shared
 // MARK: - AVPictureInPictureControllerDelegate
 
 extension PlaylistViewController: AVPictureInPictureControllerDelegate {
-
   func pictureInPictureControllerWillStartPictureInPicture(_ pictureInPictureController: AVPictureInPictureController) {
-
     PlaylistCarplayManager.shared.playlistController = self
 
     if UIDevice.isIpad {
@@ -37,21 +35,27 @@ extension PlaylistViewController: AVPictureInPictureControllerDelegate {
     PlaylistCarplayManager.shared.playlistController = nil
   }
 
-  func pictureInPictureController(_ pictureInPictureController: AVPictureInPictureController, failedToStartPictureInPictureWithError error: Error) {
-
+  func pictureInPictureController(
+    _ pictureInPictureController: AVPictureInPictureController,
+    failedToStartPictureInPictureWithError error: Error
+  ) {
     let alert = UIAlertController(
       title: Strings.PlayList.sorryAlertTitle,
-      message: Strings.PlayList.pictureInPictureErrorTitle, preferredStyle: .alert)
+      message: Strings.PlayList.pictureInPictureErrorTitle, preferredStyle: .alert
+    )
     alert.addAction(UIAlertAction(title: Strings.PlayList.okayButtonTitle, style: .default, handler: nil))
     self.present(alert, animated: true, completion: nil)
   }
 
-  func pictureInPictureController(_ pictureInPictureController: AVPictureInPictureController, restoreUserInterfaceForPictureInPictureStopWithCompletionHandler completionHandler: @escaping (Bool) -> Void) {
-
+  func pictureInPictureController(
+    _ pictureInPictureController: AVPictureInPictureController,
+    restoreUserInterfaceForPictureInPictureStopWithCompletionHandler completionHandler: @escaping (Bool) -> Void
+  ) {
     if let restorationController = PlaylistCarplayManager.shared.playlistController {
       restorationController.modalPresentationStyle = .fullScreen
-      guard let browserViewController = view.window == nil ? PlaylistCarplayManager.shared.browserController : self.currentScene?.browserViewController else {
-
+      guard let browserViewController = view.window == nil
+        ? PlaylistCarplayManager.shared.browserController
+        : self.currentScene?.browserViewController else {
         if UIDevice.isIpad {
           attachPlayerView()
         }
@@ -67,7 +71,8 @@ extension PlaylistViewController: AVPictureInPictureControllerDelegate {
       // There is a case when the user can manually present the PlaylistController through 3-dot menu
       // or URL bar. In that case, attempting to present the same controller WILL crash the application
       // So we need to guard against it.
-      if restorationController.presentingViewController != nil || restorationController.isMovingToParent || restorationController.isBeingPresented {
+      if restorationController.presentingViewController != nil || restorationController
+        .isMovingToParent || restorationController.isBeingPresented {
         DispatchQueue.main.async {
           PlaylistCarplayManager.shared.playlistController = nil
           completionHandler(true)

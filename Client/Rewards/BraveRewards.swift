@@ -9,7 +9,6 @@ import BraveShared
 import Combine
 
 class BraveRewards: NSObject {
-
   /// Whether or not Brave Rewards is available/can be enabled
   public static var isAvailable: Bool {
     #if MOZ_CHANNEL_DEBUG
@@ -62,7 +61,9 @@ class BraveRewards: NSObject {
     let storagePath = configuration.storageURL.appendingPathComponent("ledger").path
     ledger = BraveLedger(stateStoragePath: storagePath)
     ledger?.initializeLedgerService { [weak self] in
-      guard let self = self, let ledger = self.ledger else { return }
+      guard let self = self, let ledger = self.ledger else {
+        return
+      }
       if self.ads.isEnabled {
         if self.ads.isAdsServiceRunning() {
           self.updateAdsWithWalletInfo()
@@ -80,9 +81,13 @@ class BraveRewards: NSObject {
   }
 
   private func updateAdsWithWalletInfo() {
-    guard let ledger = ledger else { return }
+    guard let ledger = ledger else {
+      return
+    }
     ledger.currentWalletInfo { wallet in
-      guard let wallet = wallet else { return }
+      guard let wallet = wallet else {
+        return
+      }
       let seed = wallet.recoverySeed.map(\.uint8Value)
       self.ads.updateWalletInfo(
         wallet.paymentId,
@@ -100,7 +105,9 @@ class BraveRewards: NSObject {
   /// Propose that the ads service should be shutdown based on whether or not that all features
   /// that use it are disabled
   private func proposeAdsShutdown() {
-    if !shouldShutdownAds { return }
+    if !shouldShutdownAds {
+      return
+    }
     ads.shutdown {
       self.ads = BraveAds(stateStoragePath: self.configuration.storageURL.appendingPathComponent("ads").path)
     }
@@ -117,7 +124,9 @@ class BraveRewards: NSObject {
       willChangeValue(for: \.isEnabled)
       Preferences.Rewards.rewardsToggledOnce.value = true
       createWalletIfNeeded { [weak self] in
-        guard let self = self else { return }
+        guard let self = self else {
+          return
+        }
         self.ledger?.isAutoContributeEnabled = newValue
         self.ads.isEnabled = newValue
         if !newValue {
@@ -146,7 +155,9 @@ class BraveRewards: NSObject {
     }
     isCreatingWallet = true
     startLedgerService {
-      guard let ledger = self.ledger else { return }
+      guard let ledger = self.ledger else {
+        return
+      }
       ledger.createWalletAndFetchDetails { [weak self] success in
         self?.isCreatingWallet = false
         completion?()
@@ -260,7 +271,6 @@ class BraveRewards: NSObject {
 }
 
 extension BraveRewards {
-
   struct Configuration {
     var storageURL: URL
     var ledgerEnvironment: Ledger.Environment
@@ -277,18 +287,21 @@ extension BraveRewards {
         adsEnvironment: .staging
       )
     }
+
     static var staging: Configuration {
       var config = Configuration.default
       config.ledgerEnvironment = .staging
       config.adsEnvironment = .staging
       return config
     }
+
     static var production: Configuration {
       var config = Configuration.default
       config.ledgerEnvironment = .production
       config.adsEnvironment = .production
       return config
     }
+
     static var testing: Configuration {
       .init(
         storageURL: URL(fileURLWithPath: NSTemporaryDirectory()),

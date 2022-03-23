@@ -35,7 +35,6 @@ class FeedActionAlertView: UIView {
     $0.numberOfLines = 0
     $0.font = .systemFont(ofSize: 14)
     $0.textColor = .white
-
   }
 
   init(image: UIImage, title: String, message: String) {
@@ -94,7 +93,8 @@ class FeedActionAlertView: UIView {
 
     baseView.alpha = 0.0
     UIView.animate(
-      withDuration: 0.3, delay: 0, usingSpringWithDamping: 1.0, initialSpringVelocity: 0, options: [.beginFromCurrentState],
+      withDuration: 0.3, delay: 0, usingSpringWithDamping: 1.0, initialSpringVelocity: 0,
+      options: [.beginFromCurrentState],
       animations: {
         self.baseView.alpha = 1.0
       },
@@ -103,7 +103,12 @@ class FeedActionAlertView: UIView {
         let message = self.messageLabel.accessibilityLabel ?? ""
         if UIAccessibility.isVoiceOverRunning, !title.isEmpty || !message.isEmpty {
           // Dismiss after announcment ends instead of after specific interval
-          NotificationCenter.default.addObserver(self, selector: #selector(self.voiceOverAnnouncmentCompleted), name: UIAccessibility.announcementDidFinishNotification, object: nil)
+          NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(self.voiceOverAnnouncmentCompleted),
+            name: UIAccessibility.announcementDidFinishNotification,
+            object: nil
+          )
           DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
             // Have to wait a second because the screen changing after the alert controller or
             // context menu goes away causes a screen changed notificaiton which resets focus.
@@ -116,7 +121,8 @@ class FeedActionAlertView: UIView {
             self.dismiss()
           }
         }
-      })
+      }
+    )
   }
 
   @objc private func voiceOverAnnouncmentCompleted() {
@@ -125,12 +131,14 @@ class FeedActionAlertView: UIView {
 
   private func dismiss() {
     UIView.animate(
-      withDuration: 0.15, delay: 0, usingSpringWithDamping: 1.0, initialSpringVelocity: 0, options: [.beginFromCurrentState],
+      withDuration: 0.15, delay: 0, usingSpringWithDamping: 1.0, initialSpringVelocity: 0,
+      options: [.beginFromCurrentState],
       animations: {
         self.baseView.alpha = 0.0
       },
       completion: { _ in
         self.removeFromSuperview()
-      })
+      }
+    )
   }
 }

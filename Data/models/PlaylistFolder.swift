@@ -40,7 +40,8 @@ final public class PlaylistFolder: NSManagedObject, CRUD, Identifiable {
 
     return NSFetchedResultsController(
       fetchRequest: fetchRequest, managedObjectContext: context,
-      sectionNameKeyPath: nil, cacheName: nil)
+      sectionNameKeyPath: nil, cacheName: nil
+    )
   }
 
   public static func addFolder(title: String, uuid: String? = nil, completion: ((_ uuid: String) -> Void)? = nil) {
@@ -78,14 +79,18 @@ final public class PlaylistFolder: NSManagedObject, CRUD, Identifiable {
   public static func removeFolder(_ uuid: String) {
     PlaylistFolder.deleteAll(
       predicate: NSPredicate(format: "uuid == %@", uuid),
-      includesPropertyValues: false)
+      includesPropertyValues: false
+    )
   }
 
   public static func removeFolder(_ folder: PlaylistFolder) {
     folder.delete()
   }
 
-  public static func updateFolder(folderID: NSManagedObjectID, _ update: @escaping (Result<PlaylistFolder, Error>) -> Void) {
+  public static func updateFolder(
+    folderID: NSManagedObjectID,
+    _ update: @escaping (Result<PlaylistFolder, Error>) -> Void
+  ) {
     DataController.perform(context: .new(inMemory: false), save: true) { context in
       do {
         guard let folder = try context.existingObject(with: folderID) as? PlaylistFolder else {

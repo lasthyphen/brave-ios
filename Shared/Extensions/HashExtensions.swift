@@ -41,20 +41,21 @@ extension Data {
       CCHmacAlgorithm(kCCHmacAlgSHA256),
       (key as NSData).bytes, Int(key.count),
       (self as NSData).bytes, Int(self.count),
-      digest)
+      digest
+    )
     return Data(bytes: UnsafePointer<UInt8>(digest), count: len)
   }
 }
 
 extension String {
   public var utf8EncodedData: Data {
-    return self.data(using: .utf8, allowLossyConversion: false)!
+    self.data(using: .utf8, allowLossyConversion: false)!
   }
 }
 
 extension Data {
   public var utf8EncodedString: String? {
-    return String(data: self, encoding: .utf8)
+    String(data: self, encoding: .utf8)
   }
 }
 
@@ -71,5 +72,4 @@ extension Data {
     }
     return Data(bytes: UnsafePointer<UInt8>(xoredBytes), count: self.count)
   }
-
 }

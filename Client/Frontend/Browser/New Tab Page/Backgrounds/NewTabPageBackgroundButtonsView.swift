@@ -23,6 +23,7 @@ class NewTabPageBackgroundButtonsView: UIView, PreferencesObserver {
     /// Displays a button with a little QR code image
     case QRCode
   }
+
   /// A block executed when a user taps one of the active buttons.
   var tappedActiveButton: ((UIControl) -> Void)?
   /// The current active button.
@@ -46,6 +47,7 @@ class NewTabPageBackgroundButtonsView: UIView, PreferencesObserver {
       }
     }
   }
+
   /// The button which is currently showing
   private var activeView: UIView? {
     willSet {
@@ -59,9 +61,11 @@ class NewTabPageBackgroundButtonsView: UIView, PreferencesObserver {
   private let imageCreditButton = ImageCreditButton().then {
     $0.isHidden = true
   }
+
   private let sponsorLogoButton = SponsorLogoButton().then {
     $0.isHidden = true
   }
+
   private let qrCodeButton = QRCodeButton().then {
     $0.isHidden = true
   }
@@ -74,6 +78,7 @@ class NewTabPageBackgroundButtonsView: UIView, PreferencesObserver {
       safeAreaInsetsConstraint?.update(inset: collectionViewSafeAreaInsets)
     }
   }
+
   private var safeAreaInsetsConstraint: Constraint?
   private let collectionViewSafeAreaLayoutGuide = UILayoutGuide()
 
@@ -108,7 +113,8 @@ class NewTabPageBackgroundButtonsView: UIView, PreferencesObserver {
     let braveNewsVisible = false
     #else
     let braveNewsVisible =
-      !PrivateBrowsingManager.shared.isPrivateBrowsing && (Preferences.BraveNews.isEnabled.value || Preferences.BraveNews.isShowingOptIn.value)
+      !PrivateBrowsingManager.shared
+        .isPrivateBrowsing && (Preferences.BraveNews.isEnabled.value || Preferences.BraveNews.isShowingOptIn.value)
     #endif
 
     imageCreditButton.snp.remakeConstraints {
@@ -176,10 +182,12 @@ extension NewTabPageBackgroundButtonsView {
       }
     }
   }
+
   private class SponsorLogoButton: SpringButton {
     let imageView = UIImageView().then {
       $0.contentMode = .scaleAspectFit
     }
+
     override init(frame: CGRect) {
       super.init(frame: frame)
 
@@ -189,6 +197,7 @@ extension NewTabPageBackgroundButtonsView {
       }
     }
   }
+
   private class QRCodeButton: SpringButton {
     let imageView = UIImageView(image: #imageLiteral(resourceName: "qr_code_button"))
 

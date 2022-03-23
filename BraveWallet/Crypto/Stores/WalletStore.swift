@@ -9,7 +9,6 @@ import Combine
 
 /// The main wallet store
 public class WalletStore {
-
   public let keyringStore: KeyringStore
   public var cryptoStore: CryptoStore?
 
@@ -54,7 +53,9 @@ public class WalletStore {
       .map(\.isKeyringCreated)
       .removeDuplicates()
       .sink { [weak self] isDefaultKeyringCreated in
-        guard let self = self else { return }
+        guard let self = self else {
+          return
+        }
         if !isDefaultKeyringCreated, self.cryptoStore != nil {
           self.cryptoStore = nil
         } else if isDefaultKeyringCreated, self.cryptoStore == nil {

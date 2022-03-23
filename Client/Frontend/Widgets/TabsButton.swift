@@ -13,7 +13,6 @@ private struct TabsButtonUX {
 }
 
 class TabsButton: UIButton {
-
   private let countLabel = UILabel().then {
     $0.font = TabsButtonUX.titleFont
     $0.textAlignment = .center
@@ -65,7 +64,9 @@ class TabsButton: UIButton {
   override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
     super.traitCollectionDidChange(previousTraitCollection)
     // CGColor's do not get automatic updates
-    borderView.layer.borderColor = isHighlighted ? UIColor.braveOrange.cgColor : UIColor.braveLabel.resolvedColor(with: traitCollection).cgColor
+    borderView.layer.borderColor = isHighlighted
+      ? UIColor.braveOrange.cgColor
+      : UIColor.braveLabel.resolvedColor(with: traitCollection).cgColor
   }
 
   private var currentCount: Int?
@@ -80,7 +81,11 @@ class TabsButton: UIButton {
     self.accessibilityValue = countToBe
   }
 
-  override func contextMenuInteraction(_ interaction: UIContextMenuInteraction, willDisplayMenuFor configuration: UIContextMenuConfiguration, animator: UIContextMenuInteractionAnimating?) {
+  override func contextMenuInteraction(
+    _ interaction: UIContextMenuInteraction,
+    willDisplayMenuFor configuration: UIContextMenuConfiguration,
+    animator: UIContextMenuInteractionAnimating?
+  ) {
     UIImpactFeedbackGenerator(style: .medium).bzzt()
   }
 }

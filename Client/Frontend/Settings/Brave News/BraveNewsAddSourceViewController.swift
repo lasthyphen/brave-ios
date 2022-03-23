@@ -11,7 +11,6 @@ import Fuzi
 import FeedKit
 
 class BraveNewsAddSourceViewController: UITableViewController {
-
   private let feedDataSource: FeedDataSource
   var sourcesAdded: ((Set<RSSFeedLocation>) -> Void)?
 
@@ -24,6 +23,7 @@ class BraveNewsAddSourceViewController: UITableViewController {
       }
     }
   }
+
   private let activityIndicator = UIActivityIndicatorView(style: .medium).then {
     $0.hidesWhenStopped = true
   }
@@ -54,7 +54,11 @@ class BraveNewsAddSourceViewController: UITableViewController {
     navigationController?.navigationBar.prefersLargeTitles = true
     navigationItem.largeTitleDisplayMode = .always
     navigationItem.backButtonTitle = ""
-    navigationItem.leftBarButtonItem = .init(barButtonSystemItem: .cancel, target: self, action: #selector(tappedCancel))
+    navigationItem.leftBarButtonItem = .init(
+      barButtonSystemItem: .cancel,
+      target: self,
+      action: #selector(tappedCancel)
+    )
     navigationItem.rightBarButtonItem = .init(customView: activityIndicator)
 
     textField.addTarget(self, action: #selector(textFieldTextChanged), for: .editingChanged)
@@ -92,7 +96,9 @@ class BraveNewsAddSourceViewController: UITableViewController {
   }
 
   private func rssLocationFromOPMLOutline(_ outline: OPML.Outline) -> RSSFeedLocation? {
-    guard let url = outline.xmlUrl?.asURL else { return nil }
+    guard let url = outline.xmlUrl?.asURL else {
+      return nil
+    }
     return .init(title: outline.text, url: url)
   }
 
@@ -103,20 +109,30 @@ class BraveNewsAddSourceViewController: UITableViewController {
   }()
 
   private func displayError(_ error: FindFeedsError) {
-    let alert = UIAlertController(title: Strings.BraveNews.addSourceFailureTitle, message: error.localizedDescription, preferredStyle: .alert)
+    let alert = UIAlertController(
+      title: Strings.BraveNews.addSourceFailureTitle,
+      message: error.localizedDescription,
+      preferredStyle: .alert
+    )
     alert.addAction(.init(title: Strings.OKString, style: .default, handler: nil))
     present(alert, animated: true)
   }
 
   private func searchPageForFeeds() {
-    guard var text = textField.text else { return }
+    guard var text = textField.text else {
+      return
+    }
     if text.hasPrefix("feed:"), let range = text.range(of: "feed:") {
       text.replaceSubrange(range, with: [])
     }
-    guard let url = URIFixup.getURL(text) else { return }
+    guard let url = URIFixup.getURL(text) else {
+      return
+    }
     isLoading = true
     downloadPageData(for: url) { [weak self] result in
-      guard let self = self else { return }
+      guard let self = self else {
+        return
+      }
       self.isLoading = false
       switch result {
       case .success(let data):
@@ -158,16 +174,21 @@ class BraveNewsAddSourceViewController: UITableViewController {
   }
 
   private var pageTask: URLSessionDataTask?
-  private func downloadPageData(for url: URL, _ completion: @escaping (Result<[RSSFeedLocation], FindFeedsError>) -> Void) {
-    pageTask = session.dataTask(with: url) { [weak self] (data, response, error) in
-      guard let self = self else { return }
+  private func downloadPageData(
+    for url: URL,
+    _ completion: @escaping (Result<[RSSFeedLocation], FindFeedsError>) -> Void
+  ) {
+    pageTask = session.dataTask(with: url) { [weak self] data, response, error in
+      guard let self = self else {
+        return
+      }
       if let error = error {
         completion(.failure(.dataTaskError(error)))
         return
       }
       guard let data = data,
-        let root = try? HTMLDocument(data: data),
-        let url = response?.url
+            let root = try? HTMLDocument(data: data),
+            let url = response?.url
       else {
         completion(.failure(.invalidData))
         return
@@ -201,9 +222,9 @@ class BraveNewsAddSourceViewController: UITableViewController {
       var reloadUrl: URL?
       for meta in root.xpath("//head/meta") {
         if let refresh = meta["http-equiv"]?.lowercased(), refresh == "refresh",
-          let content = meta["content"],
-          let index = content.range(of: "URL="),
-          let url = NSURL(string: String(content.suffix(from: index.upperBound))) {
+           let content = meta["content"],
+           let index = content.range(of: "URL="),
+           let url = NSURL(string: String(content.suffix(from: index.upperBound))) {
           reloadUrl = url as URL
         }
       }
@@ -214,10 +235,11 @@ class BraveNewsAddSourceViewController: UITableViewController {
       }
 
       var feeds: [RSSFeedLocation] = []
-      let xpath = "//head//link[contains(@type, 'application/rss+xml') or contains(@type, 'application/atom+xml') or contains(@type, 'application/json')]"
+      let xpath =
+        "//head//link[contains(@type, 'application/rss+xml') or contains(@type, 'application/atom+xml') or contains(@type, 'application/json')]"
       for link in root.xpath(xpath) {
         guard let href = link["href"], let url = URL(string: href, relativeTo: url),
-          url.isWebPage(includeDataURIs: false), !InternalURL.isValid(url: url)
+              url.isWebPage(includeDataURIs: false), !InternalURL.isValid(url: url)
         else {
           continue
         }
@@ -348,6 +370,7 @@ extension BraveNewsAddSourceViewController: UIDocumentPickerDelegate {
       }
     }
   }
+
   func documentPickerWasCancelled(_ controller: UIDocumentPickerViewController) {
     controller.dismiss(animated: true)
   }

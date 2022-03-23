@@ -18,8 +18,8 @@ open class FileAccessor {
   }
 
   /**
-     * Gets the absolute directory path at the given relative path, creating it if it does not exist.
-     */
+   * Gets the absolute directory path at the given relative path, creating it if it does not exist.
+   */
   open func getAndEnsureDirectory(_ relativeDir: String? = nil) throws -> String {
     var absolutePath = rootPath
     if let relativeDir = relativeDir {
@@ -31,16 +31,16 @@ open class FileAccessor {
   }
 
   /**
-     * Removes the file or directory at the given path, relative to the root.
-     */
+   * Removes the file or directory at the given path, relative to the root.
+   */
   open func remove(_ relativePath: String) throws {
     let path = URL(fileURLWithPath: rootPath).appendingPathComponent(relativePath).path
     try FileManager.default.removeItem(atPath: path)
   }
 
   /**
-     * Removes the contents of the directory without removing the directory itself.
-     */
+   * Removes the contents of the directory without removing the directory itself.
+   */
   open func removeFilesInDirectory(_ relativePath: String = "") throws {
     let fileManager = FileManager.default
     let path = URL(fileURLWithPath: rootPath).appendingPathComponent(relativePath).path
@@ -48,25 +48,25 @@ open class FileAccessor {
     for file in files {
       try remove(URL(fileURLWithPath: relativePath).appendingPathComponent(file).path)
     }
-    return
   }
 
   /**
-     * Determines whether a file exists at the given path, relative to the root.
-     */
+   * Determines whether a file exists at the given path, relative to the root.
+   */
   open func exists(_ relativePath: String) -> Bool {
     let path = URL(fileURLWithPath: rootPath).appendingPathComponent(relativePath).path
     return FileManager.default.fileExists(atPath: path)
   }
 
   open func attributesForFileAt(relativePath: String) throws -> [FileAttributeKey: Any] {
-    return try FileManager.default.attributesOfItem(atPath: URL(fileURLWithPath: rootPath).appendingPathComponent(relativePath).path)
+    try FileManager.default
+      .attributesOfItem(atPath: URL(fileURLWithPath: rootPath).appendingPathComponent(relativePath).path)
   }
 
   /**
-     * Moves the file or directory to the given destination, with both paths relative to the root.
-     * The destination directory is created if it does not exist.
-     */
+   * Moves the file or directory to the given destination, with both paths relative to the root.
+   * The destination directory is created if it does not exist.
+   */
   open func move(_ fromRelativePath: String, toRelativePath: String) throws {
     let rootPathURL = URL(fileURLWithPath: rootPath)
     let fromPath = rootPathURL.appendingPathComponent(fromRelativePath).path
@@ -78,7 +78,11 @@ open class FileAccessor {
     try FileManager.default.moveItem(atPath: fromPath, toPath: toPath.path)
   }
 
-  open func copyMatching(fromRelativeDirectory relativePath: String, toAbsoluteDirectory absolutePath: String, matching: (String) -> Bool) throws {
+  open func copyMatching(
+    fromRelativeDirectory relativePath: String,
+    toAbsoluteDirectory absolutePath: String,
+    matching: (String) -> Bool
+  ) throws {
     let fileManager = FileManager.default
     let pathURL = URL(fileURLWithPath: rootPath).appendingPathComponent(relativePath)
     let path = pathURL.path
@@ -108,10 +112,10 @@ open class FileAccessor {
   }
 
   /**
-     * Creates a directory with the given path, including any intermediate directories.
-     * Does nothing if the directory already exists.
-     */
-  fileprivate func createDir(_ absolutePath: String) throws {
+   * Creates a directory with the given path, including any intermediate directories.
+   * Does nothing if the directory already exists.
+   */
+  private func createDir(_ absolutePath: String) throws {
     try FileManager.default.createDirectory(atPath: absolutePath, withIntermediateDirectories: true, attributes: nil)
   }
 }

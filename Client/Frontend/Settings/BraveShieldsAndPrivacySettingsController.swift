@@ -50,12 +50,25 @@ class BraveShieldsAndPrivacySettingsController: TableViewController {
     var shields = Section(
       header: .title(Strings.shieldsDefaults),
       rows: [
-        .boolRow(title: Strings.blockAdsAndTracking, detailText: Strings.blockAdsAndTrackingDescription, option: Preferences.Shields.blockAdsAndTracking),
-        .boolRow(title: Strings.HTTPSEverywhere, detailText: Strings.HTTPSEverywhereDescription, option: Preferences.Shields.httpsEverywhere),
-        .boolRow(title: Strings.blockPhishingAndMalware, option: Preferences.Shields.blockPhishingAndMalware),
-        .boolRow(title: Strings.blockScripts, detailText: Strings.blockScriptsDescription, option: Preferences.Shields.blockScripts),
         .boolRow(
-          title: Strings.blockAllCookies, detailText: Strings.blockCookiesDescription, option: Preferences.Privacy.blockAllCookies,
+          title: Strings.blockAdsAndTracking,
+          detailText: Strings.blockAdsAndTrackingDescription,
+          option: Preferences.Shields.blockAdsAndTracking
+        ),
+        .boolRow(
+          title: Strings.HTTPSEverywhere,
+          detailText: Strings.HTTPSEverywhereDescription,
+          option: Preferences.Shields.httpsEverywhere
+        ),
+        .boolRow(title: Strings.blockPhishingAndMalware, option: Preferences.Shields.blockPhishingAndMalware),
+        .boolRow(
+          title: Strings.blockScripts,
+          detailText: Strings.blockScriptsDescription,
+          option: Preferences.Shields.blockScripts
+        ),
+        .boolRow(
+          title: Strings.blockAllCookies, detailText: Strings.blockCookiesDescription,
+          option: Preferences.Privacy.blockAllCookies,
           onValueChange: { [unowned self] in
             func toggleCookieSetting(with status: Bool) {
               // Lock/Unlock Cookie Folder
@@ -72,10 +85,18 @@ class BraveShieldsAndPrivacySettingsController: TableViewController {
                     (.cookie, false),
                     (.webSiteData, false),
                   ])
-                  self.toggleSwitch(on: false, section: self.shieldsSection, rowUUID: Preferences.Privacy.blockAllCookies.key)
+                  self.toggleSwitch(
+                    on: false,
+                    section: self.shieldsSection,
+                    rowUUID: Preferences.Privacy.blockAllCookies.key
+                  )
 
                   // TODO: Throw Alert to user to try again?
-                  let alert = UIAlertController(title: nil, message: Strings.blockAllCookiesFailedAlertMsg, preferredStyle: .alert)
+                  let alert = UIAlertController(
+                    title: nil,
+                    message: Strings.blockAllCookiesFailedAlertMsg,
+                    preferredStyle: .alert
+                  )
                   alert.addAction(UIAlertAction(title: Strings.OKString, style: .default))
                   self.present(alert, animated: true)
                 }
@@ -86,26 +107,41 @@ class BraveShieldsAndPrivacySettingsController: TableViewController {
             if $0 {
               let status = $0
               // THROW ALERT to inform user of the setting
-              let alert = UIAlertController(title: Strings.blockAllCookiesAlertTitle, message: Strings.blockAllCookiesAlertInfo, preferredStyle: .alert)
+              let alert = UIAlertController(
+                title: Strings.blockAllCookiesAlertTitle,
+                message: Strings.blockAllCookiesAlertInfo,
+                preferredStyle: .alert
+              )
               let okAction = UIAlertAction(
                 title: Strings.blockAllCookiesAction, style: .destructive,
-                handler: { (action) in
+                handler: { action in
                   toggleCookieSetting(with: status)
-                })
+                }
+              )
               alert.addAction(okAction)
 
               let cancelAction = UIAlertAction(
                 title: Strings.cancelButtonTitle, style: .cancel,
-                handler: { (action) in
-                  self.toggleSwitch(on: false, section: self.shieldsSection, rowUUID: Preferences.Privacy.blockAllCookies.key)
-                })
+                handler: { action in
+                  self.toggleSwitch(
+                    on: false,
+                    section: self.shieldsSection,
+                    rowUUID: Preferences.Privacy.blockAllCookies.key
+                  )
+                }
+              )
               alert.addAction(cancelAction)
               self.present(alert, animated: true)
             } else {
               toggleCookieSetting(with: $0)
             }
-          }),
-        .boolRow(title: Strings.fingerprintingProtection, detailText: Strings.fingerprintingProtectionDescription, option: Preferences.Shields.fingerprintingProtection),
+          }
+        ),
+        .boolRow(
+          title: Strings.fingerprintingProtection,
+          detailText: Strings.fingerprintingProtectionDescription,
+          option: Preferences.Shields.fingerprintingProtection
+        ),
       ],
       footer: .title(Strings.shieldsDefaultsFooter)
     )
@@ -122,7 +158,7 @@ class BraveShieldsAndPrivacySettingsController: TableViewController {
       return savedToggles
     }
 
-    return self.clearables.map { $0.checked }
+    return self.clearables.map(\.checked)
   }()
 
   private lazy var clearables: [(clearable: Clearable, checked: Bool)] = {
@@ -152,7 +188,7 @@ class BraveShieldsAndPrivacySettingsController: TableViewController {
   }()
 
   private lazy var clearPrivateDataSection: Section = {
-    return Section(
+    Section(
       header: .title(Strings.clearPrivateData),
       rows: clearables.indices.map { idx in
         let title = self.clearables[idx].clearable.label
@@ -162,19 +198,21 @@ class BraveShieldsAndPrivacySettingsController: TableViewController {
           valueChange: { [unowned self] checked in
             self.toggles[idx] = checked
             Preferences.Privacy.clearPrivateDataToggles.value = self.toggles
-          }, cellReuseId: "\(title.lowercased().trimmingCharacters(in: .whitespacesAndNewlines))\(idx)")
+          }, cellReuseId: "\(title.lowercased().trimmingCharacters(in: .whitespacesAndNewlines))\(idx)"
+        )
       } + [
         Row(
           text: Strings.clearDataNow,
           selection: { [unowned self] in
             self.tappedClearPrivateData()
-          }, cellClass: CenteredButtonCell.self)
+          }, cellClass: CenteredButtonCell.self
+        )
       ]
     )
   }()
 
   private lazy var manageWebsiteDataSection: Section = {
-    return Section(
+    Section(
       rows: [
         Row(
           text: Strings.manageWebsiteDataTitle,
@@ -186,7 +224,8 @@ class BraveShieldsAndPrivacySettingsController: TableViewController {
             // pushing SwiftUI with navigation/toolbars inside the PanModal is buggy…
             // presenting over context is also buggy (eats swipe gestures)
             self.present(controller, animated: true)
-          }, accessory: .disclosureIndicator)
+          }, accessory: .disclosureIndicator
+        )
       ]
     )
   }()
@@ -199,7 +238,9 @@ class BraveShieldsAndPrivacySettingsController: TableViewController {
           title: Strings.privateBrowsingOnly,
           option: Preferences.Privacy.privateBrowsingOnly,
           onValueChange: { [weak self] value in
-            guard let self = self else { return }
+            guard let self = self else {
+              return
+            }
             self.pboModeToggled(value: value)
           }
         ),
@@ -227,8 +268,13 @@ class BraveShieldsAndPrivacySettingsController: TableViewController {
       message: Strings.clearPrivateDataAlertMessage,
       preferredStyle: .alert
     )
-    let clearAction = UIAlertAction(title: Strings.clearPrivateDataAlertYesAction, style: .destructive) { [weak self] _ in
-      guard let self = self else { return }
+    let clearAction = UIAlertAction(
+      title: Strings.clearPrivateDataAlertYesAction,
+      style: .destructive
+    ) { [weak self] _ in
+      guard let self = self else {
+        return
+      }
       Preferences.Privacy.clearPrivateDataToggles.value = self.toggles
       let spinner = SpinnerView().then {
         $0.present(on: self.view)
@@ -256,22 +302,36 @@ class BraveShieldsAndPrivacySettingsController: TableViewController {
 
   private func pboModeToggled(value: Bool) {
     if value {
-      let alert = UIAlertController(title: Strings.privateBrowsingOnly, message: Strings.privateBrowsingOnlyWarning, preferredStyle: .alert)
+      let alert = UIAlertController(
+        title: Strings.privateBrowsingOnly,
+        message: Strings.privateBrowsingOnlyWarning,
+        preferredStyle: .alert
+      )
       alert.addAction(
         UIAlertAction(
           title: Strings.cancelButtonTitle, style: .cancel,
           handler: { [weak self] _ in
-            guard let self = self else { return }
-            DispatchQueue.main.async {
-              self.toggleSwitch(on: false, section: self.otherSettingsSection, rowUUID: Preferences.Privacy.privateBrowsingOnly.key)
+            guard let self = self else {
+              return
             }
-          }))
+            DispatchQueue.main.async {
+              self.toggleSwitch(
+                on: false,
+                section: self.otherSettingsSection,
+                rowUUID: Preferences.Privacy.privateBrowsingOnly.key
+              )
+            }
+          }
+        )
+      )
 
       alert.addAction(
         UIAlertAction(
           title: Strings.OKString, style: .default,
           handler: { [weak self] _ in
-            guard let self = self else { return }
+            guard let self = self else {
+              return
+            }
             let spinner = SpinnerView().then {
               $0.present(on: self.view)
             }
@@ -281,7 +341,9 @@ class BraveShieldsAndPrivacySettingsController: TableViewController {
             DispatchQueue.global(qos: .utility).asyncAfter(deadline: .now() + 0.1) {
               let clearables: [Clearable] = [CookiesAndCacheClearable()]
               self.clearPrivateData(clearables).uponQueue(.main) { [weak self] in
-                guard let self = self else { return }
+                guard let self = self else {
+                  return
+                }
 
                 // First remove all tabs so that only a blank tab exists.
                 self.tabManager.removeAll()
@@ -295,7 +357,9 @@ class BraveShieldsAndPrivacySettingsController: TableViewController {
                 spinner.dismiss()
               }
             }
-          }))
+          }
+        )
+      )
 
       self.present(alert, animated: true, completion: nil)
     } else {
@@ -311,8 +375,8 @@ class BraveShieldsAndPrivacySettingsController: TableViewController {
         log.info("Clearing \(clearable.element).")
 
         let res = Success()
-        succeed().upon() { _ in  // move off main thread
-          clearable.element.clear().upon() { result in
+        succeed().upon { _ in // move off main thread
+          clearable.element.clear().upon { result in
             res.fill(result)
           }
         }
@@ -326,10 +390,11 @@ class BraveShieldsAndPrivacySettingsController: TableViewController {
             deadline: .now() + 0.5,
             execute: {
               // For some reason, a second attempt seems to always succeed
-              _clear(clearables, secondAttempt: true).upon() { _ in
+              _clear(clearables, secondAttempt: true).upon { _ in
                 deferred.fill(())
               }
-            })
+            }
+          )
           return
         }
 
@@ -342,7 +407,7 @@ class BraveShieldsAndPrivacySettingsController: TableViewController {
     }
 
     let clearAffectsTabs = clearables.contains { item in
-      return item is CacheClearable || item is CookiesAndCacheClearable
+      item is CacheClearable || item is CookiesAndCacheClearable
     }
 
     let historyCleared = clearables.contains { $0 is HistoryClearable }
@@ -384,14 +449,16 @@ class BraveShieldsAndPrivacySettingsController: TableViewController {
               self.tabManager.clearTabHistory()
 
               /// Donate Clear Browser History for suggestions
-              let clearBrowserHistoryActivity = ActivityShortcutManager.shared.createShortcutActivity(type: .clearBrowsingHistory)
+              let clearBrowserHistoryActivity = ActivityShortcutManager.shared
+                .createShortcutActivity(type: .clearBrowsingHistory)
               self.userActivity = clearBrowserHistoryActivity
               clearBrowserHistoryActivity.becomeCurrent()
             }
 
             _toggleFolderAccessForBlockCookies(locked: true)
             deferred.fill(())
-          })
+          }
+        )
     }
 
     return deferred

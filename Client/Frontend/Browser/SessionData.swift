@@ -3,7 +3,6 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import Foundation
-
 import Shared
 import Data
 
@@ -22,22 +21,22 @@ class SessionData: NSObject, NSSecureCoding {
   }
 
   var jsonDictionary: [String: Any] {
-    return [
+    [
       SessionData.Keys.currentPage: String(self.currentPage),
       SessionData.Keys.lastUsedTime: String(self.lastUsedTime),
-      SessionData.Keys.urls: urls.map { $0.absoluteString },
+      SessionData.Keys.urls: urls.map(\.absoluteString),
       SessionData.Keys.isPrivate: self.isPrivate,
     ]
   }
 
   /**
-        Creates a new SessionData object representing a serialized tab.
+       Creates a new SessionData object representing a serialized tab.
 
-        - parameter currentPage:     The active page index. Must be in the range of (-N, 0],
-                                where 1-N is the first page in history, and 0 is the last.
-        - parameter urls:            The sequence of URLs in this tab's session history.
-        - parameter lastUsedTime:    The last time this tab was modified.
-    **/
+       - parameter currentPage:     The active page index. Must be in the range of (-N, 0],
+                               where 1-N is the first page in history, and 0 is the last.
+       - parameter urls:            The sequence of URLs in this tab's session history.
+       - parameter lastUsedTime:    The last time this tab was modified.
+   **/
   init(currentPage: Int, urls: [URL], lastUsedTime: Timestamp, isPrivate: Bool) {
     self.currentPage = currentPage
     self.urls = SessionData.updateSessionURLs(urls: urls)
@@ -66,13 +65,23 @@ class SessionData: NSObject, NSSecureCoding {
   var savedTabData: SavedTab {
     let urlStrings = jsonDictionary[SessionData.Keys.urls] as? [String] ?? []
     let isPrivate = jsonDictionary[SessionData.Keys.isPrivate] as? Bool ?? false
-    let currentURL = urlStrings[(currentPage < 0 ? max(urlStrings.count - 1, 0) : currentPage)]
+    let currentURL = urlStrings[currentPage < 0 ? max(urlStrings.count - 1, 0) : currentPage]
 
-    return SavedTab(id: "InvalidId", title: nil, url: currentURL, isSelected: false, order: -1, screenshot: nil, history: urlStrings, historyIndex: Int16(currentPage), isPrivate: isPrivate)
+    return SavedTab(
+      id: "InvalidId",
+      title: nil,
+      url: currentURL,
+      isSelected: false,
+      order: -1,
+      screenshot: nil,
+      history: urlStrings,
+      historyIndex: Int16(currentPage),
+      isPrivate: isPrivate
+    )
   }
 
   static var supportsSecureCoding: Bool {
-    return true
+    true
   }
 
   /// PR: https://github.com/mozilla-mobile/firefox-ios/pull/4387
@@ -80,7 +89,7 @@ class SessionData: NSObject, NSSecureCoding {
   /// InternalURL helps  encapsulate all internal scheme logic for urls rather than using URL extension. Extensions to built-in classes should be more minimal that what was being done previously.
   /// This migration was required mainly for above PR which is related to a PI request that reduces security risk. Also, this particular method helps in cleaning up / migrating old localhost:6571 URLs to internal: SessionData urls
   static func updateSessionURLs(urls: [URL]) -> [URL] {
-    return urls.compactMap { url in
+    urls.compactMap { url in
       var url = url
       let port = AppConstants.webServerPort
       [
@@ -100,7 +109,8 @@ class SessionData: NSObject, NSSecureCoding {
         }
       }
 
-      if let internalUrl = InternalURL(url), internalUrl.isAuthorized, let stripped = URL(string: internalUrl.stripAuthorization) {
+      if let internalUrl = InternalURL(url), internalUrl.isAuthorized,
+         let stripped = URL(string: internalUrl.stripAuthorization) {
         return stripped
       }
 

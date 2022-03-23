@@ -23,9 +23,9 @@ struct SendTokenView: View {
 
   private var isSendDisabled: Bool {
     guard let sendAmount = BDouble(amountInput),
-      let balance = sendTokenStore.selectedSendTokenBalance,
-      let token = sendTokenStore.selectedSendToken,
-      !sendTokenStore.isMakingTx
+          let balance = sendTokenStore.selectedSendTokenBalance,
+          let token = sendTokenStore.selectedSendToken,
+          !sendTokenStore.isMakingTx
     else {
       return true
     }
@@ -49,10 +49,10 @@ struct SendTokenView: View {
             keyringStore: keyringStore,
             networkStore: networkStore
           )
-          .listRowBackground(Color.clear)
-          .resetListHeaderStyle()
-          .padding(.top)
-          .padding(.bottom, -16)  // Get it a bit closer
+            .listRowBackground(Color.clear)
+            .resetListHeaderStyle()
+            .padding(.top)
+            .padding(.bottom, -16) // Get it a bit closer
         ) {
         }
         Section(
@@ -60,10 +60,10 @@ struct SendTokenView: View {
         ) {
           NavigationLink(
             destination:
-              SendTokenSearchView(
-                sendTokenStore: sendTokenStore,
-                network: networkStore.selectedChain
-              )
+            SendTokenSearchView(
+              sendTokenStore: sendTokenStore,
+              network: networkStore.selectedChain
+            )
           ) {
             HStack {
               if let token = sendTokenStore.selectedSendToken {
@@ -83,26 +83,28 @@ struct SendTokenView: View {
         .listRowBackground(Color(.secondaryBraveGroupedBackground))
         Section(
           header:
-            WalletListHeaderView(
-              title: Text(
-                String.localizedStringWithFormat(
-                  Strings.Wallet.sendCryptoAmountTitle,
-                  sendTokenStore.selectedSendToken?.symbol ?? "")
+          WalletListHeaderView(
+            title: Text(
+              String.localizedStringWithFormat(
+                Strings.Wallet.sendCryptoAmountTitle,
+                sendTokenStore.selectedSendToken?.symbol ?? ""
               )
-            ),
+            )
+          ),
           footer: ShortcutAmountGrid(action: { amount in
             amountInput = "\((sendTokenStore.selectedSendTokenBalance ?? 0) * amount.rawValue)"
           })
-          .listRowInsets(.zero)
-          .padding(.bottom, 8)
+            .listRowInsets(.zero)
+            .padding(.bottom, 8)
         ) {
           TextField(
             String.localizedStringWithFormat(
               Strings.Wallet.amountInCurrency,
-              sendTokenStore.selectedSendToken?.symbol ?? ""),
+              sendTokenStore.selectedSendToken?.symbol ?? ""
+            ),
             text: $amountInput
           )
-          .keyboardType(.decimalPad)
+            .keyboardType(.decimalPad)
         }
         .listRowBackground(Color(.secondaryBraveGroupedBackground))
         Section(
@@ -154,17 +156,17 @@ struct SendTokenView: View {
         .listRowBackground(Color(.secondaryBraveGroupedBackground))
         Section(
           header:
-            WalletLoadingButton(
-              isLoading: sendTokenStore.isMakingTx,
-              action: {
-                sendTokenStore.sendToken(amount: amountInput) { success in
-                  isShowingError = !success
-                }
-              },
-              label: {
-                Text(Strings.Wallet.sendCryptoSendButtonTitle)
+          WalletLoadingButton(
+            isLoading: sendTokenStore.isMakingTx,
+            action: {
+              sendTokenStore.sendToken(amount: amountInput) { success in
+                isShowingError = !success
               }
-            )
+            },
+            label: {
+              Text(Strings.Wallet.sendCryptoSendButtonTitle)
+            }
+          )
             .buttonStyle(BraveFilledButtonStyle(size: .normal))
             .disabled(isSendDisabled)
             .frame(maxWidth: .infinity)
@@ -211,7 +213,7 @@ struct SendTokenView_Previews: PreviewProvider {
       networkStore: .previewStore,
       sendTokenStore: .previewStore
     )
-    .previewColorSchemes()
+      .previewColorSchemes()
   }
 }
 #endif

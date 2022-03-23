@@ -7,7 +7,6 @@ import XCGLogger
 
 //// A rolling file logger that saves to a different log file based on given timestamp.
 open class RollingFileLogger: XCGLogger {
-
   public static let twoMBsInBytes: Int64 = 2 * 100000
   fileprivate let sizeLimit: Int64
   fileprivate let logDirectoryPath: String?
@@ -30,10 +29,10 @@ open class RollingFileLogger: XCGLogger {
   }
 
   /**
-    Create a new log file with the given timestamp to log events into
+   Create a new log file with the given timestamp to log events into
 
-    :param: date Date for with to start and mark the new log file
-    */
+   :param: date Date for with to start and mark the new log file
+   */
   open func newLogWithDate(_ date: Date, configureDestination: ((FileDestination) -> Void)? = nil) {
     // Don't start a log if we don't have a valid log directory path
     if logDirectoryPath == nil {
@@ -111,7 +110,11 @@ open class RollingFileLogger: XCGLogger {
 
     let logDirURL = URL(fileURLWithPath: path)
     do {
-      return try FileManager.default.allocatedSizeOfDirectoryAtURL(logDirURL, forFilesPrefixedWith: prefix, isLargerThanBytes: threshold)
+      return try FileManager.default.allocatedSizeOfDirectoryAtURL(
+        logDirURL,
+        forFilesPrefixedWith: prefix,
+        isLargerThanBytes: threshold
+      )
     } catch let errorValue as NSError {
       error("Error determining log directory size: \(errorValue)")
     }
@@ -128,6 +131,6 @@ open class RollingFileLogger: XCGLogger {
   }
 
   fileprivate func fileLogIdentifierWithRoot(_ root: String) -> String {
-    return "\(fileLogIdentifierPrefix).\(root)"
+    "\(fileLogIdentifierPrefix).\(root)"
   }
 }

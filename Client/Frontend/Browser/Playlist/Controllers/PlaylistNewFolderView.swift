@@ -17,7 +17,7 @@ class PlaylistFolderImageLoader: ObservableObject {
 
   func load(thumbnail: PlaylistItem) {
     guard let mediaSrc = thumbnail.mediaSrc,
-      let assetUrl = URL(string: mediaSrc)
+          let assetUrl = URL(string: mediaSrc)
     else {
       image = nil
       return
@@ -28,7 +28,7 @@ class PlaylistFolderImageLoader: ObservableObject {
 
   func load(favIcon: PlaylistItem) {
     guard let pageSrc = favIcon.pageSrc,
-      let favIconUrl = URL(string: pageSrc)
+          let favIconUrl = URL(string: pageSrc)
     else {
       image = nil
       return
@@ -43,7 +43,8 @@ class PlaylistFolderImageLoader: ObservableObject {
       favIconUrl: isFavIcon ? url : nil,
       completion: { [weak self] image in
         self?.image = image
-      })
+      }
+    )
   }
 }
 
@@ -71,7 +72,8 @@ private struct PlaylistFolderImage: View {
         LinearGradient(
           colors: [.clear, .black],
           startPoint: .top,
-          endPoint: .bottom)
+          endPoint: .bottom
+        )
       )
       .overlay(
         VStack(alignment: .leading) {
@@ -119,8 +121,10 @@ struct PlaylistNewFolderView: View {
     GridItem(
       .adaptive(
         minimum: PlaylistNewFolderView.designGridItemWidth,
-        maximum: .infinity),
-      spacing: PlaylistNewFolderView.designGridSpacing)
+        maximum: .infinity
+      ),
+      spacing: PlaylistNewFolderView.designGridSpacing
+    )
   ]
 
   @State private var folderName: String = ""
@@ -176,19 +180,19 @@ struct PlaylistNewFolderView: View {
                       PlaylistFolderImage(item: item)
                     }
                   )
-                  .frame(height: PlaylistNewFolderView.designGridItemHeight)
-                  .buttonStyle(.plain)
-                  .overlay(
-                    Group {
-                      if selected.contains(item.objectID) {
-                        RoundedRectangle(
-                          cornerRadius: PlaylistFolderImage.cornerRadius,
-                          style: .continuous
-                        )
-                        .strokeBorder(Color.blue, lineWidth: 2)
+                    .frame(height: PlaylistNewFolderView.designGridItemHeight)
+                    .buttonStyle(.plain)
+                    .overlay(
+                      Group {
+                        if selected.contains(item.objectID) {
+                          RoundedRectangle(
+                            cornerRadius: PlaylistFolderImage.cornerRadius,
+                            style: .continuous
+                          )
+                            .strokeBorder(Color.blue, lineWidth: 2)
+                        }
                       }
-                    }
-                  )
+                    )
                 }
               }
             }

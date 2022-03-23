@@ -39,7 +39,12 @@ public class BuyTokenStore: ObservableObject {
       return
     }
 
-    blockchainRegistry.buyUrl(BraveWallet.MainnetChainId, address: account.address, symbol: token.symbol, amount: amount) { url in
+    blockchainRegistry.buyUrl(
+      BraveWallet.MainnetChainId,
+      address: account.address,
+      symbol: token.symbol,
+      amount: amount
+    ) { url in
       completion(url)
     }
   }

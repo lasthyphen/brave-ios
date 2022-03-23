@@ -10,8 +10,8 @@ import BraveUI
 struct NTPNotificationViewConfig {
   var headerText: String?
   var bodyText: (text: String, urlInfo: [String: String], action: ((URL) -> Void)?)?
-  var primaryButtonConfig: (text: String, showCoinIcon: Bool, action: (() -> Void))?
-  var secondaryButtonConfig: (text: String, action: (() -> Void))?
+  var primaryButtonConfig: (text: String, showCoinIcon: Bool, action: () -> Void)?
+  var secondaryButtonConfig: (text: String, action: () -> Void)?
   let textColor: UIColor
 
   init(textColor: UIColor) {
@@ -20,7 +20,6 @@ struct NTPNotificationViewConfig {
 }
 
 class NTPNotificationView: UIStackView {
-
   private lazy var titleStackView = UIStackView().then {
     $0.spacing = 10
 

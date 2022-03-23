@@ -8,7 +8,6 @@ import XCTest
 import BraveShared
 
 class PrivateCDNTests: BraveSharedTests {
-
   func testMissingLength() throws {
     let data = try XCTUnwrap("ABCDEFGPPPPP".data(using: .ascii))
     XCTAssertNil(PrivateCDN.unpadded(data: data))

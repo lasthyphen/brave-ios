@@ -73,7 +73,6 @@ struct MenuItemButton: View {
 }
 
 class MenuViewController: UINavigationController, UIPopoverPresentationControllerDelegate {
-
   private var menuNavigationDelegate: MenuNavigationControllerDelegate?
   private let initialHeight: CGFloat
 
@@ -97,9 +96,11 @@ class MenuViewController: UINavigationController, UIPopoverPresentationControlle
   ) {
     let container = InnerMenuNavigationController(rootViewController: viewController)
     container.delegate = menuNavigationDelegate
-    container.modalPresentationStyle = .overCurrentContext  // over to fix the dismiss animation
+    container.modalPresentationStyle = .overCurrentContext // over to fix the dismiss animation
     container.innerMenuDismissed = { [weak self] in
-      guard let self = self else { return }
+      guard let self = self else {
+        return
+      }
       if !self.isDismissing {
         self.panModalSetNeedsLayoutUpdate()
       }
@@ -149,7 +150,7 @@ class MenuViewController: UINavigationController, UIPopoverPresentationControlle
 
     // Bug with pan modal + hidden nav bar causes safe area insets to zero out
     if view.safeAreaInsets == .zero, isPanModalPresented,
-      var insets = view.window?.safeAreaInsets {
+       var insets = view.window?.safeAreaInsets {
       // When that happens we re-set them via additionalSafeAreaInsets to the windows safe
       // area insets. Since the pan modal appears over the entire screen we can safely use
       // the windows safe area. Top will stay 0 since we are using non-translucent nav bar
@@ -176,7 +177,7 @@ class MenuViewController: UINavigationController, UIPopoverPresentationControlle
 
   override func dismiss(animated flag: Bool, completion: (() -> Void)? = nil) {
     if let _ = presentedViewController as? InnerMenuNavigationController,
-      presentingViewController?.presentedViewController === self {
+       presentingViewController?.presentedViewController === self {
       isDismissing = true
       presentingViewController?.dismiss(animated: flag, completion: completion)
     } else {
@@ -203,7 +204,9 @@ extension MenuViewController: PanModalPresentable {
     //  - UITableViewController's view is a UITableView, thus the view itself is a UIScrollView
     //  - For our non-UITVC's, the scroll view is a usually a subview of the main view
     func _scrollViewChild(in parentView: UIView, depth: Int = 0) -> UIScrollView? {
-      if depth > 2 { return nil }
+      if depth > 2 {
+        return nil
+      }
       if let scrollView = parentView as? UIScrollView {
         return scrollView
       }
@@ -225,17 +228,22 @@ extension MenuViewController: PanModalPresentable {
       let scrollView = _scrollViewChild(in: vc.view)
       return scrollView
     }
-    guard let topVC = topViewController else { return nil }
+    guard let topVC = topViewController else {
+      return nil
+    }
     topVC.view.layoutIfNeeded()
     return _scrollViewChild(in: topVC.view)
   }
+
   var topOffset: CGFloat {
     let topInset = view.window?.safeAreaInsets.top ?? 0
     return topInset + 32
   }
+
   var longFormHeight: PanModalHeight {
     .maxHeight
   }
+
   var shortFormHeight: PanModalHeight {
     isPresentingInnerMenu ? .maxHeight : .contentHeight(initialHeight)
   }
@@ -251,12 +259,15 @@ extension MenuViewController: PanModalPresentable {
   var allowsExtendedPanScrolling: Bool {
     true
   }
+
   var cornerRadius: CGFloat {
     10.0
   }
+
   var anchorModalToLongForm: Bool {
     isPresentingInnerMenu
   }
+
   var panModalBackgroundColor: UIColor {
     UIColor(white: 0.0, alpha: 0.5)
   }
@@ -264,9 +275,11 @@ extension MenuViewController: PanModalPresentable {
   var dragIndicatorBackgroundColor: UIColor {
     UIColor(white: 0.95, alpha: 1.0)
   }
+
   var transitionDuration: Double {
     0.35
   }
+
   var springDamping: CGFloat {
     0.85
   }
@@ -323,6 +336,7 @@ private class MenuNavigationControllerDelegate: NSObject, UINavigationController
     self.panModal = panModal
     super.init()
   }
+
   func navigationController(
     _ navigationController: UINavigationController,
     didShow viewController: UIViewController,
@@ -354,7 +368,8 @@ class ColorAwareNavigationController: UINavigationController {
       setNeedsStatusBarAppearanceUpdate()
     }
   }
+
   override var preferredStatusBarStyle: UIStatusBarStyle {
-    return statusBarStyle
+    statusBarStyle
   }
 }

@@ -28,7 +28,8 @@ extension BrowserViewController {
           let enableVPNActivity = ActivityShortcutManager.shared.createShortcutActivity(type: .enableBraveVPN)
           menuController.userActivity = enableVPNActivity
           enableVPNActivity.becomeCurrent()
-        })
+        }
+      )
     }
   }
 
@@ -60,7 +61,9 @@ extension BrowserViewController {
         title: Strings.OptionsMenu.bravePlaylistItemTitle,
         subtitle: Strings.OptionsMenu.bravePlaylistItemDescription
       ) { [weak self] in
-        guard let self = self else { return }
+        guard let self = self else {
+          return
+        }
 
         self.presentPlaylistController()
       }
@@ -68,13 +71,15 @@ extension BrowserViewController {
       // Add Brave Talk and News options only in normal browsing
       if !PrivateBrowsingManager.shared.isPrivateBrowsing {
         // Show Brave News if it is first launch and after first launch If the new is enabled
-        if Preferences.General.isFirstLaunch.value || (!Preferences.General.isFirstLaunch.value && Preferences.BraveNews.isEnabled.value) {
+        if Preferences.General.isFirstLaunch
+          .value || (!Preferences.General.isFirstLaunch.value && Preferences.BraveNews.isEnabled.value) {
           MenuItemButton(
             icon: #imageLiteral(resourceName: "menu_brave_news").template,
             title: Strings.OptionsMenu.braveNewsItemTitle,
             subtitle: Strings.OptionsMenu.braveNewsItemDescription
           ) { [weak self] in
-            guard let self = self, let newTabPageController = self.tabManager.selectedTab?.newTabPageViewController else {
+            guard let self = self,
+                  let newTabPageController = self.tabManager.selectedTab?.newTabPageViewController else {
               return
             }
 
@@ -88,7 +93,9 @@ extension BrowserViewController {
           title: Strings.OptionsMenu.braveTalkItemTitle,
           subtitle: Strings.OptionsMenu.braveTalkItemDescription
         ) { [weak self] in
-          guard let self = self, let url = URL(string: "https://talk.brave.com/") else { return }
+          guard let self = self, let url = URL(string: "https://talk.brave.com/") else {
+            return
+          }
 
           self.popToBVC()
           self.finishEditingAndSubmit(url, visitType: .typed)
@@ -110,21 +117,34 @@ extension BrowserViewController {
 
   func destinationMenuSection(_ menuController: MenuViewController, isShownOnWebPage: Bool) -> some View {
     VStack(spacing: 0) {
-      MenuItemButton(icon: #imageLiteral(resourceName: "menu_bookmarks").template, title: Strings.bookmarksMenuItem) { [unowned self, unowned menuController] in
+      MenuItemButton(
+        icon: #imageLiteral(resourceName: "menu_bookmarks").template,
+        title: Strings.bookmarksMenuItem
+      ) { [unowned self, unowned menuController] in
         let vc = BookmarksViewController(
           folder: bookmarkManager.lastVisitedFolder(),
           bookmarkManager: bookmarkManager,
-          isPrivateBrowsing: PrivateBrowsingManager.shared.isPrivateBrowsing)
+          isPrivateBrowsing: PrivateBrowsingManager.shared.isPrivateBrowsing
+        )
         vc.toolbarUrlActionsDelegate = self
         menuController.presentInnerMenu(vc)
       }
 
-      MenuItemButton(icon: #imageLiteral(resourceName: "menu-history").template, title: Strings.historyMenuItem) { [unowned self, unowned menuController] in
-        let vc = HistoryViewController(isPrivateBrowsing: PrivateBrowsingManager.shared.isPrivateBrowsing, historyAPI: braveCore.historyAPI)
+      MenuItemButton(
+        icon: #imageLiteral(resourceName: "menu-history").template,
+        title: Strings.historyMenuItem
+      ) { [unowned self, unowned menuController] in
+        let vc = HistoryViewController(
+          isPrivateBrowsing: PrivateBrowsingManager.shared.isPrivateBrowsing,
+          historyAPI: braveCore.historyAPI
+        )
         vc.toolbarUrlActionsDelegate = self
         menuController.pushInnerMenu(vc)
       }
-      MenuItemButton(icon: #imageLiteral(resourceName: "menu-downloads").template, title: Strings.downloadsMenuItem) { [unowned self] in
+      MenuItemButton(
+        icon: #imageLiteral(resourceName: "menu-downloads").template,
+        title: Strings.downloadsMenuItem
+      ) { [unowned self] in
         FileManager.default.openBraveDownloadsFolder { success in
           if !success {
             self.displayOpenDownloadsError()
@@ -138,16 +158,27 @@ extension BrowserViewController {
         ) { [unowned self] in
           self.presentWallet()
         }
-        MenuItemButton(icon: #imageLiteral(resourceName: "playlist_menu").template, title: Strings.playlistMenuItem) { [weak self] in
-          guard let self = self else { return }
+        MenuItemButton(
+          icon: #imageLiteral(resourceName: "playlist_menu").template,
+          title: Strings.playlistMenuItem
+        ) { [weak self] in
+          guard let self = self else {
+            return
+          }
           self.presentPlaylistController()
         }
       }
-      MenuItemButton(icon: #imageLiteral(resourceName: "menu-settings").template, title: Strings.settingsMenuItem) { [unowned self, unowned menuController] in
+      MenuItemButton(
+        icon: #imageLiteral(resourceName: "menu-settings").template,
+        title: Strings.settingsMenuItem
+      ) { [unowned self, unowned menuController] in
         var settingsStore: SettingsStore?
-        if let keyringService = BraveWallet.KeyringServiceFactory.get(privateMode: PrivateBrowsingManager.shared.isPrivateBrowsing),
-          let walletService = BraveWallet.ServiceFactory.get(privateMode: PrivateBrowsingManager.shared.isPrivateBrowsing),
-          let txService = BraveWallet.TxServiceFactory.get(privateMode: PrivateBrowsingManager.shared.isPrivateBrowsing) {
+        if let keyringService = BraveWallet.KeyringServiceFactory
+          .get(privateMode: PrivateBrowsingManager.shared.isPrivateBrowsing),
+          let walletService = BraveWallet.ServiceFactory
+            .get(privateMode: PrivateBrowsingManager.shared.isPrivateBrowsing),
+            let txService = BraveWallet.TxServiceFactory
+              .get(privateMode: PrivateBrowsingManager.shared.isPrivateBrowsing) {
           settingsStore = SettingsStore(
             keyringService: keyringService,
             walletService: walletService,
@@ -167,7 +198,8 @@ extension BrowserViewController {
           windowProtection: self.windowProtection,
           braveCore: self.braveCore,
           walletSettingsStore: settingsStore,
-          walletNetworkStore: networkStore)
+          walletNetworkStore: networkStore
+        )
         vc.settingsDelegate = self
         menuController.pushInnerMenu(vc)
       }
@@ -217,7 +249,9 @@ extension BrowserViewController {
       // Retrieve the item and offset-time from the current tab's webview.
       let tab = self.tabManager.selectedTab
       PlaylistCarplayManager.shared.getPlaylistController(tab: tab) { [weak self] playlistController in
-        guard let self = self else { return }
+        guard let self = self else {
+          return
+        }
 
         playlistController.modalPresentationStyle = .fullScreen
 
@@ -262,9 +296,13 @@ extension BrowserViewController {
                   let tab = browserViewController.tabManager.selectedTab
 
                   if let webView = tab?.webView {
-                    PlaylistHelper.getCurrentTime(webView: webView, nodeTag: item.tagId) { [weak browserViewController] currentTime in
-                      browserViewController?.openPlaylist(tab: tab, item: item, playbackOffset: currentTime)
-                    }
+                    PlaylistHelper
+                      .getCurrentTime(
+                        webView: webView,
+                        nodeTag: item.tagId
+                      ) { [weak browserViewController] currentTime in
+                        browserViewController?.openPlaylist(tab: tab, item: item, playbackOffset: currentTime)
+                      }
                   } else {
                     browserViewController.openPlaylist(tab: nil, item: item, playbackOffset: 0.0)
                   }
@@ -280,7 +318,10 @@ extension BrowserViewController {
           NightModeMenuButton(dismiss: {
             browserViewController.dismiss(animated: true)
           })
-          MenuItemButton(icon: #imageLiteral(resourceName: "menu-add-bookmark").template, title: Strings.addToMenuItem) {
+          MenuItemButton(
+            icon: #imageLiteral(resourceName: "menu-add-bookmark").template,
+            title: Strings.addToMenuItem
+          ) {
             browserViewController.dismiss(animated: true) {
               browserViewController.openAddBookmark()
             }

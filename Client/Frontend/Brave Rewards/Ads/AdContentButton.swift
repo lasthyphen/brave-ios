@@ -14,11 +14,13 @@ class AdContentButton: UIControl {
     $0.font = .systemFont(ofSize: 15.0, weight: .semibold)
     $0.numberOfLines = 2
   }
+
   let bodyLabel = UILabel().then {
     $0.textColor = .bravePrimary
     $0.font = .systemFont(ofSize: 15.0)
     $0.numberOfLines = 3
   }
+
   private let appNameLabel = UILabel().then {
     $0.textColor = UIColor.bravePrimary.withAlphaComponent(0.5)
     $0.font = .systemFont(ofSize: 14.0, weight: .regular)

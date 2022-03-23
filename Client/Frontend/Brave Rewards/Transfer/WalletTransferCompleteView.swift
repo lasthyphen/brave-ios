@@ -8,7 +8,6 @@ import Shared
 
 extension WalletTransferCompleteViewController {
   class WalletTransferCompleteView: UIView {
-
     private let scrollView = UIScrollView()
     private let stackView = UIStackView().then {
       $0.axis = .vertical
@@ -16,12 +15,14 @@ extension WalletTransferCompleteViewController {
       $0.layoutMargins = UIEdgeInsets(equalInset: 16)
       $0.isLayoutMarginsRelativeArrangement = true
     }
+
     let titleLabel = UILabel().then {
       $0.text = Strings.Rewards.walletTransferCompleteTitle
       $0.numberOfLines = 0
       $0.font = .systemFont(ofSize: 17, weight: .semibold)
       $0.textColor = .braveInfoLabel
     }
+
     let bodyLabel = UILabel().then {
       $0.text = Strings.Rewards.walletTransferCompleteBody
       $0.numberOfLines = 0

@@ -6,7 +6,7 @@ import UIKit
 import Shared
 
 private struct ReaderModeStyleViewControllerUX {
-  // TODO Erica can't find this to visually test
+  // TODO: Erica can't find this to visually test
   static let rowHeight = 50
 
   static let width = 270
@@ -31,7 +31,10 @@ private struct ReaderModeStyleViewControllerUX {
 // MARK: -
 
 protocol ReaderModeStyleViewControllerDelegate {
-  func readerModeStyleViewController(_ readerModeStyleViewController: ReaderModeStyleViewController, didConfigureStyle style: ReaderModeStyle)
+  func readerModeStyleViewController(
+    _ readerModeStyleViewController: ReaderModeStyleViewController,
+    didConfigureStyle style: ReaderModeStyle
+  )
 }
 
 // MARK: -
@@ -56,7 +59,10 @@ class ReaderModeStyleViewController: UIViewController {
   override func viewDidLoad() {
     // Our preferred content size has a fixed width and height based on the rows + padding
 
-    preferredContentSize = CGSize(width: ReaderModeStyleViewControllerUX.width, height: ReaderModeStyleViewControllerUX.height)
+    preferredContentSize = CGSize(
+      width: ReaderModeStyleViewControllerUX.width,
+      height: ReaderModeStyleViewControllerUX.height
+    )
 
     popoverPresentationController?.backgroundColor = ReaderModeStyleViewControllerUX.fontTypeRowBackground
 
@@ -66,7 +72,7 @@ class ReaderModeStyleViewController: UIViewController {
     view.addSubview(fontTypeRow)
     fontTypeRow.backgroundColor = ReaderModeStyleViewControllerUX.fontTypeRowBackground
 
-    fontTypeRow.snp.makeConstraints { (make) -> Void in
+    fontTypeRow.snp.makeConstraints { make -> Void in
       make.top.equalTo(self.view.safeArea.top)
       make.left.right.equalTo(self.view)
       make.height.equalTo(ReaderModeStyleViewControllerUX.rowHeight)
@@ -85,7 +91,7 @@ class ReaderModeStyleViewController: UIViewController {
     view.addSubview(fontSizeRow)
     fontSizeRow.backgroundColor = ReaderModeStyleViewControllerUX.fontSizeRowBackground
 
-    fontSizeRow.snp.makeConstraints { (make) -> Void in
+    fontSizeRow.snp.makeConstraints { make -> Void in
       make.top.equalTo(fontTypeRow.snp.bottom)
       make.left.right.equalTo(self.view)
       make.height.equalTo(ReaderModeStyleViewControllerUX.rowHeight)
@@ -94,9 +100,8 @@ class ReaderModeStyleViewController: UIViewController {
     fontSizeLabel = FontSizeLabel()
     fontSizeRow.addSubview(fontSizeLabel)
 
-    fontSizeLabel.snp.makeConstraints { (make) -> Void in
+    fontSizeLabel.snp.makeConstraints { make -> Void in
       make.center.equalTo(fontSizeRow)
-      return
     }
 
     fontSizeButtons = [
@@ -112,7 +117,7 @@ class ReaderModeStyleViewController: UIViewController {
     let themeRow = UIView()
     view.addSubview(themeRow)
 
-    themeRow.snp.makeConstraints { (make) -> Void in
+    themeRow.snp.makeConstraints { make -> Void in
       make.top.equalTo(fontSizeRow.snp.bottom)
       make.left.right.equalTo(self.view)
       make.height.equalTo(ReaderModeStyleViewControllerUX.rowHeight)
@@ -153,7 +158,7 @@ class ReaderModeStyleViewController: UIViewController {
     view.addSubview(brightnessRow)
     brightnessRow.backgroundColor = ReaderModeStyleViewControllerUX.brightnessRowBackground
 
-    brightnessRow.snp.makeConstraints { (make) -> Void in
+    brightnessRow.snp.makeConstraints { make -> Void in
       make.top.equalTo(themeRow.snp.bottom)
       make.left.right.equalTo(self.view)
       make.height.equalTo(ReaderModeStyleViewControllerUX.rowHeight)
@@ -174,7 +179,7 @@ class ReaderModeStyleViewController: UIViewController {
     brightnessMinImageView.tintColor = .braveLabel
     brightnessRow.addSubview(brightnessMinImageView)
 
-    brightnessMinImageView.snp.makeConstraints { (make) -> Void in
+    brightnessMinImageView.snp.makeConstraints { make -> Void in
       make.centerY.equalTo(slider)
       make.right.equalTo(slider.snp.left).offset(-ReaderModeStyleViewControllerUX.brightnessIconOffset)
     }
@@ -183,7 +188,7 @@ class ReaderModeStyleViewController: UIViewController {
     brightnessMaxImageView.tintColor = .braveLabel
     brightnessRow.addSubview(brightnessMaxImageView)
 
-    brightnessMaxImageView.snp.makeConstraints { (make) -> Void in
+    brightnessMaxImageView.snp.makeConstraints { make -> Void in
       make.centerY.equalTo(slider)
       make.left.equalTo(slider.snp.right).offset(ReaderModeStyleViewControllerUX.brightnessIconOffset)
     }
@@ -244,10 +249,8 @@ class ReaderModeStyleViewController: UIViewController {
       switch button.fontSizeAction {
       case .bigger:
         button.isEnabled = !readerModeStyle.fontSize.isLargest()
-        break
       case .smaller:
         button.isEnabled = !readerModeStyle.fontSize.isSmallest()
-        break
       case .reset:
         break
       }
@@ -328,7 +331,7 @@ class FontSizeButton: UIButton {
       accessibilityLabel = Strings.readerModeResetFontSizeAccessibilityLabel
     }
 
-    // TODO Does this need to change with the selected font type? Not sure if makes sense for just +/-
+    // TODO: Does this need to change with the selected font type? Not sure if makes sense for just +/-
     titleLabel?.font = UIFont(name: "FiraSans-Light", size: DynamicFontHelper.defaultHelper.ReaderBigFontSize)
   }
 }
@@ -342,8 +345,9 @@ class FontSizeLabel: UILabel {
     isAccessibilityElement = false
   }
 
+  @available(*, unavailable)
   required init?(coder aDecoder: NSCoder) {
-    // TODO
+    // TODO:
     fatalError("init(coder:) has not been implemented")
   }
 

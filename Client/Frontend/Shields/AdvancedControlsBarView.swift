@@ -8,7 +8,6 @@ import BraveShared
 import BraveUI
 
 class AdvancedControlsBarView: UIControl {
-
   var isShowingAdvancedControls: Bool = false {
     didSet {
       imageView.transform = CGAffineTransform(rotationAngle: isShowingAdvancedControls ? CGFloat.pi : 0)
@@ -83,10 +82,12 @@ class AdvancedControlsBarView: UIControl {
   override func endTracking(_ touch: UITouch?, with event: UIEvent?) {
     if isTouchInside {
       UIView.animate(
-        withDuration: 0.5, delay: 0, usingSpringWithDamping: 0.7, initialSpringVelocity: 0, options: [.beginFromCurrentState],
+        withDuration: 0.5, delay: 0, usingSpringWithDamping: 0.7, initialSpringVelocity: 0,
+        options: [.beginFromCurrentState],
         animations: {
           self.isShowingAdvancedControls.toggle()
-        }, completion: nil)
+        }, completion: nil
+      )
     }
     super.endTracking(touch, with: event)
   }

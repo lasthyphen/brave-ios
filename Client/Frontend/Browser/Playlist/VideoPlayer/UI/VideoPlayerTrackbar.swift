@@ -16,7 +16,9 @@ private class VideoSliderBar: UIControl {
 
       // Clamps the value between 0.0 and 1.0
       // Calculates the insets and then the offsets based on the ratio (value) of its bounds relative to its start position
-      filledConstraint?.constant = value >= 1.0 ? bounds.size.width : ((bounds.size.width - (trackerInsets.left + trackerInsets.right)) * value) + trackerInsets.left
+      filledConstraint?.constant = value >= 1.0
+        ? bounds.size.width
+        : ((bounds.size.width - (trackerInsets.left + trackerInsets.right)) * value) + trackerInsets.left
     }
   }
 
@@ -58,6 +60,7 @@ private class VideoSliderBar: UIControl {
     }
   }
 
+  @available(*, unavailable)
   required init?(coder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }
@@ -78,7 +81,8 @@ private class VideoSliderBar: UIControl {
 
   override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
     if tracker.bounds.size.width < 44.0 || tracker.bounds.size.height < 44.0 {
-      let adjustedBounds = CGRect(x: tracker.center.x, y: tracker.center.y, width: 0.0, height: 0.0).inset(by: touchInsets)
+      let adjustedBounds = CGRect(x: tracker.center.x, y: tracker.center.y, width: 0.0, height: 0.0)
+        .inset(by: touchInsets)
 
       if adjustedBounds.contains(point) {
         return tracker
@@ -95,7 +99,8 @@ private class VideoSliderBar: UIControl {
 
   override func point(inside point: CGPoint, with event: UIEvent?) -> Bool {
     if tracker.bounds.size.width < 44.0 || tracker.bounds.size.height < 44.0 {
-      let adjustedBounds = CGRect(x: tracker.center.x, y: tracker.center.y, width: 0.0, height: 0.0).inset(by: touchInsets)
+      let adjustedBounds = CGRect(x: tracker.center.x, y: tracker.center.y, width: 0.0, height: 0.0)
+        .inset(by: touchInsets)
 
       if adjustedBounds.contains(point) {
         return true
@@ -187,10 +192,9 @@ class VideoTrackerBar: UIView {
 
   public func setTimeRange(currentTime: CMTime, endTime: CMTime) {
     if CMTimeCompare(endTime, .zero) != 0,
-      endTime.value > 0,
-      currentTime.isValid && !currentTime.isIndefinite,
-      endTime.isValid && !endTime.isIndefinite {
-
+       endTime.value > 0,
+       currentTime.isValid && !currentTime.isIndefinite,
+       endTime.isValid && !endTime.isIndefinite {
       slider.value = CGFloat(currentTime.value) / CGFloat(endTime.value)
       currentTimeLabel.text = VideoTrackerBar.timeToString(currentTime)
       endTimeLabel.text = "-\(VideoTrackerBar.timeToString(endTime - currentTime))"
@@ -230,6 +234,7 @@ class VideoTrackerBar: UIView {
     }
   }
 
+  @available(*, unavailable)
   required init?(coder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }
@@ -247,7 +252,7 @@ class VideoTrackerBar: UIView {
   public static func timeToString(_ time: CMTime) -> String {
     let totalSeconds = abs(CMTimeGetSeconds(time))
     if Int(totalSeconds) >= 3600,
-      let result = formatter.string(from: totalSeconds) {
+       let result = formatter.string(from: totalSeconds) {
       // It is necessary to use the correct formatter because the formatter
       // can drop leading zeroes which will cause `0s` to show instead of `00:00`
       // Also if all zeroes are dropped and padded, it formats as `00`.

@@ -6,7 +6,6 @@
 import SwiftUI
 
 struct BraveSearchDebugMenu: View {
-
   @ObservedObject var logging: BraveSearchLogEntry
 
   var body: some View {

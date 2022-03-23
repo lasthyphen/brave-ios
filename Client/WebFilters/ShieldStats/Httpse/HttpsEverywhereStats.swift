@@ -62,13 +62,15 @@ class HttpsEverywhereStats: LocalAdblockResourceProtocol {
   }
 
   func setData(data: Data) {
-    guard let folderUrl = FileManager.default.getOrCreateFolder(name: folderName) else { return }
+    guard let folderUrl = FileManager.default.getOrCreateFolder(name: folderName) else {
+      return
+    }
     unzipAndLoad(folderUrl.path, data: data)
   }
 
   func unzipAndLoad(_ dir: String, data: Data) {
     httpseDb.close()
-    succeed().upon() { _ in
+    succeed().upon { _ in
 
       let fm = FileManager.default
       if fm.fileExists(atPath: dir + "/" + HttpsEverywhereStats.levelDbFileName) {
@@ -94,7 +96,8 @@ class HttpsEverywhereStats: LocalAdblockResourceProtocol {
         atPath: dir,
         withTarData: unzip,
         progress: { _ in
-        })
+        }
+      )
     } catch {
       log.error("unzip file error: \(error)")
     }

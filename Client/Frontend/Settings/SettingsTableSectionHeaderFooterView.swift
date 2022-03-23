@@ -13,7 +13,6 @@ private struct SettingsTableSectionHeaderFooterViewUX {
 }
 
 class SettingsTableSectionHeaderFooterView: UITableViewHeaderFooterView, TableViewReusable {
-
   enum TitleAlignment {
     case top
     case bottom
@@ -39,6 +38,7 @@ class SettingsTableSectionHeaderFooterView: UITableViewHeaderFooterView, TableVi
     setupInitialConstraints()
   }
 
+  @available(*, unavailable)
   required init?(coder aDecoder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }

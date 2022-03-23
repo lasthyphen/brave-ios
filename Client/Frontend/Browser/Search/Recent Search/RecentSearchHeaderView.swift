@@ -128,13 +128,15 @@ class RecentSearchHeaderView: UICollectionReusableView {
       top: -DesignUX.paddingY,
       left: -DesignUX.paddingX,
       bottom: -DesignUX.paddingY,
-      right: -DesignUX.paddingX)
+      right: -DesignUX.paddingX
+    )
 
     let contentEdgeInsets = UIEdgeInsets(
       top: DesignUX.paddingY,
       left: DesignUX.paddingX,
       bottom: DesignUX.paddingY,
-      right: DesignUX.paddingX)
+      right: DesignUX.paddingX
+    )
 
     if showRecentSearches {
       showButton.do {

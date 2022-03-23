@@ -9,11 +9,22 @@ import BraveCore
 #if DEBUG
 
 class MockEthTxManagerProxy: BraveWalletEthTxManagerProxy {
-  func setGasPriceAndLimitForUnapprovedTransaction(_ txMetaId: String, gasPrice: String, gasLimit: String, completion: @escaping (Bool) -> Void) {
+  func setGasPriceAndLimitForUnapprovedTransaction(
+    _ txMetaId: String,
+    gasPrice: String,
+    gasLimit: String,
+    completion: @escaping (Bool) -> Void
+  ) {
     completion(false)
   }
 
-  func setGasFeeAndLimitForUnapprovedTransaction(_ txMetaId: String, maxPriorityFeePerGas: String, maxFeePerGas: String, gasLimit: String, completion: @escaping (Bool) -> Void) {
+  func setGasFeeAndLimitForUnapprovedTransaction(
+    _ txMetaId: String,
+    maxPriorityFeePerGas: String,
+    maxFeePerGas: String,
+    gasLimit: String,
+    completion: @escaping (Bool) -> Void
+  ) {
     completion(false)
   }
 
@@ -29,11 +40,21 @@ class MockEthTxManagerProxy: BraveWalletEthTxManagerProxy {
     completion(true, .init())
   }
 
-  func makeErc20ApproveData(_ spenderAddress: String, amount: String, completion: @escaping (Bool, [NSNumber]) -> Void) {
+  func makeErc20ApproveData(
+    _ spenderAddress: String,
+    amount: String,
+    completion: @escaping (Bool, [NSNumber]) -> Void
+  ) {
     completion(false, .init())
   }
 
-  func makeErc721Transfer(fromData from: String, to: String, tokenId: String, contractAddress: String, completion: @escaping (Bool, [NSNumber]) -> Void) {
+  func makeErc721Transfer(
+    fromData from: String,
+    to: String,
+    tokenId: String,
+    contractAddress: String,
+    completion: @escaping (Bool, [NSNumber]) -> Void
+  ) {
     completion(false, .init())
   }
 
@@ -45,7 +66,13 @@ class MockEthTxManagerProxy: BraveWalletEthTxManagerProxy {
     completion(nil)
   }
 
-  func processHardwareSignature(_ txMetaId: String, v: String, r: String, s: String, completion: @escaping (Bool, BraveWallet.ProviderError, String) -> Void) {
+  func processHardwareSignature(
+    _ txMetaId: String,
+    v: String,
+    r: String,
+    s: String,
+    completion: @escaping (Bool, BraveWallet.ProviderError, String) -> Void
+  ) {
     completion(false, .internalError, "Error Message")
   }
 }

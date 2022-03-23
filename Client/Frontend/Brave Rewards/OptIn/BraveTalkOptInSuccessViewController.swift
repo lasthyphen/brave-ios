@@ -7,9 +7,8 @@ import UIKit
 import BraveUI
 
 class BraveTalkOptInSuccessViewController: UIViewController, PopoverContentComponent {
-
   private var braveTalkView: View {
-    view as! View  // swiftlint:disable:this force_cast
+    view as! View // swiftlint:disable:this force_cast
   }
 
   override func loadView() {
@@ -22,7 +21,6 @@ class BraveTalkOptInSuccessViewController: UIViewController, PopoverContentCompo
 
     if previousTraitCollection?.preferredContentSizeCategory
       != traitCollection.preferredContentSizeCategory {
-
       updatePreferredContentSize()
     }
   }

@@ -13,6 +13,7 @@ struct OpenWalletURLAction {
   init(action: @escaping (URL) -> Void) {
     self.action = action
   }
+
   func callAsFunction(_ url: URL) {
     action(url)
   }

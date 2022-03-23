@@ -65,7 +65,7 @@ class Blockies {
       for _ in 0..<length {
         var row: [Double] = []
         for _ in 0..<dataLength {
-          let normalized = Double((generator.next() >> 0)) / Double(UInt32.max)
+          let normalized = Double(generator.next() >> 0) / Double(UInt32.max)
           let skewed = floor(normalized * 2.3)
           row.append(skewed)
         }

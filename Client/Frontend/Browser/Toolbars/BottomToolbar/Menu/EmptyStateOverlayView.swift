@@ -7,7 +7,6 @@ import Foundation
 import Shared
 
 class EmptyStateOverlayView: UIView {
-
   private let logoImageView = UIImageView().then {
     $0.tintColor = .braveLabel
   }

@@ -13,11 +13,11 @@ class AddToPlaylistActivity: UIActivity {
   }
 
   override var activityTitle: String? {
-    return Strings.PlayList.addToPlayListAlertTitle
+    Strings.PlayList.addToPlayListAlertTitle
   }
 
   override var activityImage: UIImage? {
-    return #imageLiteral(resourceName: "playlist_menu")
+    #imageLiteral(resourceName: "playlist_menu")
   }
 
   override func perform() {
@@ -26,7 +26,7 @@ class AddToPlaylistActivity: UIActivity {
   }
 
   override func canPerform(withActivityItems activityItems: [Any]) -> Bool {
-    return true
+    true
   }
 }
 
@@ -38,11 +38,11 @@ class OpenInPlaylistActivity: UIActivity {
   }
 
   override var activityTitle: String? {
-    return Strings.PlayList.toastExitingItemPlaylistTitle
+    Strings.PlayList.toastExitingItemPlaylistTitle
   }
 
   override var activityImage: UIImage? {
-    return #imageLiteral(resourceName: "playlist_menu")
+    #imageLiteral(resourceName: "playlist_menu")
   }
 
   override func perform() {
@@ -51,6 +51,6 @@ class OpenInPlaylistActivity: UIActivity {
   }
 
   override func canPerform(withActivityItems activityItems: [Any]) -> Bool {
-    return true
+    true
   }
 }

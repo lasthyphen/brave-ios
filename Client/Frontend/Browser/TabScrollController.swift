@@ -33,7 +33,7 @@ class TabScrollingController: NSObject {
 
   // Constraint-based animation is causing PDF docs to flicker. This is used to bypass this animation.
   var isTabShowingPDF: Bool {
-    return (tab?.mimeType ?? "") == MIMEType.PDF
+    (tab?.mimeType ?? "") == MIMEType.PDF
   }
 
   weak var header: UIView?
@@ -44,7 +44,7 @@ class TabScrollingController: NSObject {
 
   var footerBottomConstraint: Constraint?
   var headerTopConstraint: Constraint?
-  var toolbarsShowing: Bool { return headerTopOffset == 0 }
+  var toolbarsShowing: Bool { headerTopOffset == 0 }
 
   fileprivate var isZoomedOut: Bool = false
   fileprivate var lastZoomedScale: CGFloat = 0
@@ -58,7 +58,9 @@ class TabScrollingController: NSObject {
   }
 
   fileprivate var tabsBarOffset: CGFloat {
-    guard let tabsBar = tabsBar else { return 0 }
+    guard let tabsBar = tabsBar else {
+      return 0
+    }
 
     return (scrollDirection == .down && !tabsBar.view.isHidden) ? UX.TabsBar.height : 0
   }
@@ -70,13 +72,13 @@ class TabScrollingController: NSObject {
     }
   }
 
-  fileprivate var scrollView: UIScrollView? { return tab?.webView?.scrollView }
-  fileprivate var contentOffset: CGPoint { return scrollView?.contentOffset ?? .zero }
-  fileprivate var contentSize: CGSize { return scrollView?.contentSize ?? .zero }
-  fileprivate var scrollViewHeight: CGFloat { return scrollView?.frame.height ?? 0 }
-  fileprivate var topScrollHeight: CGFloat { return header?.frame.height ?? 0 }
-  fileprivate var bottomScrollHeight: CGFloat { return footer?.frame.height ?? 0 }
-  fileprivate var snackBarsFrame: CGRect { return snackBars?.frame ?? .zero }
+  fileprivate var scrollView: UIScrollView? { tab?.webView?.scrollView }
+  fileprivate var contentOffset: CGPoint { scrollView?.contentOffset ?? .zero }
+  fileprivate var contentSize: CGSize { scrollView?.contentSize ?? .zero }
+  fileprivate var scrollViewHeight: CGFloat { scrollView?.frame.height ?? 0 }
+  fileprivate var topScrollHeight: CGFloat { header?.frame.height ?? 0 }
+  fileprivate var bottomScrollHeight: CGFloat { footer?.frame.height ?? 0 }
+  fileprivate var snackBarsFrame: CGRect { snackBars?.frame ?? .zero }
 
   fileprivate var lastContentOffset: CGFloat = 0
   fileprivate var scrollDirection: ScrollDirection = .down
@@ -100,7 +102,8 @@ class TabScrollingController: NSObject {
       headerOffset: 0,
       footerOffset: 0,
       alpha: 1,
-      completion: completion)
+      completion: completion
+    )
   }
 
   func hideToolbars(animated: Bool, completion: ((_ finished: Bool) -> Void)? = nil) {
@@ -117,10 +120,16 @@ class TabScrollingController: NSObject {
       headerOffset: -topScrollHeight,
       footerOffset: bottomScrollHeight,
       alpha: 0,
-      completion: completion)
+      completion: completion
+    )
   }
 
-  override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey: Any]?, context: UnsafeMutableRawPointer?) {
+  override func observeValue(
+    forKeyPath keyPath: String?,
+    of object: Any?,
+    change: [NSKeyValueChangeKey: Any]?,
+    context: UnsafeMutableRawPointer?
+  ) {
     if keyPath == "contentSize" {
       if !checkScrollHeightIsLargeEnoughForScrolling() && !toolbarsShowing {
         showToolbars(animated: true, completion: nil)
@@ -151,22 +160,24 @@ class TabScrollingController: NSObject {
   }
 
   fileprivate func roundNum(_ num: CGFloat) -> CGFloat {
-    return round(100 * num) / 100
+    round(100 * num) / 100
   }
-
 }
 
-private extension TabScrollingController {
-  func tabIsLoading() -> Bool {
-    return tab?.loading ?? true
+extension TabScrollingController {
+  private func tabIsLoading() -> Bool {
+    tab?.loading ?? true
   }
 
-  func isBouncingAtBottom() -> Bool {
-    guard let scrollView = scrollView else { return false }
-    return scrollView.contentOffset.y > (scrollView.contentSize.height - scrollView.frame.size.height) && scrollView.contentSize.height > scrollView.frame.size.height
+  private func isBouncingAtBottom() -> Bool {
+    guard let scrollView = scrollView else {
+      return false
+    }
+    return scrollView.contentOffset.y > (scrollView.contentSize.height - scrollView.frame.size.height) && scrollView
+      .contentSize.height > scrollView.frame.size.height
   }
 
-  @objc func handlePan(_ gesture: UIPanGestureRecognizer) {
+  @objc private func handlePan(_ gesture: UIPanGestureRecognizer) {
     if tabIsLoading() {
       return
     }
@@ -204,11 +215,14 @@ private extension TabScrollingController {
     }
   }
 
-  func checkRubberbandingForDelta(_ delta: CGFloat) -> Bool {
-    return !((delta < 0 && contentOffset.y + scrollViewHeight > contentSize.height && scrollViewHeight < contentSize.height) || contentOffset.y < delta)
+  private func checkRubberbandingForDelta(_ delta: CGFloat) -> Bool {
+    !(
+      (delta < 0 && contentOffset.y + scrollViewHeight > contentSize.height && scrollViewHeight < contentSize.height) ||
+        contentOffset.y < delta
+    )
   }
 
-  func scrollWithDelta(_ delta: CGFloat) {
+  private func scrollWithDelta(_ delta: CGFloat) {
     if scrollViewHeight >= contentSize.height {
       return
     }
@@ -228,11 +242,11 @@ private extension TabScrollingController {
     tabsBar?.view.alpha = tabsAlpha
   }
 
-  func isHeaderDisplayedForGivenOffset(_ offset: CGFloat) -> Bool {
-    return offset > -topScrollHeight && offset < 0
+  private func isHeaderDisplayedForGivenOffset(_ offset: CGFloat) -> Bool {
+    offset > -topScrollHeight && offset < 0
   }
 
-  func clamp(_ y: CGFloat, min: CGFloat, max: CGFloat) -> CGFloat {
+  private func clamp(_ y: CGFloat, min: CGFloat, max: CGFloat) -> CGFloat {
     if y >= max {
       return max
     } else if y <= min {
@@ -241,7 +255,14 @@ private extension TabScrollingController {
     return y
   }
 
-  func animateToolbarsWithOffsets(_ animated: Bool, duration: TimeInterval, headerOffset: CGFloat, footerOffset: CGFloat, alpha: CGFloat, completion: ((_ finished: Bool) -> Void)?) {
+  private func animateToolbarsWithOffsets(
+    _ animated: Bool,
+    duration: TimeInterval,
+    headerOffset: CGFloat,
+    footerOffset: CGFloat,
+    alpha: CGFloat,
+    completion: ((_ finished: Bool) -> Void)?
+  ) {
     self.headerTopOffset = headerOffset
     self.footerBottomOffset = footerOffset
     let animation: () -> Void = {
@@ -251,15 +272,21 @@ private extension TabScrollingController {
     }
 
     if animated {
-      UIView.animate(withDuration: duration, delay: 0, options: .allowUserInteraction, animations: animation, completion: completion)
+      UIView.animate(
+        withDuration: duration,
+        delay: 0,
+        options: .allowUserInteraction,
+        animations: animation,
+        completion: completion
+      )
     } else {
       animation()
       completion?(true)
     }
   }
 
-  func checkScrollHeightIsLargeEnoughForScrolling() -> Bool {
-    return (UIScreen.main.bounds.size.height + 2 * UIConstants.toolbarHeight) < scrollView?.contentSize.height ?? 0
+  private func checkScrollHeightIsLargeEnoughForScrolling() -> Bool {
+    (UIScreen.main.bounds.size.height + 2 * UIConstants.toolbarHeight) < scrollView?.contentSize.height ?? 0
   }
 }
 
@@ -268,7 +295,7 @@ extension TabScrollingController: UIGestureRecognizerDelegate {
     _ gestureRecognizer: UIGestureRecognizer,
     shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer
   ) -> Bool {
-    return true
+    true
   }
 }
 

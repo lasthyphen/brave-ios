@@ -8,7 +8,6 @@ import BraveShared
 
 extension ShieldsViewController {
   class View: UIView {
-
     private let scrollView = UIScrollView().then {
       $0.delaysContentTouches = false
     }
@@ -75,8 +74,7 @@ extension ShieldsViewController {
 }
 
 extension ShieldsViewController {
-
   var closeActionAccessibilityLabel: String {
-    return Strings.Popover.closeShieldsMenu
+    Strings.Popover.closeShieldsMenu
   }
 }

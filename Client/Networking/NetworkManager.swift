@@ -62,9 +62,9 @@ class NetworkManager {
     switch response.statusCode {
     case 400...499:
       let error = """
-        Failed to download, status code: \(response.statusCode),\
-        URL:\(String(describing: response.url))
-        """
+      Failed to download, status code: \(response.statusCode),\
+      URL:\(String(describing: response.url))
+      """
       throw error
 
     case fileNotModifiedStatusCode:
@@ -76,7 +76,7 @@ class NetworkManager {
       var lastModified: TimeInterval?
 
       if checkLastServerSideModification,
-        let lastModifiedHeaderValue = response.allHeaderFields["Last-Modified"] as? String {
+         let lastModifiedHeaderValue = response.allHeaderFields["Last-Modified"] as? String {
         let formatter = DateFormatter().then {
           $0.timeZone = TimeZone(abbreviation: "GMT")
           $0.dateFormat = "EEE, dd MMM yyyy HH:mm:ss zzz"
@@ -89,7 +89,8 @@ class NetworkManager {
       return CachedNetworkResource(
         data: data,
         etag: responseEtag,
-        lastModifiedTimestamp: lastModified)
+        lastModifiedTimestamp: lastModified
+      )
     }
   }
 

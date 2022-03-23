@@ -66,7 +66,7 @@ public struct CryptoView: View {
             cryptoStore: store,
             toolbarDismissContent: dismissButtonToolbarContents
           )
-          .transition(.asymmetric(insertion: .identity, removal: .opacity))
+            .transition(.asymmetric(insertion: .identity, removal: .opacity))
         }
       case .unlock:
         UIKitNavigationView {
@@ -76,7 +76,7 @@ public struct CryptoView: View {
             }
         }
         .transition(.move(edge: .bottom))
-        .zIndex(1)  // Needed or the dismiss animation messes up
+        .zIndex(1) // Needed or the dismiss animation messes up
       case .onboarding:
         UIKitNavigationView {
           SetupCryptoView(keyringStore: keyringStore)
@@ -85,16 +85,17 @@ public struct CryptoView: View {
             }
         }
         .transition(.move(edge: .bottom))
-        .zIndex(2)  // Needed or the dismiss animation messes up
+        .zIndex(2) // Needed or the dismiss animation messes up
       }
     }
-    .animation(.default, value: visibleScreen)  // Animate unlock dismiss (required for some reason)
+    .animation(.default, value: visibleScreen) // Animate unlock dismiss (required for some reason)
     .frame(maxWidth: .infinity, maxHeight: .infinity)
     .environment(
       \.openWalletURLAction,
       .init(action: { url in
         openWalletURLAction?(url)
-      }))
+      })
+    )
   }
 }
 
@@ -160,6 +161,8 @@ private struct CryptoContainerView<DismissContent: ToolbarContent>: View {
           } else {
             cryptoStore.buySendSwapDestination = destination
           }
-        }))
+        }
+      )
+    )
   }
 }

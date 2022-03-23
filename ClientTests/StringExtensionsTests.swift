@@ -7,7 +7,6 @@ import XCTest
 @testable import Client
 
 class StringExtensionsTests: XCTestCase {
-
   func testEllipsize() {
     // Odd maxLength. Note that we ellipsize with a Unicode join character to avoid wrapping.
     XCTAssertEqual("abcd…\u{2060}fgh", "abcdefgh".ellipsize(maxLength: 7))
@@ -48,7 +47,10 @@ class StringExtensionsTests: XCTestCase {
     }
 
     roundtripTest("https://mozilla.com", "https://mozilla.com")
-    roundtripTest("http://www.cnn.com/2017/09/25/politics/north-korea-fm-us-bombers/index.html", "http://www.cnn.com/2017/09/25/politics/north-korea-fm-us-bombers/index.html")
+    roundtripTest(
+      "http://www.cnn.com/2017/09/25/politics/north-korea-fm-us-bombers/index.html",
+      "http://www.cnn.com/2017/09/25/politics/north-korea-fm-us-bombers/index.html"
+    )
     roundtripTest("http://mozilla.com/?a=foo&b=bar", "http://mozilla.com/%3Fa%3Dfoo%26b%3Dbar")
   }
 

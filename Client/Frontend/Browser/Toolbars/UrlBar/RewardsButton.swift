@@ -7,7 +7,6 @@ import Shared
 import BraveShared
 
 class RewardsButton: UIButton {
-
   enum IconState {
     case initial
     case enabled

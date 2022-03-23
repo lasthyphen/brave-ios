@@ -9,7 +9,6 @@ import BraveShared
 import Shared
 
 class BraveNewsErrorView: UIView, FeedCardContent {
-
   var refreshButtonTapped: (() -> Void)?
 
   private let backgroundView = FeedCardBackgroundView()

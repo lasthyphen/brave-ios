@@ -10,7 +10,6 @@ import BraveShared
 
 extension BraveTalkOptInSuccessViewController {
   class View: UIView {
-
     private let image = UIImageView(image: #imageLiteral(resourceName: "optin_check_circle")).then {
       $0.contentMode = .scaleAspectFit
     }
@@ -54,7 +53,8 @@ extension BraveTalkOptInSuccessViewController {
         $0.addStackViewItems(
           .view(image),
           .view(title),
-          .view(body))
+          .view(body)
+        )
 
         $0.layoutMargins = .init(top: 44, left: 32, bottom: 24, right: 32)
         $0.isLayoutMarginsRelativeArrangement = true

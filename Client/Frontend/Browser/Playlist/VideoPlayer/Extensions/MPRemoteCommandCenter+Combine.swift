@@ -87,7 +87,6 @@ extension MPRemoteCommandCenter {
 
   private class EventSubscription<Target: Subscriber>: Subscription
   where Target.Input == MPRemoteCommandEvent {
-
     var target: Target?
 
     private var command: MPRemoteCommand?

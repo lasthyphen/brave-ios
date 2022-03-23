@@ -11,14 +11,15 @@ import BraveUI
 
 /// Displays shield settings and shield stats for a given URL
 class ShieldsViewController: UIViewController, PopoverContentComponent {
-
   let tab: Tab
   private lazy var url: URL? = {
-    guard let _url = tab.url else { return nil }
+    guard let _url = tab.url else {
+      return nil
+    }
 
     if InternalURL.isValid(url: _url),
-      let internalURL = InternalURL(_url),
-      internalURL.isErrorPage {
+       let internalURL = InternalURL(_url),
+       internalURL.isErrorPage {
       return internalURL.originalURLFromErrorPage
     }
 
@@ -52,7 +53,7 @@ class ShieldsViewController: UIViewController, PopoverContentComponent {
   }
 
   private var shieldsUpSwitch: ShieldsSwitch {
-    return shieldsView.simpleShieldView.shieldsSwitch
+    shieldsView.simpleShieldView.shieldsSwitch
   }
 
   // MARK: - State
@@ -88,12 +89,15 @@ class ShieldsViewController: UIViewController, PopoverContentComponent {
 
   private func updateShieldBlockStats() {
     shieldsView.simpleShieldView.blockCountView.countLabel.text = String(
-      tab.contentBlocker.stats.adCount + tab.contentBlocker.stats.trackerCount + tab.contentBlocker.stats.httpsCount + tab.contentBlocker.stats.scriptCount + tab.contentBlocker.stats.fingerprintingCount
+      tab.contentBlocker.stats.adCount + tab.contentBlocker.stats.trackerCount + tab.contentBlocker.stats
+        .httpsCount + tab.contentBlocker.stats.scriptCount + tab.contentBlocker.stats.fingerprintingCount
     )
   }
 
   private func updateBraveShieldState(shield: BraveShield, on: Bool, option: Preferences.Option<Bool>?) {
-    guard let url = url else { return }
+    guard let url = url else {
+      return
+    }
     let allOff = shield == .AllOff
     // `.AllOff` uses inverse logic. Technically we set "all off" when the switch is OFF, unlike all the others
     // If the new state is the same as the global preference, reset it to nil so future shield state queries
@@ -102,11 +106,14 @@ class ShieldsViewController: UIViewController, PopoverContentComponent {
     let isOn = allOff ? !on : on
     Domain.setBraveShield(
       forUrl: url, shield: shield, isOn: isOn,
-      isPrivateBrowsing: PrivateBrowsingManager.shared.isPrivateBrowsing)
+      isPrivateBrowsing: PrivateBrowsingManager.shared.isPrivateBrowsing
+    )
   }
 
   private func updateGlobalShieldState(_ on: Bool, animated: Bool = false) {
-    shieldsView.simpleShieldView.statusLabel.text = on ? Strings.Shields.statusValueUp.uppercased() : Strings.Shields.statusValueDown.uppercased()
+    shieldsView.simpleShieldView.statusLabel.text = on
+      ? Strings.Shields.statusValueUp.uppercased()
+      : Strings.Shields.statusValueDown.uppercased()
 
     // Whether or not shields are available for this URL.
     let isShieldsAvailable = url?.isLocal == false
@@ -155,10 +162,12 @@ class ShieldsViewController: UIViewController, PopoverContentComponent {
             withDuration: 0.15,
             animations: {
               partTwoViews.forEach { $0.alpha = 1.0 }
-            })
+            }
+          )
 
           self.updatePreferredContentSize()
-        })
+        }
+      )
     } else {
       shieldsView.simpleShieldView.blockCountView.isHidden = !shieldsEnabled
       shieldsView.simpleShieldView.footerLabel.isHidden = !shieldsEnabled
@@ -183,14 +192,17 @@ class ShieldsViewController: UIViewController, PopoverContentComponent {
           UIView.animate(withDuration: 0.1) {
             view.alpha = 1.0
           }
-        })
+        }
+      )
     } else {
       shieldsView.contentView = view
     }
   }
 
   private func updatePreferredContentSize() {
-    guard let visibleView = shieldsView.contentView else { return }
+    guard let visibleView = shieldsView.contentView else {
+      return
+    }
     let width = min(360, UIScreen.main.bounds.width - 20)
     // Ensure the a static width is given to the main view so we can calculate the height
     // correctly when we force a layout
@@ -215,7 +227,7 @@ class ShieldsViewController: UIViewController, PopoverContentComponent {
   ]
 
   var shieldsView: View {
-    return view as! View  // swiftlint:disable:this force_cast
+    view as! View // swiftlint:disable:this force_cast
   }
 
   override func loadView() {
@@ -232,18 +244,46 @@ class ShieldsViewController: UIViewController, PopoverContentComponent {
     }
     shieldsView.simpleShieldView.hostLabel.text = url?.normalizedHost()
     shieldsView.reportBrokenSiteView.urlLabel.text = url?.domainURL.absoluteString
-    shieldsView.simpleShieldView.shieldsSwitch.addTarget(self, action: #selector(shieldsOverrideSwitchValueChanged), for: .valueChanged)
+    shieldsView.simpleShieldView.shieldsSwitch.addTarget(
+      self,
+      action: #selector(shieldsOverrideSwitchValueChanged),
+      for: .valueChanged
+    )
     shieldsView.advancedShieldView.siteTitle.titleLabel.text = url?.normalizedHost()?.uppercased()
-    shieldsView.advancedShieldView.globalControlsButton.addTarget(self, action: #selector(tappedGlobalShieldsButton), for: .touchUpInside)
+    shieldsView.advancedShieldView.globalControlsButton.addTarget(
+      self,
+      action: #selector(tappedGlobalShieldsButton),
+      for: .touchUpInside
+    )
 
     shieldsView.advancedControlsBar.addTarget(self, action: #selector(tappedAdvancedControlsBar), for: .touchUpInside)
 
-    shieldsView.simpleShieldView.blockCountView.infoButton.addTarget(self, action: #selector(tappedAboutShieldsButton), for: .touchUpInside)
-    shieldsView.simpleShieldView.blockCountView.shareButton.addTarget(self, action: #selector(tappedShareShieldsButton), for: .touchUpInside)
+    shieldsView.simpleShieldView.blockCountView.infoButton.addTarget(
+      self,
+      action: #selector(tappedAboutShieldsButton),
+      for: .touchUpInside
+    )
+    shieldsView.simpleShieldView.blockCountView.shareButton.addTarget(
+      self,
+      action: #selector(tappedShareShieldsButton),
+      for: .touchUpInside
+    )
 
-    shieldsView.simpleShieldView.reportSiteButton.addTarget(self, action: #selector(tappedReportSiteButton), for: .touchUpInside)
-    shieldsView.reportBrokenSiteView.cancelButton.addTarget(self, action: #selector(tappedCancelReportingButton), for: .touchUpInside)
-    shieldsView.reportBrokenSiteView.submitButton.addTarget(self, action: #selector(tappedSubmitReportingButton), for: .touchUpInside)
+    shieldsView.simpleShieldView.reportSiteButton.addTarget(
+      self,
+      action: #selector(tappedReportSiteButton),
+      for: .touchUpInside
+    )
+    shieldsView.reportBrokenSiteView.cancelButton.addTarget(
+      self,
+      action: #selector(tappedCancelReportingButton),
+      for: .touchUpInside
+    )
+    shieldsView.reportBrokenSiteView.submitButton.addTarget(
+      self,
+      action: #selector(tappedSubmitReportingButton),
+      for: .touchUpInside
+    )
 
     updateShieldBlockStats()
 
@@ -259,7 +299,9 @@ class ShieldsViewController: UIViewController, PopoverContentComponent {
 
     shieldControlMapping.forEach { shield, toggle, option in
       toggle.valueToggled = { [weak self] on in
-        guard let self = self else { return }
+        guard let self = self else {
+          return
+        }
         // Localized / per domain toggles triggered here
         self.updateBraveShieldState(shield: shield, on: on, option: option)
         // Wait a fraction of a second to allow DB write to complete otherwise it will not use the
@@ -320,7 +362,9 @@ class ShieldsViewController: UIViewController, PopoverContentComponent {
     if let url = url {
       WebcompatReporter.reportIssue(on: url)
       DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) { [weak self] in
-        guard let self = self, !self.isBeingDismissed else { return }
+        guard let self = self, !self.isBeingDismissed else {
+          return
+        }
         self.dismiss(animated: true)
       }
     }

@@ -8,7 +8,6 @@ import WebKit
 import Shared
 
 class OnboardingWebViewController: UIViewController, WKNavigationDelegate {
-
   enum URLType {
     case termsOfService
     case privacyPolicy
@@ -56,6 +55,7 @@ class OnboardingWebViewController: UIViewController, WKNavigationDelegate {
     super.init(nibName: nil, bundle: nil)
   }
 
+  @available(*, unavailable)
   required init?(coder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }
@@ -96,7 +96,12 @@ class OnboardingWebViewController: UIViewController, WKNavigationDelegate {
     addScript(errorHelper, for: ErrorPageHelper.name())
   }
 
-  override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey: Any]?, context: UnsafeMutableRawPointer?) {
+  override func observeValue(
+    forKeyPath keyPath: String?,
+    of object: Any?,
+    change: [NSKeyValueChangeKey: Any]?,
+    context: UnsafeMutableRawPointer?
+  ) {
     guard let webView = object as? WKWebView, let kp = keyPath, let path = KVOConstants(rawValue: kp) else {
       return
     }
@@ -181,7 +186,6 @@ class OnboardingWebViewController: UIViewController, WKNavigationDelegate {
   }
 
   func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
-
     let error = error as NSError
     if error.domain == "WebKitErrorDomain" && error.code == 102 {
       return
@@ -201,15 +205,21 @@ class OnboardingWebViewController: UIViewController, WKNavigationDelegate {
     }
   }
 
-  func webView(_ webView: WKWebView, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
-    if challenge.protectionSpace.host == "localhost" && challenge.protectionSpace.port == Int(WebServer.sharedInstance.server.port) {
+  func webView(
+    _ webView: WKWebView,
+    didReceive challenge: URLAuthenticationChallenge,
+    completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void
+  ) {
+    if challenge.protectionSpace.host == "localhost" && challenge.protectionSpace
+      .port == Int(WebServer.sharedInstance.server.port) {
       return completionHandler(.useCredential, WebServer.sharedInstance.credentials)
     }
 
     let origin = "\(challenge.protectionSpace.host):\(challenge.protectionSpace.port)"
     if challenge.protectionSpace.authenticationMethod == NSURLAuthenticationMethodServerTrust,
-      let trust = challenge.protectionSpace.serverTrust,
-      let cert = SecTrustGetCertificateAtIndex(trust, 0), profile.certStore.containsCertificate(cert, forOrigin: origin) {
+       let trust = challenge.protectionSpace.serverTrust,
+       let cert = SecTrustGetCertificateAtIndex(trust, 0),
+       profile.certStore.containsCertificate(cert, forOrigin: origin) {
       return completionHandler(.useCredential, URLCredential(trust: trust))
     }
 
@@ -218,11 +228,19 @@ class OnboardingWebViewController: UIViewController, WKNavigationDelegate {
 }
 
 extension OnboardingWebViewController: WKScriptMessageHandlerWithReply {
-  func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage, replyHandler: @escaping (Any?, String?) -> Void) {
+  func userContentController(
+    _ userContentController: WKUserContentController,
+    didReceive message: WKScriptMessage,
+    replyHandler: @escaping (Any?, String?) -> Void
+  ) {
     for helper in helpers.values {
       if let scriptMessageHandlerName = helper.scriptMessageHandlerName(),
-        scriptMessageHandlerName == message.name {
-        return helper.userContentController(userContentController, didReceiveScriptMessage: message, replyHandler: replyHandler)
+         scriptMessageHandlerName == message.name {
+        return helper.userContentController(
+          userContentController,
+          didReceiveScriptMessage: message,
+          replyHandler: replyHandler
+        )
       }
     }
   }
@@ -231,7 +249,11 @@ extension OnboardingWebViewController: WKScriptMessageHandlerWithReply {
     helpers[name] = helper
 
     if let scriptMessageHandlerName = helper.scriptMessageHandlerName() {
-      webView.configuration.userContentController.addScriptMessageHandler(self, contentWorld: .page, name: scriptMessageHandlerName)
+      webView.configuration.userContentController.addScriptMessageHandler(
+        self,
+        contentWorld: .page,
+        name: scriptMessageHandlerName
+      )
     }
   }
 }
@@ -335,6 +357,7 @@ extension OnboardingWebViewController {
       }
     }
 
+    @available(*, unavailable)
     required init?(coder: NSCoder) {
       fatalError("init(coder:) has not been implemented")
     }

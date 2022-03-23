@@ -19,14 +19,18 @@ class AdsMediaReporting: TabContentScript {
   }
 
   class func name() -> String {
-    return "AdsMediaReporting"
+    "AdsMediaReporting"
   }
 
   func scriptMessageHandlerName() -> String? {
-    return "adsMediaReporting"
+    "adsMediaReporting"
   }
 
-  func userContentController(_ userContentController: WKUserContentController, didReceiveScriptMessage message: WKScriptMessage, replyHandler: (Any?, String?) -> Void) {
+  func userContentController(
+    _ userContentController: WKUserContentController,
+    didReceiveScriptMessage message: WKScriptMessage,
+    replyHandler: (Any?, String?) -> Void
+  ) {
     defer { replyHandler(nil, nil) }
     guard let body = message.body as? [String: AnyObject] else {
       return
@@ -38,7 +42,9 @@ class AdsMediaReporting: TabContentScript {
     }
 
     if let isPlaying = body["data"] as? Bool, rewards.isEnabled {
-      guard let tab = tab else { return }
+      guard let tab = tab else {
+        return
+      }
       if isPlaying {
         rewards.reportMediaStarted(tabId: Int(tab.rewardsId))
       } else {

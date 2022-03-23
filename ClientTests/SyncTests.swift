@@ -8,7 +8,6 @@ import XCTest
 @testable import Client
 
 class SyncTests: XCTestCase {
-
   let validSyncCode = "9168A3FC6C2AC10EA018E7DA5AEC4D34707F3022CDBC3B209D1EE233498AC06B"
   let tooShortSyncCode = "9168A3FC6C2AC10EA018E7DA5AEC4D34707F3022CDBC3B209D1EE233498AC0"
   let tooLongSyncCode = "9168A3FC6C2AC10EA018E7DA5AEC4D34707F3022CDBC3B209D1EE233498AC06BAA"
@@ -59,7 +58,8 @@ class SyncTests: XCTestCase {
   }
 
   func testNewerSyncDate() throws {
-    let newerDate = Date().addingTimeInterval(BraveSyncQRCodeModel.futureValidityDuration).timeIntervalSince1970 + 1.minutes
+    let newerDate = Date().addingTimeInterval(BraveSyncQRCodeModel.futureValidityDuration).timeIntervalSince1970 + 1
+      .minutes
     let result = BraveSyncQRCodeModel(
       version: BraveSyncQRCodeModel.currentlySupportedVersion,
       syncHexCode: validSyncCode,

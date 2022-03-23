@@ -15,14 +15,18 @@ class FingerprintingProtection: TabContentScript {
   }
 
   static func name() -> String {
-    return "FingerprintingProtection"
+    "FingerprintingProtection"
   }
 
   func scriptMessageHandlerName() -> String? {
-    return "FingerprintingProtection\(UserScriptManager.messageHandlerTokenString)"
+    "FingerprintingProtection\(UserScriptManager.messageHandlerTokenString)"
   }
 
-  func userContentController(_ userContentController: WKUserContentController, didReceiveScriptMessage message: WKScriptMessage, replyHandler: (Any?, String?) -> Void) {
+  func userContentController(
+    _ userContentController: WKUserContentController,
+    didReceiveScriptMessage message: WKScriptMessage,
+    replyHandler: (Any?, String?) -> Void
+  ) {
     defer { replyHandler(nil, nil) }
     if let stats = self.tab?.contentBlocker.stats {
       self.tab?.contentBlocker.stats = stats.addingFingerprintingBlock()

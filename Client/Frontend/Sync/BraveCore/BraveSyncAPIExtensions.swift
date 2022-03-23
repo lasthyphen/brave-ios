@@ -8,11 +8,10 @@ import BraveCore
 import BraveShared
 
 extension BraveSyncAPI {
-
   public static let seedByteLength = 32
 
   var isInSyncGroup: Bool {
-    return Preferences.Chromium.syncEnabled.value
+    Preferences.Chromium.syncEnabled.value
   }
 
   @discardableResult
@@ -42,7 +41,7 @@ extension BraveSyncAPI {
     // TODO: Handle fetching syncProfileService from using AppDelegate IOS-4170
     guard
       let syncProfileService =
-        (UIApplication.shared.delegate as? AppDelegate)?.braveCore.syncProfileService
+      (UIApplication.shared.delegate as? AppDelegate)?.braveCore.syncProfileService
     else {
       return
     }
@@ -77,7 +76,8 @@ extension BraveSyncAPI {
       observer,
       onRemoved: { [weak self] observer in
         self?.deviceObservers.remove(observer)
-      })
+      }
+    )
     deviceStateListener.observer = createSyncDeviceObserver(observer)
 
     deviceObservers.add(deviceStateListener)
@@ -103,32 +103,46 @@ extension BraveSyncAPI {
   }
 
   private var serviceObservers: NSHashTable<BraveSyncServiceListener> {
-    if let observers = objc_getAssociatedObject(self, &AssociatedObjectKeys.serviceObservers) as? NSHashTable<BraveSyncServiceListener> {
+    if let observers = objc_getAssociatedObject(
+      self,
+      &AssociatedObjectKeys.serviceObservers
+    ) as? NSHashTable<BraveSyncServiceListener> {
       return observers
     }
 
     let defaultValue = NSHashTable<BraveSyncServiceListener>.weakObjects()
-    objc_setAssociatedObject(self, &AssociatedObjectKeys.serviceObservers, defaultValue, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
+    objc_setAssociatedObject(
+      self,
+      &AssociatedObjectKeys.serviceObservers,
+      defaultValue,
+      .OBJC_ASSOCIATION_RETAIN_NONATOMIC
+    )
 
     return defaultValue
   }
 
   private var deviceObservers: NSHashTable<BraveSyncDeviceListener> {
-    if let observers = objc_getAssociatedObject(self, &AssociatedObjectKeys.deviceObservers) as? NSHashTable<BraveSyncDeviceListener> {
+    if let observers = objc_getAssociatedObject(
+      self,
+      &AssociatedObjectKeys.deviceObservers
+    ) as? NSHashTable<BraveSyncDeviceListener> {
       return observers
     }
 
     let defaultValue = NSHashTable<BraveSyncDeviceListener>.weakObjects()
-    objc_setAssociatedObject(self, &AssociatedObjectKeys.deviceObservers, defaultValue, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
+    objc_setAssociatedObject(
+      self,
+      &AssociatedObjectKeys.deviceObservers,
+      defaultValue,
+      .OBJC_ASSOCIATION_RETAIN_NONATOMIC
+    )
 
     return defaultValue
   }
-
 }
 
 extension BraveSyncAPI {
   private class BraveSyncServiceListener: NSObject {
-
     // MARK: Internal
 
     var observer: Any?
@@ -147,7 +161,6 @@ extension BraveSyncAPI {
   }
 
   private class BraveSyncDeviceListener: NSObject {
-
     // MARK: Internal
 
     var observer: Any?
@@ -179,7 +192,7 @@ extension BraveSyncAPI {
     // Typically QR Codes use isoLatin1, but it doesn't matter here
     // as we're not encoding any special characters
     guard let syncCodeData = BraveSyncQRCodeModel(syncHexCode: hexCode).jsonData,
-      !syncCodeData.isEmpty
+          !syncCodeData.isEmpty
     else {
       return nil
     }
@@ -194,8 +207,8 @@ extension BraveSyncAPI {
     }
 
     if let image = filter.outputImage,
-      image.extent.size.width > 0.0,
-      image.extent.size.height > 0.0 {
+       image.extent.size.width > 0.0,
+       image.extent.size.height > 0.0 {
       let scaleX = size.width / image.extent.size.width
       let scaleY = size.height / image.extent.size.height
       let transform = CGAffineTransform(scaleX: scaleX, y: scaleY)
@@ -203,7 +216,8 @@ extension BraveSyncAPI {
       return UIImage(
         ciImage: image.transformed(by: transform),
         scale: UIScreen.main.scale,
-        orientation: .up)
+        orientation: .up
+      )
     }
 
     return nil

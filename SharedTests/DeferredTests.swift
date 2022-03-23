@@ -18,7 +18,7 @@ class DeferredTests: XCTestCase {
     })
 
     d.fill(5)
-    waitForExpectations(timeout: 10) { (error) in
+    waitForExpectations(timeout: 10) { error in
       XCTAssertNil(error, "\(error.debugDescription)")
     }
 
@@ -46,7 +46,7 @@ class DeferredTests: XCTestCase {
     let e2 = self.expectation(description: "Second.")
 
     let f1: () -> Deferred<Maybe<Int>> = {
-      return deferMaybe(5)
+      deferMaybe(5)
     }
 
     let f2: (_ x: Int) -> Deferred<Maybe<String>> = {
@@ -76,13 +76,13 @@ class DeferredTests: XCTestCase {
       init(e: XCTestExpectation) {
         end = e
         accumulate([self.aSimpleFunction]).upon { _ in
-
         }
       }
 
       func aSimpleFunction() -> Success {
-        return succeed()
+        succeed()
       }
+
       deinit {
         end.fulfill()
       }
@@ -105,13 +105,13 @@ class DeferredTests: XCTestCase {
       init(e: XCTestExpectation) {
         end = e
         accumulate([self.aSimpleFunction]).upon { _ in
-
         }
       }
 
       func aSimpleFunction() -> Success {
-        return Deferred(value: Maybe(failure: TestError()))
+        Deferred(value: Maybe(failure: TestError()))
       }
+
       deinit {
         end.fulfill()
       }
@@ -121,5 +121,4 @@ class DeferredTests: XCTestCase {
     myclass = nil
     waitForExpectations(timeout: 3, handler: nil)
   }
-
 }

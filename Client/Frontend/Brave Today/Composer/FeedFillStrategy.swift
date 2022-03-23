@@ -29,6 +29,7 @@ extension FillStrategy {
   ) -> [FeedItem]? {
     next(length, from: &list, where: predicate)
   }
+
   /// Obtain the next feed item from `list`. If that item can be queried successfully, then that item is
   /// removed from `list` and returned.
   func next(
@@ -48,7 +49,9 @@ struct DefaultFillStrategy: FillStrategy {
   ) -> [FeedItem]? {
     if let predicate = predicate {
       let filteredItems = list.filter(predicate)
-      if filteredItems.count < length { return nil }
+      if filteredItems.count < length {
+        return nil
+      }
       let items = Array(filteredItems.prefix(upTo: length))
       items.forEach { item in
         if let index = list.firstIndex(of: item) {
@@ -57,7 +60,9 @@ struct DefaultFillStrategy: FillStrategy {
       }
       return items
     } else {
-      if list.count < length { return nil }
+      if list.count < length {
+        return nil
+      }
       let items = Array(list.prefix(upTo: length))
       list.removeFirst(items.count)
       return items
@@ -70,7 +75,7 @@ struct DefaultFillStrategy: FillStrategy {
 struct FilteredFillStrategy: FillStrategy {
   /// A global predicate to determine what items are valid to pull from. For example, only pulling items
   /// that are in a given category
-  var isIncluded: ((FeedItem) -> Bool)
+  var isIncluded: (FeedItem) -> Bool
 
   func next(
     _ length: Int,
@@ -80,7 +85,9 @@ struct FilteredFillStrategy: FillStrategy {
     let workingList = list.filter {
       (predicate?($0) ?? true) && isIncluded($0)
     }
-    if workingList.count < length { return nil }
+    if workingList.count < length {
+      return nil
+    }
     let items = Array(workingList.prefix(upTo: length))
     items.forEach { item in
       if let index = list.firstIndex(of: item) {
@@ -129,7 +136,9 @@ class CategoryFillStrategy<Category>: FillStrategy where Category: Hashable {
     } else {
       workingList = list
     }
-    guard let nextCategory = nextCategory else { return nil }
+    guard let nextCategory = nextCategory else {
+      return nil
+    }
     workingList = workingList.filter({ $0[keyPath: category] == nextCategory })
 
     remainingCategories.remove(nextCategory)
@@ -140,7 +149,9 @@ class CategoryFillStrategy<Category>: FillStrategy where Category: Hashable {
       self.nextCategory = remainingCategories.randomElement()!
     }
 
-    if workingList.count < length { return nil }
+    if workingList.count < length {
+      return nil
+    }
     let items = Array(workingList.prefix(upTo: length))
     items.forEach { item in
       if let index = list.firstIndex(of: item) {
@@ -168,7 +179,9 @@ struct RandomizedFillStrategy: FillStrategy {
         (predicate?($0) ?? true) && (isIncluded?($0) ?? true)
       }
     }
-    if workingList.count < length { return nil }
+    if workingList.count < length {
+      return nil
+    }
     return (0..<length).compactMap { _ in
       if let index = workingList.indices.randomElement() {
         let item = workingList.remove(at: index)

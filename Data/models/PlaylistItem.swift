@@ -38,7 +38,8 @@ final public class PlaylistItem: NSManagedObject, CRUD, Identifiable {
 
     return NSFetchedResultsController(
       fetchRequest: fetchRequest, managedObjectContext: context,
-      sectionNameKeyPath: nil, cacheName: nil)
+      sectionNameKeyPath: nil, cacheName: nil
+    )
   }
 
   public class func frc(parentFolder: PlaylistFolder?) -> NSFetchedResultsController<PlaylistItem> {
@@ -59,7 +60,8 @@ final public class PlaylistItem: NSManagedObject, CRUD, Identifiable {
 
     return NSFetchedResultsController(
       fetchRequest: fetchRequest, managedObjectContext: context,
-      sectionNameKeyPath: nil, cacheName: nil)
+      sectionNameKeyPath: nil, cacheName: nil
+    )
   }
 
   public class func allFoldersFRC() -> NSFetchedResultsController<PlaylistItem> {
@@ -74,7 +76,8 @@ final public class PlaylistItem: NSManagedObject, CRUD, Identifiable {
 
     return NSFetchedResultsController(
       fetchRequest: fetchRequest, managedObjectContext: context,
-      sectionNameKeyPath: nil, cacheName: nil)
+      sectionNameKeyPath: nil, cacheName: nil
+    )
   }
 
   public static func addItem(_ item: PlaylistInfo, cachedData: Data?, completion: (() -> Void)? = nil) {
@@ -113,26 +116,28 @@ final public class PlaylistItem: NSManagedObject, CRUD, Identifiable {
     return PlaylistItem.all(
       where: predicate,
       sortDescriptors: [orderSort, createdSort],
-      fetchBatchSize: 20) ?? []
+      fetchBatchSize: 20
+    ) ?? []
   }
 
   public static func getItem(pageSrc: String) -> PlaylistItem? {
-    return PlaylistItem.first(where: NSPredicate(format: "pageSrc == %@", pageSrc))
+    PlaylistItem.first(where: NSPredicate(format: "pageSrc == %@", pageSrc))
   }
 
   public static func itemExists(_ item: PlaylistInfo) -> Bool {
-    if let count = PlaylistItem.count(predicate: NSPredicate(format: "pageSrc == %@ OR mediaSrc == %@", item.pageSrc, item.src)), count > 0 {
+    if let count = PlaylistItem
+      .count(predicate: NSPredicate(format: "pageSrc == %@ OR mediaSrc == %@", item.pageSrc, item.src)), count > 0 {
       return true
     }
     return false
   }
 
   public static func cachedItem(cacheURL: URL) -> PlaylistItem? {
-    return PlaylistItem.all()?.first(where: {
+    PlaylistItem.all()?.first(where: {
       var isStale = false
 
       if let cacheData = $0.cachedData,
-        let url = try? URL(resolvingBookmarkData: cacheData, bookmarkDataIsStale: &isStale) {
+         let url = try? URL(resolvingBookmarkData: cacheData, bookmarkDataIsStale: &isStale) {
         return url.path == cacheURL.path
       }
       return false
@@ -142,7 +147,10 @@ final public class PlaylistItem: NSManagedObject, CRUD, Identifiable {
   public static func updateItem(_ item: PlaylistInfo, completion: (() -> Void)? = nil) {
     if itemExists(item) {
       DataController.perform(context: .new(inMemory: false), save: false) { context in
-        if let existingItem = PlaylistItem.first(where: NSPredicate(format: "pageSrc == %@ OR mediaSrc == %@", item.pageSrc, item.src), context: context) {
+        if let existingItem = PlaylistItem.first(
+          where: NSPredicate(format: "pageSrc == %@ OR mediaSrc == %@", item.pageSrc, item.src),
+          context: context
+        ) {
           existingItem.name = item.name
           existingItem.pageTitle = item.pageTitle
           existingItem.pageSrc = item.pageSrc
@@ -175,14 +183,22 @@ final public class PlaylistItem: NSManagedObject, CRUD, Identifiable {
   }
 
   public static func removeItem(_ item: PlaylistInfo) {
-    PlaylistItem.deleteAll(predicate: NSPredicate(format: "pageSrc == %@ OR mediaSrc == %@", item.pageSrc, item.src), context: .new(inMemory: false), includesPropertyValues: false)
+    PlaylistItem.deleteAll(
+      predicate: NSPredicate(format: "pageSrc == %@ OR mediaSrc == %@", item.pageSrc, item.src),
+      context: .new(inMemory: false),
+      includesPropertyValues: false
+    )
   }
 
   public static func removeItems(_ items: [PlaylistInfo]) {
-    let pageSrcs = items.map({ $0.pageSrc })
-    let mediaSrcs = items.map({ $0.src })
+    let pageSrcs = items.map(\.pageSrc)
+    let mediaSrcs = items.map(\.src)
 
-    PlaylistItem.deleteAll(predicate: NSPredicate(format: "pageSrc IN %@ OR mediaSrc IN %@", pageSrcs, mediaSrcs), context: .new(inMemory: false), includesPropertyValues: false)
+    PlaylistItem.deleteAll(
+      predicate: NSPredicate(format: "pageSrc IN %@ OR mediaSrc IN %@", pageSrcs, mediaSrcs),
+      context: .new(inMemory: false),
+      includesPropertyValues: false
+    )
   }
 
   public static func moveItems(items: [NSManagedObjectID], to folderUUID: String?) {

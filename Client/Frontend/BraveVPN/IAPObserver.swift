@@ -16,7 +16,6 @@ protocol IAPObserverDelegate: AnyObject {
 }
 
 class IAPObserver: NSObject, SKPaymentTransactionObserver {
-
   enum PurchaseError {
     case transactionError(error: SKError?)
     case receiptError
@@ -29,8 +28,10 @@ class IAPObserver: NSObject, SKPaymentTransactionObserver {
       switch transaction.transactionState {
       case .purchased, .restored:
         log.debug("Received transaction state: purchased or restored")
-        BraveVPN.validateReceipt() { [weak self] expired in
-          guard let self = self else { return }
+        BraveVPN.validateReceipt { [weak self] expired in
+          guard let self = self else {
+            return
+          }
           // This should be always called, no matter if transaction is successful or not.
           SKPaymentQueue.default().finishTransaction(transaction)
 
@@ -46,7 +47,8 @@ class IAPObserver: NSObject, SKPaymentTransactionObserver {
       case .failed:
         log.debug("Received transaction state: failed")
         self.delegate?.purchaseFailed(
-          error: .transactionError(error: transaction.error as? SKError))
+          error: .transactionError(error: transaction.error as? SKError)
+        )
         SKPaymentQueue.default().finishTransaction(transaction)
       @unknown default:
         assertionFailure("Unknown transactionState")

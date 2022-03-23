@@ -7,13 +7,12 @@ import SwiftyJSON
 private let log = Logger.browserLogger
 
 struct ReferralData {
-
   let downloadId: String
   let referralCode: String
   let offerPage: String?
 
   func isExtendedUrp() -> Bool {
-    return offerPage != nil
+    offerPage != nil
   }
 
   init(downloadId: String, code: String, offerPage: String? = nil) {

@@ -104,7 +104,7 @@ private struct OptionButtonStyle: ButtonStyle {
   func makeBody(configuration: Configuration) -> some View {
     configuration.label
       .foregroundColor(.white)
-      .colorMultiply(isSelected ? Color(.braveBackground) : Color(.secondaryBraveLabel))  // To animate text color
+      .colorMultiply(isSelected ? Color(.braveBackground) : Color(.secondaryBraveLabel)) // To animate text color
       .padding(.horizontal, 6)
       .padding(.vertical, 4)
       .background(

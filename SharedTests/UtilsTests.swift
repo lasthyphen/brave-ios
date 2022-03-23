@@ -13,7 +13,7 @@ class UtilsTests: XCTestCase {
   func testMapUtils() {
     let m: [String: Int] = ["foo": 123, "bar": 456]
     let f: (Int) -> Int? = { v in
-      return (v > 200) ? 999 : nil
+      (v > 200) ? 999 : nil
     }
 
     let o = mapValues(m, f: f)
@@ -58,7 +58,7 @@ class UtilsTests: XCTestCase {
     for (arr, by, expected) in examples {
       // Turn the ArraySlices back into Arrays for comparison.
       let actual = chunk(arr as [Int], by: by).map { Array($0) }
-      XCTAssertEqual(expected as NSArray, actual as NSArray)  //wtf. why is XCTAssert being so weeird
+      XCTAssertEqual(expected as NSArray, actual as NSArray) // wtf. why is XCTAssert being so weeird
     }
   }
 

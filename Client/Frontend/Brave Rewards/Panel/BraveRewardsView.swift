@@ -10,20 +10,22 @@ import Shared
 
 extension BraveRewardsViewController {
   class BraveRewardsView: UIView {
-
     private let stackView = UIStackView().then {
       $0.axis = .vertical
       $0.spacing = 20
     }
+
     let rewardsToggle = UISwitch().then {
       $0.setContentHuggingPriority(.required, for: .horizontal)
       $0.onTintColor = .braveOrange
     }
+
     private let titleLabel = UILabel().then {
       $0.text = Strings.braveRewardsTitle
       $0.textColor = .braveLabel
       $0.font = .systemFont(ofSize: 20)
     }
+
     let subtitleLabel = UILabel().then {
       $0.text = Strings.Rewards.disabledBody
       $0.textColor = .secondaryBraveLabel
@@ -33,10 +35,12 @@ extension BraveRewardsViewController {
     let publisherView = BraveRewardsPublisherView().then {
       $0.isHidden = true
     }
+
     let statusView = BraveRewardsStatusView()
     let legacyWalletTransferButton = LegacyWalletTransferButton().then {
       $0.isHidden = true
     }
+
     let legacyWalletTransferStatusButton = LegacyWalletTransferStatusButton().then {
       $0.isHidden = true
     }
@@ -65,10 +69,12 @@ extension BraveRewardsViewController {
                     .view(subtitleLabel)
                   )
                   $0.setContentHuggingPriority(.required, for: .vertical)
-                }),
+                }
+              ),
               .view(rewardsToggle)
             )
-          }),
+          }
+        ),
         .view(
           UIStackView().then {
             $0.axis = .vertical
@@ -78,7 +84,8 @@ extension BraveRewardsViewController {
               .view(legacyWalletTransferStatusButton),
               .view(statusView)
             )
-          }),
+          }
+        ),
         .view(publisherView)
       )
     }

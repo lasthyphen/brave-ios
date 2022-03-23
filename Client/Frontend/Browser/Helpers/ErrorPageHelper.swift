@@ -4,10 +4,10 @@ import GCDWebServers
 import Shared
 import Storage
 
-fileprivate let MozDomain = "mozilla"
-fileprivate let MozErrorDownloadsNotEnabled = 100
-fileprivate let MessageOpenInSafari = "openInSafari"
-fileprivate let MessageCertVisitOnce = "certVisitOnce"
+private let MozDomain = "mozilla"
+private let MozErrorDownloadsNotEnabled = 100
+private let MessageOpenInSafari = "openInSafari"
+private let MessageCertVisitOnce = "certVisitOnce"
 
 struct ErrorPageModel {
   let requestURL: URL
@@ -21,17 +21,17 @@ struct ErrorPageModel {
 
   init?(request: URLRequest) {
     guard let requestUrl = request.url,
-      let originalUrl = InternalURL(requestUrl)?.originalURLFromErrorPage
+          let originalUrl = InternalURL(requestUrl)?.originalURLFromErrorPage
     else {
       return nil
     }
 
     guard let components = URLComponents(url: requestUrl, resolvingAgainstBaseURL: false),
-      let code = components.valueForQuery("code"),
-      let errCode = Int(code),
-      let errDescription = components.valueForQuery("description"),
-      let errURLDomain = originalUrl.host,
-      let errDomain = components.valueForQuery("domain")
+          let code = components.valueForQuery("code"),
+          let errCode = Int(code),
+          let errDescription = components.valueForQuery("description"),
+          let errURLDomain = originalUrl.host,
+          let errDomain = components.valueForQuery("domain")
     else {
       return nil
     }
@@ -81,15 +81,15 @@ class ErrorPageHandler: InternalSchemeResponse {
 }
 
 class ErrorPageHelper {
-
-  fileprivate weak var certStore: CertStore?
+  private weak var certStore: CertStore?
 
   init(certStore: CertStore?) {
     self.certStore = certStore
   }
 
   func loadPage(_ error: NSError, forUrl url: URL, inWebView webView: WKWebView) {
-    guard var components = URLComponents(string: "\(InternalURL.baseUrl)/\(ErrorPageHandler.path)"), let webViewUrl = webView.url else {
+    guard var components = URLComponents(string: "\(InternalURL.baseUrl)/\(ErrorPageHandler.path)"),
+          let webViewUrl = webView.url else {
       return
     }
 
@@ -112,10 +112,10 @@ class ErrorPageHelper {
     // a query parameter to the error page URL; we then read the certificate from
     // the URL if the user wants to continue.
     if CertificateErrorPageHandler.isValidCertificateError(error: error),
-      let certChain = error.userInfo["NSErrorPeerCertificateChainKey"] as? [SecCertificate],
-      let cert = certChain.first,
-      let underlyingError = error.userInfo[NSUnderlyingErrorKey] as? NSError,
-      let certErrorCode = underlyingError.userInfo["_kCFStreamErrorCodeKey"] as? Int {
+       let certChain = error.userInfo["NSErrorPeerCertificateChainKey"] as? [SecCertificate],
+       let cert = certChain.first,
+       let underlyingError = error.userInfo[NSUnderlyingErrorKey] as? NSError,
+       let certErrorCode = underlyingError.userInfo["_kCFStreamErrorCodeKey"] as? Int {
       let encodedCert = (SecCertificateCopyData(cert) as Data).base64EncodedString
       queryItems.append(URLQueryItem(name: "badcert", value: encodedCert))
 
@@ -125,7 +125,8 @@ class ErrorPageHelper {
 
     components.queryItems = queryItems
     if let urlWithQuery = components.url {
-      if let internalUrl = InternalURL(webViewUrl), internalUrl.isSessionRestore, let page = InternalURL.authorize(url: urlWithQuery) {
+      if let internalUrl = InternalURL(webViewUrl), internalUrl.isSessionRestore,
+         let page = InternalURL.authorize(url: urlWithQuery) {
         // A session restore page is already on the history stack, so don't load another page on the history stack.
         webView.replaceLocation(with: page)
       } else {
@@ -139,18 +140,17 @@ class ErrorPageHelper {
 extension ErrorPageHelper {
   static func certificateError(for url: URL) -> Int {
     if InternalURL.isValid(url: url),
-      let internalUrl = InternalURL(url),
-      internalUrl.isErrorPage {
-
+       let internalUrl = InternalURL(url),
+       internalUrl.isErrorPage {
       let query = url.getQuery()
       guard let code = query["code"],
-        let errCode = Int(code)
+            let errCode = Int(code)
       else {
         return 0
       }
 
       if let code = CFNetworkErrors(rawValue: Int32(errCode)),
-        CertificateErrorPageHandler.CFNetworkErrorsCertErrors.contains(code) {
+         CertificateErrorPageHandler.CFNetworkErrorsCertErrors.contains(code) {
         return errCode
       }
 
@@ -169,29 +169,35 @@ extension ErrorPageHelper {
 
 extension ErrorPageHelper: TabContentScript {
   static func name() -> String {
-    return "ErrorPageHelper"
+    "ErrorPageHelper"
   }
 
   func scriptMessageHandlerName() -> String? {
-    return "errorPageHelperMessageManager"
+    "errorPageHelperMessageManager"
   }
 
-  func userContentController(_ userContentController: WKUserContentController, didReceiveScriptMessage message: WKScriptMessage, replyHandler: (Any?, String?) -> Void) {
+  func userContentController(
+    _ userContentController: WKUserContentController,
+    didReceiveScriptMessage message: WKScriptMessage,
+    replyHandler: (Any?, String?) -> Void
+  ) {
     defer { replyHandler(nil, nil) }
     guard let errorURL = message.frameInfo.request.url,
-      let internalUrl = InternalURL(errorURL),
-      internalUrl.isErrorPage,
-      let originalURL = internalUrl.originalURLFromErrorPage,
-      let res = message.body as? [String: String],
-      let type = res["type"]
-    else { return }
+          let internalUrl = InternalURL(errorURL),
+          internalUrl.isErrorPage,
+          let originalURL = internalUrl.originalURLFromErrorPage,
+          let res = message.body as? [String: String],
+          let type = res["type"]
+    else {
+      return
+    }
 
     switch type {
     case MessageOpenInSafari:
       UIApplication.shared.open(originalURL, options: [:])
     case MessageCertVisitOnce:
       if let cert = CertificateErrorPageHandler.certFromErrorURL(errorURL),
-        let host = originalURL.host {
+         let host = originalURL.host {
         let origin = "\(host):\(originalURL.port ?? 443)"
         certStore?.addCertificate(cert, forOrigin: origin)
         message.webView?.replaceLocation(with: originalURL)

@@ -36,6 +36,7 @@ class SnackButton: UIButton {
     self.accessibilityIdentifier = accessibilityIdentifier
   }
 
+  @available(*, unavailable)
   required init?(coder aDecoder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }
@@ -54,7 +55,6 @@ class SnackButton: UIButton {
       make.top.bottom.equalTo(self)
     }
   }
-
 }
 
 class SnackBar: UIView {
@@ -153,17 +153,18 @@ class SnackBar: UIView {
     self.layer.borderColor = UIColor.braveSeparator.resolvedColor(with: traitCollection).cgColor
   }
 
+  @available(*, unavailable)
   required init?(coder aDecoder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }
 
   /**
-     * Called to check if the snackbar should be removed or not. By default, Snackbars persist forever.
-     * Override this class or use a class like CountdownSnackbar if you want things expire
-     * - returns: true if the snackbar should be kept alive
-     */
+   * Called to check if the snackbar should be removed or not. By default, Snackbars persist forever.
+   * Override this class or use a class like CountdownSnackbar if you want things expire
+   * - returns: true if the snackbar should be kept alive
+   */
   func shouldPersist(_ tab: Tab) -> Bool {
-    return true
+    true
   }
 
   override func updateConstraints() {
@@ -182,7 +183,7 @@ class SnackBar: UIView {
   }
 
   var showing: Bool {
-    return alpha != 0 && self.superview != nil
+    alpha != 0 && self.superview != nil
   }
 
   func show() {
@@ -215,17 +216,24 @@ class TimerSnackBar: SnackBar {
     super.init(text: text, img: img)
   }
 
+  @available(*, unavailable)
   required init?(coder aDecoder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }
 
   static func showAppStoreConfirmationBar(forTab tab: Tab, appStoreURL: URL) {
-    let bar = TimerSnackBar(text: Strings.externalLinkAppStoreConfirmationTitle, img: #imageLiteral(resourceName: "defaultFavicon"))
+    let bar = TimerSnackBar(
+      text: Strings.externalLinkAppStoreConfirmationTitle,
+      img: #imageLiteral(resourceName: "defaultFavicon")
+    )
     let openAppStore = SnackButton(title: Strings.OKString, accessibilityIdentifier: "ConfirmOpenInAppStore") { bar in
       tab.removeSnackbar(bar)
       UIApplication.shared.open(appStoreURL)
     }
-    let cancelButton = SnackButton(title: Strings.cancelButtonTitle, accessibilityIdentifier: "CancelOpenInAppStore") { bar in
+    let cancelButton = SnackButton(
+      title: Strings.cancelButtonTitle,
+      accessibilityIdentifier: "CancelOpenInAppStore"
+    ) { bar in
       tab.removeSnackbar(bar)
     }
     bar.addButton(openAppStore)
@@ -234,7 +242,13 @@ class TimerSnackBar: SnackBar {
   }
 
   override func show() {
-    self.timer = Timer(timeInterval: timeout, target: self, selector: #selector(timerDone), userInfo: nil, repeats: false)
+    self.timer = Timer(
+      timeInterval: timeout,
+      target: self,
+      selector: #selector(timerDone),
+      userInfo: nil,
+      repeats: false
+    )
     RunLoop.current.add(self.timer!, forMode: .default)
     super.show()
   }

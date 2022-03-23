@@ -45,7 +45,7 @@ class ReaderModeButton: UIButton {
 
   var readerModeState: ReaderModeState {
     get {
-      return _readerModeState
+      _readerModeState
     }
     set(newReaderModeState) {
       _readerModeState = newReaderModeState

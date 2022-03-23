@@ -6,7 +6,6 @@
 import UIKit
 
 extension UIFont {
-
   /// Extended Dynamic Font Function for custom weight
   /// - Parameters:
   ///   - style: textStyle for the dynamic font

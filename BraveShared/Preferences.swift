@@ -38,6 +38,7 @@ extension Preferences {
     /// The app launch date after retention
     public static let appRetentionLaunchDate = Option<Date?>(key: "dau.app-retention-launch-date", default: nil)
   }
+
   public final class URP {
     static let nextCheckDate = Option<TimeInterval?>(key: "urp.next-check-date", default: nil)
     static let retryCountdown = Option<Int?>(key: "urp.retry-countdown", default: nil)
@@ -78,6 +79,7 @@ extension Preferences {
     static let httpsUpgradeCount = Option<Int>(key: "stats.http-upgrade", default: 0)
     static let fingerprintingCount = Option<Int>(key: "stats.fingerprinting", default: 0)
   }
+
   public final class BlockFileVersion {
     public static let adblock = Option<String?>(key: "blockfile.adblock", default: nil)
     public static let httpse = Option<String?>(key: "blockfile.httpse", default: nil)
@@ -86,11 +88,20 @@ extension Preferences {
   public final class ProductNotificationBenchmarks {
     public static let videoAdBlockShown = Option<Bool>(key: "product-benchmark.videoAdBlockShown", default: false)
     public static let trackerTierCount = Option<Int>(key: "product-benchmark.trackerTierCount", default: 0)
-    public static let showingSpecificDataSavedEnabled = Option<Bool>(key: "product-benchmark.showingSpecificDataSavedEnabled", default: false)
+    public static let showingSpecificDataSavedEnabled =
+      Option<Bool>(key: "product-benchmark.showingSpecificDataSavedEnabled", default: false)
   }
 
   public final class Shields {
-    public static let allShields = [blockAdsAndTracking, httpsEverywhere, blockPhishingAndMalware, googleSafeBrowsing, blockScripts, fingerprintingProtection, blockImages]
+    public static let allShields = [
+      blockAdsAndTracking,
+      httpsEverywhere,
+      blockPhishingAndMalware,
+      googleSafeBrowsing,
+      blockScripts,
+      fingerprintingProtection,
+      blockImages
+    ]
 
     /// Shields will block ads and tracking if enabled
     public static let blockAdsAndTracking = Option<Bool>(key: "shields.block-ads-and-tracking", default: true)
@@ -120,14 +131,23 @@ extension Preferences {
     public static let hideRewardsIcon = Option<Bool>(key: "rewards.new-hide-rewards-icon", default: false)
     public static let rewardsToggledOnce = Option<Bool>(key: "rewards.rewards-toggled-once", default: false)
     public static let isUsingBAP = Option<Bool?>(key: "rewards.is-using-bap", default: nil)
-    public static let seenDataMigrationFailureError = Option<Bool>(key: "rewards.seen-data-migration-failure-error", default: false)
+    public static let seenDataMigrationFailureError = Option<Bool>(
+      key: "rewards.seen-data-migration-failure-error",
+      default: false
+    )
     public static let migratedLegacyWallet = Option<Bool>(key: "rewards.migrated-legacy-wallet", default: false)
-    public static let dismissedLegacyWalletTransfer = Option<Bool>(key: "rewards.dismissed-legacy-wallet-transfer", default: false)
+    public static let dismissedLegacyWalletTransfer = Option<Bool>(
+      key: "rewards.dismissed-legacy-wallet-transfer",
+      default: false
+    )
     public static let transferDrainID = Option<String?>(key: "rewards.legacy-wallet-transfer-drain-id", default: nil)
     public static let lastTransferStatus = Option<Int?>(key: "rewards.legacy-wallet-transfer-status", default: nil)
-    public static let lastTransferStatusDismissed = Option<Int?>(key: "rewards.legacy-wallet-transfer-last-dismissed-status", default: nil)
-    public static let transferCompletionAcknowledged = Option<Bool>(key: "rewards.legacy-wallet-transfer-completion-acknowledged", default: false)
-    public static let transferUnavailableLastSeen = Option<TimeInterval?>(key: "rewards.transfer-unavailable-warning-last-seen-date", default: nil)
+    public static let lastTransferStatusDismissed =
+      Option<Int?>(key: "rewards.legacy-wallet-transfer-last-dismissed-status", default: nil)
+    public static let transferCompletionAcknowledged =
+      Option<Bool>(key: "rewards.legacy-wallet-transfer-completion-acknowledged", default: false)
+    public static let transferUnavailableLastSeen =
+      Option<TimeInterval?>(key: "rewards.transfer-unavailable-warning-last-seen-date", default: nil)
     public static let drainStatusOverride = Option<Int?>(key: "rewards.drain-status-override", default: nil)
 
     public enum EnvironmentOverride: Int {
@@ -146,13 +166,15 @@ extension Preferences {
       }
 
       public static var sortedCases: [EnvironmentOverride] {
-        return [.none, .dev, .staging, .prod]
+        [.none, .dev, .staging, .prod]
       }
     }
+
     /// In debug/beta, this is the overriden environment.
     public static let environmentOverride = Option<Int>(
       key: "rewards.environment-override",
-      default: EnvironmentOverride.none.rawValue)
+      default: EnvironmentOverride.none.rawValue
+    )
 
     /// In debut/beta, the number of seconds before an ad should automatically dismiss
     public static let adsDurationOverride = Option<Int?>(key: "rewards.ads.dismissal-override", default: nil)
@@ -174,7 +196,6 @@ extension Preferences {
 }
 
 extension Preferences {
-
   /// An entry in the `Preferences`
   ///
   /// `ValueType` defines the type of value that will stored in the UserDefaults object
@@ -188,7 +209,9 @@ extension Preferences {
     /// Upon setting this value, UserDefaults will be updated and any observers will be called
     @Published public var value: ValueType {
       didSet {
-        if value == oldValue { return }
+        if value == oldValue {
+          return
+        }
 
         // Check if `ValueType` is something that can be nil
         if value is ExpressibleByNilLiteral {
@@ -213,10 +236,12 @@ extension Preferences {
         }
       }
     }
+
     /// Adds `object` as an observer for this Option.
     public func observe(from object: PreferencesObserver) {
       observers.insert(object)
     }
+
     /// The key used for getting/setting the value in `UserDefaults`
     public let key: String
     /// The default value of this preference
@@ -251,7 +276,12 @@ extension Dictionary: UserDefaultsEncodable where Key: StringProtocol, Value: Us
 
 extension Preferences {
   /// Migrate a given key from `Prefs` into a specific option
-  public class func migrate<T>(keyPrefix: String, key: String, to option: Preferences.Option<T>, transform: ((T) -> T)? = nil) {
+  public class func migrate<T>(
+    keyPrefix: String,
+    key: String,
+    to option: Preferences.Option<T>,
+    transform: ((T) -> T)? = nil
+  ) {
     let userDefaults = UserDefaults(suiteName: AppInfo.sharedContainerIdentifier)
 
     let profileKey = "\(keyPrefix)\(key)"

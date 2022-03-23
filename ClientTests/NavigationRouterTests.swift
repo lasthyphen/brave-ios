@@ -9,7 +9,6 @@ import BraveShared
 import XCTest
 
 class NavigationRouterTests: XCTestCase {
-
   override func setUp() {
     super.setUp()
     PrivateBrowsingManager.shared.isPrivateBrowsing = false

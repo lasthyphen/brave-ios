@@ -15,9 +15,13 @@ class CarplayTemplateApplicationSceneDelegate: NSObject {
 
   // MARK: UISceneDelegate
 
-  func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
+  func scene(
+    _ scene: UIScene,
+    willConnectTo session: UISceneSession,
+    options connectionOptions: UIScene.ConnectionOptions
+  ) {
     if scene is CPTemplateApplicationScene,
-      session.configuration.name == CarplayTemplateApplicationSceneDelegate.configurationName {
+       session.configuration.name == CarplayTemplateApplicationSceneDelegate.configurationName {
       log.debug("Template application scene will connect.")
     }
   }
@@ -44,8 +48,10 @@ class CarplayTemplateApplicationSceneDelegate: NSObject {
 // MARK: CPTemplateApplicationSceneDelegate
 
 extension CarplayTemplateApplicationSceneDelegate: CPTemplateApplicationSceneDelegate {
-
-  func templateApplicationScene(_ templateApplicationScene: CPTemplateApplicationScene, didConnect interfaceController: CPInterfaceController) {
+  func templateApplicationScene(
+    _ templateApplicationScene: CPTemplateApplicationScene,
+    didConnect interfaceController: CPInterfaceController
+  ) {
     log.debug("Template application scene did connect.")
 
     DispatchQueue.main.async {

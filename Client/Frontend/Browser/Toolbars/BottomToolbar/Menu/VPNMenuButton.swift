@@ -43,7 +43,9 @@ struct VPNMenuButton: View {
     }
     switch BraveVPN.vpnState {
     case .notPurchased, .purchased, .expired:
-      guard let vc = vpnState.enableVPNDestinationVC else { return }
+      guard let vc = vpnState.enableVPNDestinationVC else {
+        return
+      }
       displayVPNDestination(vc)
     case .installed:
       isVPNStatusChanging = true
@@ -74,7 +76,8 @@ struct VPNMenuButton: View {
       MenuItemHeaderView(
         icon: #imageLiteral(resourceName: "vpn_menu_icon").template,
         title: description == nil ? "Brave VPN" : Strings.OptionsMenu.braveVPNItemTitle,
-        subtitle: description)
+        subtitle: description
+      )
       Spacer()
       if isVPNStatusChanging {
         ActivityIndicatorView(isAnimating: true)

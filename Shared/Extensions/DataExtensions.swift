@@ -18,6 +18,6 @@ extension Data {
   }
 
   public var int8Array: [Int8] {
-    return self.map { Int8(bitPattern: $0) }
+    self.map { Int8(bitPattern: $0) }
   }
 }

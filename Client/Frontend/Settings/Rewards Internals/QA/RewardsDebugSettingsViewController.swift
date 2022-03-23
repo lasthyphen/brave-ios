@@ -13,7 +13,6 @@ import CoreServices
 private typealias EnvironmentOverride = Preferences.Rewards.EnvironmentOverride
 
 class RewardsDebugSettingsViewController: TableViewController {
-
   let rewards: BraveRewards
   let legacyWallet: BraveLedger?
   private var adsInfo: (viewed: Int, amount: Double, paymentDate: Date?)?
@@ -34,11 +33,13 @@ class RewardsDebugSettingsViewController: TableViewController {
     fatalError()
   }
 
-  private let segmentedControl = UISegmentedControl(items: EnvironmentOverride.sortedCases.map { $0.name })
+  private let segmentedControl = UISegmentedControl(items: EnvironmentOverride.sortedCases.map(\.name))
 
   @objc private func environmentChanged() {
     let value = segmentedControl.selectedSegmentIndex
-    guard value < EnvironmentOverride.sortedCases.count else { return }
+    guard value < EnvironmentOverride.sortedCases.count else {
+      return
+    }
     let overrideForIndex = EnvironmentOverride.sortedCases[value]
     Preferences.Rewards.environmentOverride.value = overrideForIndex.rawValue
     self.rewards.reset()
@@ -70,7 +71,11 @@ class RewardsDebugSettingsViewController: TableViewController {
 
   @objc private func reconcileTimeEditingEnded() {
     guard let value = Int32(reconcileTimeTextField.text ?? "") else {
-      let alert = UIAlertController(title: "Invalid value", message: "Time has been reset to 0 (no override)", preferredStyle: .alert)
+      let alert = UIAlertController(
+        title: "Invalid value",
+        message: "Time has been reset to 0 (no override)",
+        preferredStyle: .alert
+      )
       alert.addAction(.init(title: "OK", style: .default, handler: nil))
       self.present(alert, animated: true)
       reconcileTimeTextField.text = "0"
@@ -101,7 +106,7 @@ class RewardsDebugSettingsViewController: TableViewController {
   }
 
   private var numpadDismissalToolbar: UIToolbar {
-    return UIToolbar().then {
+    UIToolbar().then {
       $0.items = [
         UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil),
         UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(textFieldDismissed)),
@@ -127,7 +132,8 @@ class RewardsDebugSettingsViewController: TableViewController {
     title = "Rewards QA Settings"
     navigationItem.rightBarButtonItem = .init(barButtonSystemItem: .done, target: self, action: #selector(tappedDone))
 
-    let override: EnvironmentOverride = EnvironmentOverride(rawValue: Preferences.Rewards.environmentOverride.value) ?? .none
+    let override: EnvironmentOverride = EnvironmentOverride(rawValue: Preferences.Rewards.environmentOverride.value) ??
+      .none
     segmentedControl.selectedSegmentIndex = EnvironmentOverride.sortedCases.firstIndex(of: override) ?? 0
     segmentedControl.addTarget(self, action: #selector(environmentChanged), for: .valueChanged)
     reconcileTimeTextField.addTarget(self, action: #selector(reconcileTimeEditingEnded), for: .editingDidEnd)
@@ -169,13 +175,14 @@ class RewardsDebugSettingsViewController: TableViewController {
         case .complete: return .complete
         }
       }
+
       var displayString: String {
         status?.displayString ?? "None"
       }
     }
     var selected: DrainStatusOverride = .none
     if let override = Preferences.Rewards.drainStatusOverride.value,
-      let status = DrainStatusOverride(rawValue: override) {
+       let status = DrainStatusOverride(rawValue: override) {
       selected = status
     }
     return Row(
@@ -188,7 +195,8 @@ class RewardsDebugSettingsViewController: TableViewController {
           Preferences.Rewards.drainStatusOverride.value = option.status?.rawValue
         }
         self.navigationController?.pushViewController(options, animated: true)
-      }, accessory: .disclosureIndicator)
+      }, accessory: .disclosureIndicator
+    )
   }
 
   private func reloadSections() {
@@ -201,7 +209,9 @@ class RewardsDebugSettingsViewController: TableViewController {
           Row(text: "Default", detailText: isDefaultEnvironmentProd ? "Prod" : "Staging"),
           Row(text: "Override", accessory: .view(segmentedControl)),
         ],
-        footer: .title("Changing the environment automatically resets Brave Rewards.\n\nThe app must be force-quit after rewards is reset")
+        footer: .title(
+          "Changing the environment automatically resets Brave Rewards.\n\nThe app must be force-quit after rewards is reset"
+        )
       ),
       Section(
         header: .title("Wallet"),
@@ -214,17 +224,21 @@ class RewardsDebugSettingsViewController: TableViewController {
                 self.navigationController?.pushViewController(controller, animated: true)
               } else {
                 self.rewards.startLedgerService {
-                  guard let ledger = self.rewards.ledger else { return }
+                  guard let ledger = self.rewards.ledger else {
+                    return
+                  }
                   let controller = RewardsInternalsDebugViewController(ledger: ledger)
                   self.navigationController?.pushViewController(controller, animated: true)
                 }
               }
-            }, accessory: .disclosureIndicator),
+            }, accessory: .disclosureIndicator
+          ),
           Row(
             text: "Fetch & Claim Promotions",
             selection: { [unowned self] in
               self.fetchAndClaimPromotions()
-            }, cellClass: ButtonCell.self),
+            }, cellClass: ButtonCell.self
+          ),
         ]
       ),
       Section(
@@ -234,29 +248,43 @@ class RewardsDebugSettingsViewController: TableViewController {
             text: "Internals",
             selection: { [unowned self] in
               guard let legacyWallet = legacyWallet else {
-                let alert = UIAlertController(title: "Legacy Wallet", message: "No Wallet Found. Use \"Create Legacy Wallet\" action below to duplicate the current wallet", preferredStyle: .alert)
+                let alert = UIAlertController(
+                  title: "Legacy Wallet",
+                  message: "No Wallet Found. Use \"Create Legacy Wallet\" action below to duplicate the current wallet",
+                  preferredStyle: .alert
+                )
                 alert.addAction(.init(title: "OK", style: .default, handler: nil))
                 self.present(alert, animated: true)
                 return
               }
               let controller = RewardsInternalsDebugViewController(ledger: legacyWallet)
               self.navigationController?.pushViewController(controller, animated: true)
-            }, accessory: .disclosureIndicator),
+            }, accessory: .disclosureIndicator
+          ),
           Row(
             text: "Create Legacy Wallet",
             selection: { [unowned self] in
               self.createLegacyLedger()
-            }, cellClass: ButtonCell.self),
+            }, cellClass: ButtonCell.self
+          ),
           drainOverrideStatusRow,
         ]
       ),
       Section(
         header: .title("Ads"),
         rows: [
-          Row(text: "Dismissal Timer", detailText: "Number of seconds before an ad is automatically dismissed. 0 = Default", accessory: .view(adsDismissalTextField), cellClass: MultilineSubtitleCell.self),
+          Row(
+            text: "Dismissal Timer",
+            detailText: "Number of seconds before an ad is automatically dismissed. 0 = Default",
+            accessory: .view(adsDismissalTextField),
+            cellClass: MultilineSubtitleCell.self
+          ),
           Row(text: "Ads Received", detailText: adsInfo.map { "\($0.viewed)" } ?? "—"),
           Row(text: "Estimated Payout", detailText: adsInfo.map { "\($0.amount) BAT" } ?? "—"),
-          Row(text: "Next Payment Date", detailText: adsInfo?.paymentDate.map { self.dateFormatter.string(from: $0) } ?? "—"),
+          Row(
+            text: "Next Payment Date",
+            detailText: adsInfo?.paymentDate.map { self.dateFormatter.string(from: $0) } ?? "—"
+          ),
         ]
       ),
       Section(
@@ -266,12 +294,14 @@ class RewardsDebugSettingsViewController: TableViewController {
             text: "Import Rewards Database",
             selection: {
               self.tappedImportRewardsDatabase()
-            }, cellClass: ButtonCell.self),
+            }, cellClass: ButtonCell.self
+          ),
           Row(
             text: "Export Rewards Database",
             selection: {
               self.tappedShareRewardsDatabase()
-            }, cellClass: ButtonCell.self),
+            }, cellClass: ButtonCell.self
+          ),
         ]
       ),
       Section(
@@ -282,14 +312,26 @@ class RewardsDebugSettingsViewController: TableViewController {
             accessory: .switchToggle(value: BraveLedger.isDebug, { value in
               BraveLedger.isDebug = value
               BraveAds.isDebug = value
-            })),
+            })
+          ),
           Row(
             text: "Use Short Retries",
             accessory: .switchToggle(value: BraveLedger.retryInterval != 0, { value in
               BraveLedger.retryInterval = value ? 30 : 0
-            })),
-          Row(text: "Reconcile Time", detailText: "Number of minutes between reconciles. 0 = No Override", accessory: .view(reconcileTimeTextField), cellClass: MultilineSubtitleCell.self),
-          Row(text: "Custom User Agent", detailText: "Non-persistant. Empty = default", accessory: .view(customUserAgentTextField), cellClass: MultilineSubtitleCell.self),
+            })
+          ),
+          Row(
+            text: "Reconcile Time",
+            detailText: "Number of minutes between reconciles. 0 = No Override",
+            accessory: .view(reconcileTimeTextField),
+            cellClass: MultilineSubtitleCell.self
+          ),
+          Row(
+            text: "Custom User Agent",
+            detailText: "Non-persistant. Empty = default",
+            accessory: .view(customUserAgentTextField),
+            cellClass: MultilineSubtitleCell.self
+          ),
         ]
       ),
       Section(
@@ -298,19 +340,28 @@ class RewardsDebugSettingsViewController: TableViewController {
             text: "Reset Rewards",
             selection: {
               self.tappedReset()
-            }, cellClass: ButtonCell.self)
+            }, cellClass: ButtonCell.self
+          )
         ]
       ),
     ]
   }
 
   private func fetchAndClaimPromotions() {
-    guard let ledger = rewards.ledger else { return }
+    guard let ledger = rewards.ledger else {
+      return
+    }
     ledger.fetchPromotions { [weak self] promotions in
-      guard let self = self else { return }
+      guard let self = self else {
+        return
+      }
       let activePromotions = promotions.filter { $0.status == .active }
       if activePromotions.isEmpty {
-        let alert = UIAlertController(title: "Promotions", message: "No Active Promotions Found", preferredStyle: .alert)
+        let alert = UIAlertController(
+          title: "Promotions",
+          message: "No Active Promotions Found",
+          preferredStyle: .alert
+        )
         alert.addAction(.init(title: "OK", style: .default, handler: nil))
         self.present(alert, animated: true)
         return
@@ -332,8 +383,14 @@ class RewardsDebugSettingsViewController: TableViewController {
         }
       }
       group.notify(queue: .main) { [weak self] in
-        guard let self = self else { return }
-        let alert = UIAlertController(title: "Promotions", message: "Claimed: \(claimedAmount) BAT in \(successCount) Grants. (\(failuresCount) failures)", preferredStyle: .alert)
+        guard let self = self else {
+          return
+        }
+        let alert = UIAlertController(
+          title: "Promotions",
+          message: "Claimed: \(claimedAmount) BAT in \(successCount) Grants. (\(failuresCount) failures)",
+          preferredStyle: .alert
+        )
         alert.addAction(.init(title: "OK", style: .default, handler: nil))
         self.present(alert, animated: true)
       }
@@ -342,7 +399,11 @@ class RewardsDebugSettingsViewController: TableViewController {
 
   private func createLegacyLedger() {
     let fm = FileManager.default
-    let stateStorage = URL(fileURLWithPath: NSSearchPathForDirectoriesInDomains(.applicationSupportDirectory, .userDomainMask, true).first!)
+    let stateStorage =
+      URL(
+        fileURLWithPath: NSSearchPathForDirectoriesInDomains(.applicationSupportDirectory, .userDomainMask, true)
+          .first!
+      )
     let legacyLedger = stateStorage.appendingPathComponent("legacy_ledger")
     let ledgerFolder = stateStorage.appendingPathComponent("ledger")
 
@@ -377,14 +438,20 @@ class RewardsDebugSettingsViewController: TableViewController {
   }
 
   private func tappedImportRewardsDatabase() {
-    let docPicker = UIDocumentPickerViewController(documentTypes: [String(kUTTypeData), String(kUTTypeDatabase)], in: .import)
+    let docPicker = UIDocumentPickerViewController(
+      documentTypes: [String(kUTTypeData), String(kUTTypeDatabase)],
+      in: .import
+    )
     docPicker.shouldShowFileExtensions = true
     docPicker.delegate = self
     self.present(docPicker, animated: true)
   }
 
   private func tappedShareRewardsDatabase() {
-    guard let appSupportPath = NSSearchPathForDirectoriesInDomains(.applicationSupportDirectory, .userDomainMask, true).first else { return }
+    guard let appSupportPath = NSSearchPathForDirectoriesInDomains(.applicationSupportDirectory, .userDomainMask, true)
+      .first else {
+      return
+    }
     let dbPath = (appSupportPath as NSString).appendingPathComponent("ledger/Rewards.db")
     let activity = UIActivityViewController(activityItems: [URL(fileURLWithPath: dbPath)], applicationActivities: nil)
     if UIDevice.current.userInterfaceIdiom == .pad {
@@ -415,7 +482,9 @@ class RewardsDebugSettingsViewController: TableViewController {
         title: "Exit Now", style: .destructive,
         handler: { _ in
           fatalError()
-        }))
+        }
+      )
+    )
     alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
     present(alert, animated: true)
   }
@@ -425,6 +494,7 @@ extension RewardsDebugSettingsViewController: KeyboardHelperDelegate {
   public func keyboardHelper(_ keyboardHelper: KeyboardHelper, keyboardWillShowWithState state: KeyboardState) {
     self.tableView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: state.intersectionHeightForView(view), right: 0)
   }
+
   public func keyboardHelper(_ keyboardHelper: KeyboardHelper, keyboardWillHideWithState state: KeyboardState) {
     self.tableView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
   }
@@ -439,8 +509,13 @@ extension RewardsDebugSettingsViewController: UITextFieldDelegate {
 
 extension RewardsDebugSettingsViewController: UIDocumentPickerDelegate {
   public func documentPicker(_ controller: UIDocumentPickerViewController, didPickDocumentsAt urls: [URL]) {
-    guard let documentURL = urls.first, documentURL.pathExtension == "db" else { return }
-    guard let appSupportPath = NSSearchPathForDirectoriesInDomains(.applicationSupportDirectory, .userDomainMask, true).first else { return }
+    guard let documentURL = urls.first, documentURL.pathExtension == "db" else {
+      return
+    }
+    guard let appSupportPath = NSSearchPathForDirectoriesInDomains(.applicationSupportDirectory, .userDomainMask, true)
+      .first else {
+      return
+    }
     let dbPath = (appSupportPath as NSString).appendingPathComponent("ledger/Rewards.db")
     do {
       _ = try FileManager.default.replaceItemAt(URL(fileURLWithPath: dbPath), withItemAt: documentURL)
@@ -457,11 +532,17 @@ extension RewardsDebugSettingsViewController: UIDocumentPickerDelegate {
           title: "Exit Now", style: .destructive,
           handler: { _ in
             fatalError()
-          }))
+          }
+        )
+      )
       alert.addAction(UIAlertAction(title: "Later…", style: .default, handler: nil))
       present(alert, animated: true)
     } catch {
-      let alert = UIAlertController(title: "Failed To Import Database", message: error.localizedDescription, preferredStyle: .alert)
+      let alert = UIAlertController(
+        title: "Failed To Import Database",
+        message: error.localizedDescription,
+        preferredStyle: .alert
+      )
       alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
       present(alert, animated: true)
     }

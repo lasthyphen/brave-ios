@@ -13,6 +13,7 @@ class NewTabPageBackgroundView: UIView {
   let imageView = UIImageView().then {
     $0.contentMode = .scaleAspectFit
   }
+
   /// Constraints generated on `imageView` for adjusting layout based on
   /// orientation
   var imageConstraints: (portraitCenter: Constraint, landscapeCenter: Constraint)?

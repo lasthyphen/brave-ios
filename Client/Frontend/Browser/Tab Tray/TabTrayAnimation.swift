@@ -16,27 +16,28 @@ extension TabTrayController: UIViewControllerTransitioningDelegate {
     presenting: UIViewController,
     source: UIViewController
   ) -> UIViewControllerAnimatedTransitioning? {
-    return BasicAnimationController(delegate: self, direction: .presenting)
+    BasicAnimationController(delegate: self, direction: .presenting)
   }
 
   func animationController(
     forDismissed dismissed: UIViewController
   ) -> UIViewControllerAnimatedTransitioning? {
-    return BasicAnimationController(delegate: self, direction: .dismissing)
+    BasicAnimationController(delegate: self, direction: .dismissing)
   }
 }
 
 extension TabTrayController: BasicAnimationControllerDelegate {
   func animatePresentation(context: UIViewControllerContextTransitioning) {
     guard let containerController = context.viewController(forKey: .from) as? UINavigationController,
-      let bvc = containerController.topViewController as? BrowserViewController,
-      let destinationController = context.viewController(forKey: .to)
+          let bvc = containerController.topViewController as? BrowserViewController,
+          let destinationController = context.viewController(forKey: .to)
     else {
       log.error(
         """
             Attempted to present the tab tray on something that is not a BrowserViewController which is
             currently unsupported.
-        """)
+        """
+      )
       context.completeTransition(true)
       return
     }
@@ -151,7 +152,7 @@ extension TabTrayController: BasicAnimationControllerDelegate {
 
   func animateDismissal(context: UIViewControllerContextTransitioning) {
     guard let toViewController = context.viewController(forKey: .to),
-      let toView = context.view(forKey: .to)
+          let toView = context.view(forKey: .to)
     else {
       log.error(
         """
@@ -159,19 +160,21 @@ extension TabTrayController: BasicAnimationControllerDelegate {
 
             Likely the `modalPresentationStyle` was changed away from `fullScreen` and should be changed
             back if using this custom animation.
-        """)
+        """
+      )
       context.completeTransition(true)
       return
     }
 
     guard let containerController = toViewController as? UINavigationController,
-      let bvc = containerController.topViewController as? BrowserViewController
+          let bvc = containerController.topViewController as? BrowserViewController
     else {
       log.error(
         """
             Attempted to dismiss the tab tray from something that is not a BrowserViewController which is
             currently unsupported.
-        """)
+        """
+      )
       context.completeTransition(true)
       return
     }

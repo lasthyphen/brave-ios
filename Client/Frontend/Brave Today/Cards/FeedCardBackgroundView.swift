@@ -17,6 +17,7 @@ class FeedCardBackgroundView: UIVisualEffectView {
     isAccessibilityElement = false
     contentView.backgroundColor = UIColor.white.withAlphaComponent(0.17)
   }
+
   @available(*, unavailable)
   required init(coder: NSCoder) {
     fatalError()
@@ -44,8 +45,12 @@ class FeedCardBackgroundButton: SpringButton {
   }
 
   override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
-    guard let view = super.hitTest(point, with: event) else { return nil }
-    if view is UIControl { return view }
+    guard let view = super.hitTest(point, with: event) else {
+      return nil
+    }
+    if view is UIControl {
+      return view
+    }
     return self
   }
 }

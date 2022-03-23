@@ -12,7 +12,6 @@ import DeviceCheck
 import Combine
 
 class BraveRewardsSettingsViewController: TableViewController {
-
   let rewards: BraveRewards
   let legacyWallet: BraveLedger?
   var walletTransferLearnMoreTapped: (() -> Void)?
@@ -47,7 +46,8 @@ class BraveRewardsSettingsViewController: TableViewController {
             accessory: .switchToggle(value: rewards.isEnabled, { [unowned self] isOn in
               self.rewards.isEnabled = isOn
             }),
-            cellClass: MultilineSubtitleCell.self)
+            cellClass: MultilineSubtitleCell.self
+          )
         ],
         footer: .title(Strings.Rewards.settingsFooterMessage)
       )
@@ -57,16 +57,21 @@ class BraveRewardsSettingsViewController: TableViewController {
       if Preferences.Rewards.transferDrainID.value == nil {
         if !legacyWallet.isLedgerTransferExpired {
           legacyWallet.transferrableAmount({ [weak self] total in
-            guard let self = self, total > 0 else { return }
+            guard let self = self, total > 0 else {
+              return
+            }
             self.dataSource.sections.insert(
               .init(
                 header: .title(Strings.Rewards.walletTransferTitle),
                 rows: [
                   Row(
                     text: Strings.Rewards.legacyWalletTransfer,
-                    detailText: Preferences.Rewards.lastTransferStatus.value.map(Ledger.DrainStatus.init)??.displayString,
+                    detailText: Preferences.Rewards.lastTransferStatus.value.map(Ledger.DrainStatus.init)??
+                      .displayString,
                     selection: { [unowned self] in
-                      guard let legacyWallet = self.legacyWallet else { return }
+                      guard let legacyWallet = self.legacyWallet else {
+                        return
+                      }
                       let controller = WalletTransferViewController(legacyWallet: legacyWallet)
                       controller.learnMoreHandler = { [weak self] in
                         self?.walletTransferLearnMoreTapped?()
@@ -74,9 +79,11 @@ class BraveRewardsSettingsViewController: TableViewController {
                       let container = UINavigationController(rootViewController: controller)
                       container.modalPresentationStyle = .formSheet
                       self.present(container, animated: true)
-                    }, image: UIImage(imageLiteralResourceName: "rewards-qr-code").template)
+                    }, image: UIImage(imageLiteralResourceName: "rewards-qr-code").template
+                  )
                 ]
-              ), at: 1)
+              ), at: 1
+            )
           })
         }
       } else {
@@ -97,9 +104,11 @@ class BraveRewardsSettingsViewController: TableViewController {
                         let container = UINavigationController(rootViewController: controller)
                         container.modalPresentationStyle = .formSheet
                         self.present(container, animated: true)
-                      }, image: UIImage(imageLiteralResourceName: "rewards-qr-code").template)
+                      }, image: UIImage(imageLiteralResourceName: "rewards-qr-code").template
+                    )
                   ]
-                ), at: 1)
+                ), at: 1
+              )
             }
           }
         }
@@ -114,10 +123,13 @@ class BraveRewardsSettingsViewController: TableViewController {
               Row(
                 text: Strings.RewardsInternals.title,
                 selection: {
-                  guard let self = self else { return }
+                  guard let self = self else {
+                    return
+                  }
                   let controller = RewardsInternalsViewController(ledger: ledger, legacyLedger: self.legacyWallet)
                   self.navigationController?.pushViewController(controller, animated: true)
-                }, accessory: .disclosureIndicator)
+                }, accessory: .disclosureIndicator
+              )
             ])
           ]
         }
@@ -131,7 +143,9 @@ class BraveRewardsSettingsViewController: TableViewController {
     title = Strings.braveRewardsTitle
 
     rewards.startLedgerService { [weak self] in
-      guard let self = self else { return }
+      guard let self = self else {
+        return
+      }
       if let legacyWallet = self.legacyWallet, !legacyWallet.isInitialized {
         legacyWallet.initializeLedgerService {
           self.reloadSections()

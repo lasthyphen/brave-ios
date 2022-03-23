@@ -34,7 +34,8 @@ class WelcomeViewController: UIViewController {
     self.init(
       profile: profile,
       rewards: rewards,
-      state: .welcome(title: Strings.Onboarding.welcomeScreenTitle))
+      state: .welcome(title: Strings.Onboarding.welcomeScreenTitle)
+    )
   }
 
   init(profile: Profile?, rewards: BraveRewards?, state: WelcomeViewCalloutState?) {
@@ -47,6 +48,7 @@ class WelcomeViewController: UIViewController {
     self.loadViewIfNeeded()
   }
 
+  @available(*, unavailable)
   required init?(coder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }
@@ -175,7 +177,8 @@ class WelcomeViewController: UIViewController {
     stack.addStackViewItems(
       .view(UIView.spacer(.vertical, amount: 1)),
       .view(contentContainer),
-      .view(UIView.spacer(.vertical, amount: 1)))
+      .view(UIView.spacer(.vertical, amount: 1))
+    )
 
     [calloutView, iconView, searchView].forEach {
       contentContainer.addArrangedSubview($0)
@@ -358,7 +361,8 @@ class WelcomeViewController: UIViewController {
     let nextController = WelcomeViewController(
       profile: profile,
       rewards: rewards,
-      state: nil)
+      state: nil
+    )
     nextController.onAdsWebsiteSelected = onAdsWebsiteSelected
     nextController.onSkipSelected = onSkipSelected
     let state = WelcomeViewCalloutState.privacy(
@@ -377,7 +381,8 @@ class WelcomeViewController: UIViewController {
     let nextController = WelcomeViewController(
       profile: profile,
       rewards: rewards,
-      state: nil)
+      state: nil
+    )
     nextController.onAdsWebsiteSelected = onAdsWebsiteSelected
     nextController.onSkipSelected = onSkipSelected
     let state = WelcomeViewCalloutState.defaultBrowser(
@@ -402,13 +407,15 @@ class WelcomeViewController: UIViewController {
     let nextController = WelcomeViewController(
       profile: profile,
       rewards: rewards,
-      state: nil)
+      state: nil
+    )
     nextController.onAdsWebsiteSelected = onAdsWebsiteSelected
     nextController.onSkipSelected = onSkipSelected
     let state = WelcomeViewCalloutState.ready(
       title: Strings.Onboarding.readyScreenTitle,
       details: Strings.Onboarding.readyScreenDescription,
-      moreDetails: Strings.Onboarding.readyScreenAdditionalDescription)
+      moreDetails: Strings.Onboarding.readyScreenAdditionalDescription
+    )
     nextController.setLayoutState(state: state)
     self.present(nextController, animated: true, completion: nil)
   }
@@ -451,7 +458,7 @@ class WelcomeViewController: UIViewController {
       }
 
       if let presentingController = presenting as? UINavigationController,
-        let topController = presentingController.topViewController {
+         let topController = presentingController.topViewController {
         presenting = topController
         if presenting.isKind(of: BrowserViewController.self) {
           break
@@ -476,80 +483,200 @@ class WelcomeViewController: UIViewController {
     // Canada
     case "CA":
       siteList = [
-        WebsiteRegion(icon: #imageLiteral(resourceName: "welcome-view-search-view-yahoo"), title: "Yahoo", domain: "https://yahoo.com/"),
-        WebsiteRegion(icon: #imageLiteral(resourceName: "welcome-view-search-view-environment-canada"), title: "Environment Canada", domain: "https://weather.gc.ca/"),
-        WebsiteRegion(icon: #imageLiteral(resourceName: "welcome-view-search-view-cdn-tire"), title: "Canadian Tire", domain: "https://canadiantire.ca/"),
+        WebsiteRegion(
+          icon: #imageLiteral(resourceName: "welcome-view-search-view-yahoo"),
+          title: "Yahoo",
+          domain: "https://yahoo.com/"
+        ),
+        WebsiteRegion(
+          icon: #imageLiteral(resourceName: "welcome-view-search-view-environment-canada"),
+          title: "Environment Canada",
+          domain: "https://weather.gc.ca/"
+        ),
+        WebsiteRegion(
+          icon: #imageLiteral(resourceName: "welcome-view-search-view-cdn-tire"),
+          title: "Canadian Tire",
+          domain: "https://canadiantire.ca/"
+        ),
       ]
 
     // United Kingdom
     case "GB":
       siteList = [
-        WebsiteRegion(icon: #imageLiteral(resourceName: "welcome-view-search-view-bbc"), title: "BBC", domain: "https://bbc.co.uk/"),
-        WebsiteRegion(icon: #imageLiteral(resourceName: "welcome-view-search-view-sky"), title: "Sky", domain: "https://sky.com/"),
-        WebsiteRegion(icon: #imageLiteral(resourceName: "welcome-view-search-view-wired"), title: "Wired", domain: "https://wired.com/"),
+        WebsiteRegion(
+          icon: #imageLiteral(resourceName: "welcome-view-search-view-bbc"),
+          title: "BBC",
+          domain: "https://bbc.co.uk/"
+        ),
+        WebsiteRegion(
+          icon: #imageLiteral(resourceName: "welcome-view-search-view-sky"),
+          title: "Sky",
+          domain: "https://sky.com/"
+        ),
+        WebsiteRegion(
+          icon: #imageLiteral(resourceName: "welcome-view-search-view-wired"),
+          title: "Wired",
+          domain: "https://wired.com/"
+        ),
       ]
 
     // Germany
     case "DE":
       siteList = [
-        WebsiteRegion(icon: #imageLiteral(resourceName: "welcome-view-search-view-yahoo"), title: "Yahoo", domain: "https://yahoo.com/"),
-        WebsiteRegion(icon: #imageLiteral(resourceName: "welcome-view-search-view-gmx"), title: "GMX", domain: "https://gmx.net/"),
-        WebsiteRegion(icon: #imageLiteral(resourceName: "welcome-view-search-view-mobilede"), title: "Mobile", domain: "https://mobile.de/"),
+        WebsiteRegion(
+          icon: #imageLiteral(resourceName: "welcome-view-search-view-yahoo"),
+          title: "Yahoo",
+          domain: "https://yahoo.com/"
+        ),
+        WebsiteRegion(
+          icon: #imageLiteral(resourceName: "welcome-view-search-view-gmx"),
+          title: "GMX",
+          domain: "https://gmx.net/"
+        ),
+        WebsiteRegion(
+          icon: #imageLiteral(resourceName: "welcome-view-search-view-mobilede"),
+          title: "Mobile",
+          domain: "https://mobile.de/"
+        ),
       ]
 
     // France
     case "FR":
       siteList = [
-        WebsiteRegion(icon: #imageLiteral(resourceName: "welcome-view-search-view-yahoo"), title: "Yahoo", domain: "https://yahoo.com/"),
-        WebsiteRegion(icon: #imageLiteral(resourceName: "welcome-view-search-view-jdf"), title: "Les Journal des Femmes", domain: "https://journaldesfemmes.fr/"),
-        WebsiteRegion(icon: #imageLiteral(resourceName: "welcome-view-search-view-programme-tv"), title: "Programme TV", domain: "https://programme-tv.net/"),
+        WebsiteRegion(
+          icon: #imageLiteral(resourceName: "welcome-view-search-view-yahoo"),
+          title: "Yahoo",
+          domain: "https://yahoo.com/"
+        ),
+        WebsiteRegion(
+          icon: #imageLiteral(resourceName: "welcome-view-search-view-jdf"),
+          title: "Les Journal des Femmes",
+          domain: "https://journaldesfemmes.fr/"
+        ),
+        WebsiteRegion(
+          icon: #imageLiteral(resourceName: "welcome-view-search-view-programme-tv"),
+          title: "Programme TV",
+          domain: "https://programme-tv.net/"
+        ),
       ]
 
     // India
     case "IN":
       siteList = [
-        WebsiteRegion(icon: #imageLiteral(resourceName: "welcome-view-search-view-hotstar"), title: "Hot Star", domain: "https://hotstar.com/"),
-        WebsiteRegion(icon: #imageLiteral(resourceName: "welcome-view-search-view-cricketbuzz"), title: "Cricket Buzz", domain: "https://cricbuzz.com/"),
-        WebsiteRegion(icon: #imageLiteral(resourceName: "welcome-view-search-view-flipkart"), title: "Flipkart", domain: "https://flipkart.com/"),
+        WebsiteRegion(
+          icon: #imageLiteral(resourceName: "welcome-view-search-view-hotstar"),
+          title: "Hot Star",
+          domain: "https://hotstar.com/"
+        ),
+        WebsiteRegion(
+          icon: #imageLiteral(resourceName: "welcome-view-search-view-cricketbuzz"),
+          title: "Cricket Buzz",
+          domain: "https://cricbuzz.com/"
+        ),
+        WebsiteRegion(
+          icon: #imageLiteral(resourceName: "welcome-view-search-view-flipkart"),
+          title: "Flipkart",
+          domain: "https://flipkart.com/"
+        ),
       ]
 
     // Australia
     case "AU":
       siteList = [
-        WebsiteRegion(icon: #imageLiteral(resourceName: "welcome-view-search-view-news-au"), title: "News", domain: "https://news.com.au/"),
-        WebsiteRegion(icon: #imageLiteral(resourceName: "welcome-view-search-view-gumtree"), title: "Gumtree", domain: "https://gumtree.com.au/"),
-        WebsiteRegion(icon: #imageLiteral(resourceName: "welcome-view-search-view-realestate-au"), title: "Real Estate", domain: "https://realestate.com.au/"),
+        WebsiteRegion(
+          icon: #imageLiteral(resourceName: "welcome-view-search-view-news-au"),
+          title: "News",
+          domain: "https://news.com.au/"
+        ),
+        WebsiteRegion(
+          icon: #imageLiteral(resourceName: "welcome-view-search-view-gumtree"),
+          title: "Gumtree",
+          domain: "https://gumtree.com.au/"
+        ),
+        WebsiteRegion(
+          icon: #imageLiteral(resourceName: "welcome-view-search-view-realestate-au"),
+          title: "Real Estate",
+          domain: "https://realestate.com.au/"
+        ),
       ]
 
     // Ireland
     case "IE":
       siteList = [
-        WebsiteRegion(icon: #imageLiteral(resourceName: "welcome-view-search-view-rte"), title: "RTÉ", domain: "https://rte.ie/"),
-        WebsiteRegion(icon: #imageLiteral(resourceName: "welcome-view-search-view-independent"), title: "Independent", domain: "https://independent.ie/"),
-        WebsiteRegion(icon: #imageLiteral(resourceName: "welcome-view-search-view-donedeal"), title: "DoneDeal", domain: "https://donedeal.ie/"),
+        WebsiteRegion(
+          icon: #imageLiteral(resourceName: "welcome-view-search-view-rte"),
+          title: "RTÉ",
+          domain: "https://rte.ie/"
+        ),
+        WebsiteRegion(
+          icon: #imageLiteral(resourceName: "welcome-view-search-view-independent"),
+          title: "Independent",
+          domain: "https://independent.ie/"
+        ),
+        WebsiteRegion(
+          icon: #imageLiteral(resourceName: "welcome-view-search-view-donedeal"),
+          title: "DoneDeal",
+          domain: "https://donedeal.ie/"
+        ),
       ]
 
     // Japan
     case "JP":
       siteList = [
-        WebsiteRegion(icon: #imageLiteral(resourceName: "faviconYahoo"), title: "Yahoo! JAPAN", domain: "https://m.yahoo.co.jp/"),
-        WebsiteRegion(icon: #imageLiteral(resourceName: "welcome-view-search-view-wired"), title: "Wired(日本版)", domain: "https://wired.jp/"),
-        WebsiteRegion(icon: #imageLiteral(resourceName: "welcome-view-search-view-number-bunshin"), title: "Number Web", domain: "https://number.bunshun.jp/"),
+        WebsiteRegion(
+          icon: #imageLiteral(resourceName: "faviconYahoo"),
+          title: "Yahoo! JAPAN",
+          domain: "https://m.yahoo.co.jp/"
+        ),
+        WebsiteRegion(
+          icon: #imageLiteral(resourceName: "welcome-view-search-view-wired"),
+          title: "Wired(日本版)",
+          domain: "https://wired.jp/"
+        ),
+        WebsiteRegion(
+          icon: #imageLiteral(resourceName: "welcome-view-search-view-number-bunshin"),
+          title: "Number Web",
+          domain: "https://number.bunshun.jp/"
+        ),
       ]
 
     // United States
     case "US":
       siteList = [
-        WebsiteRegion(icon: #imageLiteral(resourceName: "welcome-view-search-view-yahoo"), title: "Yahoo", domain: "https://yahoo.com/"),
-        WebsiteRegion(icon: #imageLiteral(resourceName: "welcome-view-search-view-wired"), title: "Wired", domain: "https://wired.com/"),
-        WebsiteRegion(icon: #imageLiteral(resourceName: "welcome-view-search-view-espn"), title: "ESPN", domain: "https://espn.com/"),
+        WebsiteRegion(
+          icon: #imageLiteral(resourceName: "welcome-view-search-view-yahoo"),
+          title: "Yahoo",
+          domain: "https://yahoo.com/"
+        ),
+        WebsiteRegion(
+          icon: #imageLiteral(resourceName: "welcome-view-search-view-wired"),
+          title: "Wired",
+          domain: "https://wired.com/"
+        ),
+        WebsiteRegion(
+          icon: #imageLiteral(resourceName: "welcome-view-search-view-espn"),
+          title: "ESPN",
+          domain: "https://espn.com/"
+        ),
       ]
 
     default:
       siteList = [
-        WebsiteRegion(icon: #imageLiteral(resourceName: "welcome-view-search-view-yahoo"), title: "Yahoo", domain: "https://yahoo.com/"),
-        WebsiteRegion(icon: #imageLiteral(resourceName: "welcome-view-search-view-wired"), title: "Wired", domain: "https://wired.com/"),
-        WebsiteRegion(icon: #imageLiteral(resourceName: "welcome-view-search-view-espn"), title: "ESPN", domain: "https://espn.com/"),
+        WebsiteRegion(
+          icon: #imageLiteral(resourceName: "welcome-view-search-view-yahoo"),
+          title: "Yahoo",
+          domain: "https://yahoo.com/"
+        ),
+        WebsiteRegion(
+          icon: #imageLiteral(resourceName: "welcome-view-search-view-wired"),
+          title: "Wired",
+          domain: "https://wired.com/"
+        ),
+        WebsiteRegion(
+          icon: #imageLiteral(resourceName: "welcome-view-search-view-espn"),
+          title: "ESPN",
+          domain: "https://espn.com/"
+        ),
       ]
     }
     return siteList
@@ -557,31 +684,35 @@ class WelcomeViewController: UIViewController {
 }
 
 extension WelcomeViewController: UIViewControllerTransitioningDelegate {
-  func animationController(forPresented presented: UIViewController, presenting: UIViewController, source: UIViewController) -> UIViewControllerAnimatedTransitioning? {
-    return WelcomeAnimator(isPresenting: true)
+  func animationController(
+    forPresented presented: UIViewController,
+    presenting: UIViewController,
+    source: UIViewController
+  ) -> UIViewControllerAnimatedTransitioning? {
+    WelcomeAnimator(isPresenting: true)
   }
 
   func animationController(forDismissed dismissed: UIViewController) -> UIViewControllerAnimatedTransitioning? {
-    return WelcomeAnimator(isPresenting: false)
+    WelcomeAnimator(isPresenting: false)
   }
 }
 
 // Disabling orientation changes
 extension WelcomeViewController {
   override var preferredStatusBarStyle: UIStatusBarStyle {
-    return .default
+    .default
   }
 
   override var supportedInterfaceOrientations: UIInterfaceOrientationMask {
-    return .portrait
+    .portrait
   }
 
   override var preferredInterfaceOrientationForPresentation: UIInterfaceOrientation {
-    return .portrait
+    .portrait
   }
 
   override var shouldAutorotate: Bool {
-    return false
+    false
   }
 }
 
@@ -600,7 +731,7 @@ private class WelcomeAnimator: NSObject, UIViewControllerAnimatedTransitioning {
     let skipButton: UIView
 
     var allViews: [UIView] {
-      return [
+      [
         backgroundImageView,
         topImageView,
         contentContainer,
@@ -615,14 +746,14 @@ private class WelcomeAnimator: NSObject, UIViewControllerAnimatedTransitioning {
 
     init?(view: UIView) {
       guard let backgroundImageView = view.subview(with: WelcomeViewID.background.rawValue),
-        let topImageView = view.subview(with: WelcomeViewID.topImage.rawValue),
-        let contentContainer = view.subview(with: WelcomeViewID.contents.rawValue),
-        let calloutView = view.subview(with: WelcomeViewID.callout.rawValue),
-        let iconView = view.subview(with: WelcomeViewID.iconView.rawValue),
-        let iconBackgroundView = view.subview(with: WelcomeViewID.iconBackground.rawValue),
-        let searchEnginesView = view.subview(with: WelcomeViewID.searchView.rawValue),
-        let bottomImageView = view.subview(with: WelcomeViewID.bottomImage.rawValue),
-        let skipButton = view.subview(with: WelcomeViewID.skipButton.rawValue)
+            let topImageView = view.subview(with: WelcomeViewID.topImage.rawValue),
+            let contentContainer = view.subview(with: WelcomeViewID.contents.rawValue),
+            let calloutView = view.subview(with: WelcomeViewID.callout.rawValue),
+            let iconView = view.subview(with: WelcomeViewID.iconView.rawValue),
+            let iconBackgroundView = view.subview(with: WelcomeViewID.iconBackground.rawValue),
+            let searchEnginesView = view.subview(with: WelcomeViewID.searchView.rawValue),
+            let bottomImageView = view.subview(with: WelcomeViewID.bottomImage.rawValue),
+            let skipButton = view.subview(with: WelcomeViewID.skipButton.rawValue)
       else {
         return nil
       }
@@ -691,7 +822,7 @@ private class WelcomeAnimator: NSObject, UIViewControllerAnimatedTransitioning {
 
     // Get animatable views
     guard let fromWelcomeView = WelcomeViewInfo(view: fromView),
-      let toWelcomeView = WelcomeViewInfo(view: toView)
+          let toWelcomeView = WelcomeViewInfo(view: toView)
     else {
       performDefaultAnimation(using: transitionContext)
       return
@@ -727,7 +858,8 @@ private class WelcomeAnimator: NSObject, UIViewControllerAnimatedTransitioning {
         continue
       }
 
-      if fromView == fromWelcomeView.topImageView || fromView == fromWelcomeView.bottomImageView || fromView == fromWelcomeView.skipButton {
+      if fromView == fromWelcomeView.topImageView || fromView == fromWelcomeView
+        .bottomImageView || fromView == fromWelcomeView.skipButton {
         UIView.animate(withDuration: totalAnimationTime, delay: 0.0, options: .curveEaseInOut) {
           fromView.transform = toView.transform
         } completion: { finished in
@@ -750,13 +882,12 @@ private class WelcomeAnimator: NSObject, UIViewControllerAnimatedTransitioning {
           fromView.alpha = 0.0
           toView.alpha = toAlpha
         } completion: { finished in
-
         }
       }
     }
 
     if let fromCallout = fromWelcomeView.calloutView as? WelcomeViewCallout,
-      let toCallout = toWelcomeView.calloutView as? WelcomeViewCallout {
+       let toCallout = toWelcomeView.calloutView as? WelcomeViewCallout {
       fromCallout.animateFromCopy(view: toCallout, duration: totalAnimationTime, delay: 0.0)
     }
 
@@ -767,12 +898,12 @@ private class WelcomeAnimator: NSObject, UIViewControllerAnimatedTransitioning {
   }
 
   func transitionDuration(using transitionContext: UIViewControllerContextTransitioning?) -> TimeInterval {
-    return 0.5
+    0.5
   }
 }
 
-private extension UIView {
-  func subview(with tag: Int) -> UIView? {
+extension UIView {
+  fileprivate func subview(with tag: Int) -> UIView? {
     if self.tag == tag {
       return self
     }

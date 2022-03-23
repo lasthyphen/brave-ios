@@ -9,7 +9,6 @@ import SnapKit
 import BraveShared
 
 class OpenSearchEngineButton: BraveButton {
-
   // MARK: Action
 
   enum Action {
@@ -58,6 +57,7 @@ class OpenSearchEngineButton: BraveButton {
     setTheme(with: title)
   }
 
+  @available(*, unavailable)
   required init?(coder aDecoder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }

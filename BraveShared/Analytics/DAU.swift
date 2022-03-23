@@ -7,7 +7,6 @@ import XCGLogger
 private let log = Logger.browserLogger
 
 public class DAU {
-
   /// Default installation date for legacy woi version.
   public static let defaultWoiDate = "2016-01-04"
 
@@ -18,14 +17,14 @@ public class DAU {
   private let pingRefreshDuration = 5.minutes
 
   /// We always use gregorian calendar for DAU pings. This also adds more anonymity to the server call.
-  fileprivate static var calendar: Calendar { return Calendar(identifier: .gregorian) }
+  fileprivate static var calendar: Calendar { Calendar(identifier: .gregorian) }
 
   private var launchTimer: Timer?
   private let today: Date
   /// Whether a current ping attempt is being made
   private var processingPing = false
   private var todayComponents: DateComponents {
-    return DAU.calendar.dateComponents([.day, .month, .year, .weekday], from: today)
+    DAU.calendar.dateComponents([.day, .month, .year, .weekday], from: today)
   }
 
   /// Date formatted used for passing date strings to the DAU server.
@@ -41,7 +40,8 @@ public class DAU {
 
   public init(date: Date = Date()) {
     today = date
-    apiKey = (Bundle.main.infoDictionary?[Self.apiKeyPlistKey] as? String)?.trimmingCharacters(in: .whitespacesAndNewlines)
+    apiKey = (Bundle.main.infoDictionary?[Self.apiKeyPlistKey] as? String)?
+      .trimmingCharacters(in: .whitespacesAndNewlines)
   }
 
   /// Sends ping to server and returns a boolean whether a timer for the server call was scheduled.
@@ -57,14 +57,17 @@ public class DAU {
 
     // Setting up timer to try to send ping after certain amount of time.
     // This helps in offline mode situations.
-    if launchTimer != nil { return false }
+    if launchTimer != nil {
+      return false
+    }
     launchTimer =
       Timer.scheduledTimer(
         timeInterval: pingRefreshDuration,
         target: self,
         selector: #selector(sendPingToServerInternal),
         userInfo: nil,
-        repeats: true)
+        repeats: true
+      )
 
     return true
   }
@@ -122,7 +125,7 @@ public class DAU {
   struct ParamsAndPrefs {
     let queryParams: [URLQueryItem]
     let headers: [String: String]
-    let lastLaunchInfoPreference: [Optional<Int>]
+    let lastLaunchInfoPreference: [Int?]
   }
 
   /// Return params query or nil if no ping should be send to server and also preference values to set
@@ -156,7 +159,7 @@ public class DAU {
     // Installation date for `dtoi` param has a limited lifetime.
     // After that we clear the install date from the app and always send null `dtoi` param.
     if let installationDate = Preferences.DAU.installationDate.value,
-      retentionMeasureDatePassed(since: installationDate) {
+       retentionMeasureDatePassed(since: installationDate) {
       Preferences.DAU.installationDate.value = nil
     }
 
@@ -168,7 +171,7 @@ public class DAU {
       UrpLog.log("DAU ping with added ref, params: \(params)")
     }
 
-    let lastPingTimestamp = [Int((today).timeIntervalSince1970)]
+    let lastPingTimestamp = [Int(today.timeIntervalSince1970)]
 
     var headers: [String: String] = [:]
 
@@ -181,7 +184,7 @@ public class DAU {
 
   private func retentionMeasureDatePassed(since date: Date) -> Bool {
     guard let referenceDateOrdinal = DAU.calendar.ordinality(of: .day, in: .era, for: date),
-      let currentDateOrdinal = DAU.calendar.ordinality(of: .day, in: .era, for: today)
+          let currentDateOrdinal = DAU.calendar.ordinality(of: .day, in: .era, for: today)
     else {
       assertionFailure()
       // This should never happen but we fallback to true here to avoid sending `dtoi` param
@@ -195,7 +198,7 @@ public class DAU {
   }
 
   func channelParam(for channel: AppBuildChannel = AppConstants.buildChannel) -> URLQueryItem {
-    return URLQueryItem(name: "channel", value: channel.serverChannelParam)
+    URLQueryItem(name: "channel", value: channel.serverChannelParam)
   }
 
   func versionParam(for version: String = AppInfo.appVersion) -> URLQueryItem {
@@ -221,7 +224,7 @@ public class DAU {
   }
 
   func firstLaunchParam(for isFirst: Bool) -> URLQueryItem {
-    return URLQueryItem(name: "first", value: isFirst.description)
+    URLQueryItem(name: "first", value: isFirst.description)
   }
 
   /// All first app installs are normalized to first day of the week.
@@ -257,10 +260,10 @@ public class DAU {
     var pings = Set<PingType>()
 
     func eraDayOrdinal(_ date: Date) -> Int? {
-      return calendar.ordinality(of: .day, in: .era, for: date)
+      calendar.ordinality(of: .day, in: .era, for: date)
     }
     func nextDate(matching components: DateComponents) -> Date? {
-      return calendar.nextDate(after: lastPingDate, matching: components, matchingPolicy: .nextTime)
+      calendar.nextDate(after: lastPingDate, matching: components, matchingPolicy: .nextTime)
     }
 
     if let nowDay = eraDayOrdinal(date), let lastPingDay = eraDayOrdinal(lastPingDate), nowDay > lastPingDay {
@@ -290,9 +293,8 @@ public class DAU {
     firstPing: Bool,
     channel: AppBuildChannel = AppConstants.buildChannel
   ) -> [URLQueryItem]? {
-
     func dauParams(_ daily: Bool, _ weekly: Bool, _ monthly: Bool) -> [URLQueryItem] {
-      return ["daily": daily, "weekly": weekly, "monthly": monthly].map {
+      ["daily": daily, "weekly": weekly, "monthly": monthly].map {
         URLQueryItem(name: $0.key, value: $0.value.description)
       }
     }
@@ -334,12 +336,18 @@ extension Date {
     // We look for a previous monday because Sunday is considered a beggining of a new week using default gregorian calendar.
     // For example if today is Sunday, the next Monday using Calendar would be the day after Sunday which is wrong.
     // That's why backward search may sound counter intuitive.
-    guard let monday = self.next(.monday, direction: .backward, considerSelf: true) else { return nil }
+    guard let monday = self.next(.monday, direction: .backward, considerSelf: true) else {
+      return nil
+    }
 
     return DAU.dateFormatter.string(from: monday)
   }
 
-  private func next(_ weekday: Weekday, direction: Calendar.SearchDirection = .forward, considerSelf: Bool = false) -> Date? {
+  private func next(
+    _ weekday: Weekday,
+    direction: Calendar.SearchDirection = .forward,
+    considerSelf: Bool = false
+  ) -> Date? {
     let calendar = DAU.calendar
     let components = DateComponents(weekday: weekday.rawValue)
 
@@ -351,10 +359,17 @@ extension Date {
       after: self,
       matching: components,
       matchingPolicy: .nextTime,
-      direction: direction)
+      direction: direction
+    )
   }
 
   enum Weekday: Int {
-    case sunday = 1, monday, tuesday, wednesday, thursday, friday, saturday
+    case sunday = 1
+    case monday
+    case tuesday
+    case wednesday
+    case thursday
+    case friday
+    case saturday
   }
 }

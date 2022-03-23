@@ -14,7 +14,6 @@ import Storage
 private let log = Logger.browserLogger
 
 class BraveCoreMigrator {
-
   // MARK: Migration State
 
   enum MigrationState {
@@ -32,11 +31,11 @@ class BraveCoreMigrator {
     case failedPasswordMigration
 
     public var failureReason: String {
-      return Strings.Sync.v2MigrationErrorTitle
+      Strings.Sync.v2MigrationErrorTitle
     }
 
     public var errorDescription: String {
-      return Strings.Sync.v2MigrationErrorMessage
+      Strings.Sync.v2MigrationErrorMessage
     }
   }
 
@@ -95,7 +94,9 @@ class BraveCoreMigrator {
       } else {
         self.bookmarkObserver = self.bookmarksAPI.add(
           BookmarksModelLoadedObserver({ [weak self] in
-            guard let self = self else { return }
+            guard let self = self else {
+              return
+            }
             self.bookmarkObserver?.destroy()
             self.bookmarkObserver = nil
 
@@ -104,7 +105,8 @@ class BraveCoreMigrator {
             // self.migrate() { _ in
             didFinishTest = true
             // }
-          }))
+          })
+        )
       }
     }
 
@@ -165,7 +167,6 @@ class BraveCoreMigrator {
 // MARK: Bookmarks Migration
 
 extension BraveCoreMigrator {
-
   private func migrateBookmarkModels(_ completion: @escaping (Bool) -> Void) {
     if !Preferences.Chromium.syncV2BookmarksMigrationCompleted.value {
       // If the bookmark model has already loaded, the observer does NOT get called!
@@ -178,14 +179,17 @@ extension BraveCoreMigrator {
         // Wait for the bookmark model to load before we attempt to perform migration!
         self.bookmarkObserver = bookmarksAPI.add(
           BookmarksModelLoadedObserver({ [weak self] in
-            guard let self = self else { return }
+            guard let self = self else {
+              return
+            }
             self.bookmarkObserver?.destroy()
             self.bookmarkObserver = nil
 
             self.performBookmarkMigrationIfNeeded { success in
               completion(success)
             }
-          }))
+          })
+        )
       }
     } else {
       completion(true)
@@ -195,10 +199,12 @@ extension BraveCoreMigrator {
   private func performBookmarkMigrationIfNeeded(_ completion: ((Bool) -> Void)?) {
     log.info("Migrating to Chromium Bookmarks v1 - Exporting")
     exportBookmarks { [weak self] success in
-      guard let self = self else { return }
+      guard let self = self else {
+        return
+      }
       if success {
         log.info("Migrating to Chromium Bookmarks v1 - Start")
-        self.migrateBookmarks() { success in
+        self.migrateBookmarks { success in
           Preferences.Chromium.syncV2BookmarksMigrationCompleted.value = success
 
           if let url = self.bookmarksURL {
@@ -244,7 +250,11 @@ extension BraveCoreMigrator {
     }
   }
 
-  private func migrateChromiumBookmarks(context: NSManagedObjectContext, bookmark: LegacyBookmark, chromiumBookmark: BookmarkNode) -> Bool {
+  private func migrateChromiumBookmarks(
+    context: NSManagedObjectContext,
+    bookmark: LegacyBookmark,
+    chromiumBookmark: BookmarkNode
+  ) -> Bool {
     guard let title = bookmark.isFolder ? bookmark.customTitle : bookmark.title else {
       log.error("Invalid Bookmark Title")
       return false
@@ -289,7 +299,6 @@ extension BraveCoreMigrator {
 // MARK: - History Migration
 
 extension BraveCoreMigrator {
-
   private func migrateHistoryModels(_ completion: @escaping (Bool) -> Void) {
     if !Preferences.Chromium.syncV2HistoryMigrationCompleted.value {
       // If the history model has already loaded, the observer does NOT get called!
@@ -302,14 +311,17 @@ extension BraveCoreMigrator {
         // Wait for the history service to load before we attempt to perform migration!
         self.historyObserver = historyAPI.add(
           HistoryServiceLoadedObserver({ [weak self] in
-            guard let self = self else { return }
+            guard let self = self else {
+              return
+            }
             self.historyObserver?.destroy()
             self.historyObserver = nil
 
             self.performHistoryMigrationIfNeeded { success in
               completion(success)
             }
-          }))
+          })
+        )
       }
     } else {
       completion(true)
@@ -318,7 +330,7 @@ extension BraveCoreMigrator {
 
   private func performHistoryMigrationIfNeeded(_ completion: ((Bool) -> Void)?) {
     log.info("Migrating to Chromium History v1 - Start")
-    migrateHistory() { success in
+    migrateHistory { success in
       Preferences.Chromium.syncV2HistoryMigrationCompleted.value = success
       completion?(success)
     }
@@ -344,8 +356,8 @@ extension BraveCoreMigrator {
 
   private func migrateChromiumHistory(history: History) -> Bool {
     guard let title = history.title,
-      let absoluteUrl = history.url, let url = URL(string: absoluteUrl),
-      let dateAdded = history.visitedOn
+          let absoluteUrl = history.url, let url = URL(string: absoluteUrl),
+          let dateAdded = history.visitedOn
     else {
       log.error("Invalid History Specifics")
       return false
@@ -361,7 +373,6 @@ extension BraveCoreMigrator {
 // MARK: - Password Migration
 
 extension BraveCoreMigrator {
-
   private func migratePasswordForms(_ completion: @escaping (Bool) -> Void) {
     Preferences.Chromium.syncV2PasswordMigrationStarted.value = true
 
@@ -376,7 +387,7 @@ extension BraveCoreMigrator {
 
   private func performPasswordMigrationIfNeeded(_ completion: ((Bool) -> Void)?) {
     log.info("Migrating to Chromium Password v1 - Start")
-    migratePasswords() { success in
+    migratePasswords { success in
       Preferences.Chromium.syncV2PasswordMigrationCompleted.value = success
       completion?(success)
     }
@@ -384,7 +395,9 @@ extension BraveCoreMigrator {
 
   private func migratePasswords(_ completion: @escaping (_ success: Bool) -> Void) {
     profile.logins.getAllLogins() >>== { [weak self] results in
-      guard let self = self else { return }
+      guard let self = self else {
+        return
+      }
 
       for login in results.asArray() {
         if self.migrateChromiumPasswords(login: login) {
@@ -409,9 +422,9 @@ extension BraveCoreMigrator {
 
   private func migrateChromiumPasswords(login: Login) -> Bool {
     guard let formSubmitURLString = login.formSubmitURL,
-      let formSubmitURL = URL(string: formSubmitURLString),
-      let originURLString = formSubmitURL.origin,
-      let originURL = URL(string: originURLString)
+          let formSubmitURL = URL(string: formSubmitURLString),
+          let originURLString = formSubmitURL.origin,
+          let originURL = URL(string: originURLString)
     else {
       return false
     }
@@ -427,7 +440,8 @@ extension BraveCoreMigrator {
       passwordElement: login.password,
       passwordValue: login.password,
       isBlockedByUser: false,
-      scheme: .typeHtml)
+      scheme: .typeHtml
+    )
 
     DispatchQueue.main.async {
       self.passwordAPI.addLogin(loginForm)
@@ -440,7 +454,6 @@ extension BraveCoreMigrator {
 // MARK: - Bookmarks Export
 
 extension BraveCoreMigrator {
-
   public var bookmarksURL: URL? {
     let paths = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)
     guard let documentsDirectory = paths.first else {
@@ -478,7 +491,10 @@ extension BraveCoreMigrator {
   }
 
   public func exportBookmarks(to url: URL, _ completion: @escaping (_ success: Bool) -> Void) {
-    self.dataImportExporter.exportBookmarks(to: url, bookmarks: LegacyBookmarksHelper.getTopLevelLegacyBookmarks().sorted(by: { $0.order < $1.order })) { success in
+    self.dataImportExporter.exportBookmarks(
+      to: url,
+      bookmarks: LegacyBookmarksHelper.getTopLevelLegacyBookmarks().sorted(by: { $0.order < $1.order })
+    ) { success in
       completion(success)
     }
   }
@@ -488,7 +504,10 @@ extension BraveCoreMigrator {
       return completion(false)
     }
 
-    self.dataImportExporter.exportBookmarks(to: url, bookmarks: LegacyBookmarksHelper.getTopLevelLegacyBookmarks().sorted(by: { $0.order < $1.order })) { success in
+    self.dataImportExporter.exportBookmarks(
+      to: url,
+      bookmarks: LegacyBookmarksHelper.getTopLevelLegacyBookmarks().sorted(by: { $0.order < $1.order })
+    ) { success in
       completion(success)
     }
   }
@@ -497,7 +516,6 @@ extension BraveCoreMigrator {
 // MARK: Model Observer
 
 extension BraveCoreMigrator {
-
   class BookmarksModelLoadedObserver: NSObject & BookmarkModelObserver {
     private let onModelLoaded: () -> Void
 

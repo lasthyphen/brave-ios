@@ -84,11 +84,12 @@ struct ManageWebsiteDataView: View {
           withAnimation {
             self.dataRecords =
               records
-              .filter { $0.displayName != "localhost" }
-              .sorted(by: { $0.displayName < $1.displayName })
+                .filter { $0.displayName != "localhost" }
+                .sorted(by: { $0.displayName < $1.displayName })
             self.isLoading = false
           }
-        })
+        }
+      )
   }
 
   var body: some View {
@@ -123,7 +124,8 @@ struct ManageWebsiteDataView: View {
                     .modifier(
                       SwipeActionsViewModifier_FB9812596 {
                         removeRecords([record])
-                      })
+                      }
+                    )
                 } else {
                   content
                 }
@@ -199,7 +201,7 @@ private func localizedStringForDataRecordType(_ type: String) -> String? {
   case WKWebsiteDataTypeCookies:
     return Strings.dataRecordCookies
   case WKWebsiteDataTypeDiskCache, WKWebsiteDataTypeMemoryCache, WKWebsiteDataTypeFetchCache,
-    WKWebsiteDataTypeOfflineWebApplicationCache, WKWebsiteDataTypeServiceWorkerRegistrations:
+       WKWebsiteDataTypeOfflineWebApplicationCache, WKWebsiteDataTypeServiceWorkerRegistrations:
     return Strings.dataRecordCache
   case WKWebsiteDataTypeLocalStorage, WKWebsiteDataTypeSessionStorage:
     return Strings.dataRecordLocalStorage

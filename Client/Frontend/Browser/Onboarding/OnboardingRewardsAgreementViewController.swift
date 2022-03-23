@@ -37,7 +37,7 @@ class OnboardingRewardsAgreementViewController: UIViewController {
   required init(coder: NSCoder) { fatalError() }
 
   private var contentView: View {
-    return view as! View  // swiftlint:disable:this force_cast
+    view as! View // swiftlint:disable:this force_cast
   }
 
   override func loadView() {
@@ -53,13 +53,25 @@ class OnboardingRewardsAgreementViewController: UIViewController {
     contentView.skipButton.addTarget(self, action: #selector(skipTapped), for: .touchUpInside)
 
     contentView.onTermsOfServicePressed = { [weak self] in
-      guard let self = self else { return }
-      self.present(OnboardingWebViewController(profile: self.profile, url: .termsOfService), animated: true, completion: nil)
+      guard let self = self else {
+        return
+      }
+      self.present(
+        OnboardingWebViewController(profile: self.profile, url: .termsOfService),
+        animated: true,
+        completion: nil
+      )
     }
 
     contentView.onPrivacyPolicyPressed = { [weak self] in
-      guard let self = self else { return }
-      self.present(OnboardingWebViewController(profile: self.profile, url: .privacyPolicy), animated: true, completion: nil)
+      guard let self = self else {
+        return
+      }
+      self.present(
+        OnboardingWebViewController(profile: self.profile, url: .privacyPolicy),
+        animated: true,
+        completion: nil
+      )
     }
   }
 
@@ -79,7 +91,6 @@ class OnboardingRewardsAgreementViewController: UIViewController {
 
 extension OnboardingRewardsAgreementViewController {
   class View: UIView {
-
     var onTermsOfServicePressed: (() -> Void)?
     var onPrivacyPolicyPressed: (() -> Void)?
 
@@ -175,7 +186,8 @@ extension OnboardingRewardsAgreementViewController {
           attributes: [
             .font: UIFont.systemFont(ofSize: fontSize, weight: UIFont.Weight.regular),
             .foregroundColor: UIColor.braveLabel,
-          ])
+          ]
+        )
 
         text.append(
           NSAttributedString(
@@ -183,7 +195,9 @@ extension OnboardingRewardsAgreementViewController {
             attributes: [
               .font: UIFont.systemFont(ofSize: fontSize, weight: UIFont.Weight.regular),
               .foregroundColor: UIColor.braveLabel,
-            ]))
+            ]
+          )
+        )
 
         text.append(
           NSAttributedString(
@@ -192,7 +206,9 @@ extension OnboardingRewardsAgreementViewController {
               .font: UIFont.systemFont(ofSize: fontSize, weight: UIFont.Weight.regular),
               .foregroundColor: OnboardingCommon.UX.linkColor,
               .link: "brave_terms_of_service",
-            ]))
+            ]
+          )
+        )
 
         text.append(
           NSAttributedString(
@@ -200,7 +216,9 @@ extension OnboardingRewardsAgreementViewController {
             attributes: [
               .font: UIFont.systemFont(ofSize: fontSize, weight: UIFont.Weight.regular),
               .foregroundColor: UIColor.braveLabel,
-            ]))
+            ]
+          )
+        )
 
         text.append(
           NSAttributedString(
@@ -209,7 +227,9 @@ extension OnboardingRewardsAgreementViewController {
               .font: UIFont.systemFont(ofSize: fontSize, weight: UIFont.Weight.regular),
               .foregroundColor: OnboardingCommon.UX.linkColor,
               .link: "brave_privacy_policy",
-            ]))
+            ]
+          )
+        )
 
         let paragraphStyle = NSMutableParagraphStyle()
         paragraphStyle.lineBreakMode = .byWordWrapping
@@ -231,7 +251,8 @@ extension OnboardingRewardsAgreementViewController {
       subTitle.addAttribute(
         .foregroundColor,
         value: UIColor.braveLabel,
-        range: NSRange(location: 0, length: subTitle.length))
+        range: NSRange(location: 0, length: subTitle.length)
+      )
       self.subtitleLabel.attributedText = subTitle
     }
 
@@ -272,7 +293,12 @@ extension OnboardingRewardsAgreementViewController {
 
       // Design wants LESS offset on iPhone 8 than on iPhone X
       let offset = self.safeAreaInsets.top > 30 ? 0 : -OnboardingCommon.UX.animationContentInset
-      imageView.frame = CGRect(x: 0.0, y: OnboardingCommon.UX.animationContentInset + offset, width: newSize.width, height: newSize.height)
+      imageView.frame = CGRect(
+        x: 0.0,
+        y: OnboardingCommon.UX.animationContentInset + offset,
+        width: newSize.width,
+        height: newSize.height
+      )
     }
 
     @available(*, unavailable)
@@ -284,7 +310,12 @@ extension OnboardingRewardsAgreementViewController {
 
 extension OnboardingRewardsAgreementViewController.View: UITextViewDelegate {
   @objc
-  func textView(_ textView: UITextView, shouldInteractWith URL: URL, in characterRange: NSRange, interaction: UITextItemInteraction) -> Bool {
+  func textView(
+    _ textView: UITextView,
+    shouldInteractWith URL: URL,
+    in characterRange: NSRange,
+    interaction: UITextItemInteraction
+  ) -> Bool {
     if URL.absoluteString == "brave_terms_of_service" {
       onTermsOfServicePressed?()
     } else if URL.absoluteString == "brave_privacy_policy" {
@@ -304,24 +335,24 @@ extension OnboardingRewardsAgreementViewController.View: UITextViewDelegate {
 // Disabling orientation changes
 extension OnboardingRewardsAgreementViewController {
   override var preferredStatusBarStyle: UIStatusBarStyle {
-    return .default
+    .default
   }
 
   override var supportedInterfaceOrientations: UIInterfaceOrientationMask {
-    return .portrait
+    .portrait
   }
 
   override var preferredInterfaceOrientationForPresentation: UIInterfaceOrientation {
-    return .portrait
+    .portrait
   }
 
   override var shouldAutorotate: Bool {
-    return false
+    false
   }
 }
 
-private extension String {
-  func boldWords(with font: UIFont, amount: Int) -> NSMutableAttributedString {
+extension String {
+  fileprivate func boldWords(with font: UIFont, amount: Int) -> NSMutableAttributedString {
     let mutableDescriptionText = NSMutableAttributedString(string: self)
 
     let components = self.components(separatedBy: " ")

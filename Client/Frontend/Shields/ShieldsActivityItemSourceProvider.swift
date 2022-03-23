@@ -20,7 +20,6 @@ public enum ActivityTypeValue: String, CaseIterable {
 // MARK: - ShieldsActivityItemSourceProvider
 
 final class ShieldsActivityItemSourceProvider {
-
   static let shared = ShieldsActivityItemSourceProvider()
 
   func setupGlobalShieldsActivityController() -> UIActivityViewController {
@@ -52,34 +51,36 @@ final class ShieldsActivityItemSourceProvider {
     contentView.addSubview(statsView)
     statsView.frame = CGRect(
       origin: .zero,
-      size: CGSize(width: statsView.frame.width, height: statsView.frame.height))
+      size: CGSize(width: statsView.frame.width, height: statsView.frame.height)
+    )
 
     let snapshotImage = statsView.snapshot
     let snapshotImageWithText =
       contentView.snapshot.textToImage(
         drawText: Strings.ShieldEducation.shareDescriptionTitle,
-        atPoint: CGPoint(x: 0, y: statsView.frame.height + 20)) ?? snapshotImage
+        atPoint: CGPoint(x: 0, y: statsView.frame.height + 20)
+      ) ?? snapshotImage
 
     let activityViewController = UIActivityViewController(
       activityItems: [
         ImageActivityItemSource(
           image: snapshotImage,
-          imageWithText: snapshotImageWithText),
+          imageWithText: snapshotImageWithText
+        ),
         OptionalTextActivityItemSource(text: Strings.ShieldEducation.shareDescriptionTitle),
       ],
-      applicationActivities: nil)
+      applicationActivities: nil
+    )
 
     activityViewController.excludedActivityTypes = [.openInIBooks, .saveToCameraRoll, .assignToContact]
 
     return activityViewController
   }
-
 }
 
 // MARK: - OptionalTextActivityItemSource
 
 class OptionalTextActivityItemSource: NSObject, UIActivityItemSource {
-
   let text: String
 
   weak var viewController: UIViewController?
@@ -91,10 +92,13 @@ class OptionalTextActivityItemSource: NSObject, UIActivityItemSource {
   }
 
   func activityViewControllerPlaceholderItem(_ activityViewController: UIActivityViewController) -> Any {
-    return text
+    text
   }
 
-  func activityViewController(_ activityViewController: UIActivityViewController, itemForActivityType activityType: UIActivity.ActivityType?) -> Any? {
+  func activityViewController(
+    _ activityViewController: UIActivityViewController,
+    itemForActivityType activityType: UIActivity.ActivityType?
+  ) -> Any? {
     let activityValueType = ActivityTypeValue.allCases.first(where: { $0.rawValue == activityType?.rawValue })
 
     return activityValueType == nil ? text : nil
@@ -115,10 +119,13 @@ class ImageActivityItemSource: NSObject, UIActivityItemSource {
   }
 
   func activityViewControllerPlaceholderItem(_ activityViewController: UIActivityViewController) -> Any {
-    return image
+    image
   }
 
-  func activityViewController(_ activityViewController: UIActivityViewController, itemForActivityType activityType: UIActivity.ActivityType?) -> Any? {
+  func activityViewController(
+    _ activityViewController: UIActivityViewController,
+    itemForActivityType activityType: UIActivity.ActivityType?
+  ) -> Any? {
     let activityValueType = ActivityTypeValue.allCases.first(where: { $0.rawValue == activityType?.rawValue })
 
     return activityValueType == nil ? image : imageWithText

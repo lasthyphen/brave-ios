@@ -29,8 +29,8 @@ class NTPDownloader {
       // This should _probably_ correspond host for URP
       let baseUrl =
         buildChannel.isPublic
-        ? "https://mobile-data.s3.brave.com/"
-        : "https://mobile-data-dev.s3.brave.software"
+          ? "https://mobile-data.s3.brave.com/"
+          : "https://mobile-data-dev.s3.brave.software"
 
       switch self {
       case .superReferral(let code):
@@ -38,7 +38,9 @@ class NTPDownloader {
           .appendingPathComponent("superreferrer")
           .appendingPathComponent(code)
       case .sponsor:
-        guard let region = locale.regionCode else { return nil }
+        guard let region = locale.regionCode else {
+          return nil
+        }
         let url = URL(string: baseUrl)?
           .appendingPathComponent(region)
           .appendingPathComponent("ios")
@@ -60,7 +62,9 @@ class NTPDownloader {
         let baseUrl = FileManager.default
           .urls(for: .applicationSupportDirectory, in: .userDomainMask).first?
           .appendingPathComponent(self.saveTopFolderName)
-      else { return nil }
+      else {
+        return nil
+      }
 
       switch self {
       case .sponsor:
@@ -89,8 +93,7 @@ class NTPDownloader {
     }
 
     if let retryDeadline = Preferences.NewTabPage.superReferrerThemeRetryDeadline.value,
-      let refCode = Preferences.URP.referralCode.value {
-
+       let refCode = Preferences.URP.referralCode.value {
       if Date() < retryDeadline {
         return .superReferral(code: refCode)
       }
@@ -116,7 +119,9 @@ class NTPDownloader {
   }
 
   func preloadCustomTheme() {
-    guard let themeId = Preferences.NewTabPage.selectedCustomTheme.value else { return }
+    guard let themeId = Preferences.NewTabPage.selectedCustomTheme.value else {
+      return
+    }
     let customTheme = loadNTPResource(for: .superReferral(code: themeId)) as? CustomTheme
 
     delegate?.preloadCustomTheme(theme: customTheme)
@@ -125,8 +130,7 @@ class NTPDownloader {
   private func getNTPResource(for type: ResourceType) async throws -> NTPThemeable? {
     // Load from cache because the time since the last fetch hasn't expired yet..
     if let nextDate = Preferences.NTP.ntpCheckDate.value,
-      Date().timeIntervalSince1970 - nextDate < 0 {
-
+       Date().timeIntervalSince1970 - nextDate < 0 {
       if self.timer == nil {
         let relativeTime = abs(Date().timeIntervalSince1970 - nextDate)
         self.scheduleObservers(relativeTime: relativeTime)
@@ -153,7 +157,9 @@ class NTPDownloader {
 
       // Move contents of `url` directory
       // to somewhere more permanent where we'll load the images from..
-      guard let saveLocation = type.saveLocation else { throw "Can't find location to save" }
+      guard let saveLocation = type.saveLocation else {
+        throw "Can't find location to save"
+      }
 
       try FileManager.default.createDirectory(at: saveLocation, withIntermediateDirectories: true, attributes: nil)
 
@@ -220,9 +226,10 @@ class NTPDownloader {
       }
 
       let baseTime = 1.hours
-      let minVariance = 1.10  // 10% variance
-      let maxVariance = 1.14  // 14% variance
-      return baseTime * Double.random(in: ClosedRange<Double>(uncheckedBounds: (lower: minVariance, upper: maxVariance)))
+      let minVariance = 1.10 // 10% variance
+      let maxVariance = 1.14 // 14% variance
+      return baseTime * Double
+        .random(in: ClosedRange<Double>(uncheckedBounds: (lower: minVariance, upper: maxVariance)))
     }()
 
     Preferences.NTP.ntpCheckDate.value = Date().timeIntervalSince1970 + relativeTime
@@ -249,22 +256,33 @@ class NTPDownloader {
       self?.notifyObservers(for: resourceType)
     }
 
-    self.backgroundObserver = NotificationCenter.default.addObserver(forName: UIApplication.willResignActiveNotification, object: nil, queue: .main) { [weak self] _ in
-      guard let self = self else { return }
+    self.backgroundObserver = NotificationCenter.default.addObserver(
+      forName: UIApplication.willResignActiveNotification,
+      object: nil,
+      queue: .main
+    ) { [weak self] _ in
+      guard let self = self else {
+        return
+      }
       self.timer?.invalidate()
       self.timer = nil
     }
 
-    self.foregroundObserver = NotificationCenter.default.addObserver(forName: UIApplication.didBecomeActiveNotification, object: nil, queue: .main) { [weak self] _ in
-      guard let self = self else { return }
+    self.foregroundObserver = NotificationCenter.default.addObserver(
+      forName: UIApplication.didBecomeActiveNotification,
+      object: nil,
+      queue: .main
+    ) { [weak self] _ in
+      guard let self = self else {
+        return
+      }
 
       self.timer?.invalidate()
       self.timer = nil
 
       // If the time hasn't passed yet, reschedule the timer with the relative time..
       if let nextDate = Preferences.NTP.ntpCheckDate.value,
-        Date().timeIntervalSince1970 - nextDate < 0 {
-
+         Date().timeIntervalSince1970 - nextDate < 0 {
         let relativeTime = abs(Date().timeIntervalSince1970 - nextDate)
         self.timer = Timer.scheduledTimer(withTimeInterval: relativeTime, repeats: true) { [weak self] _ in
           self?.notifyObservers(for: resourceType)
@@ -285,7 +303,9 @@ class NTPDownloader {
 
       let metadata = try Data(contentsOf: metadataFileURL)
 
-      guard let downloadsFolderURL = type.saveLocation else { throw "Can't find location to save" }
+      guard let downloadsFolderURL = type.saveLocation else {
+        throw "Can't find location to save"
+      }
 
       switch type {
       case .sponsor:
@@ -311,7 +331,8 @@ class NTPDownloader {
         let fullPathCampaigns = campaigns.map {
           NTPCampaign(
             wallpapers: mapNTPWallpapersToFullPath($0.wallpapers, basePath: downloadsFolderURL),
-            logo: mapNTPLogoToFullPath($0.logo, basePath: downloadsFolderURL))
+            logo: mapNTPLogoToFullPath($0.logo, basePath: downloadsFolderURL)
+          )
         }
 
         return NTPSponsor(schemaVersion: 1, campaigns: fullPathCampaigns)
@@ -330,7 +351,8 @@ class NTPDownloader {
 
         return CustomTheme(
           themeName: customTheme.themeName, wallpapers: wallpapers,
-          logo: logo, topSites: customTheme.topSites, refCode: code)
+          logo: logo, topSites: customTheme.topSites, refCode: code
+        )
       }
     } catch {
       logger.error(error)
@@ -343,7 +365,8 @@ class NTPDownloader {
     wallpapers.map {
       NTPWallpaper(
         imageUrl: basePath.appendingPathComponent($0.imageUrl).path, logo: $0.logo,
-        focalPoint: $0.focalPoint, creativeInstanceId: $0.creativeInstanceId)
+        focalPoint: $0.focalPoint, creativeInstanceId: $0.creativeInstanceId
+      )
     }
   }
 
@@ -354,7 +377,8 @@ class NTPDownloader {
 
     return NTPLogo(
       imageUrl: basePath.appendingPathComponent(logo.imageUrl).path, alt: logo.alt,
-      companyName: logo.companyName, destinationUrl: logo.destinationUrl)
+      companyName: logo.companyName, destinationUrl: logo.destinationUrl
+    )
   }
 
   private func getETag(type: ResourceType) -> String? {
@@ -389,7 +413,9 @@ class NTPDownloader {
 
   func removeCampaign(type: ResourceType) throws {
     try self.removeETag(type: type)
-    guard let saveLocation = type.saveLocation else { throw "Can't find location to save" }
+    guard let saveLocation = type.saveLocation else {
+      throw "Can't find location to save"
+    }
 
     switch type {
     case .superReferral(let code):
@@ -417,7 +443,8 @@ class NTPDownloader {
       (data, cacheInfo) = try await download(
         type: type,
         path: type.resourceName,
-        etag: getETag(type: type))
+        etag: getETag(type: type)
+      )
     } catch {
       throw NTPError.metadataError(error)
     }
@@ -473,7 +500,8 @@ class NTPDownloader {
       request.setValue(etag, forHTTPHeaderField: "If-None-Match")
     }
 
-    let (data, response) = try await NetworkManager(session: URLSession(configuration: .ephemeral)).dataRequest(with: request)
+    let (data, response) = try await NetworkManager(session: URLSession(configuration: .ephemeral))
+      .dataRequest(with: request)
 
     guard let response = response as? HTTPURLResponse else {
       throw "Response is not an HTTP Response"
@@ -489,7 +517,8 @@ class NTPDownloader {
   // Unpacks NTPResource by downloading all of its assets to a temporary directory
   // and returning the URL to the directory
   private func unpackMetadata(type: ResourceType, data: Data) async throws -> URL {
-    func decodeAndSave(type: ResourceType) throws -> (wallpapers: [NTPWallpaper], logos: [NTPLogo], topSites: [CustomTheme.TopSite]?) {
+    func decodeAndSave(type: ResourceType) throws
+    -> (wallpapers: [NTPWallpaper], logos: [NTPLogo], topSites: [CustomTheme.TopSite]?) {
       switch type {
       case .sponsor:
         let schema = try JSONDecoder().decode(NTPSchema.self, from: data)
@@ -531,8 +560,8 @@ class NTPDownloader {
 
       var imagesToDownload = [String]()
 
-      imagesToDownload.append(contentsOf: item.logos.map { $0.imageUrl })
-      imagesToDownload.append(contentsOf: item.wallpapers.map { $0.imageUrl })
+      imagesToDownload.append(contentsOf: item.logos.map(\.imageUrl))
+      imagesToDownload.append(contentsOf: item.wallpapers.map(\.imageUrl))
       imagesToDownload.append(contentsOf: item.wallpapers.compactMap { $0.logo?.imageUrl })
 
       try await withThrowingTaskGroup(
@@ -550,7 +579,7 @@ class NTPDownloader {
             /// For favicons we do not move them to temp directory but write directly to a folder with favicon overrides.
             guard
               let saveLocation =
-                FileManager.default.getOrCreateFolder(name: NTPDownloader.faviconOverridesDirectory)
+              FileManager.default.getOrCreateFolder(name: NTPDownloader.faviconOverridesDirectory)
             else {
               throw "Failed to create directory for favicon overrides"
             }
@@ -570,11 +599,13 @@ class NTPDownloader {
 
                 try topSite.backgroundColor.write(
                   to: topSiteBackgroundColorURL,
-                  atomically: true, encoding: .utf8)
+                  atomically: true, encoding: .utf8
+                )
               }
             }
           }
-        })
+        }
+      )
       return directory
     } catch {
       throw NTPError.unpackError(error)
@@ -582,27 +613,31 @@ class NTPDownloader {
   }
 
   private func ntpETagFileURL(type: ResourceType) throws -> URL {
-    guard let saveLocation = type.saveLocation else { throw "Can't find location to save" }
+    guard let saveLocation = type.saveLocation else {
+      throw "Can't find location to save"
+    }
     return saveLocation.appendingPathComponent(NTPDownloader.etagFile)
   }
 
   private func ntpMetadataFileURL(type: ResourceType) throws -> URL {
-    guard let saveLocation = type.saveLocation else { throw "Can't find location to save" }
+    guard let saveLocation = type.saveLocation else {
+      throw "Can't find location to save"
+    }
     return saveLocation.appendingPathComponent(type.resourceName)
   }
 
   static func isSponsorCampaignEnded(data: Data) -> Bool {
     var hasWallpapers = false
     if let json = try? JSONSerialization.jsonObject(with: data, options: []) as? [String: Any],
-      let wallpapers = json["wallpapers"] as? [[String: Any]],
-      wallpapers.count > 0 {
+       let wallpapers = json["wallpapers"] as? [[String: Any]],
+       wallpapers.count > 0 {
       hasWallpapers = true
     }
 
     var hasCampaigns = false
     if let json = try? JSONSerialization.jsonObject(with: data, options: []) as? [String: Any],
-      let campaigns = json["campaigns"] as? [[String: Any]],
-      campaigns.count > 0 {
+       let campaigns = json["campaigns"] as? [[String: Any]],
+       campaigns.count > 0 {
       hasCampaigns = true
     }
 
@@ -615,8 +650,8 @@ class NTPDownloader {
 
   static func isSuperReferralCampaignEnded(data: Data) -> Bool {
     guard let json = try? JSONSerialization.jsonObject(with: data, options: []) as? [String: Any],
-      let wallpapers = json["wallpapers"] as? [[String: Any]],
-      wallpapers.count > 0
+          let wallpapers = json["wallpapers"] as? [[String: Any]],
+          wallpapers.count > 0
     else {
       return true
     }
@@ -641,8 +676,8 @@ class NTPDownloader {
         return nil
 
       case .metadataError(let error),
-        .unpackError(let error),
-        .loadingError(let error):
+           .unpackError(let error),
+           .loadingError(let error):
         return error
       }
     }

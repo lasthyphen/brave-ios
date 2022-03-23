@@ -12,7 +12,7 @@ import BraveCore
 private let braveCoreLogger = Logger.braveCoreLogger
 private let browserLogger = Logger.browserLogger
 
-fileprivate class LogLineCell: UITableViewCell, TableViewReusable {
+private class LogLineCell: UITableViewCell, TableViewReusable {
   override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
     super.init(style: .subtitle, reuseIdentifier: reuseIdentifier)
     textLabel?.font = .systemFont(ofSize: 12, weight: .regular)
@@ -21,6 +21,7 @@ fileprivate class LogLineCell: UITableViewCell, TableViewReusable {
     detailTextLabel?.numberOfLines = 0
     selectionStyle = .none
   }
+
   @available(*, unavailable)
   required init(coder: NSCoder) {
     fatalError()
@@ -34,9 +35,11 @@ class RewardsInternalsLogController: UITableViewController {
 
     init?(from line: String) {
       let logPrefix = #"^[0-9]{4}-[0-9]{2}-[0-9]{2}[^>]+"#
-      if let range = line.range(of: logPrefix, options: .regularExpression, range: line.startIndex..<line.endIndex), !range.isEmpty {
+      if let range = line.range(of: logPrefix, options: .regularExpression, range: line.startIndex..<line.endIndex),
+         !range.isEmpty {
         metadata = line[range].trimmingCharacters(in: .whitespacesAndNewlines)
-        message = line[line.index(range.upperBound, offsetBy: 1)..<line.endIndex].trimmingCharacters(in: .whitespacesAndNewlines)
+        message = line[line.index(range.upperBound, offsetBy: 1)..<line.endIndex]
+          .trimmingCharacters(in: .whitespacesAndNewlines)
       } else {
         metadata = nil
         message = line
@@ -79,7 +82,11 @@ class RewardsInternalsLogController: UITableViewController {
     tableView.register(LogLineCell.self)
     tableView.estimatedRowHeight = UITableView.automaticDimension
 
-    navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .action, target: self, action: #selector(tappedShare)).then {
+    navigationItem.rightBarButtonItem = UIBarButtonItem(
+      barButtonSystemItem: .action,
+      target: self,
+      action: #selector(tappedShare)
+    ).then {
       $0.accessibilityLabel = Strings.RewardsInternals.shareInternalsTitle
     }
     toolbarItems = [
@@ -105,7 +112,11 @@ class RewardsInternalsLogController: UITableViewController {
   }
 
   @objc private func clearLogs(_ sender: UIBarButtonItem) {
-    let alert = UIAlertController(title: Strings.RewardsInternals.clearLogsTitle, message: Strings.RewardsInternals.clearLogsConfirmation, preferredStyle: .actionSheet)
+    let alert = UIAlertController(
+      title: Strings.RewardsInternals.clearLogsTitle,
+      message: Strings.RewardsInternals.clearLogsConfirmation,
+      preferredStyle: .actionSheet
+    )
     alert.addAction(
       UIAlertAction(
         title: Strings.yes, style: .destructive,
@@ -117,10 +128,13 @@ class RewardsInternalsLogController: UITableViewController {
               // Same as debug log, Rewards framework handles function names in message
               destination.showFunctionName = false
               destination.showThreadName = false
-            })
+            }
+          )
           self.lines = []
           self.tableView.reloadData()
-        }))
+        }
+      )
+    )
     alert.addAction(UIAlertAction(title: Strings.cancelButtonTitle, style: .cancel, handler: nil))
     alert.popoverPresentationController?.barButtonItem = sender
     alert.popoverPresentationController?.permittedArrowDirections = .any
@@ -146,7 +160,9 @@ class RewardsInternalsLogController: UITableViewController {
         let urls = try braveCoreLogger.logFilenamesAndURLs().map(\.1).reversed()
         for url in urls {
           // If user leaves controller and its dealloc'd no reason to continue reading files
-          if self == nil { return }
+          if self == nil {
+            return
+          }
           let fileURL = URL(fileURLWithPath: url.path)
           do {
             // Load file
@@ -169,7 +185,8 @@ class RewardsInternalsLogController: UITableViewController {
               break
             }
           } catch {
-            browserLogger.error("Failed to load log file: \(fileURL.absoluteString) with error: \(String(describing: error))")
+            browserLogger
+              .error("Failed to load log file: \(fileURL.absoluteString) with error: \(String(describing: error))")
           }
         }
         DispatchQueue.main.async {
@@ -191,13 +208,17 @@ class RewardsInternalsLogController: UITableViewController {
   }
 
   override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-    return lines.count
+    lines.count
   }
 }
 
 /// A file generator that copies all Rewards related log files into the sharable directory
 struct RewardsInternalsLogsGenerator: RewardsInternalsFileGenerator {
-  func generateFiles(at path: String, using builder: RewardsInternalsSharableBuilder, completion: @escaping (Error?) -> Void) {
+  func generateFiles(
+    at path: String,
+    using builder: RewardsInternalsSharableBuilder,
+    completion: @escaping (Error?) -> Void
+  ) {
     do {
       let fileURLs = try braveCoreLogger.logFilenamesAndURLs().map { URL(fileURLWithPath: $0.1.path) }
       for url in fileURLs {

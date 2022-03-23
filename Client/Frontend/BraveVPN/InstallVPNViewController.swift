@@ -9,9 +9,8 @@ import BraveShared
 import Lottie
 
 class InstallVPNViewController: UIViewController {
-
   private var installVPNView: View {
-    return view as! View  // swiftlint:disable:this force_cast
+    view as! View // swiftlint:disable:this force_cast
   }
 
   override func loadView() {
@@ -27,7 +26,10 @@ class InstallVPNViewController: UIViewController {
     title = Strings.VPN.installTitle
     installVPNView.installVPNButton.addTarget(self, action: #selector(installVPNAction), for: .touchUpInside)
     installVPNView.contactSupportButton.addTarget(self, action: #selector(contactSupportAction), for: .touchUpInside)
-    navigationItem.setLeftBarButton(.init(barButtonSystemItem: .cancel, target: self, action: #selector(dismissView)), animated: true)
+    navigationItem.setLeftBarButton(
+      .init(barButtonSystemItem: .cancel, target: self, action: #selector(dismissView)),
+      animated: true
+    )
 
     navigationItem.standardAppearance = BraveVPNCommonUI.navigationBarAppearance
   }
@@ -50,8 +52,10 @@ class InstallVPNViewController: UIViewController {
   @objc func installVPNAction() {
     installVPNView.installVPNButton.isLoading = true
 
-    BraveVPN.connectOrMigrateToNewNode() { [weak self] status in
-      guard let self = self else { return }
+    BraveVPN.connectOrMigrateToNewNode { [weak self] status in
+      guard let self = self else {
+        return
+      }
 
       DispatchQueue.main.async {
         self.installVPNView.installVPNButton.isLoading = false
@@ -72,7 +76,8 @@ class InstallVPNViewController: UIViewController {
 
             let alert = UIAlertController(
               title: Strings.VPN.vpnConfigPermissionDeniedErrorTitle,
-              message: message, preferredStyle: .alert)
+              message: message, preferredStyle: .alert
+            )
             alert.addAction(okAction)
             return alert
           case .loadConfigError, .saveConfigError:
@@ -80,7 +85,8 @@ class InstallVPNViewController: UIViewController {
             let alert = UIAlertController(
               title: Strings.VPN.vpnConfigGenericErrorTitle,
               message: message,
-              preferredStyle: .alert)
+              preferredStyle: .alert
+            )
             alert.addAction(okAction)
             return alert
           }
@@ -108,7 +114,8 @@ class InstallVPNViewController: UIViewController {
       imageView: animation,
       title: Strings.VPN.installSuccessPopup, message: "",
       titleWeight: .semibold, titleSize: 18,
-      dismissHandler: { true })
+      dismissHandler: { true }
+    )
 
     popup.showWithType(showType: .flyUp, autoDismissTime: 1.5)
   }

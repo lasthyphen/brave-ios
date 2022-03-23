@@ -48,7 +48,7 @@ class CreatePDFActivity: UIActivity {
   }
 
   override func canPerform(withActivityItems activityItems: [Any]) -> Bool {
-    return true
+    true
   }
 }
 

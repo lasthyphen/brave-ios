@@ -12,9 +12,11 @@ public class AdView: UIView {
   let openSwipeButton = AdSwipeButton(contentType: .text(Strings.Ads.open, textColor: .white)).then {
     $0.backgroundColor = .braveBlurple
   }
-  let dislikeSwipeButton = AdSwipeButton(contentType: .image(UIImage(imageLiteralResourceName: "dislike-ad-icon"))).then {
-    $0.backgroundColor = .braveErrorLabel
-  }
+
+  let dislikeSwipeButton = AdSwipeButton(contentType: .image(UIImage(imageLiteralResourceName: "dislike-ad-icon")))
+    .then {
+      $0.backgroundColor = .braveErrorLabel
+    }
 
   public override init(frame: CGRect) {
     super.init(frame: frame)
@@ -51,11 +53,16 @@ public class AdView: UIView {
   }
 
   var swipeTranslation: CGFloat {
-    return adContentButton.transform.tx
+    adContentButton.transform.tx
   }
 
   /// Set the horizontal swipe translation
-  func setSwipeTranslation(_ tx: CGFloat, animated: Bool = false, panVelocity: CGFloat? = nil, completionBlock: (() -> Void)? = nil) {
+  func setSwipeTranslation(
+    _ tx: CGFloat,
+    animated: Bool = false,
+    panVelocity: CGFloat? = nil,
+    completionBlock: (() -> Void)? = nil
+  ) {
     if animated {
       adContentButton.layer.springAnimate(property: kPOPLayerTranslationX, key: "translation.x") { animation, _ in
         animation.toValue = tx

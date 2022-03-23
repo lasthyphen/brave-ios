@@ -53,7 +53,8 @@ struct AccountsHeaderView: View {
         NavigationLink(
           destination: WalletSettingsView(
             settingsStore: settingsStore,
-            networkStore: networkStore)
+            networkStore: networkStore
+          )
         ) {
           Label(Strings.Wallet.settings, image: "brave.gear")
             .labelStyle(.iconOnly)
@@ -73,8 +74,8 @@ struct AccountsHeaderView_Previews: PreviewProvider {
       settingsStore: .previewStore,
       networkStore: .previewStore
     )
-    .previewLayout(.sizeThatFits)
-    .previewColorSchemes()
+      .previewLayout(.sizeThatFits)
+      .previewColorSchemes()
   }
 }
 #endif

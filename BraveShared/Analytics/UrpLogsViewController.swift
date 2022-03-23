@@ -13,7 +13,9 @@ public struct UrpLog {
     let calendar = Calendar.current
     let components = calendar.dateComponents([.year, .month, .day, .hour, .minute], from: date)
 
-    guard let year = components.year, let month = components.month, let day = components.day, let hour = components.hour, let minute = components.minute else {
+    guard let year = components.year, let month = components.month, let day = components.day,
+          let hour = components.hour,
+          let minute = components.minute else {
       return
     }
 
@@ -40,7 +42,9 @@ public class UrpLogsViewController: UIViewController {
       make.left.right.bottom.equalTo(self.view).inset(8)
     }
 
-    guard let logs = UserDefaults.standard.string(forKey: UrpLog.prefsKey) else { return }
+    guard let logs = UserDefaults.standard.string(forKey: UrpLog.prefsKey) else {
+      return
+    }
     logsTextView.text = logs
   }
 }

@@ -40,7 +40,7 @@ enum ReaderModeTheme: String {
     case .dark:
       return .darkGray
     case .sepia:
-      return .init(rgb: 0xf0e6dc)  // Light Beige
+      return .init(rgb: 0xf0e6dc) // Light Beige
     case .black:
       return .black
     }
@@ -68,7 +68,7 @@ enum ReaderModeFontSize: Int {
   case size13 = 13
 
   func isSmallest() -> Bool {
-    return self == ReaderModeFontSize.size1
+    self == ReaderModeFontSize.size1
   }
 
   func smaller() -> ReaderModeFontSize {
@@ -80,7 +80,7 @@ enum ReaderModeFontSize: Int {
   }
 
   func isLargest() -> Bool {
-    return self == ReaderModeFontSize.size13
+    self == ReaderModeFontSize.size13
   }
 
   static var defaultSize: ReaderModeFontSize {
@@ -120,12 +120,12 @@ struct ReaderModeStyle {
 
   /// Encode the style to a JSON dictionary that can be passed to ReaderMode.js
   func encode() -> String {
-    return JSON(["theme": theme.rawValue, "fontType": fontType.rawValue, "fontSize": fontSize.rawValue]).stringValue() ?? ""
+    JSON(["theme": theme.rawValue, "fontType": fontType.rawValue, "fontSize": fontSize.rawValue]).stringValue() ?? ""
   }
 
   /// Encode the style to a dictionary that can be stored in the profile
   func encodeAsDictionary() -> [String: Any] {
-    return ["theme": theme.rawValue, "fontType": fontType.rawValue, "fontSize": fontSize.rawValue]
+    ["theme": theme.rawValue, "fontType": fontType.rawValue, "fontSize": fontSize.rawValue]
   }
 
   init(theme: ReaderModeTheme, fontType: ReaderModeFontType, fontSize: ReaderModeFontSize) {
@@ -156,7 +156,11 @@ struct ReaderModeStyle {
   }
 }
 
-let DefaultReaderModeStyle = ReaderModeStyle(theme: .light, fontType: .sansSerif, fontSize: ReaderModeFontSize.defaultSize)
+let DefaultReaderModeStyle = ReaderModeStyle(
+  theme: .light,
+  fontType: .sansSerif,
+  fontSize: ReaderModeFontSize.defaultSize
+)
 
 /// This struct captures the response from the Readability.js code.
 struct ReadabilityResult {
@@ -212,7 +216,7 @@ struct ReadabilityResult {
 
   /// Encode to a dictionary, which can then for example be json encoded
   func encode() -> [String: Any] {
-    return ["domain": domain, "url": url, "content": content, "title": title, "credits": credits]
+    ["domain": domain, "url": url, "content": content, "title": title, "credits": credits]
   }
 
   /// Encode to a JSON encoded string
@@ -226,7 +230,11 @@ struct ReadabilityResult {
 protocol ReaderModeDelegate {
   func readerMode(_ readerMode: ReaderMode, didChangeReaderModeState state: ReaderModeState, forTab tab: Tab)
   func readerMode(_ readerMode: ReaderMode, didDisplayReaderizedContentForTab tab: Tab)
-  func readerMode(_ readerMode: ReaderMode, didParseReadabilityResult readabilityResult: ReadabilityResult, forTab tab: Tab)
+  func readerMode(
+    _ readerMode: ReaderMode,
+    didParseReadabilityResult readabilityResult: ReadabilityResult,
+    forTab tab: Tab
+  )
 }
 
 let ReaderModeNamespace = "window.__firefox__.reader"
@@ -239,7 +247,7 @@ class ReaderMode: TabContentScript {
   fileprivate var originalURL: URL?
 
   class func name() -> String {
-    return "ReaderMode"
+    "ReaderMode"
   }
 
   required init(tab: Tab) {
@@ -247,7 +255,7 @@ class ReaderMode: TabContentScript {
   }
 
   func scriptMessageHandlerName() -> String? {
-    return "readerModeMessageHandler"
+    "readerModeMessageHandler"
   }
 
   fileprivate func handleReaderPageEvent(_ readerPageEvent: ReaderPageEvent) {
@@ -274,7 +282,11 @@ class ReaderMode: TabContentScript {
     delegate?.readerMode(self, didParseReadabilityResult: readabilityResult, forTab: tab)
   }
 
-  func userContentController(_ userContentController: WKUserContentController, didReceiveScriptMessage message: WKScriptMessage, replyHandler: (Any?, String?) -> Void) {
+  func userContentController(
+    _ userContentController: WKUserContentController,
+    didReceiveScriptMessage message: WKScriptMessage,
+    replyHandler: (Any?, String?) -> Void
+  ) {
     defer { replyHandler(nil, nil) }
     guard let body = message.body as? [String: AnyObject] else {
       return
@@ -285,7 +297,7 @@ class ReaderMode: TabContentScript {
       return
     }
 
-    if let msg = body["data"] as? Dictionary<String, Any> {
+    if let msg = body["data"] as? [String: Any] {
       if let messageType = ReaderModeMessageType(rawValue: msg["Type"] as? String ?? "") {
         switch messageType {
         case .pageEvent:
@@ -308,8 +320,12 @@ class ReaderMode: TabContentScript {
   var style: ReaderModeStyle = DefaultReaderModeStyle {
     didSet {
       if state == ReaderModeState.active {
-        tab?.webView?.evaluateSafeJavaScript(functionName: "\(ReaderModeNamespace).setStyle", args: [style.encode()], contentWorld: .defaultClient, escapeArgs: false) { (object, error) -> Void in
-          return
+        tab?.webView?.evaluateSafeJavaScript(
+          functionName: "\(ReaderModeNamespace).setStyle",
+          args: [style.encode()],
+          contentWorld: .defaultClient,
+          escapeArgs: false
+        ) { object, error -> Void in
         }
       }
     }
@@ -323,5 +339,4 @@ class ReaderMode: TabContentScript {
       return MemoryReaderModeCache.sharedInstance
     }
   }
-
 }

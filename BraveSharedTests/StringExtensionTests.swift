@@ -6,7 +6,6 @@ import XCTest
 import BraveShared
 
 class StringExtensionTests: XCTestCase {
-
   func testFirstURL() {
     let urlString = "https://brave.com"
     let url = URL(string: urlString)!
@@ -36,23 +35,28 @@ class StringExtensionTests: XCTestCase {
 
   func testWords() {
     let longMultilinedText = """
-      Multiple words
+    Multiple words
 
-      On multiple lines.
+    On multiple lines.
 
-      That will get stripped!\r
-      """
+    That will get stripped!\r
+    """
 
-    XCTAssertEqual(longMultilinedText.words, ["Multiple", "words", "On", "multiple", "lines", "That", "will", "get", "stripped"])
+    XCTAssertEqual(
+      longMultilinedText.words,
+      ["Multiple", "words", "On", "multiple", "lines", "That", "will", "get", "stripped"]
+    )
 
     let wordsWithPunctuation = "\"It's a wonderful life—isn't it…\""
     XCTAssertEqual(wordsWithPunctuation.words, ["It's", "a", "wonderful", "life", "isn't", "it"])
   }
 
   func testJavascriptEscapedString() {
-    let originalString = "function(){window.google={kEI:\'UZe4YMHZE8HBkwWpkIPoBg\',kEXPI:\'31\',kBL:\'ckvK\'};google.sn=\'web\';google.kHL=\'en\';}\u{2028}"
+    let originalString =
+      "function(){window.google={kEI:\'UZe4YMHZE8HBkwWpkIPoBg\',kEXPI:\'31\',kBL:\'ckvK\'};google.sn=\'web\';google.kHL=\'en\';}\u{2028}"
 
-    let expectedString = "\"function(){window.google={kEI:\'UZe4YMHZE8HBkwWpkIPoBg\',kEXPI:\'31\',kBL:\'ckvK\'};google.sn=\'web\';google.kHL=\'en\';}\\\\u2028\""
+    let expectedString =
+      "\"function(){window.google={kEI:\'UZe4YMHZE8HBkwWpkIPoBg\',kEXPI:\'31\',kBL:\'ckvK\'};google.sn=\'web\';google.kHL=\'en\';}\\\\u2028\""
 
     XCTAssertEqual(originalString.javaScriptEscapedString, expectedString)
   }

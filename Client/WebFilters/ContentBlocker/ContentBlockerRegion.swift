@@ -22,7 +22,6 @@ class ContentBlockerRegion: BlocklistName {
 }
 
 extension ContentBlockerRegion {
-
   /// Get a `ContentBlockerRegion` for a given locale if one exists for that region
   static func with(localeCode code: String?) -> ContentBlockerRegion? {
     guard let code = code else {
@@ -31,7 +30,9 @@ extension ContentBlockerRegion {
     }
 
     // Check if regional resource exists for a given locale.
-    if ResourceLocale(rawValue: code) == nil { return nil }
+    if ResourceLocale(rawValue: code) == nil {
+      return nil
+    }
 
     // This handles two cases, regional content blocker is nil,
     // or locale has changed and the content blocker needs to be reassigned

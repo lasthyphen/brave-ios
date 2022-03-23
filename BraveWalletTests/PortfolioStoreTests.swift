@@ -9,7 +9,6 @@ import BraveCore
 @testable import BraveWallet
 
 class PortfolioStoreTests: XCTestCase {
-
   private var cancellables: Set<AnyCancellable> = .init()
 
   func testUpdate() {
@@ -22,8 +21,16 @@ class PortfolioStoreTests: XCTestCase {
     let numDecimals = Int(mockUserAssets[0].decimals)
     let formatter = WeiFormatter(decimalFormatStyle: .decimals(precision: numDecimals))
     let mockBalanceWei = formatter.weiString(from: 0.0896, radix: .hex, decimals: numDecimals) ?? ""
-    let mockEthAssetPrice: BraveWallet.AssetPrice = .init(fromAsset: "eth", toAsset: "usd", price: "3059.99", assetTimeframeChange: "-57.23")
-    let mockEthPriceHistory: [BraveWallet.AssetTimePrice] = [.init(date: Date(timeIntervalSinceNow: -1000), price: "$3000.00"), .init(date: Date(), price: "3059.99")]
+    let mockEthAssetPrice: BraveWallet.AssetPrice = .init(
+      fromAsset: "eth",
+      toAsset: "usd",
+      price: "3059.99",
+      assetTimeframeChange: "-57.23"
+    )
+    let mockEthPriceHistory: [BraveWallet.AssetTimePrice] = [
+      .init(date: Date(timeIntervalSinceNow: -1000), price: "$3000.00"),
+      .init(date: Date(), price: "3059.99")
+    ]
     let totalEthBalanceValue: Double = (Double(mockEthAssetPrice.price) ?? 0) * mockDecimalBalance
     let currencyFormatter = NumberFormatter().then { $0.numberStyle = .currency }
     let totalEthBalance = currencyFormatter.string(from: NSNumber(value: totalEthBalanceValue)) ?? ""
@@ -36,7 +43,8 @@ class PortfolioStoreTests: XCTestCase {
         isKeyringCreated: true,
         isLocked: false,
         isBackedUp: true,
-        accountInfos: mockAccountInfos)
+        accountInfos: mockAccountInfos
+      )
       completion(keyring)
     }
     keyringService._addObserver = { _ in }
@@ -69,7 +77,7 @@ class PortfolioStoreTests: XCTestCase {
     )
     // test that `update()` will assign new value to `userVisibleAssets` publisher
     let userVisibleAssetsException = expectation(description: "update-userVisibleAssets")
-    XCTAssertTrue(store.userVisibleAssets.isEmpty)  // Initial state
+    XCTAssertTrue(store.userVisibleAssets.isEmpty) // Initial state
     store.$userVisibleAssets
       .dropFirst()
       .first()

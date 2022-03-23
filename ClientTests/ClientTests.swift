@@ -4,14 +4,12 @@
 
 import UIKit
 import XCTest
-
 import Shared
 import Storage
 import WebKit
 @testable import Client
 
 class ClientTests: XCTestCase {
-
   /// Our local server should only accept whitelisted hosts (localhost and 127.0.0.1).
   /// All other localhost equivalents should return 403.
   func testDisallowLocalhostAliases() {
@@ -66,10 +64,11 @@ class ClientTests: XCTestCase {
 
     request.setValue("Basic \(credentials)", forHTTPHeaderField: "Authorization")
 
-    URLSession(configuration: .ephemeral, delegate: nil, delegateQueue: .main).dataTask(with: request) { data, resp, error in
-      response = resp as? HTTPURLResponse
-      expectation.fulfill()
-    }.resume()
+    URLSession(configuration: .ephemeral, delegate: nil, delegateQueue: .main)
+      .dataTask(with: request) { data, resp, error in
+        response = resp as? HTTPURLResponse
+        expectation.fulfill()
+      }.resume()
 
     waitForExpectations(timeout: 100, handler: nil)
     return response?.statusCode == 200

@@ -47,7 +47,7 @@ struct RewardsInternalsSharable: Equatable {
   var generator: RewardsInternalsFileGenerator
 
   static func == (lhs: RewardsInternalsSharable, rhs: RewardsInternalsSharable) -> Bool {
-    return lhs.id == rhs.id
+    lhs.id == rhs.id
   }
 
   static let basic = RewardsInternalsSharable(
@@ -110,7 +110,11 @@ enum RewardsInternalsSharableError: Error {
 
 /// A file generator that copies the Rewards ledger database into the sharable path
 private struct RewardsInternalsDatabaseGenerator: RewardsInternalsFileGenerator {
-  func generateFiles(at path: String, using builder: RewardsInternalsSharableBuilder, completion: @escaping (Error?) -> Void) {
+  func generateFiles(
+    at path: String,
+    using builder: RewardsInternalsSharableBuilder,
+    completion: @escaping (Error?) -> Void
+  ) {
     // Move Rewards database to path
     do {
       let dbPath = URL(fileURLWithPath: builder.ledger.rewardsDatabasePath)

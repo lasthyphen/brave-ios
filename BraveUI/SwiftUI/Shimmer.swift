@@ -37,13 +37,13 @@ private struct ShimmerViewModifier: ViewModifier {
         startPoint: points.0,
         endPoint: points.1
       )
-      .onAppear {
-        DispatchQueue.main.async { [self] in  // Need this due to a SwiftUI bug…
-          withAnimation(animation) {
-            points = (.trailing, UnitPoint(x: 2, y: 0.5))
+        .onAppear {
+          DispatchQueue.main.async { [self] in // Need this due to a SwiftUI bug…
+            withAnimation(animation) {
+              points = (.trailing, UnitPoint(x: 2, y: 0.5))
+            }
           }
         }
-      }
     }
   }
 }
@@ -68,7 +68,9 @@ struct ShimmerViewModifier_PreviewProvider: PreviewProvider {
     @State private var isShimmering: Bool = false
     var body: some View {
       VStack {
-        Text("Donec ullamcorper nulla non metus auctor fringilla. Donec id elit non mi porta gravida at eget metus. Cras justo odio, dapibus ac facilisis in, egestas eget quam.")
+        Text(
+          "Donec ullamcorper nulla non metus auctor fringilla. Donec id elit non mi porta gravida at eget metus. Cras justo odio, dapibus ac facilisis in, egestas eget quam."
+        )
           .shimmer(isShimmering)
           .redacted(reason: .placeholder)
         Toggle(isOn: $isShimmering) {

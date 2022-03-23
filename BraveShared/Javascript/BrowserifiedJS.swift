@@ -14,7 +14,9 @@ public class BrowserifiedJS {
   public init?(browserifiedScript script: BundledBrowserifiedScript?) {
     context = JSContext()
 
-    guard let script = script, let scriptString = script.get else { return nil }
+    guard let script = script, let scriptString = script.get else {
+      return nil
+    }
     // window must be assigned to the script, browserify functions won't work otherwise.
     let src = "var window = this; \(scriptString)"
     context.evaluateScript(src)

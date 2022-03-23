@@ -186,6 +186,7 @@ extension FeedItem.Content {
       offersCategory: nil
     )
   }
+
   fileprivate static var mockOffer: FeedItem.Content {
     .init(
       publishTime: Date(timeIntervalSinceNow: -60),

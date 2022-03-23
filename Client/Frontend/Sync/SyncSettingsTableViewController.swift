@@ -10,7 +10,6 @@ import BraveCore
 private let log = Logger.browserLogger
 
 class SyncSettingsTableViewController: UITableViewController {
-
   // MARK: Lifecycle
 
   init(showDoneButton: Bool = false, syncAPI: BraveSyncAPI) {
@@ -50,9 +49,15 @@ class SyncSettingsTableViewController: UITableViewController {
       navigationItem.setHidesBackButton(true, animated: false)
       navigationItem.rightBarButtonItem = UIBarButtonItem(
         barButtonSystemItem: .done, target: self,
-        action: #selector(doneTapped))
+        action: #selector(doneTapped)
+      )
     } else {
-      navigationItem.rightBarButtonItem = UIBarButtonItem(image: UIImage(systemName: "gearshape"), style: .plain, target: self, action: #selector(onSyncInternalsTapped))
+      navigationItem.rightBarButtonItem = UIBarButtonItem(
+        image: UIImage(systemName: "gearshape"),
+        style: .plain,
+        target: self,
+        action: #selector(onSyncInternalsTapped)
+      )
     }
   }
 
@@ -78,7 +83,9 @@ class SyncSettingsTableViewController: UITableViewController {
   private var devices = [BraveSyncDevice]()
 
   private enum Sections: Int {
-    case deviceList, deviceActions, syncTypes
+    case deviceList
+    case deviceActions
+    case syncTypes
   }
 
   private enum SyncDataTypes: Int {
@@ -98,14 +105,16 @@ class SyncSettingsTableViewController: UITableViewController {
     }
 
     static var count: Int {
-      return SyncDataTypes.passwords.rawValue + 1
+      SyncDataTypes.passwords.rawValue + 1
     }
   }
 
   /// A different logic and UI is used depending on what device was selected to remove and if it is the only device
   /// left in the Sync Chain.
   private enum DeviceRemovalType {
-    case lastDeviceLeft, currentDevice, otherDevice
+    case lastDeviceLeft
+    case currentDevice
+    case otherDevice
   }
 
   /// After synchronization is completed, user needs to tap on `Done` to go back.
@@ -149,12 +158,15 @@ class SyncSettingsTableViewController: UITableViewController {
       removeButtonName = Strings.removeDevice
     }
 
-    guard let popupTitle = title, let popupMessage = message, let popupButtonName = removeButtonName else { fatalError() }
+    guard let popupTitle = title, let popupMessage = message,
+          let popupButtonName = removeButtonName else {
+      fatalError()
+    }
 
     let popup = AlertPopupView(imageView: nil, title: popupTitle, message: popupMessage)
     let fontSize: CGFloat = 15
 
-    popup.addButton(title: Strings.cancelButtonTitle, fontSize: fontSize) { return .flyDown }
+    popup.addButton(title: Strings.cancelButtonTitle, fontSize: fontSize) { .flyDown }
     popup.addButton(title: popupButtonName, type: .destructive, fontSize: fontSize) {
       switch type {
       case .lastDeviceLeft, .currentDevice:
@@ -188,7 +200,6 @@ class SyncSettingsTableViewController: UITableViewController {
 // MARK: - UITableViewDelegate, UITableViewDataSource
 
 extension SyncSettingsTableViewController {
-
   override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
     defer { tableView.deselectRow(at: indexPath, animated: true) }
 
@@ -244,7 +255,7 @@ extension SyncSettingsTableViewController {
   }
 
   override func numberOfSections(in tableView: UITableView) -> Int {
-    return 3
+    3
   }
 
   override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -309,7 +320,9 @@ extension SyncSettingsTableViewController {
         return
       }
 
-      guard let name = device.name else { break }
+      guard let name = device.name else {
+        break
+      }
       let deviceName = device.isCurrentDevice ? "\(name) (\(Strings.syncThisDevice))" : name
 
       cell.textLabel?.text = deviceName
@@ -366,7 +379,7 @@ extension SyncSettingsTableViewController {
   }
 
   private func makeInformationTextView(with info: String) -> UITextView {
-    return UITextView().then {
+    UITextView().then {
       $0.text = info
       $0.textContainerInset = UIEdgeInsets(top: 16, left: 16, bottom: 0, right: 16)
       $0.isEditable = false
@@ -383,7 +396,6 @@ extension SyncSettingsTableViewController {
 // MARK: - Sync Device Functionality
 
 extension SyncSettingsTableViewController {
-
   private func updateDeviceList() {
     if let json = syncAPI.getDeviceListJSON(), let data = json.data(using: .utf8) {
       do {
@@ -431,7 +443,8 @@ extension SyncSettingsTableViewController {
     let alert = UIAlertController(
       title: Strings.syncRemoveThisDeviceQuestion,
       message: Strings.syncRemoveThisDeviceQuestionDesc,
-      preferredStyle: .alert)
+      preferredStyle: .alert
+    )
     alert.addAction(UIAlertAction(title: Strings.cancelButtonTitle, style: .cancel, handler: nil))
     alert.addAction(
       UIAlertAction(title: Strings.removeDevice, style: .destructive) { action in
@@ -442,7 +455,8 @@ extension SyncSettingsTableViewController {
 
         self.syncAPI.leaveSyncGroup()
         self.navigationController?.popToRootViewController(animated: true)
-      })
+      }
+    )
 
     navigationController?.present(alert, animated: true, completion: nil)
   }

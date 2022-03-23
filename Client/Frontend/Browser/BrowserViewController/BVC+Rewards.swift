@@ -16,17 +16,24 @@ private let log = Logger.braveCoreLogger
 
 extension BrowserViewController {
   func updateRewardsButtonState() {
-    if !isViewLoaded { return }
+    if !isViewLoaded {
+      return
+    }
     if !BraveRewards.isAvailable {
       self.topToolbar.locationView.rewardsButton.isHidden = true
       return
     }
-    self.topToolbar.locationView.rewardsButton.isHidden = Preferences.Rewards.hideRewardsIcon.value || PrivateBrowsingManager.shared.isPrivateBrowsing
-    self.topToolbar.locationView.rewardsButton.iconState = Preferences.Rewards.rewardsToggledOnce.value ? (rewards.isEnabled || rewards.isCreatingWallet ? .enabled : .disabled) : .initial
+    self.topToolbar.locationView.rewardsButton.isHidden = Preferences.Rewards.hideRewardsIcon
+      .value || PrivateBrowsingManager.shared.isPrivateBrowsing
+    self.topToolbar.locationView.rewardsButton.iconState = Preferences.Rewards.rewardsToggledOnce.value
+      ? (rewards.isEnabled || rewards.isCreatingWallet ? .enabled : .disabled)
+      : .initial
   }
 
   func showRewardsDebugSettings() {
-    if AppConstants.buildChannel.isPublic { return }
+    if AppConstants.buildChannel.isPublic {
+      return
+    }
 
     let settings = RewardsDebugSettingsViewController(rewards: rewards, legacyWallet: legacyWallet)
     let container = UINavigationController(rootViewController: settings)
@@ -35,9 +42,8 @@ extension BrowserViewController {
 
   func showBraveRewardsPanel() {
     if !Preferences.FullScreenCallout.rewardsCalloutCompleted.value,
-      Preferences.General.isNewRetentionUser.value == true,
-      !Preferences.Rewards.rewardsToggledOnce.value {
-
+       Preferences.General.isNewRetentionUser.value == true,
+       !Preferences.Rewards.rewardsToggledOnce.value {
       let controller = OnboardingRewardsAgreementViewController(profile: profile, rewards: rewards)
       controller.onOnboardingStateChanged = { [weak self] controller, state in
         self?.completeOnboarding(controller)
@@ -45,7 +51,9 @@ extension BrowserViewController {
 
       Preferences.FullScreenCallout.rewardsCalloutCompleted.value = true
       present(controller, animated: true)
-      topToolbar.locationView.rewardsButton.iconState = Preferences.Rewards.rewardsToggledOnce.value ? (rewards.isEnabled || rewards.isCreatingWallet ? .enabled : .disabled) : .initial
+      topToolbar.locationView.rewardsButton.iconState = Preferences.Rewards.rewardsToggledOnce.value
+        ? (rewards.isEnabled || rewards.isCreatingWallet ? .enabled : .disabled)
+        : .initial
       return
     }
 
@@ -53,7 +61,9 @@ extension BrowserViewController {
 
     UIDevice.current.forcePortraitIfIphone(for: UIApplication.shared)
 
-    guard let tab = tabManager.selectedTab else { return }
+    guard let tab = tabManager.selectedTab else {
+      return
+    }
 
     let braveRewardsPanel = BraveRewardsViewController(
       tab: tab,
@@ -63,7 +73,9 @@ extension BrowserViewController {
     braveRewardsPanel.actionHandler = { [weak self, unowned braveRewardsPanel] action in
       switch action {
       case .rewardsTransferTapped:
-        guard let legacyWallet = self?.legacyWallet else { return }
+        guard let legacyWallet = self?.legacyWallet else {
+          return
+        }
         braveRewardsPanel.dismiss(animated: true) {
           let controller = WalletTransferViewController(legacyWallet: legacyWallet)
           controller.learnMoreHandler = { [weak self, unowned controller] in
@@ -84,7 +96,9 @@ extension BrowserViewController {
     popover.addsConvenientDismissalMargins = false
     popover.present(from: topToolbar.locationView.rewardsButton, on: self)
     popover.popoverDidDismiss = { [weak self] _ in
-      guard let self = self else { return }
+      guard let self = self else {
+        return
+      }
       if let tabId = self.tabManager.selectedTab?.rewardsId, self.rewards.ledger?.selectedTabId == 0 {
         // Show the tab currently visible
         self.rewards.ledger?.selectedTabId = tabId
@@ -111,13 +125,17 @@ extension BrowserViewController {
     let now = Date()
 
     guard let legacyWallet = legacyWallet,
-      !legacyWallet.isLedgerTransferExpired,
-      presentedViewController == nil,
-      Locale.current.regionCode == "JP"
-    else { return }
+          !legacyWallet.isLedgerTransferExpired,
+          presentedViewController == nil,
+          Locale.current.regionCode == "JP"
+    else {
+      return
+    }
 
     legacyWallet.transferrableAmount { amount in
-      guard amount > 0 else { return }
+      guard amount > 0 else {
+        return
+      }
       let gap = AppConstants.buildChannel.isPublic ? 3.days : 2.minutes
       if let lastSeenTimeInterval = Preferences.Rewards.transferUnavailableLastSeen.value {
         // Check if they've seen it in the past 3 days
@@ -131,7 +149,9 @@ extension BrowserViewController {
   }
 
   func claimPendingPromotions() {
-    guard let ledger = rewards.ledger else { return }
+    guard let ledger = rewards.ledger else {
+      return
+    }
     ledger.pendingPromotions.forEach { promo in
       if promo.status == .active {
         ledger.claimPromotion(promo) { success in
@@ -142,7 +162,9 @@ extension BrowserViewController {
   }
 
   func authorizeUpholdWallet(from tab: Tab, queryItems items: [String: String]) {
-    guard let ledger = rewards.ledger else { return }
+    guard let ledger = rewards.ledger else {
+      return
+    }
     ledger.authorizeExternalWallet(
       ofType: .uphold,
       queryItems: items
@@ -170,9 +192,14 @@ extension BrowserViewController {
           titleWeight: .semibold,
           titleSize: 18.0
         )
-        popup.addButton(title: Strings.userWalletCloseButtonTitle, type: .primary, fontSize: 14.0) { () -> PopupViewDismissType in
-          return .flyDown
-        }
+        popup
+          .addButton(
+            title: Strings.userWalletCloseButtonTitle,
+            type: .primary,
+            fontSize: 14.0
+          ) { () -> PopupViewDismissType in
+            .flyDown
+          }
         popup.showWithType(showType: .flyUp)
       }
     }
@@ -232,16 +259,20 @@ extension BrowserViewController {
     center.getPendingNotificationRequests { requests in
       let ids =
         requests
-        .filter { $0.identifier.hasPrefix(idPrefix) }
-        .map(\.identifier)
-      if ids.isEmpty { return }
+          .filter { $0.identifier.hasPrefix(idPrefix) }
+          .map(\.identifier)
+      if ids.isEmpty {
+        return
+      }
       center.removeDeliveredNotifications(withIdentifiers: ids)
       center.removePendingNotificationRequests(withIdentifiers: ids)
     }
   }
 
   func setupLedger() {
-    guard let ledger = rewards.ledger else { return }
+    guard let ledger = rewards.ledger else {
+      return
+    }
     // Update defaults
     ledger.minimumVisitDuration = 8
     ledger.minimumNumberOfVisits = 1
@@ -254,7 +285,9 @@ extension BrowserViewController {
     ledger.add(rewardsObserver)
 
     rewardsObserver.walletInitalized = { [weak self] result in
-      guard let self = self, let client = self.deviceCheckClient else { return }
+      guard let self = self, let client = self.deviceCheckClient else {
+        return
+      }
       if result == .walletCreated {
         ledger.setupDeviceCheckEnrollment(client) {}
         self.updateRewardsButtonState()
@@ -264,7 +297,10 @@ extension BrowserViewController {
       self?.claimPendingPromotions()
     }
     rewardsObserver.fetchedPanelPublisher = { [weak self] publisher, tabId in
-      guard let self = self, self.isViewLoaded, let tab = self.tabManager.selectedTab, tab.rewardsId == tabId else { return }
+      guard let self = self, self.isViewLoaded, let tab = self.tabManager.selectedTab,
+            tab.rewardsId == tabId else {
+        return
+      }
       self.publisher = publisher
     }
 
@@ -272,7 +308,9 @@ extension BrowserViewController {
       withTimeInterval: 1.hours,
       repeats: true,
       block: { [weak self, weak ledger] _ in
-        guard let self = self, let ledger = ledger else { return }
+        guard let self = self, let ledger = ledger else {
+          return
+        }
         if self.rewards.isEnabled {
           ledger.fetchPromotions(nil)
         }
@@ -283,8 +321,12 @@ extension BrowserViewController {
 
 extension Tab {
   func reportPageLoad(to rewards: BraveRewards, redirectionURLs urls: [URL]) {
-    guard let webView = webView, let url = webView.url else { return }
-    if url.isLocal || PrivateBrowsingManager.shared.isPrivateBrowsing { return }
+    guard let webView = webView, let url = webView.url else {
+      return
+    }
+    if url.isLocal || PrivateBrowsingManager.shared.isPrivateBrowsing {
+      return
+    }
 
     var htmlBlob: String?
     var classifierText: String?
@@ -292,14 +334,23 @@ extension Tab {
     let group = DispatchGroup()
     group.enter()
 
-    webView.evaluateSafeJavaScript(functionName: "new XMLSerializer().serializeToString", args: ["document"], contentWorld: WKContentWorld.defaultClient, escapeArgs: false) { html, _ in
+    webView.evaluateSafeJavaScript(
+      functionName: "new XMLSerializer().serializeToString",
+      args: ["document"],
+      contentWorld: WKContentWorld.defaultClient,
+      escapeArgs: false
+    ) { html, _ in
       htmlBlob = html as? String
       group.leave()
     }
 
     if shouldClassifyLoadsForAds {
       group.enter()
-      webView.evaluateSafeJavaScript(functionName: "document?.body?.innerText", contentWorld: .defaultClient, asFunction: false) { text, _ in
+      webView.evaluateSafeJavaScript(
+        functionName: "document?.body?.innerText",
+        contentWorld: .defaultClient,
+        asFunction: false
+      ) { text, _ in
         classifierText = text as? String
         group.leave()
       }
@@ -313,7 +364,8 @@ extension Tab {
       rewards.reportLoadedPage(
         url: url, redirectionURLs: urls.isEmpty ? [url] : urls,
         faviconURL: faviconURL, tabId: Int(self.rewardsId),
-        html: htmlBlob ?? "", adsInnerText: classifierText)
+        html: htmlBlob ?? "", adsInnerText: classifierText
+      )
     }
   }
 

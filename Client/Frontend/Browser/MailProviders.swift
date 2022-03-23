@@ -13,9 +13,15 @@ protocol MailProvider {
   func newEmailURLFromMetadata(_ metadata: MailToMetadata) -> URL?
 }
 
-private func constructEmailURLString(_ beginningURLString: String, metadata: MailToMetadata, supportedHeaders: [String], bodyHName: String = "body", toHName: String = "to") -> String {
+private func constructEmailURLString(
+  _ beginningURLString: String,
+  metadata: MailToMetadata,
+  supportedHeaders: [String],
+  bodyHName: String = "body",
+  toHName: String = "to"
+) -> String {
   var lowercasedHeaders = [String: String]()
-  metadata.headers.forEach { (hname, hvalue) in
+  metadata.headers.forEach { hname, hvalue in
     lowercasedHeaders[hname.lowercased()] = hvalue
   }
 
@@ -29,7 +35,7 @@ private func constructEmailURLString(_ beginningURLString: String, metadata: Mai
   }
 
   var queryParams: [String] = []
-  lowercasedHeaders.forEach({ (hname, hvalue) in
+  lowercasedHeaders.forEach({ hname, hvalue in
     if supportedHeaders.contains(hname) {
       queryParams.append("\(hname)=\(hvalue)")
     } else if hname == "body" {
@@ -37,7 +43,11 @@ private func constructEmailURLString(_ beginningURLString: String, metadata: Mai
     }
   })
   let stringParams = queryParams.joined(separator: "&")
-  let finalURLString = beginningURLString + (stringParams.isEmpty ? toParam : [toParam, stringParams].joined(separator: "&"))
+  let finalURLString = beginningURLString + (
+    stringParams.isEmpty
+      ? toParam
+      : [toParam, stringParams].joined(separator: "&")
+  )
   return finalURLString
 }
 
@@ -53,7 +63,13 @@ class ReaddleSparkIntegration: MailProvider {
   ]
 
   func newEmailURLFromMetadata(_ metadata: MailToMetadata) -> URL? {
-    return constructEmailURLString(beginningScheme, metadata: metadata, supportedHeaders: supportedHeaders, bodyHName: "textbody", toHName: "recipient").asURL
+    constructEmailURLString(
+      beginningScheme,
+      metadata: metadata,
+      supportedHeaders: supportedHeaders,
+      bodyHName: "textbody",
+      toHName: "recipient"
+    ).asURL
   }
 }
 
@@ -70,7 +86,12 @@ class AirmailIntegration: MailProvider {
   ]
 
   func newEmailURLFromMetadata(_ metadata: MailToMetadata) -> URL? {
-    return constructEmailURLString(beginningScheme, metadata: metadata, supportedHeaders: supportedHeaders, bodyHName: "htmlBody").asURL
+    constructEmailURLString(
+      beginningScheme,
+      metadata: metadata,
+      supportedHeaders: supportedHeaders,
+      bodyHName: "htmlBody"
+    ).asURL
   }
 }
 
@@ -85,7 +106,7 @@ class MyMailIntegration: MailProvider {
   ]
 
   func newEmailURLFromMetadata(_ metadata: MailToMetadata) -> URL? {
-    return constructEmailURLString(beginningScheme, metadata: metadata, supportedHeaders: supportedHeaders).asURL
+    constructEmailURLString(beginningScheme, metadata: metadata, supportedHeaders: supportedHeaders).asURL
   }
 }
 
@@ -107,7 +128,7 @@ class MSOutlookIntegration: MailProvider {
   ]
 
   func newEmailURLFromMetadata(_ metadata: MailToMetadata) -> URL? {
-    return constructEmailURLString(beginningScheme, metadata: metadata, supportedHeaders: supportedHeaders).asURL
+    constructEmailURLString(beginningScheme, metadata: metadata, supportedHeaders: supportedHeaders).asURL
   }
 }
 
@@ -121,7 +142,7 @@ class YMailIntegration: MailProvider {
   ]
 
   func newEmailURLFromMetadata(_ metadata: MailToMetadata) -> URL? {
-    return constructEmailURLString(beginningScheme, metadata: metadata, supportedHeaders: supportedHeaders).asURL
+    constructEmailURLString(beginningScheme, metadata: metadata, supportedHeaders: supportedHeaders).asURL
   }
 }
 
@@ -136,7 +157,7 @@ class GoogleGmailIntegration: MailProvider {
   ]
 
   func newEmailURLFromMetadata(_ metadata: MailToMetadata) -> URL? {
-    return constructEmailURLString(beginningScheme, metadata: metadata, supportedHeaders: supportedHeaders).asURL
+    constructEmailURLString(beginningScheme, metadata: metadata, supportedHeaders: supportedHeaders).asURL
   }
 }
 
@@ -151,6 +172,6 @@ class GoogleInboxIntegration: MailProvider {
   ]
 
   func newEmailURLFromMetadata(_ metadata: MailToMetadata) -> URL? {
-    return constructEmailURLString(beginningScheme, metadata: metadata, supportedHeaders: supportedHeaders).asURL
+    constructEmailURLString(beginningScheme, metadata: metadata, supportedHeaders: supportedHeaders).asURL
   }
 }

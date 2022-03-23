@@ -130,7 +130,7 @@ class MediaPlayer: NSObject {
   /// If a new item is loaded, you should call play to begin playback.
   /// Returns an error on failure.
   func load(asset: AVURLAsset) -> Combine.Deferred<AnyPublisher<Bool, MediaPlaybackError>> {
-    return Deferred { [weak self] in
+    Deferred { [weak self] in
       guard let self = self else {
         return Fail<Bool, MediaPlaybackError>(error: .other("MediaPlayer Deallocated"))
           .eraseToAnyPublisher()
@@ -139,9 +139,11 @@ class MediaPlayer: NSObject {
       return Future { resolver in
         // If the same asset is being loaded again.
         // Just play it.
-        if let currentItem = self.player.currentItem, currentItem.asset.isKind(of: AVURLAsset.self) && self.player.status == .readyToPlay {
-          if let currentAsset = currentItem.asset as? AVURLAsset, currentAsset.url.absoluteString == asset.url.absoluteString {
-            resolver(.success(false))  // Same item is playing.
+        if let currentItem = self.player.currentItem,
+           currentItem.asset.isKind(of: AVURLAsset.self) && self.player.status == .readyToPlay {
+          if let currentAsset = currentItem.asset as? AVURLAsset,
+             currentAsset.url.absoluteString == asset.url.absoluteString {
+            resolver(.success(false)) // Same item is playing.
             self.pendingMediaItem = nil
             return
           }
@@ -152,7 +154,9 @@ class MediaPlayer: NSObject {
 
         DispatchQueue.global(qos: .userInitiated).async {
           asset.loadValuesAsynchronously(forKeys: assetKeys) { [weak self] in
-            guard let self = self, let item = self.pendingMediaItem else { return }
+            guard let self = self, let item = self.pendingMediaItem else {
+              return
+            }
 
             for key in assetKeys {
               var error: NSError?
@@ -173,7 +177,7 @@ class MediaPlayer: NSObject {
             DispatchQueue.main.async {
               self.player.replaceCurrentItem(with: item)
               self.pendingMediaItem = nil
-              resolver(.success(true))  // New Item loaded
+              resolver(.success(true)) // New Item loaded
             }
           }
         }
@@ -270,7 +274,9 @@ class MediaPlayer: NSObject {
       self.changePlaybackPositionSubscriber.send(
         EventNotification(
           mediaPlayer: self,
-          event: .changePlaybackPosition))
+          event: .changePlaybackPosition
+        )
+      )
     }
   }
 
@@ -291,7 +297,9 @@ class MediaPlayer: NSObject {
     changeRepeatModeSubscriber.send(
       EventNotification(
         mediaPlayer: self,
-        event: .changeRepeatMode))
+        event: .changeRepeatMode
+      )
+    )
   }
 
   func toggleShuffleMode() {
@@ -308,7 +316,9 @@ class MediaPlayer: NSObject {
     changeShuffleModeSubscriber.send(
       EventNotification(
         mediaPlayer: self,
-        event: .changeShuffleMode))
+        event: .changeShuffleMode
+      )
+    )
   }
 
   func toggleGravity() {
@@ -326,7 +336,9 @@ class MediaPlayer: NSObject {
     playerGravitySubscriber.send(
       EventNotification(
         mediaPlayer: self,
-        event: .playerGravityChanged))
+        event: .playerGravityChanged
+      )
+    )
   }
 
   func setPlaybackRate(rate: Float) {
@@ -335,7 +347,9 @@ class MediaPlayer: NSObject {
     changePlaybackRateSubscriber.send(
       EventNotification(
         mediaPlayer: self,
-        event: .changePlaybackRate))
+        event: .changePlaybackRate
+      )
+    )
   }
 
   @discardableResult
@@ -454,41 +468,47 @@ extension MediaPlayer {
       NotificationCenter.default.publisher(for: UIScene.didEnterBackgroundNotification),
       NotificationCenter.default.publisher(for: UIApplication.didEnterBackgroundNotification)
     )
-    .sink { [weak self] _ in
-      guard let self = self else { return }
+      .sink { [weak self] _ in
+        guard let self = self else {
+          return
+        }
 
-      if let pictureInPictureController = self.pictureInPictureController,
-        pictureInPictureController.isPictureInPictureActive {
-        return
-      }
+        if let pictureInPictureController = self.pictureInPictureController,
+           pictureInPictureController.isPictureInPictureActive {
+          return
+        }
 
-      self.detachLayer()
-    }.store(in: &notificationObservers)
+        self.detachLayer()
+      }.store(in: &notificationObservers)
 
     Publishers.Zip(
       NotificationCenter.default.publisher(for: UIScene.didActivateNotification),
       NotificationCenter.default.publisher(for: UIApplication.didBecomeActiveNotification)
     )
-    .sink { [weak self] _ in
-      guard let self = self else { return }
+      .sink { [weak self] _ in
+        guard let self = self else {
+          return
+        }
 
-      if let pictureInPictureController = self.pictureInPictureController,
-        pictureInPictureController.isPictureInPictureActive {
-        return
-      }
+        if let pictureInPictureController = self.pictureInPictureController,
+           pictureInPictureController.isPictureInPictureActive {
+          return
+        }
 
-      self.attachLayer()
-    }.store(in: &notificationObservers)
+        self.attachLayer()
+      }.store(in: &notificationObservers)
 
-    NotificationCenter.default.publisher(for: AVAudioSession.interruptionNotification, object: AVAudioSession.sharedInstance())
+    NotificationCenter.default.publisher(
+      for: AVAudioSession.interruptionNotification,
+      object: AVAudioSession.sharedInstance()
+    )
       .sink { [weak self] notification in
 
         guard let self = self,
-          let userInfo = notification.userInfo,
-          let typeValue = userInfo[AVAudioSessionInterruptionTypeKey] as? UInt,
-          let type = AVAudioSession.InterruptionType(rawValue: typeValue)
+              let userInfo = notification.userInfo,
+              let typeValue = userInfo[AVAudioSessionInterruptionTypeKey] as? UInt,
+              let type = AVAudioSession.InterruptionType(rawValue: typeValue)
         else {
-
           return
         }
 
@@ -519,25 +539,34 @@ extension MediaPlayer {
 
     NotificationCenter.default.publisher(for: .AVPlayerItemDidPlayToEndTime)
       .sink { [weak self] _ in
-        guard let self = self else { return }
+        guard let self = self else {
+          return
+        }
 
         self.finishedPlayingSubscriber.send(
           EventNotification(
             mediaPlayer: self,
-            event: .finishedPlaying))
+            event: .finishedPlaying
+          )
+        )
       }.store(in: &notificationObservers)
 
     let interval = CMTimeMake(value: 25, timescale: 1000)
     periodicTimeObserver = player.addPeriodicTimeObserver(
       forInterval: interval, queue: .main,
       using: { [weak self] time in
-        guard let self = self else { return }
+        guard let self = self else {
+          return
+        }
 
         self.periodicTimeSubscriber.send(
           EventNotification(
             mediaPlayer: self,
-            event: .periodicPlayTimeChanged))
-      })
+            event: .periodicPlayTimeChanged
+          )
+        )
+      }
+    )
   }
 
   /// Registers playback controls notifications
@@ -558,7 +587,9 @@ extension MediaPlayer {
     center.changePlaybackRateCommand.supportedPlaybackRates =
       supportedPlaybackRates.map { NSNumber(value: $0) }
     center.publisher(for: .changePlaybackRateCommand).sink { [weak self] event in
-      guard let self = self, let event = event as? MPChangePlaybackRateCommandEvent else { return }
+      guard let self = self, let event = event as? MPChangePlaybackRateCommandEvent else {
+        return
+      }
       self.setPlaybackRate(rate: event.playbackRate)
     }.store(in: &notificationObservers)
 
@@ -581,29 +612,37 @@ extension MediaPlayer {
     center.skipBackwardCommand.preferredIntervals = [NSNumber(value: seekInterval)]
     center.publisher(for: .skipBackwardCommand).sink { [weak self] event in
       guard let self = self,
-        let event = event as? MPSkipIntervalCommandEvent
-      else { return }
+            let event = event as? MPSkipIntervalCommandEvent
+      else {
+        return
+      }
 
       let currentTime = self.player.currentTime()
       self.seekBackwards()
-      MPNowPlayingInfoCenter.default().nowPlayingInfo?[MPNowPlayingInfoPropertyElapsedPlaybackTime] = Double(currentTime.seconds - event.interval)
+      MPNowPlayingInfoCenter.default()
+        .nowPlayingInfo?[MPNowPlayingInfoPropertyElapsedPlaybackTime] = Double(currentTime.seconds - event.interval)
     }.store(in: &notificationObservers)
 
     center.skipForwardCommand.preferredIntervals = [NSNumber(value: seekInterval)]
     center.publisher(for: .skipForwardCommand).sink { [weak self] event in
       guard let self = self,
-        let event = event as? MPSkipIntervalCommandEvent
-      else { return }
+            let event = event as? MPSkipIntervalCommandEvent
+      else {
+        return
+      }
 
       let currentTime = self.player.currentTime()
       self.seekForwards()
-      MPNowPlayingInfoCenter.default().nowPlayingInfo?[MPNowPlayingInfoPropertyElapsedPlaybackTime] = Double(currentTime.seconds + event.interval)
+      MPNowPlayingInfoCenter.default()
+        .nowPlayingInfo?[MPNowPlayingInfoPropertyElapsedPlaybackTime] = Double(currentTime.seconds + event.interval)
     }.store(in: &notificationObservers)
 
     center.publisher(for: .changePlaybackPositionCommand).sink { [weak self] event in
       guard let self = self,
-        let event = event as? MPChangePlaybackPositionCommandEvent
-      else { return }
+            let event = event as? MPChangePlaybackPositionCommandEvent
+      else {
+        return
+      }
 
       self.seek(to: event.positionTime)
     }.store(in: &notificationObservers)
@@ -613,20 +652,29 @@ extension MediaPlayer {
   private func registerPictureInPictureNotifications() {
     if AVPictureInPictureController.isPictureInPictureSupported() {
       pictureInPictureController = AVPictureInPictureController(playerLayer: self.playerLayer)
-      guard let pictureInPictureController = pictureInPictureController else { return }
+      guard let pictureInPictureController = pictureInPictureController else {
+        return
+      }
 
-      pictureInPictureController.publisher(for: \AVPictureInPictureController.isPictureInPicturePossible).sink { [weak self] status in
-        guard let self = self else { return }
-        self.pictureInPictureStatusSubscriber.send(
-          EventNotification(
-            mediaPlayer: self,
-            event: .pictureInPictureStatusChanged))
-      }.store(in: &notificationObservers)
+      pictureInPictureController.publisher(for: \AVPictureInPictureController.isPictureInPicturePossible)
+        .sink { [weak self] status in
+          guard let self = self else {
+            return
+          }
+          self.pictureInPictureStatusSubscriber.send(
+            EventNotification(
+              mediaPlayer: self,
+              event: .pictureInPictureStatusChanged
+            )
+          )
+        }.store(in: &notificationObservers)
     } else {
       pictureInPictureStatusSubscriber.send(
         EventNotification(
           mediaPlayer: self,
-          event: .pictureInPictureStatusChanged))
+          event: .pictureInPictureStatusChanged
+        )
+      )
     }
   }
 }

@@ -28,7 +28,6 @@ typealias ImageCacheProgress = ((Int, Int, URL) -> Void)?
 typealias ImageCacheCompletion = ((UIImage?, Data?, Error?, ImageCacheType, URL) -> Void)?
 
 protocol ImageCacheProtocol {
-
   associatedtype ReturnAssociatedType
 
   /// Initialize an image cache with privacy protection.
@@ -44,7 +43,12 @@ protocol ImageCacheProtocol {
   /// - parameter progress: An ImageCacheProgress block called while the image is downloading.
   /// - parameter completion: An ImageCacheCompletion block called when the operation has completed.
   /// - returns: ReturnAssociatedType customized using typealias.
-  @discardableResult func load(from url: URL, options: ImageCacheOptions, progress: ImageCacheProgress, completion: ImageCacheCompletion) -> ReturnAssociatedType?
+  @discardableResult func load(
+    from url: URL,
+    options: ImageCacheOptions,
+    progress: ImageCacheProgress,
+    completion: ImageCacheCompletion
+  ) -> ReturnAssociatedType?
 
   /// Returns whether the image at the given URL is cached in memory or not.
   ///
@@ -62,5 +66,4 @@ protocol ImageCacheProtocol {
 
   /// Clears the disk cache.
   func clearDiskCache()
-
 }

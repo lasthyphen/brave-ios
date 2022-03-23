@@ -4,8 +4,8 @@
 
 import Foundation
 
-public extension SetIterator {
-  mutating func take(_ n: Int) -> [Element]? {
+extension SetIterator {
+  public mutating func take(_ n: Int) -> [Element]? {
     precondition(n >= 0)
 
     if n == 0 {
@@ -29,8 +29,8 @@ public extension SetIterator {
   }
 }
 
-public extension Set {
-  func withSubsetsOfSize(_ n: Int, f: (Set<Iterator.Element>) throws -> Void) rethrows {
+extension Set {
+  public func withSubsetsOfSize(_ n: Int, f: (Set<Iterator.Element>) throws -> Void) rethrows {
     precondition(n > 0)
 
     if self.isEmpty {
@@ -55,7 +55,7 @@ public extension Set {
     }
   }
 
-  func subsetsOfSize(_ n: Int) -> [Set<Iterator.Element>] {
+  public func subsetsOfSize(_ n: Int) -> [Set<Iterator.Element>] {
     precondition(n > 0)
 
     if self.isEmpty {

@@ -10,7 +10,6 @@ import BraveCore
 
 class NTPTableViewController: TableViewController {
   enum BackgroundImageType: RepresentableOptionType {
-
     case defaultImages
     case sponsored
     case superReferrer(String)
@@ -54,7 +53,8 @@ class NTPTableViewController: TableViewController {
     var section = Section(rows: [
       Row.boolRow(
         title: Strings.NTP.settingsBackgroundImages,
-        option: Preferences.NewTabPage.backgroundImages)
+        option: Preferences.NewTabPage.backgroundImages
+      )
     ])
 
     if Preferences.NewTabPage.backgroundImages.value {
@@ -85,7 +85,8 @@ class NTPTableViewController: TableViewController {
       text: Strings.NTP.settingsBackgroundImageSubMenu,
       detailText: selectedItem().displayString,
       accessory: .disclosureIndicator,
-      cellClass: MultilineSubtitleCell.self)
+      cellClass: MultilineSubtitleCell.self
+    )
 
     row.selection = { [unowned self] in
       // Show options for tab bar visibility

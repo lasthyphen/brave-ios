@@ -7,7 +7,6 @@ import Foundation
 import UIKit
 
 class PlaylistParticleEmitter: UIView {
-
   override init(frame: CGRect) {
     super.init(frame: frame)
 
@@ -18,6 +17,7 @@ class PlaylistParticleEmitter: UIView {
     }
   }
 
+  @available(*, unavailable)
   required init?(coder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }

@@ -6,7 +6,6 @@ import XCTest
 @testable import Client
 
 class NetworkManagerTests: XCTestCase {
-
   var session: NetworkSessionMock!
   var manager: NetworkManager!
   var data: Data!
@@ -78,7 +77,6 @@ class NetworkManagerTests: XCTestCase {
         XCTAssertEqual(testResponse, response)
         exp.fulfill()
       } catch {
-
       }
     }
 
@@ -120,10 +118,10 @@ class NetworkManagerTests: XCTestCase {
         _ = try await self.manager.downloadResource(
           with: self.url,
           resourceType: .regular,
-          retryTimeout: nil)
+          retryTimeout: nil
+        )
         exp.fulfill()
       } catch {
-
       }
     }
 
@@ -143,7 +141,8 @@ class NetworkManagerTests: XCTestCase {
         _ = try await self.manager.downloadResource(
           with: self.url,
           resourceType: .regular,
-          retryTimeout: nil)
+          retryTimeout: nil
+        )
       } catch {
         exp.fulfill()
       }
@@ -165,11 +164,11 @@ class NetworkManagerTests: XCTestCase {
         let value = try await self.manager.downloadResource(
           with: self.url,
           resourceType: .regular,
-          retryTimeout: nil)
+          retryTimeout: nil
+        )
         XCTAssert(value.data.isEmpty)
         exp.fulfill()
       } catch {
-
       }
     }
 
@@ -188,11 +187,11 @@ class NetworkManagerTests: XCTestCase {
         let value = try await self.manager.downloadResource(
           with: self.url,
           resourceType: .cached(etag: self.etag),
-          retryTimeout: nil)
+          retryTimeout: nil
+        )
         XCTAssertEqual(value.etag, self.etag)
         exp.fulfill()
       } catch {
-
       }
     }
 
@@ -212,10 +211,10 @@ class NetworkManagerTests: XCTestCase {
         _ = try await self.manager.downloadResource(
           with: self.url,
           resourceType: .cached(etag: nil),
-          retryTimeout: nil)
+          retryTimeout: nil
+        )
         exp.fulfill()
       } catch {
-
       }
     }
 
@@ -238,10 +237,10 @@ class NetworkManagerTests: XCTestCase {
         _ = try await self.manager.downloadResource(
           with: self.url,
           resourceType: .cached(etag: self.etag),
-          retryTimeout: nil)
+          retryTimeout: nil
+        )
         exp.fulfill()
       } catch {
-
       }
     }
 
@@ -262,10 +261,10 @@ class NetworkManagerTests: XCTestCase {
         _ = try await self.manager.downloadResource(
           with: self.url,
           resourceType: .regular,
-          retryTimeout: 5)
+          retryTimeout: 5
+        )
         exp.fulfill()
       } catch {
-
       }
     }
 
@@ -279,8 +278,9 @@ class NetworkManagerTests: XCTestCase {
     statusCode code: Int = 200,
     headerFields: [String: String]? = nil
   ) -> HTTPURLResponse {
-    return HTTPURLResponse(
+    HTTPURLResponse(
       url: url, statusCode: code,
-      httpVersion: "HTTP/1.1", headerFields: headerFields)!
+      httpVersion: "HTTP/1.1", headerFields: headerFields
+    )!
   }
 }

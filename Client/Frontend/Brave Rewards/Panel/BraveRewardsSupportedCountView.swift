@@ -7,7 +7,6 @@ import Foundation
 import Shared
 
 class BraveRewardsSupportedCountView: UIStackView {
-
   let countLabel = UILabel().then {
     $0.text = "0"
     $0.font = .systemFont(ofSize: 36)

@@ -56,15 +56,15 @@ class BraveSearchScriptHandler: TabContentScript {
     let allowedHosts = DomainUserScript.braveSearch.associatedDomains
 
     guard let requestHost = message.frameInfo.request.url?.host,
-      allowedHosts.contains(requestHost),
-      message.frameInfo.isMainFrame
+          allowedHosts.contains(requestHost),
+          message.frameInfo.isMainFrame
     else {
       log.error("Backup search request called from disallowed host")
       return
     }
 
     guard let data = try? JSONSerialization.data(withJSONObject: message.body, options: []),
-      let method = try? JSONDecoder().decode(MethodModel.self, from: data).methodId
+          let method = try? JSONDecoder().decode(MethodModel.self, from: data).methodId
     else {
       log.error("Failed to retrieve method id")
       return
@@ -81,7 +81,6 @@ class BraveSearchScriptHandler: TabContentScript {
   }
 
   private func handleCanSetBraveSearchAsDefault(methodId: Int) {
-
     if PrivateBrowsingManager.shared.isPrivateBrowsing {
       log.debug("Private mode detected, skipping setting Brave Search as a default")
       callback(methodId: methodId, result: false)
@@ -89,7 +88,8 @@ class BraveSearchScriptHandler: TabContentScript {
     }
 
     let maximumPromptCount = Preferences.Search.braveSearchDefaultBrowserPromptCount
-    if Self.canSetAsDefaultCounter >= maxCountOfDefaultBrowserPromptsPerSession || maximumPromptCount.value >= maxCountOfDefaultBrowserPromptsTotal {
+    if Self.canSetAsDefaultCounter >= maxCountOfDefaultBrowserPromptsPerSession || maximumPromptCount
+      .value >= maxCountOfDefaultBrowserPromptsTotal {
       log.debug("Maximum number of tries of Brave Search website prompts reached")
       callback(methodId: methodId, result: false)
       return
@@ -121,6 +121,7 @@ class BraveSearchScriptHandler: TabContentScript {
     self.tab?.webView?.evaluateSafeJavaScript(
       functionName: functionName,
       args: args,
-      contentWorld: .page)
+      contentWorld: .page
+    )
   }
 }

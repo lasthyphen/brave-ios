@@ -19,6 +19,7 @@ class BottomToolbarView: UIView, ToolbarProtocol {
   let searchButton = ToolbarButton(top: false).then {
     $0.isHidden = true
   }
+
   let menuButton = MenuButton(top: false)
   let actionButtons: [UIButton]
 
@@ -91,6 +92,7 @@ class BottomToolbarView: UIView, ToolbarProtocol {
     accessibilityLabel = Strings.tabToolbarAccessibilityLabel
   }
 
+  @available(*, unavailable)
   required init(coder aDecoder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }

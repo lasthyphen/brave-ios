@@ -27,7 +27,8 @@ struct AccountActivityView: View {
   }
 
   private var accountInfo: BraveWallet.AccountInfo {
-    guard let info = keyringStore.keyring.accountInfos.first(where: { $0.address == activityStore.account.address }) else {
+    guard let info = keyringStore.keyring.accountInfos.first(where: { $0.address == activityStore.account.address })
+    else {
       // The account has been removed... User should technically never see this state because
       // `AccountsViewController` pops this view off the stack when the account is removed
       return activityStore.account
@@ -73,7 +74,8 @@ struct AccountActivityView: View {
               image: AssetIconView(token: asset.token),
               title: asset.token.name,
               symbol: asset.token.symbol,
-              amount: currencyFormatter.string(from: NSNumber(value: (Double(asset.price) ?? 0) * asset.decimalBalance)) ?? "",
+              amount: currencyFormatter
+                .string(from: NSNumber(value: (Double(asset.price) ?? 0) * asset.decimalBalance)) ?? "",
               quantity: String(format: "%.04f", asset.decimalBalance)
             )
           }
@@ -96,18 +98,18 @@ struct AccountActivityView: View {
               displayAccountCreator: false,
               assetRatios: assetRatios
             )
-            .contextMenu {
-              if !tx.txHash.isEmpty {
-                Button(action: {
-                  if let baseURL = self.networkStore.selectedChain.blockExplorerUrls.first.map(URL.init(string:)),
-                    let url = baseURL?.appendingPathComponent("tx/\(tx.txHash)") {
-                    openWalletURL?(url)
+              .contextMenu {
+                if !tx.txHash.isEmpty {
+                  Button(action: {
+                    if let baseURL = self.networkStore.selectedChain.blockExplorerUrls.first.map(URL.init(string:)),
+                       let url = baseURL?.appendingPathComponent("tx/\(tx.txHash)") {
+                      openWalletURL?(url)
+                    }
+                  }) {
+                    Label(Strings.Wallet.viewOnBlockExplorer, systemImage: "arrow.up.forward.square")
                   }
-                }) {
-                  Label(Strings.Wallet.viewOnBlockExplorer, systemImage: "arrow.up.forward.square")
                 }
               }
-            }
           }
         }
       }
@@ -182,7 +184,7 @@ struct AccountActivityView_Previews: PreviewProvider {
       activityStore: .previewStore,
       networkStore: .previewStore
     )
-    .previewColorSchemes()
+      .previewColorSchemes()
   }
 }
 #endif

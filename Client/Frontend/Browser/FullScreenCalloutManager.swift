@@ -8,9 +8,11 @@ import Shared
 import BraveShared
 
 struct FullScreenCalloutManager {
-
   enum FullScreenCalloutType {
-    case vpn, sync, rewards, defaultBrowser
+    case vpn
+    case sync
+    case rewards
+    case defaultBrowser
 
     /// The number of days passed to show certain type of callout
     var period: Int {
@@ -37,15 +39,19 @@ struct FullScreenCalloutManager {
   /// Returns true if the callout should be shown.
   static func shouldShowDefaultBrowserCallout(calloutType: FullScreenCalloutType) -> Bool {
     guard Preferences.General.isNewRetentionUser.value == true,
-      let appRetentionLaunchDate = Preferences.DAU.appRetentionLaunchDate.value,
-      !calloutType.preferenceValue.value
+          let appRetentionLaunchDate = Preferences.DAU.appRetentionLaunchDate.value,
+          !calloutType.preferenceValue.value
     else {
       return false
     }
 
     let rightNow = Date()
 
-    let nextShowDate = appRetentionLaunchDate.addingTimeInterval(AppConstants.buildChannel.isPublic ? calloutType.period.days : calloutType.period.minutes)
+    let nextShowDate = appRetentionLaunchDate.addingTimeInterval(
+      AppConstants.buildChannel.isPublic
+        ? calloutType.period.days
+        : calloutType.period.minutes
+    )
 
     if rightNow > nextShowDate {
       calloutType.preferenceValue.value = true

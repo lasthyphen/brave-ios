@@ -60,10 +60,13 @@ open class BraveGlobalShieldStats {
   }
 
   private func postUpdateNotification() {
-    NotificationCenter.default.post(name: Notification.Name(rawValue: BraveGlobalShieldStats.didUpdateNotification), object: nil)
+    NotificationCenter.default.post(
+      name: Notification.Name(rawValue: BraveGlobalShieldStats.didUpdateNotification),
+      object: nil
+    )
   }
 
-  fileprivate init() {
+  private init() {
     adblock = Preferences.BlockStats.adsCount.value
     trackingProtection = Preferences.BlockStats.trackersCount.value
     httpse = Preferences.BlockStats.httpsUpgradeCount.value
@@ -73,44 +76,47 @@ open class BraveGlobalShieldStats {
     safeBrowsing = Preferences.BlockStats.phishingCount.value
   }
 
-  fileprivate let millisecondsPerItem: Int = 50
-  fileprivate let bytesPerItem = 30485
+  private let millisecondsPerItem: Int = 50
+  private let bytesPerItem = 30485
 
   public var timeSaved: String {
-    get {
-      let estimatedMillisecondsSaved = (adblock + trackingProtection) * millisecondsPerItem
-      let hours = estimatedMillisecondsSaved < 1000 * 60 * 60 * 24
-      let minutes = estimatedMillisecondsSaved < 1000 * 60 * 60
-      let seconds = estimatedMillisecondsSaved < 1000 * 60
-      var counter: Double = 0
-      var text = ""
+    let estimatedMillisecondsSaved = (adblock + trackingProtection) * millisecondsPerItem
+    let hours = estimatedMillisecondsSaved < 1000 * 60 * 60 * 24
+    let minutes = estimatedMillisecondsSaved < 1000 * 60 * 60
+    let seconds = estimatedMillisecondsSaved < 1000 * 60
+    var counter: Double = 0
+    var text = ""
 
-      if seconds {
-        counter = ceil(Double(estimatedMillisecondsSaved / 1000))
-        text = Strings.shieldsTimeStatsSeconds
-      } else if minutes {
-        counter = ceil(Double(estimatedMillisecondsSaved / 1000 / 60))
-        text = Strings.shieldsTimeStatsMinutes
-      } else if hours {
-        counter = ceil(Double(estimatedMillisecondsSaved / 1000 / 60 / 60))
-        text = Strings.shieldsTimeStatsHour
-      } else {
-        counter = ceil(Double(estimatedMillisecondsSaved / 1000 / 60 / 60 / 24))
-        text = Strings.shieldsTimeStatsDays
-      }
+    if seconds {
+      counter = ceil(Double(estimatedMillisecondsSaved / 1000))
+      text = Strings.shieldsTimeStatsSeconds
+    } else if minutes {
+      counter = ceil(Double(estimatedMillisecondsSaved / 1000 / 60))
+      text = Strings.shieldsTimeStatsMinutes
+    } else if hours {
+      counter = ceil(Double(estimatedMillisecondsSaved / 1000 / 60 / 60))
+      text = Strings.shieldsTimeStatsHour
+    } else {
+      counter = ceil(Double(estimatedMillisecondsSaved / 1000 / 60 / 60 / 24))
+      text = Strings.shieldsTimeStatsDays
+    }
 
-      if let counterLocaleStr = Int(counter).decimalFormattedString {
-        return counterLocaleStr + text
-      } else {
-        return "0" + Strings.shieldsTimeStatsSeconds  // If decimalFormattedString returns nil, default to "0s"
-      }
+    if let counterLocaleStr = Int(counter).decimalFormattedString {
+      return counterLocaleStr + text
+    } else {
+      return "0" + Strings.shieldsTimeStatsSeconds // If decimalFormattedString returns nil, default to "0s"
     }
   }
 
   public var dataSaved: String {
-    var estimatedDataSavedInBytes = (BraveGlobalShieldStats.shared.adblock + BraveGlobalShieldStats.shared.trackingProtection) * bytesPerItem
+    var estimatedDataSavedInBytes = (
+      BraveGlobalShieldStats.shared.adblock + BraveGlobalShieldStats.shared
+        .trackingProtection
+    ) * bytesPerItem
 
-    if estimatedDataSavedInBytes <= 0 { return "0" }
+    if estimatedDataSavedInBytes <= 0 {
+      return "0"
+    }
     let _1MB = 1000 * 1000
 
     // Byte formatted megabytes value can be too long to display nicely(#3274).
@@ -129,8 +135,8 @@ open class BraveGlobalShieldStats {
   }
 }
 
-private extension Int {
-  var decimalFormattedString: String? {
+extension Int {
+  fileprivate var decimalFormattedString: String? {
     let numberFormatter = NumberFormatter()
     numberFormatter.numberStyle = NumberFormatter.Style.decimal
     numberFormatter.locale = NSLocale.current

@@ -20,14 +20,18 @@ class RewardsReporting: TabContentScript {
   }
 
   class func name() -> String {
-    return "RewardsReporting"
+    "RewardsReporting"
   }
 
   func scriptMessageHandlerName() -> String? {
-    return "rewardsReporting"
+    "rewardsReporting"
   }
 
-  func userContentController(_ userContentController: WKUserContentController, didReceiveScriptMessage message: WKScriptMessage, replyHandler: (Any?, String?) -> Void) {
+  func userContentController(
+    _ userContentController: WKUserContentController,
+    didReceiveScriptMessage message: WKScriptMessage,
+    replyHandler: (Any?, String?) -> Void
+  ) {
     defer { replyHandler(nil, nil) }
     struct Content: Decodable {
       var method: String
@@ -54,19 +58,29 @@ class RewardsReporting: TabContentScript {
         let json = try JSONSerialization.data(withJSONObject: body, options: [])
         var content = try JSONDecoder().decode(Content.self, from: json)
 
-        guard let tab = tab, let tabURL = tab.url else { return }
+        guard let tab = tab, let tabURL = tab.url else {
+          return
+        }
 
         if content.url.hasPrefix("//") {
           content.url = "\(tabURL.scheme ?? "http"):\(content.url)"
         }
 
-        guard let url = URL(string: content.url) else { return }
+        guard let url = URL(string: content.url) else {
+          return
+        }
         let refURL = URL(string: content.referrerUrl ?? "")
 
         if content.method.lowercased() == "post" {
           if let postData = content.data?.removingPercentEncoding, let data = postData.data(using: .utf8) {
             if BraveLedger.isMediaURL(url, firstPartyURL: tabURL, referrerURL: refURL) {
-              rewards.reportPostData(data, url: url, tabId: Int(tab.rewardsId), firstPartyURL: tabURL, referrerURL: refURL)
+              rewards.reportPostData(
+                data,
+                url: url,
+                tabId: Int(tab.rewardsId),
+                firstPartyURL: tabURL,
+                referrerURL: refURL
+              )
             }
           }
         } else {

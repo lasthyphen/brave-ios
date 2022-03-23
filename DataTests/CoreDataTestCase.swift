@@ -8,14 +8,14 @@ import CoreData
 @testable import BraveShared
 
 class CoreDataTestCase: XCTestCase {
-
   override func setUp() {
     super.setUp()
 
     NotificationCenter.default.addObserver(
       self, selector: #selector(contextSaved),
       name: NSNotification.Name.NSManagedObjectContextDidSave,
-      object: nil)
+      object: nil
+    )
 
     Preferences.Database.DocumentToSupportDirectoryMigration.completed.value = true
     DataController.shared = InMemoryDataController()

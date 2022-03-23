@@ -15,9 +15,9 @@ protocol BookmarkFormFieldsProtocol: UIView {
 }
 
 extension BookmarkFormFieldsProtocol {
-  var urlTextField: UITextField? { return nil }
+  var urlTextField: UITextField? { nil }
 
   func validateFields() -> Bool {
-    return BookmarkValidation.validateBookmark(title: titleTextField.text, url: urlTextField?.text)
+    BookmarkValidation.validateBookmark(title: titleTextField.text, url: urlTextField?.text)
   }
 }

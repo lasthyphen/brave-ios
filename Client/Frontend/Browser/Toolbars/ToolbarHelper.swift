@@ -39,7 +39,10 @@ class ToolbarHelper: NSObject {
 
     toolbar.forwardButton.setImage(#imageLiteral(resourceName: "nav-forward").template, for: .normal)
     toolbar.forwardButton.accessibilityLabel = Strings.tabToolbarForwardButtonAccessibilityLabel
-    let longPressGestureForwardButton = UILongPressGestureRecognizer(target: self, action: #selector(didLongPressForward))
+    let longPressGestureForwardButton = UILongPressGestureRecognizer(
+      target: self,
+      action: #selector(didLongPressForward)
+    )
     toolbar.forwardButton.addGestureRecognizer(longPressGestureForwardButton)
     toolbar.forwardButton.addTarget(self, action: #selector(didClickForward), for: .touchUpInside)
   }

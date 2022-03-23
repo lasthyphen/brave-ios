@@ -43,7 +43,9 @@ class PlaylistHelper: NSObject, TabContentScript {
     urlObserver = tab.webView?.observe(
       \.url, options: [.new],
       changeHandler: { [weak self] _, change in
-        guard let self = self, let url = change.newValue else { return }
+        guard let self = self, let url = change.newValue else {
+          return
+        }
         if self.url != url {
           self.url = url
           self.playlistItems = Set<String>()
@@ -53,12 +55,14 @@ class PlaylistHelper: NSObject, TabContentScript {
 
           self.delegate?.updatePlaylistURLBar(tab: self.tab, state: .none, item: nil)
         }
-      })
+      }
+    )
 
     tab.webView?.addGestureRecognizer(
       UILongPressGestureRecognizer(target: self, action: #selector(onLongPressedWebView(_:))).then {
         $0.delegate = self
-      })
+      }
+    )
   }
 
   deinit {
@@ -67,18 +71,23 @@ class PlaylistHelper: NSObject, TabContentScript {
   }
 
   static func name() -> String {
-    return "PlaylistHelper"
+    "PlaylistHelper"
   }
 
   func scriptMessageHandlerName() -> String? {
-    return "playlistHelper_\(UserScriptManager.messageHandlerTokenString)"
+    "playlistHelper_\(UserScriptManager.messageHandlerTokenString)"
   }
 
-  func userContentController(_ userContentController: WKUserContentController, didReceiveScriptMessage message: WKScriptMessage, replyHandler: (Any?, String?) -> Void) {
+  func userContentController(
+    _ userContentController: WKUserContentController,
+    didReceiveScriptMessage message: WKScriptMessage,
+    replyHandler: (Any?, String?) -> Void
+  ) {
     defer { replyHandler(nil, nil) }
     PlaylistHelper.processPlaylistInfo(
       helper: self,
-      item: PlaylistInfo.from(message: message))
+      item: PlaylistInfo.from(message: message)
+    )
   }
 
   private class func processPlaylistInfo(helper: PlaylistHelper, item: PlaylistInfo?) {
@@ -90,9 +99,12 @@ class PlaylistHelper: NSObject, TabContentScript {
     }
 
     PlaylistHelper.queue.async { [weak helper] in
-      guard let helper = helper else { return }
+      guard let helper = helper else {
+        return
+      }
 
-      if item.duration <= 0.0 && !item.detected || item.src.isEmpty || item.src.hasPrefix("data:") || item.src.hasPrefix("blob:") {
+      if item.duration <= 0.0 && !item.detected || item.src.isEmpty || item.src.hasPrefix("data:") || item.src
+        .hasPrefix("blob:") {
         DispatchQueue.main.async {
           helper.delegate?.updatePlaylistURLBar(tab: helper.tab, state: .none, item: nil)
         }
@@ -102,8 +114,10 @@ class PlaylistHelper: NSObject, TabContentScript {
       if let url = URL(string: item.src) {
         helper.loadAssetPlayability(url: url) { [weak helper] isPlayable in
           guard let helper = helper,
-            let delegate = helper.delegate
-          else { return }
+                let delegate = helper.delegate
+          else {
+            return
+          }
 
           if !isPlayable {
             delegate.updatePlaylistURLBar(tab: helper.tab, state: .none, item: nil)
@@ -136,7 +150,9 @@ class PlaylistHelper: NSObject, TabContentScript {
     }
 
     let isAssetPlayable = { [weak self] () -> Bool in
-      guard let self = self else { return false }
+      guard let self = self else {
+        return false
+      }
 
       var error: NSError?
       let status = self.asset?.statusOfValue(forKey: "playable", error: &error)
@@ -182,7 +198,9 @@ class PlaylistHelper: NSObject, TabContentScript {
     }
 
     PlaylistItem.updateItem(item) { [weak self] in
-      guard let self = self else { return }
+      guard let self = self else {
+        return
+      }
 
       log.debug("Playlist Item Updated")
 
@@ -205,13 +223,18 @@ extension PlaylistHelper: UIGestureRecognizerDelegate {
   @objc
   func onLongPressedWebView(_ gestureRecognizer: UILongPressGestureRecognizer) {
     if gestureRecognizer.state == .began,
-      let webView = tab?.webView,
-      Preferences.Playlist.enableLongPressAddToPlaylist.value {
+       let webView = tab?.webView,
+       Preferences.Playlist.enableLongPressAddToPlaylist.value {
       let touchPoint = gestureRecognizer.location(in: webView)
 
       let token = UserScriptManager.securityTokenString
 
-      webView.evaluateSafeJavaScript(functionName: "window.__firefox__.onLongPressActivated_\(token)", args: [touchPoint.x, touchPoint.y], contentWorld: .page, asFunction: true) { _, error in
+      webView.evaluateSafeJavaScript(
+        functionName: "window.__firefox__.onLongPressActivated_\(token)",
+        args: [touchPoint.x, touchPoint.y],
+        contentWorld: .page,
+        asFunction: true
+      ) { _, error in
 
         if let error = error {
           log.error("Error executing onLongPressActivated: \(error)")
@@ -220,15 +243,21 @@ extension PlaylistHelper: UIGestureRecognizerDelegate {
     }
   }
 
-  func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
+  func gestureRecognizer(
+    _ gestureRecognizer: UIGestureRecognizer,
+    shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer
+  ) -> Bool {
     if otherGestureRecognizer.isKind(of: UILongPressGestureRecognizer.self) {
       return true
     }
     return false
   }
 
-  func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldBeRequiredToFailBy otherGestureRecognizer: UIGestureRecognizer) -> Bool {
-    return false
+  func gestureRecognizer(
+    _ gestureRecognizer: UIGestureRecognizer,
+    shouldBeRequiredToFailBy otherGestureRecognizer: UIGestureRecognizer
+  ) -> Bool {
+    false
   }
 }
 
@@ -241,7 +270,12 @@ extension PlaylistHelper {
 
     let token = UserScriptManager.securityTokenString
 
-    webView.evaluateSafeJavaScript(functionName: "window.__firefox__.mediaCurrentTimeFromTag_\(token)", args: [nodeTag], contentWorld: .page, asFunction: true) { value, error in
+    webView.evaluateSafeJavaScript(
+      functionName: "window.__firefox__.mediaCurrentTimeFromTag_\(token)",
+      args: [nodeTag],
+      contentWorld: .page,
+      asFunction: true
+    ) { value, error in
 
       if let error = error {
         log.error("Error Retrieving Playlist Page Media Current Time: \(error)")
@@ -258,7 +292,9 @@ extension PlaylistHelper {
   }
 
   static func stopPlayback(tab: Tab?) {
-    guard let tab = tab else { return }
+    guard let tab = tab else {
+      return
+    }
 
     let token = UserScriptManager.securityTokenString
     let javascript = String(format: "window.__firefox__.stopMediaPlayback_%@()", token)
@@ -269,7 +305,8 @@ extension PlaylistHelper {
         if let error = error {
           log.error("Error Retrieving Stopping Media Playback: \(error)")
         }
-      })
+      }
+    )
   }
 }
 

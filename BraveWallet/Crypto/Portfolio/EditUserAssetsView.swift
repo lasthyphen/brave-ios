@@ -70,8 +70,8 @@ struct EditUserAssetsView: View {
     }
     return
       stores
-      .sorted(by: { $0.token.symbol.caseInsensitiveCompare($1.token.symbol) == .orderedAscending })
-      .sorted(by: { $0.isVisible && !$1.isVisible })
+        .sorted(by: { $0.token.symbol.caseInsensitiveCompare($1.token.symbol) == .orderedAscending })
+        .sorted(by: { $0.isVisible && !$1.isVisible })
   }
 
   var body: some View {
@@ -94,7 +94,7 @@ struct EditUserAssetsView: View {
           }
           .osAvailabilityModifiers { content in
             if #available(iOS 15.0, *) {
-              content  // Padding already applied
+              content // Padding already applied
             } else {
               content
                 .padding(.top)
@@ -118,7 +118,8 @@ struct EditUserAssetsView: View {
                         .modifier(
                           SwipeActionsViewModifier_FB9812596 {
                             removeCustomToken(store.token)
-                          })
+                          }
+                        )
                     } else {
                       content
                         .contextMenu {

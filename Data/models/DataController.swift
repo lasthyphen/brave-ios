@@ -55,7 +55,9 @@ public class DataController {
   /// IMPORTANT: This must be called after pre 1.12 migration logic has been called.
   /// Initialization logic will run only once, then do nothing on subsequent calls to this method.
   public func initializeOnce() {
-    if initializationCompleted { return }
+    if initializationCompleted {
+      return
+    }
 
     configureContainer(container, store: storeURL)
     createOldDocumentStoreIfNeeded()
@@ -68,12 +70,13 @@ public class DataController {
   public static var sharedInMemory: DataController = InMemoryDataController()
 
   public func storeExists() -> Bool {
-    return FileManager.default.fileExists(atPath: storeURL.path)
+    FileManager.default.fileExists(atPath: storeURL.path)
   }
 
   private let container = NSPersistentContainer(
     name: DataController.modelName,
-    managedObjectModel: DataController.model)
+    managedObjectModel: DataController.model
+  )
 
   // MARK: - Old Database migration methods
 
@@ -88,13 +91,18 @@ public class DataController {
         for: FileManager.SearchPathDirectory.documentDirectory,
         in: .userDomainMask
       ).last
-    else { return }
+    else {
+      return
+    }
 
     let name = DataController.databaseName
     let path = urls.appendingPathComponent(name).path
 
     if fm.fileExists(atPath: path) {
-      migrationContainer = NSPersistentContainer(name: DataController.modelName, managedObjectModel: DataController.model)
+      migrationContainer = NSPersistentContainer(
+        name: DataController.modelName,
+        managedObjectModel: DataController.model
+      )
       if let migrationContainer = migrationContainer {
         configureContainer(migrationContainer, store: oldDocumentStoreURL)
       }
@@ -108,7 +116,9 @@ public class DataController {
         for: FileManager.SearchPathDirectory.applicationSupportDirectory,
         in: .userDomainMask
       ).last
-    else { return false }
+    else {
+      return false
+    }
 
     let name = DataController.databaseName
     let path = urls.appendingPathComponent(name).path
@@ -156,7 +166,12 @@ public class DataController {
       let migrationOptions = [
         NSPersistentStoreFileProtectionKey: true
       ]
-      try coordinator.migratePersistentStore(oldStore, to: supportStoreURL, options: migrationOptions, withType: NSSQLiteStoreType)
+      try coordinator.migratePersistentStore(
+        oldStore,
+        to: supportStoreURL,
+        options: migrationOptions,
+        withType: NSSQLiteStoreType
+      )
     } catch {
       throw MigrationError.MigrationFailed("Document -> Support database migration failed: \(error)")
       // Migration failed somehow, and old store is present. Flag not being updated 😭
@@ -172,7 +187,8 @@ public class DataController {
       let documentFiles = try FileManager.default.contentsOfDirectory(
         at: oldDocumentStoreURL.deletingLastPathComponent(),
         includingPropertiesForKeys: nil,
-        options: [])
+        options: []
+      )
 
       // Delete all Brave.X files
       try documentFiles
@@ -188,12 +204,12 @@ public class DataController {
 
   /// Warning! Please use `storeURL`. This is for migration purpose only.
   private var oldDocumentStoreURL: URL {
-    return storeURL(for: FileManager.SearchPathDirectory.documentDirectory)
+    storeURL(for: FileManager.SearchPathDirectory.documentDirectory)
   }
 
   /// Warning! Please use `storeURL`. This is for migration purposes only.
   private var supportStoreURL: URL {
-    return storeURL(for: FileManager.SearchPathDirectory.applicationSupportDirectory)
+    storeURL(for: FileManager.SearchPathDirectory.applicationSupportDirectory)
   }
 
   private func storeURL(for directory: FileManager.SearchPathDirectory) -> URL {
@@ -228,12 +244,16 @@ public class DataController {
       let queue = inMemory ? DataController.sharedInMemory.operationQueue : DataController.shared.operationQueue
 
       queue.addOperation({
-        let backgroundContext = inMemory ? DataController.newBackgroundContextInMemory() : DataController.newBackgroundContext()
+        let backgroundContext = inMemory
+          ? DataController.newBackgroundContextInMemory()
+          : DataController.newBackgroundContext()
         // performAndWait doesn't block main thread because it fires on OperationQueue`s background thread.
         backgroundContext.performAndWait {
           task(backgroundContext)
 
-          guard save && backgroundContext.hasChanges else { return }
+          guard save && backgroundContext.hasChanges else {
+            return
+          }
 
           do {
             assert(!Thread.isMainThread)
@@ -251,17 +271,17 @@ public class DataController {
   }
 
   public static var swiftUIContext: NSManagedObjectContext {
-    return DataController.shared.container.viewContext
+    DataController.shared.container.viewContext
   }
 
   // Context object also allows us access to all persistent container data if needed.
   static var viewContext: NSManagedObjectContext {
-    return DataController.shared.container.viewContext
+    DataController.shared.container.viewContext
   }
 
   // Context object also allows us access to all persistent container data if needed.
   static var viewContextInMemory: NSManagedObjectContext {
-    return DataController.sharedInMemory.container.viewContext
+    DataController.sharedInMemory.container.viewContext
   }
 
   func addPersistentStore(for container: NSPersistentContainer, store: URL) {

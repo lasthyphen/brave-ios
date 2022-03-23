@@ -10,7 +10,6 @@ import BraveShared
 import WebKit
 
 class FingerprintProtectionTest: XCTestCase {
-
   override func setUp() {
     DataController.shared = DataController()
     DataController.shared.initializeOnce()
@@ -22,7 +21,6 @@ class FingerprintProtectionTest: XCTestCase {
 }
 
 private class FingerprintProtectionNavDelegate: NSObject, WKNavigationDelegate {
-
   let completed: (Error?) -> Void
 
   init(completed: @escaping (Error?) -> Void) {

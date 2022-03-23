@@ -11,7 +11,7 @@ struct NewTabAccessors {
   static let `default` = NewTabPage.topSites
 
   static func getNewTabPage() -> NewTabPage {
-    return `default`
+    `default`
   }
 }
 

@@ -38,11 +38,11 @@ class SyncCodewordsView: UIView, UITextViewDelegate {
 
     setCodewords(data: data)
 
-    field.snp.makeConstraints { (make) in
+    field.snp.makeConstraints { make in
       make.edges.equalTo(self).inset(20)
     }
 
-    placeholder.snp.makeConstraints { (make) in
+    placeholder.snp.makeConstraints { make in
       make.top.left.right.equalTo(field).inset(UIEdgeInsets(top: 8, left: 4, bottom: 0, right: 0))
     }
 
@@ -56,11 +56,11 @@ class SyncCodewordsView: UIView, UITextViewDelegate {
   }
 
   func codeWords() -> [String] {
-    return field.text.separatedBy(" ").filter { !$0.isEmpty }
+    field.text.separatedBy(" ").filter { !$0.isEmpty }
   }
 
   func wordCount() -> Int {
-    return codeWords().count
+    codeWords().count
   }
 
   func updateWordCount() {
@@ -79,7 +79,7 @@ class SyncCodewordsView: UIView, UITextViewDelegate {
   }
 
   func textView(_ textView: UITextView, shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool {
-    return text != "\n"
+    text != "\n"
   }
 
   func textViewDidChange(_ textView: UITextView) {

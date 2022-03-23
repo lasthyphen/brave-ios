@@ -23,7 +23,9 @@ extension FeedDataSource {
 
   var rssFeedLocations: [RSSFeedLocation] {
     RSSFeedSource.all().compactMap {
-      guard let url = URL(string: $0.feedUrl) else { return nil }
+      guard let url = URL(string: $0.feedUrl) else {
+        return nil
+      }
       return RSSFeedLocation(title: $0.title, url: url)
     }
   }
@@ -43,7 +45,8 @@ extension FeedDataSource {
     }
     RSSFeedSource.insert(
       title: location.title,
-      feedUrl: feedUrl)
+      feedUrl: feedUrl
+    )
     setNeedsReloadCards()
     return true
   }
@@ -76,8 +79,8 @@ extension FeedDataSource {
 extension FeedItem.Content {
   private static func imageURL(from document: HTMLDocument, releativeTo baseURL: URL?) -> URL? {
     if let src = document.firstChild(xpath: "//img[@src]")?.attr("src"),
-      let url = URL(string: src, relativeTo: baseURL),
-      url.isWebPage(includeDataURIs: false), !InternalURL.isValid(url: url) {
+       let url = URL(string: src, relativeTo: baseURL),
+       url.isWebPage(includeDataURIs: false), !InternalURL.isValid(url: url) {
       return url
     }
     return nil
@@ -96,16 +99,16 @@ extension FeedItem.Content {
 
   init?(from feedItem: JSONFeedItem, location: RSSFeedLocation) {
     guard let publishTime = feedItem.datePublished,
-      let url = feedItem.url?.asURL,
-      let title = feedItem.title,
-      url.isWebPage()
+          let url = feedItem.url?.asURL,
+          let title = feedItem.title,
+          url.isWebPage()
     else {
       return nil
     }
     var description = ""
     var imageURL: URL?
     if let image = feedItem.image, let url = URL(string: image, relativeTo: location.url.domainURL),
-      url.isWebPage(includeDataURIs: false), !InternalURL.isValid(url: url) {
+       url.isWebPage(includeDataURIs: false), !InternalURL.isValid(url: url) {
       imageURL = url
     }
     if let text = feedItem.contentText {
@@ -113,7 +116,7 @@ extension FeedItem.Content {
     }
     if let html = feedItem.contentHtml, let doc = try? HTMLDocument(string: html) {
       if imageURL == nil,
-        let imageURLFromHTML = Self.imageURL(from: doc, releativeTo: location.url.domainURL) {
+         let imageURLFromHTML = Self.imageURL(from: doc, releativeTo: location.url.domainURL) {
         imageURL = imageURLFromHTML
       }
       if description.isEmpty, let text = Self.descriptionText(from: doc) {
@@ -133,30 +136,31 @@ extension FeedItem.Content {
       offersCategory: nil
     )
   }
+
   init?(from feedItem: AtomFeedEntry, location: RSSFeedLocation) {
     guard let publishTime = feedItem.published,
-      let href = feedItem.links?.first?.attributes?.href,
-      let url = URL(string: href),
-      let title = feedItem.title,
-      url.isWebPage()
+          let href = feedItem.links?.first?.attributes?.href,
+          let url = URL(string: href),
+          let title = feedItem.title,
+          url.isWebPage()
     else {
       return nil
     }
     var description = ""
     var imageURL: URL?
     if let thumbnail = feedItem.media?.mediaThumbnails?.first?.attributes?.url,
-      let url = URL(string: thumbnail, relativeTo: location.url.domainURL),
-      url.isWebPage(includeDataURIs: false), !InternalURL.isValid(url: url) {
+       let url = URL(string: thumbnail, relativeTo: location.url.domainURL),
+       url.isWebPage(includeDataURIs: false), !InternalURL.isValid(url: url) {
       imageURL = url
     }
     if feedItem.summary?.attributes?.type == "text" {
       description = feedItem.summary?.value ?? ""
     } else if feedItem.content?.attributes?.type == "html",
-      let html = feedItem.content?.value,
-      let doc = try? HTMLDocument(string: html) {
+              let html = feedItem.content?.value,
+              let doc = try? HTMLDocument(string: html) {
       // Find one in description?
       if imageURL == nil,
-        let imageURLFromHTML = Self.imageURL(from: doc, releativeTo: location.url.domainURL) {
+         let imageURLFromHTML = Self.imageURL(from: doc, releativeTo: location.url.domainURL) {
         imageURL = imageURLFromHTML
       }
       if description.isEmpty, let text = Self.descriptionText(from: doc) {
@@ -176,25 +180,26 @@ extension FeedItem.Content {
       offersCategory: nil
     )
   }
+
   init?(from feedItem: RSSFeedItem, location: RSSFeedLocation) {
     guard let publishTime = feedItem.pubDate,
-      let href = feedItem.link,
-      let url = URL(string: href),
-      let title = feedItem.title,
-      url.isWebPage()
+          let href = feedItem.link,
+          let url = URL(string: href),
+          let title = feedItem.title,
+          url.isWebPage()
     else {
       return nil
     }
     var description = ""
     var imageURL: URL?
     if let thumbnail = feedItem.media?.mediaThumbnails?.first?.attributes?.url,
-      let url = URL(string: thumbnail, relativeTo: location.url.domainURL),
-      url.isWebPage(includeDataURIs: false), !InternalURL.isValid(url: url) {
+       let url = URL(string: thumbnail, relativeTo: location.url.domainURL),
+       url.isWebPage(includeDataURIs: false), !InternalURL.isValid(url: url) {
       imageURL = url
     }
     if let html = feedItem.description, let doc = try? HTMLDocument(string: html) {
       if imageURL == nil,
-        let imageURLFromHTML = Self.imageURL(from: doc, releativeTo: location.url.domainURL) {
+         let imageURLFromHTML = Self.imageURL(from: doc, releativeTo: location.url.domainURL) {
         imageURL = imageURLFromHTML
       }
       if description.isEmpty, let text = Self.descriptionText(from: doc) {
@@ -215,10 +220,13 @@ extension FeedItem.Content {
     )
   }
 }
+
 extension FeedItem.Source {
   init?(from feed: FeedKit.Feed, location: RSSFeedLocation) {
     let id = location.id
-    guard let title = feed.title else { return nil }
+    guard let title = feed.title else {
+      return nil
+    }
     self.init(id: id, isDefault: true, category: "", name: title, isUserSource: true)
   }
 }

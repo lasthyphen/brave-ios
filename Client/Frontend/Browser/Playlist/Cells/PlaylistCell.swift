@@ -30,6 +30,7 @@ class PlaylistResizingThumbnailView: UIImageView {
     super.init(frame: .zero)
   }
 
+  @available(*, unavailable)
   required init?(coder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }
@@ -117,7 +118,7 @@ class PlaylistCell: UITableViewCell {
 
     thumbnailHolder.snp.makeConstraints {
       // Keeps a 94.0px width on iPhone-X as per design
-      $0.width.equalTo(iconStackView.snp.height).multipliedBy(1.46875 /* 94.0 / (tableViewCellHeight - (8.0 * 2)) */)
+      $0.width.equalTo(iconStackView.snp.height).multipliedBy(1.46875 /* 94.0 / (tableViewCellHeight - (8.0 * 2)) */ )
       $0.height.equalToSuperview()
     }
 
@@ -152,7 +153,9 @@ class PlaylistCell: UITableViewCell {
   }
 
   private static func onThumbnailChanged(_ imageView: PlaylistResizingThumbnailView) {
-    guard let superView = imageView.superview else { return }
+    guard let superView = imageView.superview else {
+      return
+    }
 
     imageView.snp.remakeConstraints {
       $0.center.equalToSuperview()
@@ -170,26 +173,27 @@ class PlaylistCell: UITableViewCell {
     }
   }
 
+  @available(*, unavailable)
   required init?(coder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }
 
   override var layoutMargins: UIEdgeInsets {
     get {
-      return .zero
+      .zero
     }
 
-    set {  // swiftlint:disable:this unused_setter_value
+    set { // swiftlint:disable:this unused_setter_value
       super.layoutMargins = .zero
     }
   }
 
   override var separatorInset: UIEdgeInsets {
     get {
-      return UIEdgeInsets(top: 0, left: self.titleLabel.frame.origin.x, bottom: 0, right: 0)
+      UIEdgeInsets(top: 0, left: self.titleLabel.frame.origin.x, bottom: 0, right: 0)
     }
 
-    set {  // swiftlint:disable:this unused_setter_value
+    set { // swiftlint:disable:this unused_setter_value
       super.separatorInset = UIEdgeInsets(top: 0, left: self.titleLabel.frame.origin.x, bottom: 0, right: 0)
     }
   }

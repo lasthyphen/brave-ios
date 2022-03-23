@@ -15,7 +15,7 @@ struct PasscodeMigrationContainerView: View {
   var body: some View {
     let isUserAuthenticationAvailable =
       context
-      .canEvaluatePolicy(.deviceOwnerAuthentication, error: nil)
+        .canEvaluatePolicy(.deviceOwnerAuthentication, error: nil)
     let biometryType = context.biometryType
     PasscodeMigrationView(
       isUserAuthenticationAvailable: isUserAuthenticationAvailable,
@@ -127,7 +127,7 @@ struct PasscodeMigrationView_Previews: PreviewProvider {
         availableBiometryMethod: .faceID,
         continueAction: {}
       )
-      .environment(\.sizeCategory, .accessibilityExtraExtraLarge)
+        .environment(\.sizeCategory, .accessibilityExtraExtraLarge)
     }
   }
 }

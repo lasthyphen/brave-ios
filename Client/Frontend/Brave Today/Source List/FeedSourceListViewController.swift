@@ -47,13 +47,13 @@ class FeedSourceListViewController: UITableViewController {
     if !searchQuery.isEmpty {
       list =
         list
-        .filter { $0.name.lowercased().contains(searchQuery.lowercased()) }
+          .filter { $0.name.lowercased().contains(searchQuery.lowercased()) }
     }
     var updatedSections: [[FeedItem.Source]] = []
     let otherSections = Dictionary(grouping: list, by: { $0.sectionIndexTitle ?? "" })
       .filter { !$0.key.isEmpty }
       .sorted(by: { $0.key < $1.key })
-      .reduce(into: [[FeedItem.Source]]()) { (sections, value) in
+      .reduce(into: [[FeedItem.Source]]()) { sections, value in
         sections.append(value.value)
       }
     if !otherSections.isEmpty {
@@ -105,19 +105,25 @@ class FeedSourceListViewController: UITableViewController {
         title: Strings.BraveNews.enableAll, style: .default,
         handler: { [weak self] _ in
           self?.toggleCategory(enabled: true)
-        }))
+        }
+      )
+    )
     alert.addAction(
       UIAlertAction(
         title: Strings.BraveNews.disableAll, style: .destructive,
         handler: { [weak self] _ in
           self?.toggleCategory(enabled: false)
-        }))
+        }
+      )
+    )
     alert.addAction(UIAlertAction(title: Strings.cancelButtonTitle, style: .cancel))
     present(alert, animated: true)
   }
 
   private func toggleCategory(enabled: Bool) {
-    guard let category = category else { return }
+    guard let category = category else {
+      return
+    }
     // Update DB
     dataSource.toggleCategory(category, enabled: enabled)
     // Update local state
@@ -160,11 +166,11 @@ extension FeedSourceListViewController {
   }
 
   override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-    return sections[section].count
+    sections[section].count
   }
 
   override func numberOfSections(in tableView: UITableView) -> Int {
-    return sections.count
+    sections.count
   }
 
   override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -178,7 +184,9 @@ extension FeedSourceListViewController {
     cell.accessoryView = cell.enabledToggle
     cell.enabledToggle.isOn = customizedSources[source.id] ?? source.isDefault
     cell.enabledToggleValueChanged = { [weak self] isOn in
-      guard let self = self else { return }
+      guard let self = self else {
+        return
+      }
       // Update data source + DB
       self.dataSource.toggleSource(source, enabled: isOn)
       // Update local state

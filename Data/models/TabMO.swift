@@ -41,12 +41,11 @@ public struct SavedTab {
 private let log = Logger.browserLogger
 
 public final class TabMO: NSManagedObject, CRUD {
-
   @NSManaged public var title: String?
   @NSManaged public var url: String?
   @NSManaged public var syncUUID: String?
   @NSManaged public var order: Int16
-  @NSManaged public var urlHistorySnapshot: NSArray?  // array of strings for urls
+  @NSManaged public var urlHistorySnapshot: NSArray? // array of strings for urls
   @NSManaged public var urlHistoryCurrentIndex: Int16
   @NSManaged public var screenshot: Data?
   @NSManaged public var isSelected: Bool
@@ -104,7 +103,7 @@ public final class TabMO: NSManagedObject, CRUD {
   }
 
   public class func get(fromId id: String?) -> TabMO? {
-    return getInternal(fromId: id)
+    getInternal(fromId: id)
   }
 
   // MARK: Update
@@ -113,7 +112,9 @@ public final class TabMO: NSManagedObject, CRUD {
   // Usually called when user navigates to a new website for in his existing tab.
   public class func update(tabData: SavedTab) {
     DataController.perform { context in
-      guard let tabToUpdate = getInternal(fromId: tabData.id, context: context) else { return }
+      guard let tabToUpdate = getInternal(fromId: tabData.id, context: context) else {
+        return
+      }
 
       if let screenshot = tabData.screenshot {
         tabToUpdate.screenshot = screenshot.jpegData(compressionQuality: 1)
@@ -132,15 +133,18 @@ public final class TabMO: NSManagedObject, CRUD {
   // Updates Tab's last accesed time.
   public class func touch(tabID: String) {
     DataController.perform { context in
-      guard let tabToUpdate = getInternal(fromId: tabID, context: context) else { return }
+      guard let tabToUpdate = getInternal(fromId: tabID, context: context) else {
+        return
+      }
       tabToUpdate.lastUpdate = Date()
     }
-
   }
 
   public class func selectTabAndDeselectOthers(selectedTabId: String) {
     DataController.perform { context in
-      guard let tabToUpdate = getInternal(fromId: selectedTabId, context: context) else { return }
+      guard let tabToUpdate = getInternal(fromId: selectedTabId, context: context) else {
+        return
+      }
 
       let predicate = NSPredicate(format: "isSelected == true")
       all(where: predicate, context: context)?
@@ -155,7 +159,9 @@ public final class TabMO: NSManagedObject, CRUD {
   // Deletes the Tab History by removing items except the last one from historysnapshot and setting current index
   public class func removeHistory(with tabID: String) {
     DataController.perform { context in
-      guard let tabToUpdate = getInternal(fromId: tabID, context: context) else { return }
+      guard let tabToUpdate = getInternal(fromId: tabID, context: context) else {
+        return
+      }
 
       if let lastItem = tabToUpdate.urlHistorySnapshot?.lastObject {
         tabToUpdate.urlHistorySnapshot = [lastItem] as NSArray
@@ -212,14 +218,16 @@ public final class TabMO: NSManagedObject, CRUD {
 extension TabMO {
   // Currently required, because not `syncable`
   private static func entity(_ context: NSManagedObjectContext) -> NSEntityDescription {
-    return NSEntityDescription.entity(forEntityName: "TabMO", in: context)!
+    NSEntityDescription.entity(forEntityName: "TabMO", in: context)!
   }
 
   private class func getInternal(
     fromId id: String?,
     context: NSManagedObjectContext = DataController.viewContext
   ) -> TabMO? {
-    guard let id = id else { return nil }
+    guard let id = id else {
+      return nil
+    }
     let predicate = NSPredicate(format: "\(#keyPath(TabMO.syncUUID)) == %@", id)
 
     return first(where: predicate, context: context)

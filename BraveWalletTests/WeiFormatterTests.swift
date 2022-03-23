@@ -18,6 +18,7 @@ class WeiFormatterTests: XCTestCase {
     // Hex
     XCTAssertEqual(try XCTUnwrap(formatter.decimalString(for: "16345785d8a0000", radix: .hex, decimals: 18)), "0.10000")
   }
+
   func testWeiToBalance() throws {
     let formatter = WeiFormatter(decimalFormatStyle: .balance)
     // Round up
@@ -25,16 +26,19 @@ class WeiFormatterTests: XCTestCase {
     // Round down
     XCTAssertEqual(try XCTUnwrap(formatter.decimalString(for: "31050332080585020020", decimals: 18)), "31.0503")
   }
+
   func testWeiToGasFee() throws {
     let formatter = WeiFormatter(decimalFormatStyle: .gasFee(limit: "100"))
     XCTAssertEqual(try XCTUnwrap(formatter.decimalString(for: "31050382080585020020", decimals: 18)), "3105.038208")
   }
+
   func testInvalidString() {
     let formatter = WeiFormatter(decimalFormatStyle: .balance)
     XCTAssertNil(formatter.decimalString(for: "0x429d069189e0000", radix: .decimal, decimals: 18))
     XCTAssertNil(formatter.decimalString(for: "", decimals: 18))
     XCTAssertNil(formatter.decimalString(for: "hello, world", radix: .hex, decimals: 18))
   }
+
   func testDecimalToWei() throws {
     let formatter = WeiFormatter(decimalFormatStyle: .balance)
     XCTAssertEqual(try XCTUnwrap(formatter.weiString(from: "1", radix: .decimal, decimals: 18)), "1000000000000000000")

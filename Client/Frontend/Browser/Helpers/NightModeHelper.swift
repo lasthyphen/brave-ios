@@ -11,7 +11,7 @@ class NightModeHelper: TabContentScript {
   fileprivate weak var tab: Tab?
 
   static var isActivated: Bool {
-    return Preferences.General.nightModeEnabled.value
+    Preferences.General.nightModeEnabled.value
   }
 
   required init(tab: Tab) {
@@ -19,14 +19,18 @@ class NightModeHelper: TabContentScript {
   }
 
   static func name() -> String {
-    return "NightMode"
+    "NightMode"
   }
 
   func scriptMessageHandlerName() -> String? {
-    return "NightMode"
+    "NightMode"
   }
 
-  func userContentController(_ userContentController: WKUserContentController, didReceiveScriptMessage message: WKScriptMessage, replyHandler: @escaping (Any?, String?) -> Void) {
+  func userContentController(
+    _ userContentController: WKUserContentController,
+    didReceiveScriptMessage message: WKScriptMessage,
+    replyHandler: @escaping (Any?, String?) -> Void
+  ) {
     // Do nothing.
   }
 

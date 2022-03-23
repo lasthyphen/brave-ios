@@ -9,7 +9,6 @@ import Storage
 import Shared
 
 class TestFavicons: ProfileTest {
-
   func testBundledFavicons() {
     let fetcher = FaviconFetcher(siteURL: URL(string: "http://www.google.de")!, kind: .favicon)
     XCTAssertNotNil(fetcher.bundledIcon)

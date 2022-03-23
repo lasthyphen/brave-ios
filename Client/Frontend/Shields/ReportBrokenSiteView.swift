@@ -9,7 +9,6 @@ import BraveShared
 import BraveUI
 
 class ReportBrokenSiteView: UIStackView {
-
   private let titleLabel = UILabel().then {
     $0.text = Strings.Shields.reportABrokenSite
     $0.textColor = .braveLabel
@@ -71,11 +70,12 @@ class ReportBrokenSiteView: UIStackView {
         UIStackView().then {
           $0.spacing = 10
           $0.addStackViewItems(
-            .view(UIView()),  // spacer
+            .view(UIView()), // spacer
             .view(cancelButton),
             .view(submitButton)
           )
-        })
+        }
+      )
     )
   }
 

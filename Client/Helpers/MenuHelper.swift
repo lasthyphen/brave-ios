@@ -50,6 +50,13 @@ open class MenuHelper: NSObject {
     let findInPageItem = UIMenuItem(title: Strings.findInPage, action: MenuHelper.selectorFindInPage)
     let searchWithBraveItem = UIMenuItem(title: Strings.searchWithBrave, action: MenuHelper.selectorSearchWithBrave)
 
-    UIMenuController.shared.menuItems = [copyItem, revealPasswordItem, hidePasswordItem, openWebsiteItem, findInPageItem, searchWithBraveItem]
+    UIMenuController.shared.menuItems = [
+      copyItem,
+      revealPasswordItem,
+      hidePasswordItem,
+      openWebsiteItem,
+      findInPageItem,
+      searchWithBraveItem
+    ]
   }
 }

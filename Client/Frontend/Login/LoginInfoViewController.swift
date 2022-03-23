@@ -12,7 +12,6 @@ import BraveCore
 private let log = Logger.browserLogger
 
 class LoginInfoViewController: LoginAuthViewController {
-
   // MARK: UX
 
   struct UX {
@@ -52,6 +51,7 @@ class LoginInfoViewController: LoginAuthViewController {
       tableView.reloadData()
     }
   }
+
   private var isEditingFieldData: Bool = false {
     didSet {
       if isEditingFieldData != oldValue {
@@ -79,7 +79,9 @@ class LoginInfoViewController: LoginAuthViewController {
     // Adding the Password store observer in constructor to watch credential passed to info screen is updated
     passwordStoreListener = passwordAPI.add(
       PasswordStoreStateObserver { [weak self] stateChange in
-        guard let self = self else { return }
+        guard let self = self else {
+          return
+        }
 
         switch stateChange {
         case .passwordFormsChanged(let formList):
@@ -99,9 +101,11 @@ class LoginInfoViewController: LoginAuthViewController {
         default:
           break
         }
-      })
+      }
+    )
   }
 
+  @available(*, unavailable)
   required init?(coder aDecoder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }
@@ -127,7 +131,8 @@ class LoginInfoViewController: LoginAuthViewController {
       $0.register(LoginInfoTableViewCell.self)
       $0.registerHeaderFooter(SettingsTableSectionHeaderFooterView.self)
       $0.tableFooterView = SettingsTableSectionHeaderFooterView(
-        frame: CGRect(width: tableView.bounds.width, height: 1.0))
+        frame: CGRect(width: tableView.bounds.width, height: 1.0)
+      )
       $0.estimatedRowHeight = 44.0
       #if swift(>=5.5)
       if #available(iOS 15.0, *) {
@@ -141,7 +146,6 @@ class LoginInfoViewController: LoginAuthViewController {
 // MARK: TableViewDataSource - TableViewDelegate
 
 extension LoginInfoViewController {
-
   override func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
     let headerView = tableView.dequeueReusableHeaderFooter() as SettingsTableSectionHeaderFooterView
     headerView.titleLabel.text = Strings.Login.loginInfoDetailsHeaderTitle.uppercased()
@@ -247,7 +251,7 @@ extension LoginInfoViewController {
   }
 
   override func numberOfSections(in tableView: UITableView) -> Int {
-    return Section.allCases.count
+    Section.allCases.count
   }
 
   override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -289,7 +293,6 @@ extension LoginInfoViewController {
 // MARK: Actions
 
 extension LoginInfoViewController {
-
   @objc private func edit() {
     isEditingFieldData = true
 
@@ -314,7 +317,9 @@ extension LoginInfoViewController {
 
   @objc private func done() {
     updateLoginInfo { [weak self] success in
-      guard let self = self else { return }
+      guard let self = self else {
+        return
+      }
 
       self.isEditingFieldData = false
       if success {
@@ -327,7 +332,7 @@ extension LoginInfoViewController {
 
   private func updateLoginInfo(completion: @escaping (Bool) -> Void) {
     guard let username = usernameField?.text, let password = passwordField?.text,
-      username != credentials.usernameValue || password != credentials.passwordValue
+          username != credentials.usernameValue || password != credentials.passwordValue
     else {
       completion(false)
       return
@@ -347,7 +352,8 @@ extension LoginInfoViewController {
     let alert = UIAlertController(
       title: Strings.deleteLoginAlertTitle,
       message: Strings.Login.loginEntryDeleteAlertMessage,
-      preferredStyle: .alert)
+      preferredStyle: .alert
+    )
 
     alert.addAction(
       UIAlertAction(
@@ -355,14 +361,17 @@ extension LoginInfoViewController {
         handler: { _ in
           self.passwordAPI.removeLogin(self.credentials)
           self.navigationController?.popViewController(animated: true)
-        }))
+        }
+      )
+    )
 
     alert.addAction(UIAlertAction(title: Strings.cancelButtonTitle, style: .cancel, handler: nil))
     present(alert, animated: true, completion: nil)
   }
 
   private func cellForItem(_ infoItem: InfoItem) -> LoginInfoTableViewCell? {
-    guard let cell = tableView.cellForRow(at: IndexPath(row: infoItem.rawValue, section: 0)) as? LoginInfoTableViewCell else {
+    guard let cell = tableView.cellForRow(at: IndexPath(row: infoItem.rawValue, section: 0)) as? LoginInfoTableViewCell
+    else {
       return nil
     }
 
@@ -395,8 +404,8 @@ extension LoginInfoViewController: LoginInfoTableViewCellDelegate {
     case InfoItem.passwordItem.rawValue:
       let hideRevealPasswordOption =
         cell.descriptionTextField.isSecureTextEntry
-        ? (action == MenuHelper.selectorReveal)
-        : (action == MenuHelper.selectorHide)
+          ? (action == MenuHelper.selectorReveal)
+          : (action == MenuHelper.selectorHide)
       return action == MenuHelper.selectorCopy || hideRevealPasswordOption
     default:
       return false

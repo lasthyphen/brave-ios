@@ -142,13 +142,13 @@ enum TabEvent {
 ////////////////////////////////////////////////////////////////////////////////////////
 extension TabEventLabel {
   var name: Notification.Name {
-    return Notification.Name(self.rawValue)
+    Notification.Name(self.rawValue)
   }
 }
 
 extension TabEvent {
   func notification(for tab: Any) -> Notification {
-    return Notification(name: label.name, object: tab, userInfo: ["payload": self])
+    Notification(name: label.name, object: tab, userInfo: ["payload": self])
   }
 
   /// Use this method to post notifications to any concerned listeners.
@@ -167,10 +167,10 @@ extension TabEventHandler {
   /// Implementations of handles should use this method to register for events.
   /// `TabObservers` should be preserved for unregistering later.
   func registerFor(_ tabEvents: TabEventLabel..., queue: OperationQueue? = nil) -> TabObservers {
-    return tabEvents.map { eventType in
+    tabEvents.map { eventType in
       center.addObserver(forName: eventType.name, object: nil, queue: queue) { notification in
         guard let tab = notification.object as? Tab,
-          let event = notification.userInfo?["payload"] as? TabEvent
+              let event = notification.userInfo?["payload"] as? TabEvent
         else {
           return
         }

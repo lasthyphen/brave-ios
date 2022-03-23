@@ -13,6 +13,7 @@ extension String {
     let prefixLength = hasPrefix("0x") ? 6 : 4
     return "\(prefix(prefixLength))…\(suffix(4))"
   }
+
   /// Removes the `0x` prefix that may exist on the string
   var removingHexPrefix: String {
     hasPrefix("0x") ? String(dropFirst(2)) : self
@@ -21,7 +22,9 @@ extension String {
   /// Check if the string is a valid ETH address
   var isETHAddress: Bool {
     // An address has to start with `0x`
-    guard starts(with: "0x") else { return false }
+    guard starts(with: "0x") else {
+      return false
+    }
 
     // removing `0x`
     let hex = removingHexPrefix

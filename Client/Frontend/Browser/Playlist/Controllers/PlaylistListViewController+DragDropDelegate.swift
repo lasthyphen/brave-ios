@@ -16,17 +16,26 @@ extension PlaylistListViewController: UITableViewDragDelegate, UITableViewDropDe
     }
   }
 
-  func tableView(_ tableView: UITableView, itemsForBeginning session: UIDragSession, at indexPath: IndexPath) -> [UIDragItem] {
+  func tableView(
+    _ tableView: UITableView,
+    itemsForBeginning session: UIDragSession,
+    at indexPath: IndexPath
+  ) -> [UIDragItem] {
     let item = PlaylistManager.shared.itemAtIndex(indexPath.row)
     let dragItem = UIDragItem(itemProvider: NSItemProvider())
     dragItem.localObject = item
     return [dragItem]
   }
 
-  func tableView(_ tableView: UITableView, dropSessionDidUpdate session: UIDropSession, withDestinationIndexPath destinationIndexPath: IndexPath?) -> UITableViewDropProposal {
-
+  func tableView(
+    _ tableView: UITableView,
+    dropSessionDidUpdate session: UIDropSession,
+    withDestinationIndexPath destinationIndexPath: IndexPath?
+  ) -> UITableViewDropProposal {
     var dropProposal = UITableViewDropProposal(operation: .cancel)
-    guard session.items.count == 1 else { return dropProposal }
+    guard session.items.count == 1 else {
+      return dropProposal
+    }
 
     if tableView.hasActiveDrag {
       dropProposal = UITableViewDropProposal(operation: .move, intent: .insertAtDestinationIndexPath)
@@ -35,7 +44,9 @@ extension PlaylistListViewController: UITableViewDragDelegate, UITableViewDropDe
   }
 
   func tableView(_ tableView: UITableView, performDropWith coordinator: UITableViewDropCoordinator) {
-    guard let sourceIndexPath = coordinator.items.first?.sourceIndexPath else { return }
+    guard let sourceIndexPath = coordinator.items.first?.sourceIndexPath else {
+      return
+    }
     let destinationIndexPath: IndexPath
     if let indexPath = coordinator.destinationIndexPath {
       destinationIndexPath = indexPath
@@ -46,14 +57,21 @@ extension PlaylistListViewController: UITableViewDragDelegate, UITableViewDropDe
     }
 
     if coordinator.proposal.operation == .move {
-      guard let item = coordinator.items.first else { return }
+      guard let item = coordinator.items.first else {
+        return
+      }
       _ = coordinator.drop(item.dragItem, toRowAt: destinationIndexPath)
       tableView.moveRow(at: sourceIndexPath, to: destinationIndexPath)
     }
   }
 
-  func tableView(_ tableView: UITableView, dragPreviewParametersForRowAt indexPath: IndexPath) -> UIDragPreviewParameters? {
-    guard let cell = tableView.cellForRow(at: indexPath) as? PlaylistCell else { return nil }
+  func tableView(
+    _ tableView: UITableView,
+    dragPreviewParametersForRowAt indexPath: IndexPath
+  ) -> UIDragPreviewParameters? {
+    guard let cell = tableView.cellForRow(at: indexPath) as? PlaylistCell else {
+      return nil
+    }
 
     let preview = UIDragPreviewParameters()
     preview.visiblePath = UIBezierPath(roundedRect: cell.contentView.frame, cornerRadius: 12.0)
@@ -61,8 +79,13 @@ extension PlaylistListViewController: UITableViewDragDelegate, UITableViewDropDe
     return preview
   }
 
-  func tableView(_ tableView: UITableView, dropPreviewParametersForRowAt indexPath: IndexPath) -> UIDragPreviewParameters? {
-    guard let cell = tableView.cellForRow(at: indexPath) as? PlaylistCell else { return nil }
+  func tableView(
+    _ tableView: UITableView,
+    dropPreviewParametersForRowAt indexPath: IndexPath
+  ) -> UIDragPreviewParameters? {
+    guard let cell = tableView.cellForRow(at: indexPath) as? PlaylistCell else {
+      return nil
+    }
 
     let preview = UIDragPreviewParameters()
     preview.visiblePath = UIBezierPath(roundedRect: cell.contentView.frame, cornerRadius: 12.0)
@@ -70,7 +93,10 @@ extension PlaylistListViewController: UITableViewDragDelegate, UITableViewDropDe
     return preview
   }
 
-  func tableView(_ tableView: UITableView, dragSessionIsRestrictedToDraggingApplication session: UIDragSession) -> Bool {
+  func tableView(
+    _ tableView: UITableView,
+    dragSessionIsRestrictedToDraggingApplication session: UIDragSession
+  ) -> Bool {
     true
   }
 }

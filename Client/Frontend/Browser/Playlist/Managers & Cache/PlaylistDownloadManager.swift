@@ -12,13 +12,24 @@ private let log = Logger.browserLogger
 
 protocol PlaylistDownloadManagerDelegate: AnyObject {
   func onDownloadProgressUpdate(id: String, percentComplete: Double)
-  func onDownloadStateChanged(id: String, state: PlaylistDownloadManager.DownloadState, displayName: String?, error: Error?)
+  func onDownloadStateChanged(
+    id: String,
+    state: PlaylistDownloadManager.DownloadState,
+    displayName: String?,
+    error: Error?
+  )
 }
 
 private protocol PlaylistStreamDownloadManagerDelegate: AnyObject {
   func localAsset(for pageSrc: String) -> AVURLAsset?
   func onDownloadProgressUpdate(streamDownloader: Any, id: String, percentComplete: Double)
-  func onDownloadStateChanged(streamDownloader: Any, id: String, state: PlaylistDownloadManager.DownloadState, displayName: String?, error: Error?)
+  func onDownloadStateChanged(
+    streamDownloader: Any,
+    id: String,
+    state: PlaylistDownloadManager.DownloadState,
+    displayName: String?,
+    error: Error?
+  )
 }
 
 struct MediaDownloadTask {
@@ -42,7 +53,8 @@ public class PlaylistDownloadManager: PlaylistStreamDownloadManagerDelegate {
     FileManager.default.getOrCreateFolder(
       name: "Playlist",
       excludeFromBackups: true,
-      location: .applicationSupportDirectory)
+      location: .applicationSupportDirectory
+    )
   }
 
   public enum DownloadState: String {
@@ -52,17 +64,21 @@ public class PlaylistDownloadManager: PlaylistStreamDownloadManagerDelegate {
   }
 
   init() {
-    let hlsConfiguration = URLSessionConfiguration.background(withIdentifier: "com.brave.playlist.hls.background.session")
+    let hlsConfiguration = URLSessionConfiguration
+      .background(withIdentifier: "com.brave.playlist.hls.background.session")
     hlsSession = AVAssetDownloadURLSession(
       configuration: hlsConfiguration,
       assetDownloadDelegate: hlsDelegate,
-      delegateQueue: hlsQueue)
+      delegateQueue: hlsQueue
+    )
 
-    let fileConfiguration = URLSessionConfiguration.background(withIdentifier: "com.brave.playlist.file.background.session")
+    let fileConfiguration = URLSessionConfiguration
+      .background(withIdentifier: "com.brave.playlist.file.background.session")
     fileSession = URLSession(
       configuration: fileConfiguration,
       delegate: fileDelegate,
-      delegateQueue: fileQueue)
+      delegateQueue: fileQueue
+    )
 
     hlsDelegate.delegate = self
     fileDelegate.delegate = self
@@ -98,7 +114,9 @@ public class PlaylistDownloadManager: PlaylistStreamDownloadManagerDelegate {
       hlsDelegate.downloadAsset(self.hlsSession, assetUrl: assetUrl, for: item)
     } else {
       hlsQueue.addOperation { [weak self] in
-        guard let self = self else { return }
+        guard let self = self else {
+          return
+        }
         self.hlsDelegate.downloadAsset(self.hlsSession, assetUrl: assetUrl, for: item)
       }
     }
@@ -109,7 +127,9 @@ public class PlaylistDownloadManager: PlaylistStreamDownloadManagerDelegate {
       fileDelegate.downloadAsset(self.fileSession, assetUrl: assetUrl, for: item)
     } else {
       fileQueue.addOperation { [weak self] in
-        guard let self = self else { return }
+        guard let self = self else {
+          return
+        }
         self.fileDelegate.downloadAsset(self.fileSession, assetUrl: assetUrl, for: item)
       }
     }
@@ -141,7 +161,9 @@ public class PlaylistDownloadManager: PlaylistStreamDownloadManagerDelegate {
     var hlsTask: MediaDownloadTask?
     hlsQueue.addOperation { [weak self] in
       defer { group.leave() }
-      guard let self = self else { return }
+      guard let self = self else {
+        return
+      }
       hlsTask = self.hlsDelegate.downloadTask(for: pageSrc)
     }
 
@@ -149,7 +171,9 @@ public class PlaylistDownloadManager: PlaylistStreamDownloadManagerDelegate {
     var fileTask: MediaDownloadTask?
     fileQueue.addOperation { [weak self] in
       defer { group.leave() }
-      guard let self = self else { return }
+      guard let self = self else {
+        return
+      }
       fileTask = self.fileDelegate.downloadTask(for: pageSrc)
     }
 
@@ -161,15 +185,18 @@ public class PlaylistDownloadManager: PlaylistStreamDownloadManagerDelegate {
 
   func localAsset(for pageSrc: String) -> AVURLAsset? {
     guard let item = PlaylistItem.getItem(pageSrc: pageSrc),
-      let cachedData = item.cachedData,
-      !cachedData.isEmpty
-    else { return nil }
+          let cachedData = item.cachedData,
+          !cachedData.isEmpty
+    else {
+      return nil
+    }
 
     var bookmarkDataIsStale = false
     do {
       let url = try URL(
         resolvingBookmarkData: cachedData,
-        bookmarkDataIsStale: &bookmarkDataIsStale)
+        bookmarkDataIsStale: &bookmarkDataIsStale
+      )
 
       if bookmarkDataIsStale {
         return nil
@@ -186,7 +213,13 @@ public class PlaylistDownloadManager: PlaylistStreamDownloadManagerDelegate {
     delegate?.onDownloadProgressUpdate(id: id, percentComplete: percentComplete)
   }
 
-  fileprivate func onDownloadStateChanged(streamDownloader: Any, id: String, state: PlaylistDownloadManager.DownloadState, displayName: String?, error: Error?) {
+  fileprivate func onDownloadStateChanged(
+    streamDownloader: Any,
+    id: String,
+    state: PlaylistDownloadManager.DownloadState,
+    displayName: String?,
+    error: Error?
+  ) {
     delegate?.onDownloadStateChanged(id: id, state: state, displayName: displayName, error: error)
   }
 
@@ -213,16 +246,20 @@ private class PlaylistHLSDownloadManager: NSObject, AVAssetDownloadDelegate {
         }
       }
 
-      guard let self = self else { return }
+      guard let self = self else {
+        return
+      }
 
       for task in tasks {
         // TODO: Investigate progress calculation of AVAggregateAssetDownloadTask
         guard let downloadTask = task as? AVAssetDownloadTask,
-          let pageSrc = task.taskDescription
-        else { continue }
+              let pageSrc = task.taskDescription
+        else {
+          continue
+        }
 
         if downloadTask.state != .completed,
-          let item = PlaylistItem.getItem(pageSrc: pageSrc) {
+           let item = PlaylistItem.getItem(pageSrc: pageSrc) {
           let info = PlaylistInfo(item: item)
           let asset = MediaDownloadTask(id: info.pageSrc, name: info.name, asset: downloadTask.urlAsset)
           self.activeDownloadTasks[downloadTask] = asset
@@ -244,26 +281,35 @@ private class PlaylistHLSDownloadManager: NSObject, AVAssetDownloadDelegate {
 
     guard
       let task =
-        session.makeAssetDownloadTask(
-          asset: asset,
-          assetTitle: item.name,
-          assetArtworkData: nil,
-          options: [AVAssetDownloadTaskMinimumRequiredMediaBitrateKey: PlaylistHLSDownloadManager.minimumBitRate])
-    else { return }
+      session.makeAssetDownloadTask(
+        asset: asset,
+        assetTitle: item.name,
+        assetArtworkData: nil,
+        options: [AVAssetDownloadTaskMinimumRequiredMediaBitrateKey: PlaylistHLSDownloadManager.minimumBitRate]
+      )
+    else {
+      return
+    }
 
     task.taskDescription = item.pageSrc
     activeDownloadTasks[task] = MediaDownloadTask(id: item.pageSrc, name: item.name, asset: asset)
     task.resume()
 
     DispatchQueue.main.async {
-      self.delegate?.onDownloadStateChanged(streamDownloader: self, id: item.pageSrc, state: .inProgress, displayName: nil, error: nil)
+      self.delegate?.onDownloadStateChanged(
+        streamDownloader: self,
+        id: item.pageSrc,
+        state: .inProgress,
+        displayName: nil,
+        error: nil
+      )
     }
   }
 
   func cancelDownload(item: PlaylistInfo) {
     if let task = activeDownloadTasks.first(where: { $0.value.id == item.pageSrc })?.key {
       pendingCancellationTasks.append(task)
-      task.cancel()  // will call didCompleteWithError which will cleanup the assets
+      task.cancel() // will call didCompleteWithError which will cleanup the assets
     }
   }
 
@@ -277,35 +323,83 @@ private class PlaylistHLSDownloadManager: NSObject, AVAssetDownloadDelegate {
     pendingDownloadTasks[assetDownloadTask] = location
   }
 
-  func urlSession(_ session: URLSession, assetDownloadTask: AVAssetDownloadTask, didLoad timeRange: CMTimeRange, totalTimeRangesLoaded loadedTimeRanges: [NSValue], timeRangeExpectedToLoad: CMTimeRange) {
-
-    self.urlSession(session, downloadTask: assetDownloadTask, didLoad: timeRange, totalTimeRangesLoaded: loadedTimeRanges, timeRangeExpectedToLoad: timeRangeExpectedToLoad)
+  func urlSession(
+    _ session: URLSession,
+    assetDownloadTask: AVAssetDownloadTask,
+    didLoad timeRange: CMTimeRange,
+    totalTimeRangesLoaded loadedTimeRanges: [NSValue],
+    timeRangeExpectedToLoad: CMTimeRange
+  ) {
+    self.urlSession(
+      session,
+      downloadTask: assetDownloadTask,
+      didLoad: timeRange,
+      totalTimeRangesLoaded: loadedTimeRanges,
+      timeRangeExpectedToLoad: timeRangeExpectedToLoad
+    )
   }
 
   // MARK: - AVAggregateAssetDownloadTask
 
-  func urlSession(_ session: URLSession, aggregateAssetDownloadTask: AVAggregateAssetDownloadTask, willDownloadTo location: URL) {
+  func urlSession(
+    _ session: URLSession,
+    aggregateAssetDownloadTask: AVAggregateAssetDownloadTask,
+    willDownloadTo location: URL
+  ) {
     pendingDownloadTasks[aggregateAssetDownloadTask] = location
   }
 
-  func urlSession(_ session: URLSession, aggregateAssetDownloadTask: AVAggregateAssetDownloadTask, didLoad timeRange: CMTimeRange, totalTimeRangesLoaded loadedTimeRanges: [NSValue], timeRangeExpectedToLoad: CMTimeRange, for mediaSelection: AVMediaSelection) {
-    self.urlSession(session, downloadTask: aggregateAssetDownloadTask, didLoad: timeRange, totalTimeRangesLoaded: loadedTimeRanges, timeRangeExpectedToLoad: timeRangeExpectedToLoad)
+  func urlSession(
+    _ session: URLSession,
+    aggregateAssetDownloadTask: AVAggregateAssetDownloadTask,
+    didLoad timeRange: CMTimeRange,
+    totalTimeRangesLoaded loadedTimeRanges: [NSValue],
+    timeRangeExpectedToLoad: CMTimeRange,
+    for mediaSelection: AVMediaSelection
+  ) {
+    self.urlSession(
+      session,
+      downloadTask: aggregateAssetDownloadTask,
+      didLoad: timeRange,
+      totalTimeRangesLoaded: loadedTimeRanges,
+      timeRangeExpectedToLoad: timeRangeExpectedToLoad
+    )
   }
 
-  func urlSession(_ session: URLSession, aggregateAssetDownloadTask: AVAggregateAssetDownloadTask, didCompleteFor mediaSelection: AVMediaSelection) {
-    guard let asset = activeDownloadTasks[aggregateAssetDownloadTask] else { return }
+  func urlSession(
+    _ session: URLSession,
+    aggregateAssetDownloadTask: AVAggregateAssetDownloadTask,
+    didCompleteFor mediaSelection: AVMediaSelection
+  ) {
+    guard let asset = activeDownloadTasks[aggregateAssetDownloadTask] else {
+      return
+    }
     aggregateAssetDownloadTask.taskDescription = asset.id
     aggregateAssetDownloadTask.resume()
 
     DispatchQueue.main.async {
-      self.delegate?.onDownloadStateChanged(streamDownloader: self, id: asset.id, state: .inProgress, displayName: nil, error: nil)
+      self.delegate?.onDownloadStateChanged(
+        streamDownloader: self,
+        id: asset.id,
+        state: .inProgress,
+        displayName: nil,
+        error: nil
+      )
     }
   }
 
   // MARK: - AVAssetDownloadDelegate - Commonly shared code with AVAggregateAssetDownloadTask and AVAssetDownloadTask
 
-  private func urlSession(_ session: URLSession, downloadTask: URLSessionTask, didLoad timeRange: CMTimeRange, totalTimeRangesLoaded loadedTimeRanges: [NSValue], timeRangeExpectedToLoad: CMTimeRange) {
-    guard let asset = activeDownloadTasks[downloadTask] else { return }
+  private func urlSession(
+    _ session: URLSession,
+    downloadTask: URLSessionTask,
+    didLoad timeRange: CMTimeRange,
+    totalTimeRangesLoaded loadedTimeRanges: [NSValue],
+    timeRangeExpectedToLoad: CMTimeRange
+  ) {
+    guard let asset = activeDownloadTasks[downloadTask] else {
+      return
+    }
 
     var percentComplete = 0.0
     for value in loadedTimeRanges {
@@ -320,7 +414,11 @@ private class PlaylistHLSDownloadManager: NSObject, AVAssetDownloadDelegate {
     }
 
     DispatchQueue.main.async {
-      self.delegate?.onDownloadProgressUpdate(streamDownloader: self, id: asset.id, percentComplete: percentComplete * 100.0)
+      self.delegate?.onDownloadProgressUpdate(
+        streamDownloader: self,
+        id: asset.id,
+        percentComplete: percentComplete * 100.0
+      )
     }
   }
 
@@ -334,17 +432,20 @@ private class PlaylistHLSDownloadManager: NSObject, AVAssetDownloadDelegate {
     let assetUrl = pendingDownloadTasks.removeValue(forKey: task)
 
     if asset == nil,
-      let taskDescription = task.taskDescription,
-      let taskURL = URL(string: taskDescription) {
+       let taskDescription = task.taskDescription,
+       let taskURL = URL(string: taskDescription) {
       asset = MediaDownloadTask(
         id: taskDescription,
         name: "System Restore - Cached Item",
-        asset: AVURLAsset(url: taskURL))
+        asset: AVURLAsset(url: taskURL)
+      )
     }
 
     guard let asset = asset,
-      let assetUrl = assetUrl
-    else { return }
+          let assetUrl = assetUrl
+    else {
+      return
+    }
 
     let cleanupAndFailDownload = { (location: URL?, error: Error) in
       if let location = location {
@@ -357,7 +458,13 @@ private class PlaylistHLSDownloadManager: NSObject, AVAssetDownloadDelegate {
 
       DispatchQueue.main.async {
         PlaylistItem.updateCache(pageSrc: asset.id, cachedData: nil)
-        self.delegate?.onDownloadStateChanged(streamDownloader: self, id: asset.id, state: .invalid, displayName: nil, error: error)
+        self.delegate?.onDownloadStateChanged(
+          streamDownloader: self,
+          id: asset.id,
+          state: .invalid,
+          displayName: nil,
+          error: error
+        )
       }
     }
 
@@ -388,7 +495,13 @@ private class PlaylistHLSDownloadManager: NSObject, AVAssetDownloadDelegate {
 
           DispatchQueue.main.async {
             PlaylistItem.updateCache(pageSrc: asset.id, cachedData: nil)
-            self.delegate?.onDownloadStateChanged(streamDownloader: self, id: asset.id, state: .invalid, displayName: nil, error: nil)
+            self.delegate?.onDownloadStateChanged(
+              streamDownloader: self,
+              id: asset.id,
+              state: .invalid,
+              displayName: nil,
+              error: nil
+            )
           }
           return
         }
@@ -403,7 +516,13 @@ private class PlaylistHLSDownloadManager: NSObject, AVAssetDownloadDelegate {
       DispatchQueue.main.async {
         log.debug(PlaylistItem.getItem(pageSrc: asset.id))
         PlaylistItem.updateCache(pageSrc: asset.id, cachedData: nil)
-        self.delegate?.onDownloadStateChanged(streamDownloader: self, id: asset.id, state: .invalid, displayName: nil, error: error)
+        self.delegate?.onDownloadStateChanged(
+          streamDownloader: self,
+          id: asset.id,
+          state: .invalid,
+          displayName: nil,
+          error: error
+        )
       }
     } else {
       do {
@@ -417,7 +536,13 @@ private class PlaylistHLSDownloadManager: NSObject, AVAssetDownloadDelegate {
 
           DispatchQueue.main.async {
             PlaylistItem.updateCache(pageSrc: asset.id, cachedData: cachedData)
-            self.delegate?.onDownloadStateChanged(streamDownloader: self, id: asset.id, state: .downloaded, displayName: nil, error: nil)
+            self.delegate?.onDownloadStateChanged(
+              streamDownloader: self,
+              id: asset.id,
+              state: .downloaded,
+              displayName: nil,
+              error: nil
+            )
           }
         } catch {
           log.error("Failed to create bookmarkData for download URL.")
@@ -445,7 +570,9 @@ private class PlaylistFileDownloadManager: NSObject, URLSessionDownloadDelegate 
         }
       }
 
-      guard let self = self else { return }
+      guard let self = self else {
+        return
+      }
 
       for task in tasks {
         guard let pageSrc = task.taskDescription else {
@@ -454,9 +581,9 @@ private class PlaylistFileDownloadManager: NSObject, URLSessionDownloadDelegate 
 
         ensureMainThread {
           if task.state != .completed,
-            let item = PlaylistItem.getItem(pageSrc: pageSrc),
-            let mediaSrc = item.mediaSrc,
-            let assetUrl = URL(string: mediaSrc) {
+             let item = PlaylistItem.getItem(pageSrc: pageSrc),
+             let mediaSrc = item.mediaSrc,
+             let assetUrl = URL(string: mediaSrc) {
             let info = PlaylistInfo(item: item)
             let asset = MediaDownloadTask(id: info.pageSrc, name: info.name, asset: AVURLAsset(url: assetUrl))
             self.activeDownloadTasks[task] = asset
@@ -475,7 +602,10 @@ private class PlaylistFileDownloadManager: NSObject, URLSessionDownloadDelegate 
       // https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Range
       request.addValue("bytes=0-", forHTTPHeaderField: "Range")
       request.addValue(UUID().uuidString, forHTTPHeaderField: "X-Playback-Session-Id")
-      request.addValue(UserAgent.shouldUseDesktopMode ? UserAgent.desktop : UserAgent.mobile, forHTTPHeaderField: "User-Agent")
+      request.addValue(
+        UserAgent.shouldUseDesktopMode ? UserAgent.desktop : UserAgent.mobile,
+        forHTTPHeaderField: "User-Agent"
+      )
       return request
     }()
 
@@ -486,36 +616,47 @@ private class PlaylistFileDownloadManager: NSObject, URLSessionDownloadDelegate 
     task.resume()
 
     DispatchQueue.main.async {
-      self.delegate?.onDownloadStateChanged(streamDownloader: self, id: item.pageSrc, state: .inProgress, displayName: nil, error: nil)
+      self.delegate?.onDownloadStateChanged(
+        streamDownloader: self,
+        id: item.pageSrc,
+        state: .inProgress,
+        displayName: nil,
+        error: nil
+      )
     }
   }
 
   func cancelDownload(item: PlaylistInfo) {
     if let task = activeDownloadTasks.first(where: { item.pageSrc == $0.value.id })?.key {
-      task.cancel()  // will call didCompleteWithError which will cleanup the assets
+      task.cancel() // will call didCompleteWithError which will cleanup the assets
     }
   }
 
   func downloadTask(for pageSrc: String) -> MediaDownloadTask? {
-    return activeDownloadTasks.first(where: { $0.value.id == pageSrc })?.value
+    activeDownloadTasks.first(where: { $0.value.id == pageSrc })?.value
   }
 
   // MARK: - URLSessionDownloadDelegate
 
   func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
-    guard let task = task as? URLSessionDownloadTask else { return }
+    guard let task = task as? URLSessionDownloadTask else {
+      return
+    }
 
     var asset = activeDownloadTasks.removeValue(forKey: task)
     if asset == nil,
-      let taskDescription = task.taskDescription,
-      let taskURL = URL(string: taskDescription) {
+       let taskDescription = task.taskDescription,
+       let taskURL = URL(string: taskDescription) {
       asset = MediaDownloadTask(
         id: taskDescription,
         name: "System Restore - Cached Item",
-        asset: AVURLAsset(url: taskURL))
+        asset: AVURLAsset(url: taskURL)
+      )
     }
 
-    guard let asset = asset else { return }
+    guard let asset = asset else {
+      return
+    }
 
     if let error = error as NSError? {
       switch (error.domain, error.code) {
@@ -534,7 +675,13 @@ private class PlaylistFileDownloadManager: NSObject, URLSessionDownloadDelegate 
         if pendingCancellationTasks.contains(task) {
           pendingCancellationTasks.removeAll(where: { $0 == task })
           DispatchQueue.main.async {
-            self.delegate?.onDownloadStateChanged(streamDownloader: self, id: asset.id, state: .invalid, displayName: nil, error: nil)
+            self.delegate?.onDownloadStateChanged(
+              streamDownloader: self,
+              id: asset.id,
+              state: .invalid,
+              displayName: nil,
+              error: nil
+            )
           }
           return
         }
@@ -547,13 +694,27 @@ private class PlaylistFileDownloadManager: NSObject, URLSessionDownloadDelegate 
       }
 
       DispatchQueue.main.async {
-        self.delegate?.onDownloadStateChanged(streamDownloader: self, id: asset.id, state: .invalid, displayName: nil, error: error)
+        self.delegate?.onDownloadStateChanged(
+          streamDownloader: self,
+          id: asset.id,
+          state: .invalid,
+          displayName: nil,
+          error: error
+        )
       }
     }
   }
 
-  func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didWriteData bytesWritten: Int64, totalBytesWritten: Int64, totalBytesExpectedToWrite: Int64) {
-    guard let asset = activeDownloadTasks[downloadTask] else { return }
+  func urlSession(
+    _ session: URLSession,
+    downloadTask: URLSessionDownloadTask,
+    didWriteData bytesWritten: Int64,
+    totalBytesWritten: Int64,
+    totalBytesExpectedToWrite: Int64
+  ) {
+    guard let asset = activeDownloadTasks[downloadTask] else {
+      return
+    }
 
     if totalBytesExpectedToWrite == NSURLSessionTransferSizeUnknown || totalBytesExpectedToWrite == 0 {
       DispatchQueue.main.async {
@@ -569,19 +730,21 @@ private class PlaylistFileDownloadManager: NSObject, URLSessionDownloadDelegate 
   }
 
   func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didFinishDownloadingTo location: URL) {
-
     var asset = activeDownloadTasks.removeValue(forKey: downloadTask)
 
     if asset == nil,
-      let taskDescription = downloadTask.taskDescription,
-      let taskURL = URL(string: taskDescription) {
+       let taskDescription = downloadTask.taskDescription,
+       let taskURL = URL(string: taskDescription) {
       asset = MediaDownloadTask(
         id: taskDescription,
         name: "System Restore - Cached Item",
-        asset: AVURLAsset(url: taskURL))
+        asset: AVURLAsset(url: taskURL)
+      )
     }
 
-    guard let asset = asset else { return }
+    guard let asset = asset else {
+      return
+    }
 
     func cleanupAndFailDownload(location: URL?, error: Error) {
       if let location = location {
@@ -594,24 +757,30 @@ private class PlaylistFileDownloadManager: NSObject, URLSessionDownloadDelegate 
 
       DispatchQueue.main.async {
         PlaylistItem.updateCache(pageSrc: asset.id, cachedData: nil)
-        self.delegate?.onDownloadStateChanged(streamDownloader: self, id: asset.id, state: .invalid, displayName: nil, error: error)
+        self.delegate?.onDownloadStateChanged(
+          streamDownloader: self,
+          id: asset.id,
+          state: .invalid,
+          displayName: nil,
+          error: error
+        )
       }
     }
 
-    if let response = downloadTask.response as? HTTPURLResponse, response.statusCode == 302 || response.statusCode >= 200 && response.statusCode <= 299 {
-
+    if let response = downloadTask.response as? HTTPURLResponse,
+       response.statusCode == 302 || response.statusCode >= 200 && response.statusCode <= 299 {
       var detectedFileExtension: String?
 
       // Detect based on File Extension.
       if let url = downloadTask.originalRequest?.url,
-        let detectedExtension = PlaylistMimeTypeDetector(url: url).fileExtension {
+         let detectedExtension = PlaylistMimeTypeDetector(url: url).fileExtension {
         detectedFileExtension = detectedExtension
       }
 
       // Detect based on Content-Type header.
       if detectedFileExtension == nil,
-        let contentType = response.allHeaderFields["Content-Type"] as? String,
-        let detectedExtension = PlaylistMimeTypeDetector(mimeType: contentType).fileExtension {
+         let contentType = response.allHeaderFields["Content-Type"] as? String,
+         let detectedExtension = PlaylistMimeTypeDetector(mimeType: contentType).fileExtension {
         detectedFileExtension = detectedExtension
       }
 
@@ -636,7 +805,8 @@ private class PlaylistFileDownloadManager: NSObject, URLSessionDownloadDelegate 
       }
 
       do {
-        guard let path = try PlaylistDownloadManager.uniqueDownloadPathForFilename(asset.name + ".\(fileExtension)") else {
+        guard let path = try PlaylistDownloadManager.uniqueDownloadPathForFilename(asset.name + ".\(fileExtension)")
+        else {
           throw "Failed to create unique path for playlist item."
         }
 
@@ -646,7 +816,13 @@ private class PlaylistFileDownloadManager: NSObject, URLSessionDownloadDelegate 
 
           DispatchQueue.main.async {
             PlaylistItem.updateCache(pageSrc: asset.id, cachedData: cachedData)
-            self.delegate?.onDownloadStateChanged(streamDownloader: self, id: asset.id, state: .downloaded, displayName: nil, error: nil)
+            self.delegate?.onDownloadStateChanged(
+              streamDownloader: self,
+              id: asset.id,
+              state: .downloaded,
+              displayName: nil,
+              error: nil
+            )
           }
         } catch {
           log.error("Failed to create bookmarkData for download URL.")

@@ -22,29 +22,29 @@ public protocol PopoverContentComponent {
   var closeActionAccessibilityLabel: String { get }
 }
 
-public extension PopoverContentComponent {
-  var extendEdgeIntoArrow: Bool {
-    return true
+extension PopoverContentComponent {
+  public var extendEdgeIntoArrow: Bool {
+    true
   }
 
-  var isPanToDismissEnabled: Bool {
-    return true
+  public var isPanToDismissEnabled: Bool {
+    true
   }
 
-  func popoverShouldDismiss(_ popoverController: PopoverController) -> Bool {
-    return true
+  public func popoverShouldDismiss(_ popoverController: PopoverController) -> Bool {
+    true
   }
 
-  func popoverDidDismiss(_ popoverController: PopoverController) {
+  public func popoverDidDismiss(_ popoverController: PopoverController) {
   }
 
-  var closeActionAccessibilityLabel: String {
-    return Strings.Popover.closeContextMenu
+  public var closeActionAccessibilityLabel: String {
+    Strings.Popover.closeContextMenu
   }
 }
 
-public extension PopoverContentComponent where Self: UINavigationController {
-  var extendEdgeIntoArrow: Bool {
-    return false
+extension PopoverContentComponent where Self: UINavigationController {
+  public var extendEdgeIntoArrow: Bool {
+    false
   }
 }

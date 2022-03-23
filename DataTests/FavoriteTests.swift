@@ -8,7 +8,6 @@ import XCTest
 @testable import Data
 
 class FavoriteTests: CoreDataTestCase {
-
   private let fetchRequest: NSFetchRequest<Favorite> = {
     let fetchRequest = NSFetchRequest<Favorite>(entityName: String(describing: "Bookmark"))
     // We always want favorites folder to be on top, in the first section.
@@ -23,7 +22,7 @@ class FavoriteTests: CoreDataTestCase {
   private lazy var fetchController = Favorite.frc()
 
   private func entity(for context: NSManagedObjectContext) -> NSEntityDescription {
-    return NSEntityDescription.entity(forEntityName: String(describing: "Bookmark"), in: context)!
+    NSEntityDescription.entity(forEntityName: String(describing: "Bookmark"), in: context)!
   }
 
   // MARK: - Adding

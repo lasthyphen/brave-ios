@@ -65,7 +65,9 @@ class PlaylistCarplayController: NSObject {
     PlaylistCarplayManager.shared.onCarplayUIChangedToRoot.eraseToAnyPublisher()
       .receive(on: DispatchQueue.main)
       .sink { [weak self] in
-        guard let self = self else { return }
+        guard let self = self else {
+          return
+        }
         self.interfaceController.popToRootTemplate(animated: true) { success, error in
           if !success, let error = error {
             log.error(error)
@@ -76,7 +78,9 @@ class PlaylistCarplayController: NSObject {
     PlaylistManager.shared.onCurrentFolderDidChange
       .receive(on: DispatchQueue.main)
       .sink { [weak self] in
-        guard let self = self else { return }
+        guard let self = self else {
+          return
+        }
 
         if self.interfaceController.rootTemplate == self.interfaceController.topTemplate {
           // Nothing to Pop
@@ -109,7 +113,9 @@ class PlaylistCarplayController: NSObject {
 
   func observePlayerStates() {
     player.publisher(for: .play).sink { [weak self] event in
-      guard let self = self else { return }
+      guard let self = self else {
+        return
+      }
 
       MPNowPlayingInfoCenter.default().playbackState = .playing
       PlaylistMediaStreamer.updateNowPlayingInfo(event.mediaPlayer)
@@ -124,8 +130,8 @@ class PlaylistCarplayController: NSObject {
 
       // If the folder's items isn't showing, then we're either on the folder view or settings view
       // Therefore we need to push the folder view onto the stack
-      if currentTemplate == nil || (currentTemplate?.userInfo as? [String: String])?["id"] != PlaylistCarPlayTemplateID.itemsList.rawValue {
-
+      if currentTemplate == nil || (currentTemplate?.userInfo as? [String: String])?["id"] != PlaylistCarPlayTemplateID
+        .itemsList.rawValue {
         // Fetch the root playlistTabTemplate
         currentTemplate = tabTemplate.templates.compactMap({ $0 as? CPListTemplate }).first(where: {
           ($0.userInfo as? [String: String])?["id"] == PlaylistCarPlayTemplateID.itemsList.rawValue
@@ -133,17 +139,17 @@ class PlaylistCarplayController: NSObject {
       }
 
       // We need to ensure the template that is showing is the list of playlist items
-      guard (currentTemplate?.userInfo as? [String: String])?["id"] == PlaylistCarPlayTemplateID.itemsList.rawValue else {
+      guard (currentTemplate?.userInfo as? [String: String])?["id"] == PlaylistCarPlayTemplateID.itemsList.rawValue
+      else {
         return
       }
 
       if let playlistTabTemplate = currentTemplate {
-        let items = playlistTabTemplate.sections.flatMap({ $0.items }).compactMap({ $0 as? CPListItem })
+        let items = playlistTabTemplate.sections.flatMap(\.items).compactMap({ $0 as? CPListItem })
 
         items.forEach({
           if let userInfo = $0.userInfo as? [String: Any],
-            let itemId = userInfo["id"] as? String {
-
+             let itemId = userInfo["id"] as? String {
             $0.accessoryType = PlaylistManager.shared.state(for: itemId) != .downloaded ? .cloud : .none
 
             if PlaylistCarplayManager.shared.currentPlaylistItem?.pageSrc == itemId {
@@ -174,7 +180,9 @@ class PlaylistCarplayController: NSObject {
     }.store(in: &playerStateObservers)
 
     player.publisher(for: .stop).sink { [weak self] _ in
-      guard let self = self else { return }
+      guard let self = self else {
+        return
+      }
       MPNowPlayingInfoCenter.default().playbackState = .stopped
 
       if self.interfaceController.topTemplate == CPNowPlayingTemplate.shared {
@@ -256,7 +264,8 @@ class PlaylistCarplayController: NSObject {
         if !success, let error = error {
           self?.displayErrorAlert(error: error)
         }
-      })
+      }
+    )
   }
 
   private func reloadData() {
@@ -311,7 +320,9 @@ class PlaylistCarplayController: NSObject {
     let itemCount = savedFolder?.playlistItems?.count ?? 0
     let savedFolder = CPListItem(
       text: savedFolder?.title ?? Strings.PlaylistFolders.playlistUntitledFolderTitle,
-      detailText: "\(itemCount == 1 ? Strings.PlaylistFolders.playlistFolderSubtitleItemSingleCount : String.localizedStringWithFormat(Strings.PlaylistFolders.playlistFolderSubtitleItemCount, itemCount))",
+      detailText: "\(itemCount == 1
+        ? Strings.PlaylistFolders.playlistFolderSubtitleItemSingleCount
+        : String.localizedStringWithFormat(Strings.PlaylistFolders.playlistFolderSubtitleItemCount, itemCount))",
       image: nil,
       accessoryImage: nil,
       accessoryType: .disclosureIndicator
@@ -329,7 +340,9 @@ class PlaylistCarplayController: NSObject {
       let itemCount = folder.playlistItems?.count ?? 0
       return CPListItem(
         text: folder.title ?? Strings.PlaylistFolders.playlistUntitledFolderTitle,
-        detailText: "\(itemCount == 1 ? Strings.PlaylistFolders.playlistFolderSubtitleItemSingleCount : String.localizedStringWithFormat(Strings.PlaylistFolders.playlistFolderSubtitleItemCount, itemCount))",
+        detailText: "\(itemCount == 1
+          ? Strings.PlaylistFolders.playlistFolderSubtitleItemSingleCount
+          : String.localizedStringWithFormat(Strings.PlaylistFolders.playlistFolderSubtitleItemCount, itemCount))",
         image: nil,
         accessoryImage: nil,
         accessoryType: .disclosureIndicator
@@ -362,13 +375,13 @@ class PlaylistCarplayController: NSObject {
 
   private func generatePlaylistListTemplate() -> CPTemplate {
     // Map all items to their IDs
-    let playlistItemIds = PlaylistManager.shared.allItems.map { $0.pageSrc }
+    let playlistItemIds = PlaylistManager.shared.allItems.map(\.pageSrc)
 
     // Fetch all Playlist Items
     var listItems = [CPListItem]()
     listItems = playlistItemIds.compactMap { itemId -> CPListItem? in
       guard let itemIndex = PlaylistManager.shared.index(of: itemId),
-        let item = PlaylistManager.shared.itemAtIndex(itemIndex)
+            let item = PlaylistManager.shared.itemAtIndex(itemIndex)
       else {
         return nil
       }
@@ -393,7 +406,9 @@ class PlaylistCarplayController: NSObject {
           let isPlaying = self.player.isPlaying || self.player.isWaitingToPlay
           for item in listItems.enumerated() {
             let userInfo = item.element.userInfo as? [String: Any] ?? [:]
-            item.element.isPlaying = isPlaying && (PlaylistCarplayManager.shared.currentPlaylistItem?.src == userInfo["id"] as? String)
+            item.element
+              .isPlaying = isPlaying &&
+              (PlaylistCarplayManager.shared.currentPlaylistItem?.src == userInfo["id"] as? String)
           }
 
           let userInfo = listItem.userInfo as? [String: Any]
@@ -424,26 +439,28 @@ class PlaylistCarplayController: NSObject {
         "thumbnailRenderer": self.loadThumbnail(for: item) {
           [weak listItem]
           image in
-          guard let listItem = listItem else { return }
+            guard let listItem = listItem else {
+              return
+            }
 
-          // Store the thumbnail that was fetched
-          userInfo["icon"] = image
-          listItem.userInfo = userInfo
-
-          if let image = image {
-            listItem.setImage(image.scale(toSize: CPListItem.maximumImageSize))
-          }
-
-          if listItem.isPlaying {
-            PlaylistMediaStreamer.setNowPlayingMediaArtwork(image: image)
-          }
-
-          // After completion, remove the renderer from the user info
-          // so that it can dealloc nicely and save us some memory.
-          DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-            userInfo["thumbnailRenderer"] = nil
+            // Store the thumbnail that was fetched
+            userInfo["icon"] = image
             listItem.userInfo = userInfo
-          }
+
+            if let image = image {
+              listItem.setImage(image.scale(toSize: CPListItem.maximumImageSize))
+            }
+
+            if listItem.isPlaying {
+              PlaylistMediaStreamer.setNowPlayingMediaArtwork(image: image)
+            }
+
+            // After completion, remove the renderer from the user info
+            // so that it can dealloc nicely and save us some memory.
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+              userInfo["thumbnailRenderer"] = nil
+              listItem.userInfo = userInfo
+            }
         } as Any,
       ])
       listItem.userInfo = userInfo
@@ -471,8 +488,12 @@ class PlaylistCarplayController: NSObject {
     ).then {
       $0.handler = { [unowned self] listItem, completion in
         let enableGridView = Preferences.Playlist.enableCarPlayRestartPlayback.value
-        let title = enableGridView ? Strings.PlayList.playlistCarplayRestartPlaybackButtonStateEnabled : Strings.PlayList.playlistCarplayRestartPlaybackButtonStateDisabled
-        let icon = enableGridView ? #imageLiteral(resourceName: "checkbox_on") : #imageLiteral(resourceName: "loginUnselected")
+        let title = enableGridView
+          ? Strings.PlayList.playlistCarplayRestartPlaybackButtonStateEnabled
+          : Strings.PlayList.playlistCarplayRestartPlaybackButtonStateDisabled
+        let icon = enableGridView
+          ? #imageLiteral(resourceName: "checkbox_on")
+          : #imageLiteral(resourceName: "loginUnselected")
         let button = CPGridButton(titleVariants: [title], image: icon) { [unowned self] button in
           Preferences.Playlist.enableCarPlayRestartPlayback.value = !enableGridView
           self.interfaceController.popTemplate(
@@ -481,7 +502,8 @@ class PlaylistCarplayController: NSObject {
               if !success, let error = error {
                 log.error(error)
               }
-            })
+            }
+          )
         }
 
         self.interfaceController.pushTemplate(
@@ -502,7 +524,8 @@ class PlaylistCarplayController: NSObject {
     let playbackSection = CPListSection(
       items: [restartPlaybackOption],
       header: Strings.PlayList.playlistCarplayOptionsScreenTitle,
-      sectionIndexTitle: Strings.PlayList.playlistCarplayOptionsScreenTitle)
+      sectionIndexTitle: Strings.PlayList.playlistCarplayOptionsScreenTitle
+    )
 
     // Template
     let settingsTemplate = CPListTemplate(
@@ -521,7 +544,7 @@ extension PlaylistCarplayController: CPInterfaceControllerDelegate {
     log.debug("Template \(aTemplate.classForCoder) will appear.")
 
     if interfaceController.topTemplate != CPNowPlayingTemplate.shared,
-      (aTemplate.userInfo as? [String: String])?["id"] == PlaylistCarPlayTemplateID.folders.rawValue {
+       (aTemplate.userInfo as? [String: String])?["id"] == PlaylistCarPlayTemplateID.folders.rawValue {
       self.stop()
 
       PlaylistCarplayManager.shared.onCarplayUIChangedToRoot.send()
@@ -542,8 +565,13 @@ extension PlaylistCarplayController: CPInterfaceControllerDelegate {
 }
 
 extension PlaylistCarplayController: NSFetchedResultsControllerDelegate {
-  func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
-
+  func controller(
+    _ controller: NSFetchedResultsController<NSFetchRequestResult>,
+    didChange anObject: Any,
+    at indexPath: IndexPath?,
+    for type: NSFetchedResultsChangeType,
+    newIndexPath: IndexPath?
+  ) {
     reloadData()
   }
 
@@ -553,10 +581,12 @@ extension PlaylistCarplayController: NSFetchedResultsControllerDelegate {
 }
 
 extension PlaylistCarplayController {
-
-  func loadThumbnail(for mediaItem: PlaylistInfo, completion: @escaping (UIImage?) -> Void) -> PlaylistThumbnailRenderer? {
+  func loadThumbnail(
+    for mediaItem: PlaylistInfo,
+    completion: @escaping (UIImage?) -> Void
+  ) -> PlaylistThumbnailRenderer? {
     guard let assetUrl = URL(string: mediaItem.src),
-      let favIconUrl = URL(string: mediaItem.pageSrc)
+          let favIconUrl = URL(string: mediaItem.pageSrc)
     else {
       completion(nil)
       return nil
@@ -568,13 +598,14 @@ extension PlaylistCarplayController {
       favIconUrl: favIconUrl,
       completion: { image in
         completion(image)
-      })
+      }
+    )
     return thumbnailRenderer
   }
 
   func initiatePlaybackOfItem(itemId: String, completionHandler: @escaping (Error?) -> Void) {
     guard let index = PlaylistManager.shared.index(of: itemId),
-      let item = PlaylistManager.shared.itemAtIndex(index)
+          let item = PlaylistManager.shared.itemAtIndex(index)
     else {
       displayLoadingResourceError()
       completionHandler("Invalid Item")
@@ -649,11 +680,13 @@ extension PlaylistCarplayController {
 
     let index = PlaylistCarplayManager.shared.currentlyPlayingItemIndex - 1
     if index < PlaylistManager.shared.numberOfAssets,
-      let item = PlaylistManager.shared.itemAtIndex(index) {
+       let item = PlaylistManager.shared.itemAtIndex(index) {
       PlaylistCarplayManager.shared.currentlyPlayingItemIndex = index
       playItem(item: item) { [weak self] error in
         PlaylistCarplayManager.shared.currentPlaylistItem = nil
-        guard let self = self else { return }
+        guard let self = self else {
+          return
+        }
 
         switch error {
         case .other(let err):
@@ -697,12 +730,14 @@ extension PlaylistCarplayController {
     }
 
     if index >= 0,
-      let item = PlaylistManager.shared.itemAtIndex(index) {
+       let item = PlaylistManager.shared.itemAtIndex(index) {
       PlaylistCarplayManager.shared.currentPlaylistItem = item
       PlaylistCarplayManager.shared.currentlyPlayingItemIndex = index
       self.playItem(item: item) { [weak self] error in
         PlaylistCarplayManager.shared.currentPlaylistItem = nil
-        guard let self = self else { return }
+        guard let self = self else {
+          return
+        }
 
         switch error {
         case .other(let err):
@@ -762,7 +797,13 @@ extension PlaylistCarplayController {
 
   func seek(relativeOffset: Float) {
     if let currentItem = player.currentItem {
-      let seekTime = CMTimeMakeWithSeconds(Float64(CGFloat(relativeOffset) * CGFloat(currentItem.asset.duration.value) / CGFloat(currentItem.asset.duration.timescale)), preferredTimescale: currentItem.currentTime().timescale)
+      let seekTime = CMTimeMakeWithSeconds(
+        Float64(
+          CGFloat(relativeOffset) * CGFloat(currentItem.asset.duration.value) /
+            CGFloat(currentItem.asset.duration.timescale)
+        ),
+        preferredTimescale: currentItem.currentTime().timescale
+      )
       seek(to: seekTime.seconds)
     }
   }
@@ -806,7 +847,7 @@ extension PlaylistCarplayController {
             // We are playing the same item again..
             if !isNewItem {
               self.pause()
-              self.seek(relativeOffset: 0.0)  // Restart playback
+              self.seek(relativeOffset: 0.0) // Restart playback
               self.play()
               resolver(.success(Void()))
               return
@@ -814,7 +855,7 @@ extension PlaylistCarplayController {
 
             // Track-bar
             if autoPlayEnabled {
-              self.play()  // Play the new item
+              self.play() // Play the new item
               resolver(.success(Void()))
             }
           }
@@ -831,7 +872,7 @@ extension PlaylistCarplayController {
     let cacheState = PlaylistManager.shared.state(for: item.pageSrc)
     if cacheState != .invalid {
       if let index = PlaylistManager.shared.index(of: item.pageSrc),
-        let asset = PlaylistManager.shared.assetAtIndex(index) {
+         let asset = PlaylistManager.shared.assetAtIndex(index) {
         load(asset: asset, autoPlayEnabled: true)
           .handleEvents(receiveCancel: {
             if !isPlaying {
@@ -908,7 +949,7 @@ extension PlaylistCarplayController {
 
           // Item can be streamed, so let's retrieve its URL from our DB
           guard let index = PlaylistManager.shared.index(of: item.pageSrc),
-            let item = PlaylistManager.shared.itemAtIndex(index)
+                let item = PlaylistManager.shared.itemAtIndex(index)
           else {
             if !isPlaying {
               PlaylistMediaStreamer.clearNowPlayingInfo()
@@ -977,7 +1018,7 @@ extension PlaylistCarplayController {
     Preferences.Playlist.lastPlayedItemUrl.value = item.pageSrc
 
     if let playTime = player.currentItem?.currentTime(),
-      Preferences.Playlist.playbackLeftOff.value {
+       Preferences.Playlist.playbackLeftOff.value {
       Preferences.Playlist.lastPlayedItemTime.value = playTime.seconds
     } else {
       Preferences.Playlist.lastPlayedItemTime.value = 0.0
@@ -1004,9 +1045,12 @@ extension PlaylistCarplayController {
                   if !success, let error = error {
                     log.error(error)
                   }
-                })
-            })
-        ])
+                }
+              )
+            }
+          )
+        ]
+      )
 
       interfaceController.presentTemplate(
         alert, animated: true,
@@ -1014,7 +1058,8 @@ extension PlaylistCarplayController {
           if !success, let error = error {
             log.error(error)
           }
-        })
+        }
+      )
     } else {
       let alert = CPActionSheetTemplate(
         title: Strings.PlayList.expiredAlertTitle,
@@ -1029,9 +1074,12 @@ extension PlaylistCarplayController {
                   if !success, let error = error {
                     log.error(error)
                   }
-                })
-            })
-        ])
+                }
+              )
+            }
+          )
+        ]
+      )
 
       interfaceController.presentTemplate(
         alert, animated: true,
@@ -1039,7 +1087,8 @@ extension PlaylistCarplayController {
           if !success, let error = error {
             log.error(error)
           }
-        })
+        }
+      )
     }
   }
 
@@ -1059,9 +1108,12 @@ extension PlaylistCarplayController {
                   if !success, let error = error {
                     log.error(error)
                   }
-                })
-            })
-        ])
+                }
+              )
+            }
+          )
+        ]
+      )
 
       interfaceController.presentTemplate(
         alert, animated: true,
@@ -1069,7 +1121,8 @@ extension PlaylistCarplayController {
           if !success, let error = error {
             log.error(error)
           }
-        })
+        }
+      )
     } else {
       // Can also use CPAlertTemplate, but it doesn't have a "Message" parameter.
       let alert = CPActionSheetTemplate(
@@ -1085,9 +1138,12 @@ extension PlaylistCarplayController {
                   if !success, let error = error {
                     log.error(error)
                   }
-                })
-            })
-        ])
+                }
+              )
+            }
+          )
+        ]
+      )
 
       interfaceController.presentTemplate(
         alert, animated: true,
@@ -1095,7 +1151,8 @@ extension PlaylistCarplayController {
           if !success, let error = error {
             log.error(error)
           }
-        })
+        }
+      )
     }
   }
 
@@ -1115,9 +1172,12 @@ extension PlaylistCarplayController {
                   if !success, let error = error {
                     log.error(error)
                   }
-                })
-            })
-        ])
+                }
+              )
+            }
+          )
+        ]
+      )
 
       DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
         self.interfaceController.presentTemplate(
@@ -1126,7 +1186,8 @@ extension PlaylistCarplayController {
             if !success, let error = error {
               log.error(error)
             }
-          })
+          }
+        )
       }
     } else {
       // Can also use CPAlertTemplate, but it doesn't have a "Message" parameter.
@@ -1143,9 +1204,12 @@ extension PlaylistCarplayController {
                   if !success, let error = error {
                     log.error(error)
                   }
-                })
-            })
-        ])
+                }
+              )
+            }
+          )
+        ]
+      )
 
       DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
         self.interfaceController.presentTemplate(
@@ -1154,7 +1218,8 @@ extension PlaylistCarplayController {
             if !success, let error = error {
               log.error(error)
             }
-          })
+          }
+        )
       }
     }
   }

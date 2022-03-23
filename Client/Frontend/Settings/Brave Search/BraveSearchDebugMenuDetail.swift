@@ -47,7 +47,9 @@ struct BraveSearchDebugMenuDetail: View {
   }
 
   private var dataAsUrl: URL? {
-    guard let data = logEntry.fallbackData else { return nil }
+    guard let data = logEntry.fallbackData else {
+      return nil
+    }
     let tempUrl = FileManager.default.temporaryDirectory.appendingPathComponent("output.html")
 
     do {
@@ -77,7 +79,8 @@ struct BraveSearchDebugMenuDetail: View {
 struct BraveSearchDebugMenuDetail_Previews: PreviewProvider {
   static var previews: some View {
     BraveSearchDebugMenuDetail(
-      logEntry: BraveSearchDebugMenuFixture.sample)
+      logEntry: BraveSearchDebugMenuFixture.sample
+    )
   }
 }
 #endif

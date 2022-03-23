@@ -32,8 +32,8 @@ struct AssetDetailView: View {
           networkStore: networkStore,
           buySendSwapDestination: buySendSwapDestination
         )
-        .resetListHeaderStyle()
-        .padding(.horizontal, tableInset)  // inset grouped layout margins workaround
+          .resetListHeaderStyle()
+          .padding(.horizontal, tableInset) // inset grouped layout margins workaround
       ) {
       }
       Section(
@@ -62,7 +62,11 @@ struct AssetDetailView: View {
                 Text(showFiatPlaceholder ? "$0.00" : viewModel.fiatBalance)
                   .redacted(reason: showFiatPlaceholder ? .placeholder : [])
                   .shimmer(assetDetailStore.isLoadingPrice)
-                Text(showBalancePlaceholder ? "0.0000 \(assetDetailStore.token.symbol)" : "\(viewModel.balance) \(assetDetailStore.token.symbol)")
+                Text(
+                  showBalancePlaceholder
+                    ? "0.0000 \(assetDetailStore.token.symbol)"
+                    : "\(viewModel.balance) \(assetDetailStore.token.symbol)"
+                )
                   .redacted(reason: showBalancePlaceholder ? .placeholder : [])
                   .shimmer(assetDetailStore.isLoadingAccountBalances)
               }
@@ -90,18 +94,18 @@ struct AssetDetailView: View {
               displayAccountCreator: true,
               assetRatios: [assetDetailStore.token.symbol.lowercased(): assetDetailStore.assetPriceValue]
             )
-            .contextMenu {
-              if !tx.txHash.isEmpty {
-                Button(action: {
-                  if let baseURL = self.networkStore.selectedChain.blockExplorerUrls.first.map(URL.init(string:)),
-                    let url = baseURL?.appendingPathComponent("tx/\(tx.txHash)") {
-                    openWalletURL?(url)
+              .contextMenu {
+                if !tx.txHash.isEmpty {
+                  Button(action: {
+                    if let baseURL = self.networkStore.selectedChain.blockExplorerUrls.first.map(URL.init(string:)),
+                       let url = baseURL?.appendingPathComponent("tx/\(tx.txHash)") {
+                      openWalletURL?(url)
+                    }
+                  }) {
+                    Label(Strings.Wallet.viewOnBlockExplorer, systemImage: "arrow.up.forward.square")
                   }
-                }) {
-                  Label(Strings.Wallet.viewOnBlockExplorer, systemImage: "arrow.up.forward.square")
                 }
               }
-            }
           }
         }
       }
@@ -145,7 +149,7 @@ struct CurrencyDetailView_Previews: PreviewProvider {
         keyringStore: .previewStore,
         networkStore: .previewStore
       )
-      .navigationBarTitleDisplayMode(.inline)
+        .navigationBarTitleDisplayMode(.inline)
     }
     .previewColorSchemes()
   }

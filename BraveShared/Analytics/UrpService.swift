@@ -8,7 +8,10 @@ import SwiftyJSON
 private let log = Logger.browserLogger
 
 enum UrpError {
-  case networkError, downloadIdNotFound, ipNotFound, endpointError
+  case networkError
+  case downloadIdNotFound
+  case ipNotFound
+  case endpointError
 }
 
 /// Api endpoints for user referral program.
@@ -29,7 +32,9 @@ struct UrpService {
     self.host = host
     self.apiKey = apiKey
 
-    guard let hostUrl = URL(string: host), let normalizedHost = hostUrl.normalizedHost() else { return nil }
+    guard let hostUrl = URL(string: host), let normalizedHost = hostUrl.normalizedHost() else {
+      return nil
+    }
 
     // Certificate pinning
     certificateEvaluator = PinningCertificateEvaluator(hosts: [normalizedHost])
@@ -103,7 +108,6 @@ struct UrpService {
 extension URLSession {
   /// All requests to referral api use PUT method, accept and receive json.
   func urpApiRequest(endPoint: URL, params: [String: String], completion: @escaping (Result<Any, Error>) -> Void) {
-
     self.request(endPoint, method: .put, parameters: params, encoding: .json) { response in
       completion(response)
     }

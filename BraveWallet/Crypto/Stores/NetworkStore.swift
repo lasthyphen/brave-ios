@@ -129,8 +129,10 @@ public class NetworkStore: ObservableObject {
 extension NetworkStore: BraveWalletJsonRpcServiceObserver {
   public func onIsEip1559Changed(_ chainId: String, isEip1559: Bool) {
   }
+
   public func onAddEthereumChainRequestCompleted(_ chainId: String, error: String) {
   }
+
   public func chainChangedEvent(_ chainId: String) {
     self.selectedChainId = chainId
   }

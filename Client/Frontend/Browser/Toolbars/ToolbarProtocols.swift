@@ -5,7 +5,6 @@
 import Foundation
 
 protocol ToolbarProtocol: AnyObject {
-
   var tabToolbarDelegate: ToolbarDelegate? { get set }
   var tabsButton: TabsButton { get }
   var backButton: ToolbarButton { get }

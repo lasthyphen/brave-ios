@@ -67,7 +67,7 @@ public struct BraveValidatedTextFieldStyle<Failure: LocalizedError & Equatable>:
           Image(systemName: "exclamationmark.circle.fill")
           Text(error.localizedDescription)
             .fixedSize(horizontal: false, vertical: true)
-            .animation(nil, value: error.localizedDescription)  // Dont animate the text change, just alpha
+            .animation(nil, value: error.localizedDescription) // Dont animate the text change, just alpha
         }
         .transition(
           .asymmetric(
@@ -102,7 +102,7 @@ private struct BaseBraveTextFieldStyleModifier: ViewModifier {
       .overlay(
         borderShape
           // * 2 + clipShape below = pixel perfect hairline border
-          .stroke(strokeColor ?? Color(.secondaryButtonTint), lineWidth: 2 * (lineWidthFactor ?? 1))
+            .stroke(strokeColor ?? Color(.secondaryButtonTint), lineWidth: 2 * (lineWidthFactor ?? 1))
       )
       .background(
         backgroundColor ?? Color(.braveBackground)

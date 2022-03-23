@@ -42,8 +42,19 @@ class DownloadToast: Toast {
 
   var descriptionText: String {
     let downloadedSize = ByteCountFormatter.string(fromByteCount: combinedBytesDownloaded, countStyle: .file)
-    let expectedSize = combinedTotalBytesExpected != nil ? ByteCountFormatter.string(fromByteCount: combinedTotalBytesExpected!, countStyle: .file) : nil
-    let descriptionText = expectedSize != nil ? String(format: Strings.downloadProgressToastDescriptionText, downloadedSize, expectedSize!) : downloadedSize
+    let expectedSize = combinedTotalBytesExpected != nil
+      ? ByteCountFormatter.string(
+        fromByteCount: combinedTotalBytesExpected!,
+        countStyle: .file
+      )
+      : nil
+    let descriptionText = expectedSize != nil
+      ? String(
+        format: Strings.downloadProgressToastDescriptionText,
+        downloadedSize,
+        expectedSize!
+      )
+      : downloadedSize
 
     guard downloads.count > 1 else {
       return descriptionText
@@ -51,7 +62,11 @@ class DownloadToast: Toast {
 
     let fileCountDescription = String(format: Strings.downloadMultipleFilesToastDescriptionText, downloads.count)
 
-    return String(format: Strings.downloadMultipleFilesAndProgressToastDescriptionText, fileCountDescription, descriptionText)
+    return String(
+      format: Strings.downloadMultipleFilesAndProgressToastDescriptionText,
+      fileCountDescription,
+      descriptionText
+    )
   }
 
   var downloads: [Download] = []
@@ -81,6 +96,7 @@ class DownloadToast: Toast {
     }
   }
 
+  @available(*, unavailable)
   required init?(coder aDecoder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }
@@ -167,15 +183,24 @@ class DownloadToast: Toast {
   }
 
   @objc func buttonPressed(_ gestureRecognizer: UIGestureRecognizer) {
-    let alert = AlertController(title: Strings.cancelDownloadDialogTitle, message: Strings.cancelDownloadDialogMessage, preferredStyle: .alert)
-    alert.addAction(UIAlertAction(title: Strings.cancelDownloadDialogResume, style: .cancel, handler: nil), accessibilityIdentifier: "cancelDownloadAlert.resume")
+    let alert = AlertController(
+      title: Strings.cancelDownloadDialogTitle,
+      message: Strings.cancelDownloadDialogMessage,
+      preferredStyle: .alert
+    )
+    alert.addAction(
+      UIAlertAction(title: Strings.cancelDownloadDialogResume, style: .cancel, handler: nil),
+      accessibilityIdentifier: "cancelDownloadAlert.resume"
+    )
     alert.addAction(
       UIAlertAction(
         title: Strings.cancelDownloadDialogCancel, style: .default,
         handler: { action in
           self.completionHandler?(true)
           self.dismiss(true)
-        }), accessibilityIdentifier: "cancelDownloadAlert.cancel")
+        }
+      ), accessibilityIdentifier: "cancelDownloadAlert.cancel"
+    )
 
     viewController?.present(alert, animated: true, completion: nil)
   }

@@ -7,7 +7,6 @@ import Data
 import Combine
 
 final class PrivateBrowsingManager: ObservableObject {
-
   @Published var isPrivateBrowsing = false {
     didSet {
       if oldValue != isPrivateBrowsing {

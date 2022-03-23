@@ -41,7 +41,9 @@ class Download: NSObject {
     let downloadsPath = try FileManager.default.downloadsPath()
     let basePath = downloadsPath.appendingPathComponent(filename)
     let fileExtension = basePath.pathExtension
-    let filenameWithoutExtension = !fileExtension.isEmpty ? String(filename.dropLast(fileExtension.count + 1)) : filename
+    let filenameWithoutExtension = !fileExtension.isEmpty
+      ? String(filename.dropLast(fileExtension.count + 1))
+      : filename
 
     var proposedPath = basePath
     var count = 0
@@ -50,7 +52,8 @@ class Download: NSObject {
       count += 1
 
       let proposedFilenameWithoutExtension = "\(filenameWithoutExtension) (\(count))"
-      proposedPath = downloadsPath.appendingPathComponent(proposedFilenameWithoutExtension).appendingPathExtension(fileExtension)
+      proposedPath = downloadsPath.appendingPathComponent(proposedFilenameWithoutExtension)
+        .appendingPathExtension(fileExtension)
     }
 
     return proposedPath
@@ -62,7 +65,7 @@ class HTTPDownload: Download {
   let request: URLRequest
 
   var state: URLSessionTask.State {
-    return task?.state ?? .suspended
+    task?.state ?? .suspended
   }
 
   fileprivate(set) var session: URLSession?
@@ -95,7 +98,9 @@ class HTTPDownload: Download {
       self.mimeType = mimeType
     }
 
-    self.totalBytesExpected = preflightResponse.expectedContentLength > 0 ? preflightResponse.expectedContentLength : nil
+    self.totalBytesExpected = preflightResponse.expectedContentLength > 0
+      ? preflightResponse.expectedContentLength
+      : nil
 
     self.session = URLSession(configuration: .ephemeral, delegate: self, delegateQueue: downloadOperationQueue)
     self.task = session?.downloadTask(with: request)
@@ -132,15 +137,21 @@ extension HTTPDownload: URLSessionTaskDelegate, URLSessionDownloadDelegate {
     // Don't bubble up cancellation as an error if the
     // error is `.cancelled` and we have resume data.
     if let urlError = error as? URLError,
-      urlError.code == .cancelled,
-      resumeData != nil {
+       urlError.code == .cancelled,
+       resumeData != nil {
       return
     }
 
     delegate?.download(self, didCompleteWithError: error)
   }
 
-  func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didWriteData bytesWritten: Int64, totalBytesWritten: Int64, totalBytesExpectedToWrite: Int64) {
+  func urlSession(
+    _ session: URLSession,
+    downloadTask: URLSessionDownloadTask,
+    didWriteData bytesWritten: Int64,
+    totalBytesWritten: Int64,
+    totalBytesExpectedToWrite: Int64
+  ) {
     bytesDownloaded = totalBytesWritten
     totalBytesExpected = totalBytesExpectedToWrite
 
@@ -192,7 +203,11 @@ class BlobDownload: Download {
 
 protocol DownloadQueueDelegate {
   func downloadQueue(_ downloadQueue: DownloadQueue, didStartDownload download: Download)
-  func downloadQueue(_ downloadQueue: DownloadQueue, didDownloadCombinedBytes combinedBytesDownloaded: Int64, combinedTotalBytesExpected: Int64?)
+  func downloadQueue(
+    _ downloadQueue: DownloadQueue,
+    didDownloadCombinedBytes combinedBytesDownloaded: Int64,
+    combinedTotalBytesExpected: Int64?
+  )
   func downloadQueue(_ downloadQueue: DownloadQueue, download: Download, didFinishDownloadingTo location: URL)
   func downloadQueue(_ downloadQueue: DownloadQueue, didCompleteWithError error: Error?)
 }
@@ -203,12 +218,12 @@ class DownloadQueue {
   var delegate: DownloadQueueDelegate?
 
   var isEmpty: Bool {
-    return downloads.isEmpty
+    downloads.isEmpty
   }
 
-  fileprivate var combinedBytesDownloaded: Int64 = 0
-  fileprivate var combinedTotalBytesExpected: Int64?
-  fileprivate var lastDownloadError: Error?
+  private var combinedBytesDownloaded: Int64 = 0
+  private var combinedTotalBytesExpected: Int64?
+  private var lastDownloadError: Error?
 
   init() {
     self.downloads = []
@@ -270,7 +285,11 @@ extension DownloadQueue: DownloadDelegate {
 
   func download(_ download: Download, didDownloadBytes bytesDownloaded: Int64) {
     combinedBytesDownloaded += bytesDownloaded
-    delegate?.downloadQueue(self, didDownloadCombinedBytes: combinedBytesDownloaded, combinedTotalBytesExpected: combinedTotalBytesExpected)
+    delegate?.downloadQueue(
+      self,
+      didDownloadCombinedBytes: combinedBytesDownloaded,
+      combinedTotalBytesExpected: combinedTotalBytesExpected
+    )
   }
 
   func download(_ download: Download, didFinishDownloadingTo location: URL) {

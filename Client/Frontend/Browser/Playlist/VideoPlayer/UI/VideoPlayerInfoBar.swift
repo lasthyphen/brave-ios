@@ -19,7 +19,8 @@ class VideoPlayerInfoBar: UIView {
   }
 
   private let blurView = UIVisualEffectView(effect: UIBlurEffect(style: .systemMaterialDark)).then {
-    $0.contentView.backgroundColor = #colorLiteral(red: 0.231372549, green: 0.2431372549, blue: 0.3098039216, alpha: 0.8)
+    $0.contentView
+      .backgroundColor = #colorLiteral(red: 0.231372549, green: 0.2431372549, blue: 0.3098039216, alpha: 0.8)
   }
 
   let sidePanelButton = UIButton().then {
@@ -103,6 +104,7 @@ class VideoPlayerInfoBar: UIView {
     }
   }
 
+  @available(*, unavailable)
   required init?(coder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }

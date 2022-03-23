@@ -9,7 +9,6 @@ import BraveShared
 import Shared
 
 class BraveNewsEmptyFeedView: UIView, FeedCardContent {
-
   var sourcesAndSettingsButtonTapped: (() -> Void)?
 
   private let backgroundView = FeedCardBackgroundView()

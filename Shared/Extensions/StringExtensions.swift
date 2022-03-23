@@ -17,22 +17,23 @@ extension String {
   }
 
   public func unescape() -> String? {
-    return self.removingPercentEncoding
+    self.removingPercentEncoding
   }
 
   /**
-    Ellipsizes a String only if it's longer than `maxLength`
+   Ellipsizes a String only if it's longer than `maxLength`
 
-      "ABCDEF".ellipsize(4)
-      // "AB…EF"
+     "ABCDEF".ellipsize(4)
+     // "AB…EF"
 
-    :param: maxLength The maximum length of the String.
+   :param: maxLength The maximum length of the String.
 
-    :returns: A String with `maxLength` characters or less
-    */
+   :returns: A String with `maxLength` characters or less
+   */
   public func ellipsize(maxLength: Int) -> String {
     if (maxLength >= 2) && (self.count > maxLength) {
-      let index1 = self.index(self.startIndex, offsetBy: (maxLength + 1) / 2)  // `+ 1` has the same effect as an int ceil
+      let index1 = self
+        .index(self.startIndex, offsetBy: (maxLength + 1) / 2) // `+ 1` has the same effect as an int ceil
       let index2 = self.index(self.endIndex, offsetBy: maxLength / -2)
 
       return String(self[..<index1]) + "…\u{2060}" + String(self[index2...])
@@ -41,7 +42,7 @@ extension String {
   }
 
   private var stringWithAdditionalEscaping: String {
-    return self.replacingOccurrences(of: "|", with: "%7C")
+    self.replacingOccurrences(of: "|", with: "%7C")
   }
 
   public var asURL: URL? {
@@ -49,7 +50,7 @@ extension String {
     // Let's escape | for them.
     // We'd love to use one of the more sophisticated CFURL* or NSString.* functions, but
     // none seem to be quite suitable.
-    return URL(string: self) ?? URL(string: self.stringWithAdditionalEscaping)
+    URL(string: self) ?? URL(string: self.stringWithAdditionalEscaping)
   }
 
   /// Returns a new string made by removing the leading String characters contained
@@ -64,7 +65,7 @@ extension String {
 
   // Minimize trimming effort for characterset based on string
   public func trim(_ charactersInString: String) -> String {
-    return self.trimmingCharacters(in: CharacterSet(charactersIn: charactersInString))
+    self.trimmingCharacters(in: CharacterSet(charactersIn: charactersInString))
   }
 
   /// Adds a newline at the closest space from the middle of a string.
@@ -87,15 +88,26 @@ extension String {
     return newString
   }
 
-  public static func contentsOfFileWithResourceName(_ name: String, ofType type: String, fromBundle bundle: Bundle, encoding: String.Encoding, error: NSErrorPointer) -> String? {
-    return bundle.path(forResource: name, ofType: type).flatMap {
+  public static func contentsOfFileWithResourceName(
+    _ name: String,
+    ofType type: String,
+    fromBundle bundle: Bundle,
+    encoding: String.Encoding,
+    error: NSErrorPointer
+  ) -> String? {
+    bundle.path(forResource: name, ofType: type).flatMap {
       try? String(contentsOfFile: $0, encoding: encoding)
     }
   }
 
   public func regexReplacePattern(_ pattern: String, with: String) throws -> String {
     let regex = try NSRegularExpression(pattern: pattern, options: [])
-    return regex.stringByReplacingMatches(in: self, options: [], range: NSRange(location: 0, length: self.count), withTemplate: with)
+    return regex.stringByReplacingMatches(
+      in: self,
+      options: [],
+      range: NSRange(location: 0, length: self.count),
+      withTemplate: with
+    )
   }
 
   public func separatedBy(_ string: String) -> [String] {
@@ -104,18 +116,18 @@ extension String {
   }
 
   /*
-     Truncates the string to the specified length number of characters and appends an optional trailing string if longer.
-     - Parameter length: Desired maximum lengths of a string
-     - Parameter trailing: A 'String' that will be appended after the truncation.
+   Truncates the string to the specified length number of characters and appends an optional trailing string if longer.
+   - Parameter length: Desired maximum lengths of a string
+   - Parameter trailing: A 'String' that will be appended after the truncation.
 
-     - Returns: 'String' object.
-     */
+   - Returns: 'String' object.
+   */
   public func truncate(length: Int, trailing: String = "…") -> String {
-    return (self.count > length) ? self.prefix(length) + trailing : self
+    (self.count > length) ? self.prefix(length) + trailing : self
   }
 
   public var capitalizeFirstLetter: String {
-    return prefix(1).capitalized + dropFirst()
+    prefix(1).capitalized + dropFirst()
   }
 
   public func attributedText(stringToChange: String, font: UIFont, color: UIColor = .black) -> NSAttributedString {
@@ -125,8 +137,10 @@ extension String {
         attributes: [
           NSAttributedString.Key.font: font,
           NSAttributedString.Key.foregroundColor: color,
-        ])
-    let boldFontAttribute: [NSAttributedString.Key: Any] = [NSAttributedString.Key.font: UIFont.boldSystemFont(ofSize: font.pointSize)]
+        ]
+      )
+    let boldFontAttribute: [NSAttributedString.Key: Any] =
+      [NSAttributedString.Key.font: UIFont.boldSystemFont(ofSize: font.pointSize)]
     let range = (self as NSString).range(of: stringToChange)
     attributedString.addAttributes(boldFontAttribute, range: range)
     return attributedString
@@ -185,8 +199,7 @@ extension String {
   /// Also used for Strings which are not sanitized for displaying
   /// - Returns: Encoded String
   public var htmlEntityEncodedString: String {
-    return
-      self
+    self
       .replacingOccurrences(of: "&", with: "&amp;", options: .literal)
       .replacingOccurrences(of: "\"", with: "&quot;", options: .literal)
       .replacingOccurrences(of: "'", with: "&#39;", options: .literal)

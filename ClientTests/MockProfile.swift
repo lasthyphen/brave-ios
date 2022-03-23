@@ -9,7 +9,6 @@ import Storage
 import XCTest
 
 open class MockProfile: Profile {
-
   // Read/Writeable properties for mocking
   public var files: FileAccessor
   public var logins: BrowserLogins
@@ -22,7 +21,7 @@ open class MockProfile: Profile {
   }
 
   public func localName() -> String {
-    return name
+    name
   }
 
   public func reopen() {
@@ -33,19 +32,11 @@ open class MockProfile: Profile {
 
   public var isShutdown: Bool = false
 
-  lazy public var isChinaEdition: Bool = {
-    return Locale.current.identifier == "zh_CN"
-  }()
+  lazy public var isChinaEdition: Bool = Locale.current.identifier == "zh_CN"
 
-  lazy public var certStore: CertStore = {
-    return CertStore()
-  }()
+  lazy public var certStore: CertStore = CertStore()
 
-  lazy public var searchEngines: SearchEngines = {
-    return SearchEngines(files: self.files)
-  }()
+  lazy public var searchEngines: SearchEngines = SearchEngines(files: self.files)
 
-  lazy public var prefs: Prefs = {
-    return MockProfilePrefs()
-  }()
+  lazy public var prefs: Prefs = MockProfilePrefs()
 }

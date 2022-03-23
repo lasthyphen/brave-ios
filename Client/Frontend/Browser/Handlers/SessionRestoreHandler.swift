@@ -13,7 +13,14 @@ extension WKWebView {
   // Use JS to redirect the page without adding a history entry
   func replaceLocation(with url: URL) {
     let safeUrl = url.absoluteString.replacingOccurrences(of: "'", with: apostropheEncoded)
-    evaluateSafeJavaScript(functionName: "location.replace", args: ["'\(safeUrl)'"], contentWorld: .defaultClient, escapeArgs: false, asFunction: true, completion: nil)
+    evaluateSafeJavaScript(
+      functionName: "location.replace",
+      args: ["'\(safeUrl)'"],
+      contentWorld: .defaultClient,
+      escapeArgs: false,
+      asFunction: true,
+      completion: nil
+    )
   }
 }
 
@@ -21,20 +28,19 @@ extension InternalSchemeResponse {
   func generateInvalidSchemeResponse(url: String, for originURL: URL) -> (URLResponse, Data)? {
     // Same validation as in WKNavigationDelegate -> decidePolicyFor
     guard let scheme = URL(string: url)?.scheme,
-      ["http", "https", "file", "about", InternalURL.scheme].contains(scheme)
+          ["http", "https", "file", "about", InternalURL.scheme].contains(scheme)
     else {
-
       let html = """
-        <!DOCTYPE html>
-        <html>
-            <head>
-                <meta name="referrer" content="no-referrer">
-            </head>
-            <body>
-                <h1>\(Strings.genericErrorBody)</h1>
-            </body>
-        </html>
-        """
+      <!DOCTYPE html>
+      <html>
+          <head>
+              <meta name="referrer" content="no-referrer">
+          </head>
+          <body>
+              <h1>\(Strings.genericErrorBody)</h1>
+          </body>
+      </html>
+      """
       let data = html.data(using: .utf8)!
       let response = InternalSchemeHandler.response(forUrl: originURL)
       return (response, data)
@@ -57,16 +63,16 @@ extension InternalSchemeResponse {
     urlString = urlString.replacingOccurrences(of: "'", with: apostropheEncoded)
 
     let html = """
-      <!DOCTYPE html>
-      <html>
-          <head>
-              <meta name="referrer" content="no-referrer">
-              <script>
-                  location.replace('\(urlString)');
-              </script>
-          </head>
-      </html>
-      """
+    <!DOCTYPE html>
+    <html>
+        <head>
+            <meta name="referrer" content="no-referrer">
+            <script>
+                location.replace('\(urlString)');
+            </script>
+        </head>
+    </html>
+    """
 
     let data = html.data(using: .utf8)!
     let response = InternalSchemeHandler.response(forUrl: url)
@@ -79,7 +85,9 @@ class SessionRestoreHandler: InternalSchemeResponse {
   static let path = "sessionrestore"
 
   func response(forRequest request: URLRequest) -> (URLResponse, Data)? {
-    guard let _url = request.url, let url = InternalURL(_url) else { return nil }
+    guard let _url = request.url, let url = InternalURL(_url) else {
+      return nil
+    }
 
     // Handle the 'url='query param
     if let urlParam = url.extractedUrlParam {
@@ -89,9 +97,9 @@ class SessionRestoreHandler: InternalSchemeResponse {
     // From here on, handle 'history=' query param
     let response = InternalSchemeHandler.response(forUrl: url.url)
     guard let sessionRestorePath = Bundle.main.path(forResource: "SessionRestore", ofType: "html"),
-      var html = try? String(contentsOfFile: sessionRestorePath)
+          var html = try? String(contentsOfFile: sessionRestorePath)
     else {
-      assert(false)
+      assertionFailure()
       return nil
     }
 
@@ -99,7 +107,7 @@ class SessionRestoreHandler: InternalSchemeResponse {
     html = html.replacingOccurrences(of: "%security_token%", with: UserScriptManager.securityTokenString)
 
     guard let data = html.data(using: .utf8) else {
-      assert(false)
+      assertionFailure()
       return nil
     }
 

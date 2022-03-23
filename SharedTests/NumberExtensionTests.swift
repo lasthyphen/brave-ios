@@ -6,7 +6,6 @@ import XCTest
 @testable import Shared
 
 class NumberExtensionTests: XCTestCase {
-
   func testKFormattedNumber() {
     XCTAssertEqual(0.kFormattedNumber, "0")
     XCTAssertEqual(100.kFormattedNumber, "100")

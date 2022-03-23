@@ -26,96 +26,96 @@ struct CryptoPagesView: View {
       isShowingTransactions: $cryptoStore.isPresentingTransactionConfirmations,
       isConfirmationsButtonVisible: cryptoStore.hasUnapprovedTransactions
     )
-    .onAppear {
-      // If a user chooses not to confirm/reject their transactions we shouldn't
-      // do it again until they close and re-open wallet
-      if !fetchedUnapprovedTransactionsThisSession {
-        // Give the animation time
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-          self.fetchedUnapprovedTransactionsThisSession = true
-          self.cryptoStore.fetchUnapprovedTransactions()
+      .onAppear {
+        // If a user chooses not to confirm/reject their transactions we shouldn't
+        // do it again until they close and re-open wallet
+        if !fetchedUnapprovedTransactionsThisSession {
+          // Give the animation time
+          DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+            self.fetchedUnapprovedTransactionsThisSession = true
+            self.cryptoStore.fetchUnapprovedTransactions()
+          }
         }
       }
-    }
-    .ignoresSafeArea()
-    .navigationTitle(Strings.Wallet.cryptoTitle)
-    .navigationBarTitleDisplayMode(.inline)
-    .introspectViewController(customize: { vc in
-      vc.navigationItem.do {
-        let appearance: UINavigationBarAppearance = {
-          let appearance = UINavigationBarAppearance()
-          appearance.configureWithOpaqueBackground()
-          appearance.titleTextAttributes = [.foregroundColor: UIColor.braveLabel]
-          appearance.largeTitleTextAttributes = [.foregroundColor: UIColor.braveLabel]
-          appearance.backgroundColor = .braveBackground
-          appearance.shadowColor = .clear
-          return appearance
-        }()
-        $0.standardAppearance = appearance
-        $0.compactAppearance = appearance
-        $0.scrollEdgeAppearance = appearance
-      }
-    })
-    .background(
-      NavigationLink(
-        destination: WalletSettingsView(
-          settingsStore: cryptoStore.settingsStore,
-          networkStore: cryptoStore.networkStore
-        ),
-        isActive: $isShowingSettings
-      ) {
-        Text(Strings.Wallet.settings)
-      }
-      .hidden()
-    )
-    .background(
-      Color.clear
-        .sheet(isPresented: $cryptoStore.isPresentingAssetSearch) {
-          AssetSearchView(
-            keyringStore: keyringStore,
-            cryptoStore: cryptoStore
-          )
+      .ignoresSafeArea()
+      .navigationTitle(Strings.Wallet.cryptoTitle)
+      .navigationBarTitleDisplayMode(.inline)
+      .introspectViewController(customize: { vc in
+        vc.navigationItem.do {
+          let appearance: UINavigationBarAppearance = {
+            let appearance = UINavigationBarAppearance()
+            appearance.configureWithOpaqueBackground()
+            appearance.titleTextAttributes = [.foregroundColor: UIColor.braveLabel]
+            appearance.largeTitleTextAttributes = [.foregroundColor: UIColor.braveLabel]
+            appearance.backgroundColor = .braveBackground
+            appearance.shadowColor = .clear
+            return appearance
+          }()
+          $0.standardAppearance = appearance
+          $0.compactAppearance = appearance
+          $0.scrollEdgeAppearance = appearance
         }
-    )
-    .toolbar {
-      ToolbarItemGroup(placement: .navigationBarTrailing) {
-        Button(action: {
-          cryptoStore.isPresentingAssetSearch = true
-        }) {
-          Label(Strings.Wallet.searchTitle, systemImage: "magnifyingglass")
-            .labelStyle(.iconOnly)
-            .foregroundColor(Color(.braveOrange))
+      })
+      .background(
+        NavigationLink(
+          destination: WalletSettingsView(
+            settingsStore: cryptoStore.settingsStore,
+            networkStore: cryptoStore.networkStore
+          ),
+          isActive: $isShowingSettings
+        ) {
+          Text(Strings.Wallet.settings)
         }
-        Menu {
+        .hidden()
+      )
+      .background(
+        Color.clear
+          .sheet(isPresented: $cryptoStore.isPresentingAssetSearch) {
+            AssetSearchView(
+              keyringStore: keyringStore,
+              cryptoStore: cryptoStore
+            )
+          }
+      )
+      .toolbar {
+        ToolbarItemGroup(placement: .navigationBarTrailing) {
           Button(action: {
-            keyringStore.lock()
+            cryptoStore.isPresentingAssetSearch = true
           }) {
-            Label(Strings.Wallet.lock, image: "brave.lock")
-              .imageScale(.medium)  // Menu inside nav bar implicitly gets large
+            Label(Strings.Wallet.searchTitle, systemImage: "magnifyingglass")
+              .labelStyle(.iconOnly)
+              .foregroundColor(Color(.braveOrange))
           }
-          Divider()
-          Button(action: { isShowingSettings = true }) {
-            Label(Strings.Wallet.settings, image: "brave.gear")
-              .imageScale(.medium)  // Menu inside nav bar implicitly gets large
-          }
-        } label: {
-          Label(Strings.Wallet.otherWalletActionsAccessibilityTitle, systemImage: "ellipsis.circle")
-            .labelStyle(.iconOnly)
-            .osAvailabilityModifiers { content in
-              if #available(iOS 15.0, *) {
-                content
-              } else {
-                // iOS 14 does not correctly apply a large image scale to a `Menu`s label inside of a
-                // `ToolbarItemGroup` like it does with a `Button` using `DefaultButtonStyle`
-                content
-                  .imageScale(.large)
-              }
+          Menu {
+            Button(action: {
+              keyringStore.lock()
+            }) {
+              Label(Strings.Wallet.lock, image: "brave.lock")
+                .imageScale(.medium) // Menu inside nav bar implicitly gets large
             }
-            .foregroundColor(Color(.braveOrange))
+            Divider()
+            Button(action: { isShowingSettings = true }) {
+              Label(Strings.Wallet.settings, image: "brave.gear")
+                .imageScale(.medium) // Menu inside nav bar implicitly gets large
+            }
+          } label: {
+            Label(Strings.Wallet.otherWalletActionsAccessibilityTitle, systemImage: "ellipsis.circle")
+              .labelStyle(.iconOnly)
+              .osAvailabilityModifiers { content in
+                if #available(iOS 15.0, *) {
+                  content
+                } else {
+                  // iOS 14 does not correctly apply a large image scale to a `Menu`s label inside of a
+                  // `ToolbarItemGroup` like it does with a `Button` using `DefaultButtonStyle`
+                  content
+                    .imageScale(.large)
+                }
+              }
+              .foregroundColor(Color(.braveOrange))
+          }
+          .accessibilityLabel(Strings.Wallet.otherWalletActionsAccessibilityTitle)
         }
-        .accessibilityLabel(Strings.Wallet.otherWalletActionsAccessibilityTitle)
       }
-    }
   }
 
   private struct _CryptoPagesView: UIViewControllerRepresentable {
@@ -132,6 +132,7 @@ struct CryptoPagesView: View {
         isShowingTransactions: isShowingTransactions
       )
     }
+
     func updateUIViewController(_ uiViewController: CryptoPagesViewController, context: Context) {
       uiViewController.confirmationsButton.isHidden = !isConfirmationsButtonVisible
     }
@@ -228,8 +229,10 @@ private class CryptoPagesViewController: TabbedPageViewController {
             animated: true,
             completion: {
               self?.buySendSwapDestination = destination
-            })
-        })
+            }
+          )
+        }
+      )
     )
     presentPanModal(
       controller,

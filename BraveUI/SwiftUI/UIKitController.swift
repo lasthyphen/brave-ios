@@ -34,11 +34,14 @@ public struct UIKitController: View {
     init(_ makeVC: @escaping () -> UIViewController) {
       self.makeVC = makeVC
     }
+
     func makeUIViewController(context: Context) -> UIViewController {
       makeVC()
     }
+
     func updateUIViewController(_ uiViewController: UIViewController, context: Context) {
     }
+
     static func dismantleUIViewController(_ uiViewController: UIViewController, coordinator: ()) {
       log.debug("Dismantled \(uiViewController)")
     }

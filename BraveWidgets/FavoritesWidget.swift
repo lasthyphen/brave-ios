@@ -30,10 +30,12 @@ private struct FavoritesProvider: TimelineProvider {
   func placeholder(in context: Context) -> Entry {
     Entry(date: Date(), favorites: [])
   }
+
   func getSnapshot(in context: Context, completion: @escaping (Entry) -> Void) {
     let favorites = FavoritesWidgetData.loadWidgetData() ?? []
     completion(Entry(date: Date(), favorites: favorites))
   }
+
   func getTimeline(in context: Context, completion: @escaping (Timeline<Entry>) -> Void) {
     let favorites = FavoritesWidgetData.loadWidgetData() ?? []
     completion(Timeline(entries: [Entry(date: Date(), favorites: favorites)], policy: .never))
@@ -139,7 +141,7 @@ private struct FavoritesGridView: View {
 
   var body: some View {
     LazyVGrid(columns: Array(repeating: .init(.flexible()), count: 4), spacing: 8) {
-      ForEach((0..<itemsCount)) {
+      ForEach(0..<itemsCount) {
         if let favorite = entry.favorites[safe: $0], !placeholderOrPrivacyRedaction {
           Link(
             destination: favorite.url,
@@ -165,7 +167,8 @@ private struct FavoritesGridView: View {
                   .strokeBorder(Color(UIColor.braveSeparator).opacity(0.1), lineWidth: pixelLength)
               )
               .padding(widgetFamily == .systemMedium ? 4 : 0)
-            })
+            }
+          )
         } else {
           emptyField
             .padding(widgetFamily == .systemMedium ? 4 : 0)
@@ -188,9 +191,10 @@ struct FavoritesView_Previews: PreviewProvider {
         date: Date(),
         favorites: [
           // TODO: Fill with favorites.
-        ])
+        ]
+      )
     )
-    .previewContext(WidgetPreviewContext(family: .systemMedium))
+      .previewContext(WidgetPreviewContext(family: .systemMedium))
     FavoritesView(entry: .init(date: Date(), favorites: []))
       .previewContext(WidgetPreviewContext(family: .systemLarge))
   }

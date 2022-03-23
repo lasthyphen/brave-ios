@@ -23,7 +23,7 @@ class AdBlockStats: LocalAdblockResourceProtocol {
   /// The task that downloads all the files. Can be cancelled
   private var downloadTask: Task<Void, Never>?
 
-  fileprivate var isRegionalAdblockEnabled: Bool { return Preferences.Shields.useRegionAdBlock.value }
+  fileprivate var isRegionalAdblockEnabled: Bool { Preferences.Shields.useRegionAdBlock.value }
 
   fileprivate init() {
     generalAdblockEngine = AdblockRustEngine()
@@ -71,7 +71,9 @@ class AdBlockStats: LocalAdblockResourceProtocol {
         try await datFileUrls?.asyncConcurrentForEach {
           try Task.checkCancellation()
           let fileName = $0.deletingPathExtension().lastPathComponent
-          guard let data = fm.contents(atPath: $0.path) else { return }
+          guard let data = fm.contents(atPath: $0.path) else {
+            return
+          }
           try await self.setDataFile(data: data, id: fileName)
         }
       } catch {
@@ -87,7 +89,9 @@ class AdBlockStats: LocalAdblockResourceProtocol {
 
     // Do not block main frame urls
     // e.g. user clicked on an ad intentionally (adblock could block redirect to requested site)
-    if url == currentTabUrl { return false }
+    if url == currentTabUrl {
+      return false
+    }
 
     let mainDocDomain = stripLocalhostWebServer(request.mainDocumentURL?.host ?? "")
 
@@ -109,11 +113,19 @@ class AdBlockStats: LocalAdblockResourceProtocol {
 
     var isBlocked = false
 
-    isBlocked = generalAdblockEngine.shouldBlock(requestUrl: url.absoluteString, requestHost: requestHost, sourceHost: mainDocDomain)
+    isBlocked = generalAdblockEngine.shouldBlock(
+      requestUrl: url.absoluteString,
+      requestHost: requestHost,
+      sourceHost: mainDocDomain
+    )
 
     // Main adblocker didn't catch this rule, checking regional filters if applicable.
     if !isBlocked, isRegionalAdblockEnabled, let regionalAdblocker = regionalAdblockEngine {
-      isBlocked = regionalAdblocker.shouldBlock(requestUrl: url.absoluteString, requestHost: requestHost, sourceHost: mainDocDomain)
+      isBlocked = regionalAdblocker.shouldBlock(
+        requestUrl: url.absoluteString,
+        requestHost: requestHost,
+        sourceHost: mainDocDomain
+      )
     }
 
     fifoCacheOfUrlsChecked.addItem(key, value: isBlocked as AnyObject)
@@ -125,7 +137,9 @@ class AdBlockStats: LocalAdblockResourceProtocol {
   // http://localhost:6571/errors/error.html?url=http%3A//news.google.ca/
   // to populate the browser history, and load+redirect using GCDWebServer
   private func stripLocalhostWebServer(_ url: String?) -> String {
-    guard let url = url else { return "" }
+    guard let url = url else {
+      return ""
+    }
 
     // I think the ones prefixed with the following are the only ones of concern. There is also about/sessionrestore urls, not sure if we need to look at those
     let token = "?url="
@@ -169,7 +183,7 @@ class AdBlockStats: LocalAdblockResourceProtocol {
   }
 
   private func isGeneralAdblocker(id: String) -> Bool {
-    return id == AdblockerType.general.identifier || id == bundledGeneralBlocklist
+    id == AdblockerType.general.identifier || id == bundledGeneralBlocklist
   }
 }
 

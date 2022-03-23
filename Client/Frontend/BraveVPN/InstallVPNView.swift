@@ -10,7 +10,6 @@ import BraveUI
 
 extension InstallVPNViewController {
   class View: UIView {
-
     private let mainStackView = UIStackView().then {
       $0.axis = .vertical
       $0.translatesAutoresizingMaskIntoConstraints = false
@@ -42,7 +41,6 @@ extension InstallVPNViewController {
     }
 
     private lazy var infoStackView = UIStackView().then {
-
       let contentStackView = UIStackView().then { stackView in
         stackView.axis = .vertical
         stackView.distribution = .equalSpacing
@@ -78,7 +76,8 @@ extension InstallVPNViewController {
         $0.spacing = 4
         $0.addStackViewItems(
           .view(installVPNButton),
-          .view(contactSupportButton))
+          .view(contactSupportButton)
+        )
       }
 
       [textStackView, buttonsStackView].forEach(contentStackView.addArrangedSubview(_:))
@@ -88,7 +87,7 @@ extension InstallVPNViewController {
         contentStackView,
         UIView.spacer(.horizontal, amount: 30),
       ]
-      .forEach($0.addArrangedSubview(_:))
+        .forEach($0.addArrangedSubview(_:))
     }
 
     let installVPNButton = BraveButton().then {

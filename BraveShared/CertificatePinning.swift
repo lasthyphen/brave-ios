@@ -31,7 +31,8 @@ public class PinningCertificateEvaluator: NSObject, URLSessionDelegate {
       let paths = Set(
         [".cer", ".CER", ".crt", ".CRT", ".der", ".DER"].map {
           Bundle.main.paths(forResourcesOfType: $0, inDirectory: nil)
-        }.joined())
+        }.joined()
+      )
 
       return paths.compactMap({ path -> SecCertificate? in
         guard let certificateData = try? Data(contentsOf: URL(fileURLWithPath: path)) as CFData else {
@@ -42,14 +43,20 @@ public class PinningCertificateEvaluator: NSObject, URLSessionDelegate {
     }()
   }
 
-  public init(hosts: [String: SecCertificate], options: PinningOptions = [.default, .validateHost, .anchorSpecificAndSystemTrusts]) {
-    self.hosts = hosts.map({ $0.key })
-    self.certificates = hosts.map({ $0.value })
+  public init(
+    hosts: [String: SecCertificate],
+    options: PinningOptions = [.default, .validateHost, .anchorSpecificAndSystemTrusts]
+  ) {
+    self.hosts = hosts.map(\.key)
+    self.certificates = hosts.map(\.value)
     self.options = options
   }
 
-  public func urlSession(_ session: URLSession, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
-
+  public func urlSession(
+    _ session: URLSession,
+    didReceive challenge: URLAuthenticationChallenge,
+    completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void
+  ) {
     // Certificate pinning
     if challenge.protectionSpace.authenticationMethod == NSURLAuthenticationMethodServerTrust {
       if let serverTrust = challenge.protectionSpace.serverTrust {
@@ -79,11 +86,11 @@ public class PinningCertificateEvaluator: NSObject, URLSessionDelegate {
   }
 
   private func canPinHost(_ host: String) -> Bool {
-    return hosts.contains(host)
+    hosts.contains(host)
   }
 
   private func error(reason: String) -> NSError {
-    return NSError(domain: "com.brave.pinning-certificate-evaluator", code: -1, userInfo: [NSLocalizedDescriptionKey: reason])
+    NSError(domain: "com.brave.pinning-certificate-evaluator", code: -1, userInfo: [NSLocalizedDescriptionKey: reason])
   }
 
   public func evaluate(_ trust: SecTrust, forHost host: String) throws {
@@ -152,7 +159,8 @@ public class PinningCertificateEvaluator: NSObject, URLSessionDelegate {
     let serverCertificates = Set(
       (0..<SecTrustGetCertificateCount(trust))
         .compactMap { SecTrustGetCertificateAtIndex(trust, $0) }
-        .compactMap({ SecCertificateCopyData($0) as Data }))
+        .compactMap({ SecCertificateCopyData($0) as Data })
+    )
 
     // Set Certificate validation
     let clientCertificates = Set(certificates.compactMap({ SecCertificateCopyData($0) as Data }))

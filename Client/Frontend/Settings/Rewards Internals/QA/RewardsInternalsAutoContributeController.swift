@@ -8,7 +8,6 @@ import BraveCore
 import BraveUI
 
 class RewardsInternalsAutoContributeController: UITableViewController {
-
   let ledger: BraveLedger
   private var publishers: [Ledger.PublisherInfo] = []
   private let percentFormatter = NumberFormatter().then {
@@ -37,7 +36,9 @@ class RewardsInternalsAutoContributeController: UITableViewController {
     title = "Auto-Contribute"
 
     ledger.listAutoContributePublishers { [weak self] list in
-      guard let self = self else { return }
+      guard let self = self else {
+        return
+      }
       self.publishers = list
       self.tableView.reloadData()
     }
@@ -75,7 +76,9 @@ class RewardsInternalsAutoContributeController: UITableViewController {
       }
       return cell
     case 1:
-      guard let publisher = publishers[safe: indexPath.item] else { return cell }
+      guard let publisher = publishers[safe: indexPath.item] else {
+        return cell
+      }
       cell.textLabel?.text = publisher.displayName
       cell.detailTextLabel?.text = percentFormatter.string(from: NSNumber(value: Double(publisher.percent) / 100.0))
       return cell
@@ -89,6 +92,7 @@ private class AutoContributePublisherCell: UITableViewCell, TableViewReusable {
   override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
     super.init(style: .value1, reuseIdentifier: reuseIdentifier)
   }
+
   @available(*, unavailable)
   required init(coder: NSCoder) {
     fatalError()

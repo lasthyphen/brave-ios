@@ -28,7 +28,9 @@ struct VerifyRecoveryPhraseView: View {
   }
 
   private func tappedVerify() {
-    guard wordsSelectedInCorrectOrder else { return }
+    guard wordsSelectedInCorrectOrder else {
+      return
+    }
     keyringStore.notifyWalletBackupComplete()
     if keyringStore.isOnboardingVisible {
       keyringStore.markOnboardingCompleted()
@@ -149,8 +151,8 @@ private struct SelectedWordsBox: View {
   private var entries: [WordEntry] {
     var words: [WordEntry] =
       selectedWords
-      .enumerated()
-      .map({ .word($0.element.value, index: $0.offset, isCorrect: recoveryWords[$0.offset] == $0.element) })
+        .enumerated()
+        .map({ .word($0.element.value, index: $0.offset, isCorrect: recoveryWords[$0.offset] == $0.element) })
     if words.count < 12 {
       words.append(contentsOf: (words.count..<12).map { .placeholder(atIndex: $0) })
     }

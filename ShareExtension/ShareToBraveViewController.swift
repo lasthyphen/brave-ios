@@ -10,7 +10,8 @@ import BraveShared
 class ShareToBraveViewController: SLComposeServiceViewController {
   private struct Scheme {
     private enum SchemeType {
-      case url, query
+      case url
+      case query
     }
 
     private let type: SchemeType
@@ -58,8 +59,8 @@ class ShareToBraveViewController: SLComposeServiceViewController {
     // Reduce all input items down to a single list of item providers
     let attachments: [NSItemProvider] =
       inputItems
-      .compactMap { $0.attachments }
-      .flatMap { $0 }
+        .compactMap(\.attachments)
+        .flatMap { $0 }
 
     // Look for the first URL the host application is sharing.
     // If there isn't a URL grab the first text item
@@ -113,11 +114,11 @@ class ShareToBraveViewController: SLComposeServiceViewController {
 
 extension NSItemProvider {
   var isText: Bool {
-    return hasItemConformingToTypeIdentifier(String(kUTTypeText))
+    hasItemConformingToTypeIdentifier(String(kUTTypeText))
   }
 
   var isUrl: Bool {
-    return hasItemConformingToTypeIdentifier(String(kUTTypeURL))
+    hasItemConformingToTypeIdentifier(String(kUTTypeURL))
   }
 
   func loadItem(of type: CFString, completion: CompletionHandler?) {

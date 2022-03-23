@@ -42,7 +42,6 @@ enum TrackingType: Equatable {
 // MARK: - ShareTrackersController
 
 class ShareTrackersController: UIViewController, PopoverContentComponent {
-
   // MARK: Action
 
   enum Action {
@@ -80,7 +79,9 @@ class ShareTrackersController: UIViewController, PopoverContentComponent {
     view.backgroundColor = .braveBackground
 
     shareTrackersView.actionHandler = { [weak self] action in
-      guard let self = self else { return }
+      guard let self = self else {
+        return
+      }
 
       switch action {
       case .didShareTheNewsTapped:
@@ -110,7 +111,6 @@ class ShareTrackersController: UIViewController, PopoverContentComponent {
 // MARK: - ShareTrackersView
 
 private class ShareTrackersView: UIView {
-
   // MARK: UX
 
   struct UX {
@@ -205,9 +205,11 @@ private class ShareTrackersView: UIView {
                   .view(subtitleLabel)
                 )
                 $0.setContentHuggingPriority(.required, for: .vertical)
-              })
+              }
+            )
           )
-        })
+        }
+      )
     )
 
     switch trackingType {
@@ -235,7 +237,8 @@ private class ShareTrackersView: UIView {
         NSMutableAttributedString(
           string: trackingType.title,
           attributes: [.font: UIFont.systemFont(ofSize: 20.0)]
-        ))
+        )
+      )
       return string.withLineSpacing(2)
     }()
 

@@ -10,12 +10,11 @@ class GenericErrorPageHandler: InterstitialPageHandler {
   func canHandle(error: NSError) -> Bool {
     // Handle CFNetwork Error
     if error.domain == kCFErrorDomainCFNetwork as String,
-      let code = CFNetworkErrors(rawValue: Int32(error.code)) {
-
+       let code = CFNetworkErrors(rawValue: Int32(error.code)) {
       let unhandledCodes: [CFNetworkErrors] = [
         // Handled by NetworkErrorPageHandler
         .cfurlErrorNotConnectedToInternet,
-
+        
         // Handled by CertificateErrorPageHandler
         .cfurlErrorSecureConnectionFailed,
         .cfurlErrorServerCertificateHasBadDate,
@@ -34,7 +33,7 @@ class GenericErrorPageHandler: InterstitialPageHandler {
       let unhandledCodes: [Int] = [
         // Handled by NetworkErrorPageHandler
         NSURLErrorNotConnectedToInternet,
-
+        
         // Handled by CertificateErrorPageHandler
         NSURLErrorSecureConnectionFailed,
         NSURLErrorServerCertificateHasBadDate,
@@ -52,33 +51,32 @@ class GenericErrorPageHandler: InterstitialPageHandler {
 
   func response(for model: ErrorPageModel) -> (URLResponse, Data)? {
     guard let asset = Bundle.main.path(forResource: "GenericError", ofType: "html") else {
-      assert(false)
+      assertionFailure()
       return nil
     }
 
     guard var html = try? String(contentsOfFile: asset) else {
-      assert(false)
+      assertionFailure()
       return nil
     }
 
     var action = ""
     var domain = model.domain
     if domain == kCFErrorDomainCFNetwork as String,
-      let code = CFNetworkErrors(rawValue: Int32(model.errorCode)) {
-
+       let code = CFNetworkErrors(rawValue: Int32(model.errorCode)) {
       // Update the error code domain
       domain = GenericErrorPageHandler.CFErrorToName(code)
 
       // If there are too many redirects, show a `reload` action button
       if code == .cfurlErrorHTTPTooManyRedirects {
         action = """
-          <script>
-              function reloader() {
-                  location.replace((new URL(location.href)).searchParams.get("url"));
-              }
-          </script>
-          <button onclick='reloader()'>\(Strings.errorPageReloadButtonTitle)</button>
-          """
+        <script>
+            function reloader() {
+                location.replace((new URL(location.href)).searchParams.get("url"));
+            }
+        </script>
+        <button onclick='reloader()'>\(Strings.errorPageReloadButtonTitle)</button>
+        """
       }
     } else if domain == NSURLErrorDomain {
       // Update the error code domain
@@ -95,7 +93,7 @@ class GenericErrorPageHandler: InterstitialPageHandler {
       "actions": action,
     ]
 
-    variables.forEach { (arg, value) in
+    variables.forEach { arg, value in
       html = html.replacingOccurrences(of: "%\(arg)%", with: value)
     }
 

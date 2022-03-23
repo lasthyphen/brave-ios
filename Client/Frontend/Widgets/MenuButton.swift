@@ -19,7 +19,7 @@ class MenuButton: ToolbarButton {
     }
 
     static func == (lhs: Self, rhs: Self) -> Bool {
-      return lhs.icon == rhs.icon
+      lhs.icon == rhs.icon
     }
 
     static let playlist: Self = .init(
@@ -42,7 +42,9 @@ class MenuButton: ToolbarButton {
       return
     }
 
-    guard let imageView = imageView else { return }
+    guard let imageView = imageView else {
+      return
+    }
 
     let view = BadgeView(badge: badge)
     badges[badge] = view
@@ -112,10 +114,12 @@ class MenuButton: ToolbarButton {
         contentView = imageView
       }
     }
+
     @available(*, unavailable)
     required init(coder: NSCoder) {
       fatalError()
     }
+
     override func layoutSubviews() {
       super.layoutSubviews()
       layer.cornerRadius = bounds.height / 2.0

@@ -8,7 +8,6 @@ import Shared
 import BraveShared
 
 class EnableVPNPopupViewController: UIViewController {
-
   var enableVPNTapped: (() -> Void)?
 
   private let contentView = ContentView()
@@ -59,7 +58,6 @@ class EnableVPNPopupViewController: UIViewController {
 }
 
 private class ContentView: UIView {
-
   private let mainStackView = UIStackView().then {
     $0.axis = .vertical
     $0.distribution = .equalSpacing
@@ -124,7 +122,9 @@ private class ContentView: UIView {
           string: checkbox,
           textColor: .black,
           font: .systemFont(ofSize: 16, weight: .regular),
-          useShieldAsCheckmark: false))
+          useShieldAsCheckmark: false
+        )
+      )
     }
   }
 

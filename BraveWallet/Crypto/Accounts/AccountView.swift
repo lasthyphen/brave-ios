@@ -41,8 +41,8 @@ struct AccountView_Previews: PreviewProvider {
       address: "0x0d8775f648430679a709e98d2b0cb6250d2887ef",
       name: "Account 1"
     )
-    .previewLayout(.sizeThatFits)
-    .previewSizeCategories()
+      .previewLayout(.sizeThatFits)
+      .previewSizeCategories()
   }
 }
 #endif

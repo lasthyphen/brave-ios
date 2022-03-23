@@ -11,7 +11,6 @@ import BraveCore
 ///
 /// - note: Do not use this directly, use ``NetworkStore.previewStore``
 class MockBraveWalletService: BraveWalletBraveWalletService {
-
   private var assets: [String: [BraveWallet.BlockchainToken]] = [
     BraveWallet.MainnetChainId: [.previewToken],
     BraveWallet.RopstenChainId: [.previewToken],
@@ -31,14 +30,24 @@ class MockBraveWalletService: BraveWalletBraveWalletService {
     assets[chainId]?.removeAll(where: { $0.contractAddress == token.contractAddress })
   }
 
-  func setUserAssetVisible(_ token: BraveWallet.BlockchainToken, chainId: String, visible: Bool, completion: @escaping (Bool) -> Void) {
+  func setUserAssetVisible(
+    _ token: BraveWallet.BlockchainToken,
+    chainId: String,
+    visible: Bool,
+    completion: @escaping (Bool) -> Void
+  ) {
     let chainAssets = assets[chainId]
     if let index = chainAssets?.firstIndex(where: { $0.contractAddress == token.contractAddress }) {
       chainAssets?[index].visible = visible
     }
   }
 
-  func `import`(from type: BraveWallet.ExternalWalletType, password: String, newPassword: String, completion: @escaping (Bool, String?) -> Void) {
+  func `import`(
+    from type: BraveWallet.ExternalWalletType,
+    password: String,
+    newPassword: String,
+    completion: @escaping (Bool, String?) -> Void
+  ) {
     completion(false, nil)
   }
 

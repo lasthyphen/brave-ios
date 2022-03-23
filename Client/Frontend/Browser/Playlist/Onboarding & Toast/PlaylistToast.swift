@@ -46,7 +46,9 @@ private class HighlightableButton: UIButton {
   private var shadowLayer: CAShapeLayer?
 
   var shadowLayerZOrder: Int {
-    guard let shadowLayer = shadowLayer else { return -1 }
+    guard let shadowLayer = shadowLayer else {
+      return -1
+    }
     return self.layer.sublayers?.firstIndex(of: shadowLayer) ?? -1
   }
 
@@ -128,6 +130,7 @@ class PlaylistToast: Toast {
     toastView.addGestureRecognizer(panGesture)
   }
 
+  @available(*, unavailable)
   required init?(coder aDecoder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }
@@ -253,7 +256,12 @@ class PlaylistToast: Toast {
     dismiss(false)
   }
 
-  override func showToast(viewController: UIViewController? = nil, delay: DispatchTimeInterval, duration: DispatchTimeInterval?, makeConstraints: @escaping (SnapKit.ConstraintMaker) -> Swift.Void) {
+  override func showToast(
+    viewController: UIViewController? = nil,
+    delay: DispatchTimeInterval,
+    duration: DispatchTimeInterval?,
+    makeConstraints: @escaping (SnapKit.ConstraintMaker) -> Swift.Void
+  ) {
     super.showToast(viewController: viewController, delay: delay, duration: duration) {
       guard let viewController = viewController as? BrowserViewController else {
         assertionFailure("Playlist Toast should only be presented on BrowserViewController")
@@ -325,7 +333,7 @@ class PlaylistToast: Toast {
   private func onSwipeToDismiss(_ recognizer: UIPanGestureRecognizer) {
     // Distance travelled after decelerating to zero velocity at a constant rate
     func project(initialVelocity: CGFloat, decelerationRate: CGFloat) -> CGFloat {
-      return (initialVelocity / 1000.0) * decelerationRate / (1.0 - decelerationRate)
+      (initialVelocity / 1000.0) * decelerationRate / (1.0 - decelerationRate)
     }
 
     if recognizer.state == .began {
@@ -334,7 +342,10 @@ class PlaylistToast: Toast {
       let velocity = recognizer.velocity(in: toastView)
       if abs(velocity.y) > abs(velocity.x) {
         let y = min(panState.y, panState.y + recognizer.translation(in: toastView).y)
-        let projected = project(initialVelocity: velocity.y, decelerationRate: UIScrollView.DecelerationRate.normal.rawValue)
+        let projected = project(
+          initialVelocity: velocity.y,
+          decelerationRate: UIScrollView.DecelerationRate.normal.rawValue
+        )
         if y + projected > toastView.frame.maxY {
           dismiss(false)
         }

@@ -12,7 +12,6 @@ private let log = Logger.browserLogger
 // MARK: - BlockingSummary
 
 struct BlockingSummary: Codable {
-
   // MARK: CodingKeys
 
   enum CodingKeys: String, CodingKey {
@@ -55,7 +54,6 @@ struct BlockingSummary: Codable {
 // MARK: - BlockingSummaryDataSource
 
 class BlockingSummaryDataSource {
-
   // MARK: Lifecycle
 
   init(with fileName: String = "blocking-summary", bundle: Bundle = Bundle.main) {
@@ -106,5 +104,4 @@ class BlockingSummaryDataSource {
 
     return nil
   }
-
 }

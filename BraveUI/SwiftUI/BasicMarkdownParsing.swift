@@ -36,7 +36,12 @@ private struct BasicMarkdownVisitor: MarkupVisitor {
   }
 }
 
-@available(iOS, introduced: 14.0, deprecated: 15.0, message: "iOS 15 introduces built-in markdown parsing that includes more supported formats")
+@available(
+  iOS,
+  introduced: 14.0,
+  deprecated: 15.0,
+  message: "iOS 15 introduces built-in markdown parsing that includes more supported formats"
+)
 extension SwiftUI.Text {
   /// Creates a text view from a parsed markdown document
   ///
@@ -45,6 +50,7 @@ extension SwiftUI.Text {
     var visitor = BasicMarkdownVisitor()
     self = visitor.visit(document)
   }
+
   /// Creates a text view from a markdown formatted string.
   ///
   /// - note: Only bold, italic and strikethrough are supported currently.

@@ -10,7 +10,6 @@ import BraveShared
 
 extension BraveTalkRewardsOptInViewController {
   class View: UIView {
-
     let enableRewardsButton = UIButton(type: .system).then {
       $0.titleLabel?.font = .preferredFont(forTextStyle: .headline)
       $0.titleLabel?.textAlignment = .center
@@ -57,7 +56,8 @@ extension BraveTalkRewardsOptInViewController {
       $0.text = String(
         format: Strings.Rewards.braveTalkRewardsOptInDisclaimer,
         Strings.OBRewardsAgreementDetailLink,
-        Strings.privacyPolicy)
+        Strings.privacyPolicy
+      )
       $0.font = .preferredFont(forTextStyle: .caption1)
       $0.adjustsFontForContentSizeCategory = true
       $0.textColor = .braveLabel
@@ -85,7 +85,8 @@ extension BraveTalkRewardsOptInViewController {
           .view(title),
           .view(body),
           .view(enableRewardsButton),
-          .view(disclaimer))
+          .view(disclaimer)
+        )
 
         $0.layoutMargins = .init(top: 44, left: 32, bottom: 24, right: 32)
         $0.isLayoutMarginsRelativeArrangement = true
@@ -148,7 +149,6 @@ extension BraveTalkRewardsOptInViewController {
 
       if previousTraitCollection?.preferredContentSizeCategory
         != traitCollection.preferredContentSizeCategory {
-
         DispatchQueue.main.async {
           self.setupButtonConstaints()
         }

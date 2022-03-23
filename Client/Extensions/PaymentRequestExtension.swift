@@ -40,16 +40,20 @@ class PaymentRequestExtension: NSObject {
 
 extension PaymentRequestExtension: TabContentScript {
   static func name() -> String {
-    return "PaymentRequest"
+    "PaymentRequest"
   }
 
   func scriptMessageHandlerName() -> String? {
-    return "\(PaymentRequestExtension.name())\(UserScriptManager.messageHandlerTokenString)"
+    "\(PaymentRequestExtension.name())\(UserScriptManager.messageHandlerTokenString)"
   }
 
   private func sendPaymentRequestError(errorName: String, errorMessage: String) {
     ensureMainThread {
-      self.tab?.webView?.evaluateSafeJavaScript(functionName: "PaymentRequestCallback\(self.token).paymentreq_postCreate", args: ["", errorName, errorMessage], contentWorld: .page) { _, error in
+      self.tab?.webView?.evaluateSafeJavaScript(
+        functionName: "PaymentRequestCallback\(self.token).paymentreq_postCreate",
+        args: ["", errorName, errorMessage],
+        contentWorld: .page
+      ) { _, error in
         if error != nil {
           log.error(error)
         }
@@ -57,33 +61,53 @@ extension PaymentRequestExtension: TabContentScript {
     }
   }
 
-  func userContentController(_ userContentController: WKUserContentController, didReceiveScriptMessage message: WKScriptMessage, replyHandler: (Any?, String?) -> Void) {
+  func userContentController(
+    _ userContentController: WKUserContentController,
+    didReceiveScriptMessage message: WKScriptMessage,
+    replyHandler: (Any?, String?) -> Void
+  ) {
     defer { replyHandler(nil, nil) }
 
-    guard message.name == Self.name(), let body = message.body as? NSDictionary else { return }
+    guard message.name == Self.name(), let body = message.body as? NSDictionary else {
+      return
+    }
 
     do {
       let messageData = try JSONSerialization.data(withJSONObject: body, options: [])
       let body = try JSONDecoder().decode(PaymentRequest.self, from: messageData)
       if body.name != "payment-request-show" {
-        sendPaymentRequestError(errorName: PaymentRequestErrors.unknownError.rawValue, errorMessage: Strings.clientErrorMessage)
+        sendPaymentRequestError(
+          errorName: PaymentRequestErrors.unknownError.rawValue,
+          errorMessage: Strings.clientErrorMessage
+        )
         return
       }
 
       guard body.methodData.contains(where: { $0.supportedMethods.lowercased() == "bat" }) else {
-        sendPaymentRequestError(errorName: PaymentRequestErrors.notSupportedError.rawValue, errorMessage: Strings.unsupportedInstrumentMessage)
+        sendPaymentRequestError(
+          errorName: PaymentRequestErrors.notSupportedError.rawValue,
+          errorMessage: Strings.unsupportedInstrumentMessage
+        )
         return
       }
 
       // All currencies should match
-      guard body.details.displayItems.map({ $0.amount.currency }).allSatisfy({ $0 == body.details.total.amount.currency }) else {
-        sendPaymentRequestError(errorName: PaymentRequestErrors.typeError.rawValue, errorMessage: Strings.invalidDetailsMessage)
+      guard body.details.displayItems.map(\.amount.currency).allSatisfy({ $0 == body.details.total.amount.currency })
+      else {
+        sendPaymentRequestError(
+          errorName: PaymentRequestErrors.typeError.rawValue,
+          errorMessage: Strings.invalidDetailsMessage
+        )
         return
       }
 
       // Sum of individual items does not match the total
-      guard Double(body.details.total.amount.value) == body.details.displayItems.compactMap({ (Double($0.amount.value)) }).reduce(0, +) else {
-        sendPaymentRequestError(errorName: PaymentRequestErrors.rangeError.rawValue, errorMessage: Strings.invalidDetailsMessage)
+      guard Double(body.details.total.amount.value) == body.details.displayItems.compactMap({ Double($0.amount.value) })
+        .reduce(0, +) else {
+        sendPaymentRequestError(
+          errorName: PaymentRequestErrors.rangeError.rawValue,
+          errorMessage: Strings.invalidDetailsMessage
+        )
         return
       }
 
@@ -91,11 +115,18 @@ extension PaymentRequestExtension: TabContentScript {
         switch response {
         case .cancelled:
           ensureMainThread {
-            self.sendPaymentRequestError(errorName: PaymentRequestErrors.abortError.rawValue, errorMessage: Strings.userCancelledMessage)
+            self.sendPaymentRequestError(
+              errorName: PaymentRequestErrors.abortError.rawValue,
+              errorMessage: Strings.userCancelledMessage
+            )
           }
         case .completed(let orderId):
           ensureMainThread {
-            self.tab?.webView?.evaluateSafeJavaScript(functionName: "PaymentRequestCallback\(self.token).paymentreq_postCreate", args: [orderId, "", ""], contentWorld: .page) { _, error in
+            self.tab?.webView?.evaluateSafeJavaScript(
+              functionName: "PaymentRequestCallback\(self.token).paymentreq_postCreate",
+              args: [orderId, "", ""],
+              contentWorld: .page
+            ) { _, error in
               if error != nil {
                 log.error(error)
               }
@@ -104,17 +135,43 @@ extension PaymentRequestExtension: TabContentScript {
         }
       }
     } catch {
-      sendPaymentRequestError(errorName: PaymentRequestErrors.typeError.rawValue, errorMessage: Strings.invalidDetailsMessage)
+      sendPaymentRequestError(
+        errorName: PaymentRequestErrors.typeError.rawValue,
+        errorMessage: Strings.invalidDetailsMessage
+      )
       return
     }
-
   }
 }
 
 extension Strings {
   // Errors
-  public static let unsupportedInstrumentMessage = NSLocalizedString("unsupportedInstrumentMessage", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Unsupported payment instruments", comment: "Error message if list of Payment Instruments doesn't include BAT")
-  public static let userCancelledMessage = NSLocalizedString("userCancelledMessage", tableName: "BraveShared", bundle: Bundle.braveShared, value: "User cancelled", comment: "Error message if the payment workflow is canceled by the user")
-  public static let invalidDetailsMessage = NSLocalizedString("invalidDetailsMessage", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Invalid details in payment request", comment: "Error message if details don't have the right type or values")
-  public static let clientErrorMessage = NSLocalizedString("clientErrorMessage", tableName: "BraveShared", bundle: Bundle.braveShared, value: "Client error", comment: "Client is in an invalid state which caused the error")
+  public static let unsupportedInstrumentMessage = NSLocalizedString(
+    "unsupportedInstrumentMessage",
+    tableName: "BraveShared",
+    bundle: Bundle.braveShared,
+    value: "Unsupported payment instruments",
+    comment: "Error message if list of Payment Instruments doesn't include BAT"
+  )
+  public static let userCancelledMessage = NSLocalizedString(
+    "userCancelledMessage",
+    tableName: "BraveShared",
+    bundle: Bundle.braveShared,
+    value: "User cancelled",
+    comment: "Error message if the payment workflow is canceled by the user"
+  )
+  public static let invalidDetailsMessage = NSLocalizedString(
+    "invalidDetailsMessage",
+    tableName: "BraveShared",
+    bundle: Bundle.braveShared,
+    value: "Invalid details in payment request",
+    comment: "Error message if details don't have the right type or values"
+  )
+  public static let clientErrorMessage = NSLocalizedString(
+    "clientErrorMessage",
+    tableName: "BraveShared",
+    bundle: Bundle.braveShared,
+    value: "Client error",
+    comment: "Client is in an invalid state which caused the error"
+  )
 }

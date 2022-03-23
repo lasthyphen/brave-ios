@@ -16,13 +16,14 @@ struct BraveSearchDebugMenuFixture {
       cookies: cookies,
       canAnswerTime: "0.25",
       backupQuery:
-        """
-        {"found":true,"found_fresh":false, \
-        "language":null,"country":"us", \
-        "safesearch":"moderate"}
-        """,
+      """
+      {"found":true,"found_fresh":false, \
+      "language":null,"country":"us", \
+      "safesearch":"moderate"}
+      """,
       fallbackTime: "0.67",
-      fallbackData: sampleHTML.data(using: .utf8))
+      fallbackData: sampleHTML.data(using: .utf8)
+    )
 
   private static let cookies: [HTTPCookie] =
     [

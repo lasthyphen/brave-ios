@@ -6,7 +6,6 @@ import UIKit
 import pop
 
 class AdSwipeButton: UIControl {
-
   enum ContentType {
     case text(String, textColor: UIColor)
     case image(UIImage)

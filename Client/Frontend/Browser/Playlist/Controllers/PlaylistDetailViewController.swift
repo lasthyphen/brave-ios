@@ -9,7 +9,6 @@ import Shared
 import Data
 
 class PlaylistDetailViewController: UIViewController, UIGestureRecognizerDelegate {
-
   private var playerView: VideoView?
   weak var delegate: PlaylistViewControllerDelegate?
 
@@ -40,7 +39,12 @@ class PlaylistDetailViewController: UIViewController, UIGestureRecognizerDelegat
 
   private func layoutBarButtons() {
     let exitBarButton = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(onExit(_:)))
-    let sideListBarButton = UIBarButtonItem(image: #imageLiteral(resourceName: "playlist_split_navigation"), style: .done, target: self, action: #selector(onDisplayModeChange))
+    let sideListBarButton = UIBarButtonItem(
+      image: #imageLiteral(resourceName: "playlist_split_navigation"),
+      style: .done,
+      target: self,
+      action: #selector(onDisplayModeChange)
+    )
 
     navigationItem.rightBarButtonItem =
       PlayListSide(rawValue: Preferences.Playlist.listViewSide.value) == .left ? exitBarButton : sideListBarButton
@@ -50,7 +54,9 @@ class PlaylistDetailViewController: UIViewController, UIGestureRecognizerDelegat
 
   private func addGestureRecognizers() {
     let slideToRevealGesture = UISwipeGestureRecognizer(target: self, action: #selector(handleGesture))
-    slideToRevealGesture.direction = PlayListSide(rawValue: Preferences.Playlist.listViewSide.value) == .left ? .right : .left
+    slideToRevealGesture.direction = PlayListSide(rawValue: Preferences.Playlist.listViewSide.value) == .left
+      ? .right
+      : .left
 
     view.addGestureRecognizer(slideToRevealGesture)
   }
@@ -91,8 +97,8 @@ class PlaylistDetailViewController: UIViewController, UIGestureRecognizerDelegat
   @objc
   func handleGesture(gesture: UISwipeGestureRecognizer) {
     guard gesture.direction == .right,
-      let playerView = playerView,
-      !playerView.controlsView.trackBar.frame.contains(gesture.location(in: view))
+          let playerView = playerView,
+          !playerView.controlsView.trackBar.frame.contains(gesture.location(in: view))
     else {
       return
     }
@@ -103,7 +109,8 @@ class PlaylistDetailViewController: UIViewController, UIGestureRecognizerDelegat
   @objc
   private func onDisplayModeChange() {
     updateSplitViewDisplayMode(
-      to: splitViewController?.displayMode == .oneOverSecondary ? .secondaryOnly : .oneOverSecondary)
+      to: splitViewController?.displayMode == .oneOverSecondary ? .secondaryOnly : .oneOverSecondary
+    )
   }
 
   public func setVideoPlayer(_ videoPlayer: VideoView?) {
@@ -115,7 +122,9 @@ class PlaylistDetailViewController: UIViewController, UIGestureRecognizerDelegat
   }
 
   public func updateLayoutForMode(_ mode: UIUserInterfaceIdiom) {
-    guard let playerView = playerView else { return }
+    guard let playerView = playerView else {
+      return
+    }
 
     if mode == .pad {
       view.addSubview(playerView)
@@ -138,7 +147,8 @@ extension PlaylistDetailViewController {
     if let item = item {
       let alert = UIAlertController(
         title: Strings.PlayList.expiredAlertTitle,
-        message: Strings.PlayList.expiredAlertDescription, preferredStyle: .alert)
+        message: Strings.PlayList.expiredAlertDescription, preferredStyle: .alert
+      )
       alert.addAction(
         UIAlertAction(
           title: Strings.PlayList.reopenButtonTitle, style: .default,
@@ -151,15 +161,19 @@ extension PlaylistDetailViewController {
               self.delegate?.openURLInNewTab(
                 url,
                 isPrivate: isPrivateBrowsing,
-                isPrivileged: false)
+                isPrivileged: false
+              )
             }
-          }))
+          }
+        )
+      )
       alert.addAction(UIAlertAction(title: Strings.cancelButtonTitle, style: .cancel, handler: nil))
       self.present(alert, animated: true, completion: nil)
     } else {
       let alert = UIAlertController(
         title: Strings.PlayList.expiredAlertTitle,
-        message: Strings.PlayList.expiredAlertDescription, preferredStyle: .alert)
+        message: Strings.PlayList.expiredAlertDescription, preferredStyle: .alert
+      )
       alert.addAction(UIAlertAction(title: Strings.OKString, style: .default, handler: nil))
       self.present(alert, animated: true, completion: nil)
     }
@@ -167,7 +181,9 @@ extension PlaylistDetailViewController {
 
   func displayLoadingResourceError() {
     let alert = UIAlertController(
-      title: Strings.PlayList.sorryAlertTitle, message: Strings.PlayList.loadResourcesErrorAlertDescription, preferredStyle: .alert)
+      title: Strings.PlayList.sorryAlertTitle, message: Strings.PlayList.loadResourcesErrorAlertDescription,
+      preferredStyle: .alert
+    )
     alert.addAction(UIAlertAction(title: Strings.PlayList.okayButtonTitle, style: .default, handler: nil))
 
     self.present(alert, animated: true, completion: nil)

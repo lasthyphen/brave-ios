@@ -15,7 +15,6 @@ extension Preferences {
 }
 
 class PreferencesTest: XCTestCase {
-
   override func setUp() {
     Preferences.optionalStringOption.reset()
     Preferences.intOption.reset()
@@ -50,5 +49,4 @@ class PreferencesTest: XCTestCase {
     Preferences.intOption.reset()
     XCTAssertEqual(intDefault, Preferences.intOption.value)
   }
-
 }

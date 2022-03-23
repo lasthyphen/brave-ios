@@ -21,8 +21,8 @@ public protocol BundledJSProtocol {
   var get: String? { get }
 }
 
-public extension BundledJSProtocol {
-  var get: String? {
+extension BundledJSProtocol {
+  public var get: String? {
     do {
       guard let filePath = bundle.path(forResource: name, ofType: "js") else {
         throw "Could not find script named: \(name)"

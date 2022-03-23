@@ -43,7 +43,7 @@ struct CustomNetworkListView: View {
   var body: some View {
     List {
       Section {
-        let customNetworks = networkStore.ethereumChains.filter({ $0.isCustom })
+        let customNetworks = networkStore.ethereumChains.filter(\.isCustom)
         ForEach(customNetworks) { network in
           Button(action: {
             isPresentingNetworkDetails = .init()
@@ -85,7 +85,8 @@ struct CustomNetworkListView: View {
                     withAnimation(.default) {
                       removeNetwork(network)
                     }
-                  })
+                  }
+                )
             } else {
               content
             }
@@ -105,7 +106,7 @@ struct CustomNetworkListView: View {
     .listStyle(.insetGrouped)
     .overlay(
       Group {
-        if networkStore.ethereumChains.filter({ $0.isCustom }).isEmpty {
+        if networkStore.ethereumChains.filter(\.isCustom).isEmpty {
           Text(Strings.Wallet.noNetworks)
             .font(.headline.weight(.medium))
             .frame(maxWidth: .infinity)

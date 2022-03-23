@@ -23,7 +23,7 @@ class DomainTests: CoreDataTestCase {
   let walletAccount2 = "0x4d60d71f411ab671f614ed0ec5b71beedb46287d"
 
   private func entity(for context: NSManagedObjectContext) -> NSEntityDescription {
-    return NSEntityDescription.entity(forEntityName: String(describing: Domain.self), in: context)!
+    NSEntityDescription.entity(forEntityName: String(describing: Domain.self), in: context)!
   }
 
   func testGetOrCreate() {
@@ -52,7 +52,6 @@ class DomainTests: CoreDataTestCase {
   }
 
   func testDefaultShieldSettings() {
-
     let domain = Domain.getOrCreate(forUrl: url, persistent: true)
     XCTAssertTrue(domain.isShieldExpected(BraveShield.AdblockAndTp, considerAllShieldsOption: true))
     XCTAssertTrue(domain.isShieldExpected(BraveShield.SafeBrowsing, considerAllShieldsOption: true))
@@ -91,7 +90,6 @@ class DomainTests: CoreDataTestCase {
 
   /// Tests non-HTTPSE shields
   func testNormalShieldSettings() {
-
     backgroundSaveAndWaitForExpectation {
       Domain.setBraveShield(forUrl: url2HTTPS, shield: .SafeBrowsing, isOn: true, isPrivateBrowsing: false)
     }

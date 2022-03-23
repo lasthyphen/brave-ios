@@ -48,7 +48,7 @@ public class LoaderView: UIView {
   }
 
   override public class var layerClass: AnyClass {
-    return LoaderLayer.self
+    LoaderLayer.self
   }
 
   private(set) public var isAnimating: Bool = false
@@ -88,7 +88,7 @@ public class LoaderView: UIView {
   }
 
   override public var intrinsicContentSize: CGSize {
-    return size.size
+    size.size
   }
 
   @available(*, unavailable)

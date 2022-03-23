@@ -25,16 +25,19 @@ extension ContentBlocker {
 
     if let jsonString = await BlocklistName.loadJsonFromBundle(forResource: filename) {
       do {
-        let rule = try await ruleStore.compileContentRuleList(forIdentifier: filename, encodedContentRuleList: jsonString)
+        let rule = try await ruleStore.compileContentRuleList(
+          forIdentifier: filename,
+          encodedContentRuleList: jsonString
+        )
 
         assert(rule != nil)
 
         self.rule = rule
         self.fileVersionPref?.value = self.fileVersion
       } catch {
-        // TODO #382: Potential telemetry location
+        // TODO: #382: Potential telemetry location
         log.error("Content blocker '\(self.filename)' errored: \(error.localizedDescription)")
-        assert(false)
+        assertionFailure()
       }
     }
   }
@@ -57,9 +60,9 @@ extension ContentBlocker {
   private static func loadJsonFromBundle(forResource file: String) async -> String? {
     await Task.detached(priority: .userInitiated) {
       guard let path = Bundle.main.path(forResource: file, ofType: "json"),
-        let source = try? String(contentsOfFile: path, encoding: .utf8)
+            let source = try? String(contentsOfFile: path, encoding: .utf8)
       else {
-        assert(false)
+        assertionFailure()
         return nil
       }
 
@@ -68,7 +71,7 @@ extension ContentBlocker {
   }
 
   public static func == (lhs: Self, rhs: Self) -> Bool {
-    return lhs.filename == rhs.filename
+    lhs.filename == rhs.filename
   }
 
   public func hash(into hasher: inout Hasher) {

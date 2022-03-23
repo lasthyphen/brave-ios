@@ -4,7 +4,6 @@
 
 import Foundation
 import Storage
-
 import Shared
 import XCGLogger
 
@@ -14,13 +13,15 @@ enum ShortcutType: String {
   case scanQRCode = "ScanQRCode"
 
   init?(fullType: String) {
-    guard let last = fullType.components(separatedBy: ".").last else { return nil }
+    guard let last = fullType.components(separatedBy: ".").last else {
+      return nil
+    }
 
     self.init(rawValue: last)
   }
 
   var type: String {
-    return Bundle.main.bundleIdentifier! + ".\(self.rawValue)"
+    Bundle.main.bundleIdentifier! + ".\(self.rawValue)"
   }
 }
 
@@ -29,7 +30,6 @@ protocol QuickActionHandlerDelegate {
 }
 
 class QuickActions: NSObject {
-
   fileprivate let log = Logger.browserLogger
 
   static let quickActionsVersion = "1.0"
@@ -43,10 +43,14 @@ class QuickActions: NSObject {
   var launchedShortcutItem: UIApplicationShortcutItem?
 
   // MARK: Handling Quick Actions
-  @discardableResult func handleShortCutItem(_ shortcutItem: UIApplicationShortcutItem, withBrowserViewController bvc: BrowserViewController) -> Bool {
-
+  @discardableResult func handleShortCutItem(
+    _ shortcutItem: UIApplicationShortcutItem,
+    withBrowserViewController bvc: BrowserViewController
+  ) -> Bool {
     // Verify that the provided `shortcutItem`'s `type` is one handled by the application.
-    guard let shortCutType = ShortcutType(fullType: shortcutItem.type) else { return false }
+    guard let shortCutType = ShortcutType(fullType: shortcutItem.type) else {
+      return false
+    }
 
     DispatchQueue.main.async {
       self.dismissAlertPopupView()
@@ -56,7 +60,11 @@ class QuickActions: NSObject {
     return true
   }
 
-  fileprivate func handleShortCutItemOfType(_ type: ShortcutType, userData: [String: NSSecureCoding]?, browserViewController: BrowserViewController) {
+  fileprivate func handleShortCutItemOfType(
+    _ type: ShortcutType,
+    userData: [String: NSSecureCoding]?,
+    browserViewController: BrowserViewController
+  ) {
     switch type {
     case .newTab:
       handleOpenNewTab(withBrowserViewController: browserViewController, isPrivate: false)
@@ -72,7 +80,8 @@ class QuickActions: NSObject {
   }
 
   fileprivate func dismissAlertPopupView() {
-    UIApplication.shared.keyWindow?.subviews.forEach { ($0 as? AlertPopupView)?.dismissWithType(dismissType: .noAnimation) }
+    UIApplication.shared.keyWindow?.subviews
+      .forEach { ($0 as? AlertPopupView)?.dismissWithType(dismissType: .noAnimation) }
   }
 
   fileprivate func handleScanQR(withBrowserViewController bvc: BrowserViewController) {

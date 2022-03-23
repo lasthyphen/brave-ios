@@ -10,8 +10,7 @@ class NetworkErrorPageHandler: InterstitialPageHandler {
   func canHandle(error: NSError) -> Bool {
     // Handle CFNetwork Error
     if error.domain == kCFErrorDomainCFNetwork as String,
-      let code = CFNetworkErrors(rawValue: Int32(error.code)) {
-
+       let code = CFNetworkErrors(rawValue: Int32(error.code)) {
       let handledCodes: [CFNetworkErrors] = [
         .cfurlErrorNotConnectedToInternet
       ]
@@ -32,19 +31,19 @@ class NetworkErrorPageHandler: InterstitialPageHandler {
 
   func response(for model: ErrorPageModel) -> (URLResponse, Data)? {
     guard let asset = Bundle.main.path(forResource: "NetworkError", ofType: "html") else {
-      assert(false)
+      assertionFailure()
       return nil
     }
 
     guard var html = try? String(contentsOfFile: asset) else {
-      assert(false)
+      assertionFailure()
       return nil
     }
     var domain = model.domain
 
     // Update the error code domain
     if domain == kCFErrorDomainCFNetwork as String,
-      let code = CFNetworkErrors(rawValue: Int32(model.errorCode)) {
+       let code = CFNetworkErrors(rawValue: Int32(model.errorCode)) {
       domain = GenericErrorPageHandler.CFErrorToName(code)
     } else if domain == NSURLErrorDomain {
       domain = GenericErrorPageHandler.NSURLErrorToName(model.errorCode)
@@ -63,7 +62,7 @@ class NetworkErrorPageHandler: InterstitialPageHandler {
       "security_token": UserScriptManager.messageHandlerTokenString,
     ]
 
-    variables.forEach { (arg, value) in
+    variables.forEach { arg, value in
       html = html.replacingOccurrences(of: "%\(arg)%", with: value)
     }
 

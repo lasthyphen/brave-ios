@@ -20,7 +20,9 @@ enum DomainUserScript: CaseIterable {
     var found: DomainUserScript?
 
     // First we look for exact domain match, if no matches we look for base domain matches.
-    guard let host = url.host else { return nil }
+    guard let host = url.host else {
+      return nil
+    }
     allCases.forEach {
       if $0.associatedDomains.contains(host) {
         found = $0
@@ -28,9 +30,13 @@ enum DomainUserScript: CaseIterable {
       }
     }
 
-    if found != nil { return found }
+    if found != nil {
+      return found
+    }
 
-    guard let baseDomain = url.baseDomain else { return nil }
+    guard let baseDomain = url.baseDomain else {
+      return nil
+    }
     allCases.forEach {
       if $0.associatedDomains.contains(baseDomain) {
         found = $0
@@ -65,7 +71,8 @@ enum DomainUserScript: CaseIterable {
         arrayLiteral: "talk.brave.com", "beta.talk.brave.com",
         "talk.bravesoftware.com", "beta.talk.bravesoftware.com",
         "dev.talk.brave.software", "beta.talk.brave.software",
-        "talk.brave.software")
+        "talk.brave.software"
+      )
     }
   }
 
@@ -83,7 +90,9 @@ enum DomainUserScript: CaseIterable {
   }
 
   var script: WKUserScript? {
-    guard let source = sourceFile else { return nil }
+    guard let source = sourceFile else {
+      return nil
+    }
 
     switch self {
     case .youtube:
@@ -94,15 +103,23 @@ enum DomainUserScript: CaseIterable {
       let token = UserScriptManager.securityTokenString
       alteredSource = alteredSource.replacingOccurrences(
         of: "$<prunePaths>", with: "ABSPP\(token)",
-        options: .literal)
+        options: .literal
+      )
       alteredSource = alteredSource.replacingOccurrences(
         of: "$<findOwner>", with: "ABSFO\(token)",
-        options: .literal)
+        options: .literal
+      )
       alteredSource = alteredSource.replacingOccurrences(
         of: "$<setJS>", with: "ABSSJ\(token)",
-        options: .literal)
+        options: .literal
+      )
 
-      return WKUserScript.create(source: alteredSource, injectionTime: .atDocumentStart, forMainFrameOnly: false, in: .page)
+      return WKUserScript.create(
+        source: alteredSource,
+        injectionTime: .atDocumentStart,
+        forMainFrameOnly: false,
+        in: .page
+      )
     case .archive:
       return WKUserScript.create(source: source, injectionTime: .atDocumentStart, forMainFrameOnly: false, in: .page)
     case .braveSearch:
@@ -111,34 +128,44 @@ enum DomainUserScript: CaseIterable {
       let securityToken = UserScriptManager.securityTokenString
       alteredSource =
         alteredSource
-        .replacingOccurrences(
-          of: "$<brave-search-helper>",
-          with: "BSH\(UserScriptManager.messageHandlerTokenString)",
-          options: .literal
-        )
-        .replacingOccurrences(of: "$<security_token>", with: securityToken)
+          .replacingOccurrences(
+            of: "$<brave-search-helper>",
+            with: "BSH\(UserScriptManager.messageHandlerTokenString)",
+            options: .literal
+          )
+          .replacingOccurrences(of: "$<security_token>", with: securityToken)
 
-      return WKUserScript.create(source: alteredSource, injectionTime: .atDocumentStart, forMainFrameOnly: false, in: .page)
+      return WKUserScript.create(
+        source: alteredSource,
+        injectionTime: .atDocumentStart,
+        forMainFrameOnly: false,
+        in: .page
+      )
     case .braveTalk:
       var alteredSource = source
 
       let securityToken = UserScriptManager.securityTokenString
       alteredSource =
         alteredSource
-        .replacingOccurrences(
-          of: "$<brave-talk-helper>",
-          with: "BT\(UserScriptManager.messageHandlerTokenString)",
-          options: .literal
-        )
-        .replacingOccurrences(of: "$<security_token>", with: securityToken)
+          .replacingOccurrences(
+            of: "$<brave-talk-helper>",
+            with: "BT\(UserScriptManager.messageHandlerTokenString)",
+            options: .literal
+          )
+          .replacingOccurrences(of: "$<security_token>", with: securityToken)
 
-      return WKUserScript.create(source: alteredSource, injectionTime: .atDocumentStart, forMainFrameOnly: false, in: .page)
+      return WKUserScript.create(
+        source: alteredSource,
+        injectionTime: .atDocumentStart,
+        forMainFrameOnly: false,
+        in: .page
+      )
     }
   }
 
   private var sourceFile: String? {
     guard let path = Bundle.main.path(forResource: scriptName, ofType: "js"),
-      let source = try? String(contentsOfFile: path)
+          let source = try? String(contentsOfFile: path)
     else {
       log.error("Failed to load \(scriptName).js")
       return nil

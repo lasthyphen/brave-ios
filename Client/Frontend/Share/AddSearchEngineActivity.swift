@@ -14,11 +14,11 @@ class AddSearchEngineActivity: UIActivity {
   }
 
   override var activityTitle: String? {
-    return Strings.CustomSearchEngine.customEngineNavigationTitle
+    Strings.CustomSearchEngine.customEngineNavigationTitle
   }
 
   override var activityImage: UIImage? {
-    return #imageLiteral(resourceName: "AddSearch").template
+    #imageLiteral(resourceName: "AddSearch").template
   }
 
   override func perform() {
@@ -27,6 +27,6 @@ class AddSearchEngineActivity: UIActivity {
   }
 
   override func canPerform(withActivityItems activityItems: [Any]) -> Bool {
-    return true
+    true
   }
 }

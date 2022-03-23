@@ -20,7 +20,6 @@ extension UILayoutPriority {
 /// - note: You must use `present(from:on:)` from an instantiated `PopoverController` to present a popover. Presenting
 /// another way will result in undefined behavior
 public class PopoverController: UIViewController {
-
   /// The preferred popover width when using `ContentSizeBehavior.preferredContentSize` or
   /// `ContentSizeBehavior.fixedSize`
   public static let preferredPopoverWidth: CGFloat = 320.0
@@ -86,7 +85,10 @@ public class PopoverController: UIViewController {
   private var containerViewWidthConstraint: NSLayoutConstraint?
 
   /// Create a popover displaying a content controller
-  public init(contentController: UIViewController & PopoverContentComponent, contentSizeBehavior: ContentSizeBehavior = .autoLayout) {
+  public init(
+    contentController: UIViewController & PopoverContentComponent,
+    contentSizeBehavior: ContentSizeBehavior = .autoLayout
+  ) {
     self.contentController = contentController
     self.contentSizeBehavior = contentSizeBehavior
 
@@ -94,7 +96,9 @@ public class PopoverController: UIViewController {
 
     if let navigationController = contentController as? UINavigationController {
       if case .autoLayout = contentSizeBehavior {
-        assertionFailure("`autoLayout` content size behavior is not supported with UINavigationController, please use `preferredContentSize` or `fixedSize`")
+        assertionFailure(
+          "`autoLayout` content size behavior is not supported with UINavigationController, please use `preferredContentSize` or `fixedSize`"
+        )
       }
       navigationController.delegate = self
       navigationController.interactivePopGestureRecognizer?.delegate = self
@@ -155,16 +159,19 @@ public class PopoverController: UIViewController {
         make.leading.trailing.equalTo(self.containerView.contentView)
       }
     case .preferredContentSize:
-      containerViewHeightConstraint = containerView.heightAnchor.constraint(equalToConstant: contentController.preferredContentSize.height + PopoverUX.arrowSize.height)
+      containerViewHeightConstraint = containerView.heightAnchor
+        .constraint(equalToConstant: contentController.preferredContentSize.height + PopoverUX.arrowSize.height)
       containerViewHeightConstraint?.priority = .popoverPreferredOrFixedSize
       containerViewHeightConstraint?.isActive = true
 
-      containerViewWidthConstraint = containerView.widthAnchor.constraint(equalToConstant: contentController.preferredContentSize.width)
+      containerViewWidthConstraint = containerView.widthAnchor
+        .constraint(equalToConstant: contentController.preferredContentSize.width)
       containerViewWidthConstraint?.priority = .popoverPreferredOrFixedSize
       containerViewWidthConstraint?.isActive = true
 
     case .fixedSize(let size):
-      containerViewHeightConstraint = containerView.heightAnchor.constraint(equalToConstant: size.height + PopoverUX.arrowSize.height)
+      containerViewHeightConstraint = containerView.heightAnchor
+        .constraint(equalToConstant: size.height + PopoverUX.arrowSize.height)
       containerViewHeightConstraint?.priority = .popoverPreferredOrFixedSize
       containerViewHeightConstraint?.isActive = true
 
@@ -175,14 +182,14 @@ public class PopoverController: UIViewController {
   }
 
   override public var preferredStatusBarStyle: UIStatusBarStyle {
-    return .default
+    .default
   }
 
   override public func viewDidLayoutSubviews() {
     super.viewDidLayoutSubviews()
 
     switch contentSizeBehavior {
-    case .preferredContentSize, .fixedSize(_):
+    case .preferredContentSize, .fixedSize:
       containerView.layoutIfNeeded()
       if contentController.extendEdgeIntoArrow {
         contentController.view.frame = containerView.contentView.bounds
@@ -228,32 +235,39 @@ public class PopoverController: UIViewController {
       }
 
       size.width = min(size.width, UIScreen.main.bounds.width - outerMargins.left - outerMargins.right)
-      size.height = min(size.height, UIScreen.main.bounds.height - containerView.frame.origin.y - view.safeAreaInsets.bottom - arrowDistance)
-      if contentController.view.bounds.size == size { return }
+      size.height = min(
+        size.height,
+        UIScreen.main.bounds.height - containerView.frame.origin.y - view.safeAreaInsets.bottom - arrowDistance
+      )
+      if contentController.view.bounds.size == size {
+        return
+      }
 
       contentController.view.setNeedsLayout()
 
       if let nc = self.contentController as? UINavigationController {
-        nc.viewControllers.filter { $0.isViewLoaded }.forEach { vc in
+        nc.viewControllers.filter(\.isViewLoaded).forEach { vc in
           var frame = vc.view.frame
           frame.size.height = size.height + PopoverUX.arrowSize.height
           vc.view.frame = frame
         }
       }
-      self.containerViewHeightConstraint?.springAnimate(property: kPOPLayoutConstraintConstant, key: "constant") { animation, _ in
-        animation.toValue = size.height + PopoverUX.arrowSize.height
-        animation.animationDidApplyBlock = { _ in
-          if let nc = self.contentController as? UINavigationController {
-            nc.viewControllers.filter { $0.isViewLoaded }.forEach { $0.view.frame = nc.view.bounds }
-          }
-          if let nc = self.contentController as? PopoverNavigationController {
-            nc.lastPoppedController?.view.frame = nc.view.bounds
+      self.containerViewHeightConstraint?
+        .springAnimate(property: kPOPLayoutConstraintConstant, key: "constant") { animation, _ in
+          animation.toValue = size.height + PopoverUX.arrowSize.height
+          animation.animationDidApplyBlock = { _ in
+            if let nc = self.contentController as? UINavigationController {
+              nc.viewControllers.filter(\.isViewLoaded).forEach { $0.view.frame = nc.view.bounds }
+            }
+            if let nc = self.contentController as? PopoverNavigationController {
+              nc.lastPoppedController?.view.frame = nc.view.bounds
+            }
           }
         }
-      }
-      self.containerViewWidthConstraint?.springAnimate(property: kPOPLayoutConstraintConstant, key: "constant") { animation, _ in
-        animation.toValue = size.width
-      }
+      self.containerViewWidthConstraint?
+        .springAnimate(property: kPOPLayoutConstraintConstant, key: "constant") { animation, _ in
+          animation.toValue = size.width
+        }
     }
   }
 
@@ -305,14 +319,25 @@ public class PopoverController: UIViewController {
     if contentController.extendEdgeIntoArrow {
       switch containerView.arrowDirection {
       case .up:
-        contentController.additionalSafeAreaInsets = UIEdgeInsets(top: PopoverUX.arrowSize.height, left: 0, bottom: 0, right: 0)
+        contentController.additionalSafeAreaInsets = UIEdgeInsets(
+          top: PopoverUX.arrowSize.height,
+          left: 0,
+          bottom: 0,
+          right: 0
+        )
       case .down:
-        contentController.additionalSafeAreaInsets = UIEdgeInsets(top: 0, left: 0, bottom: PopoverUX.arrowSize.height, right: 0)
+        contentController.additionalSafeAreaInsets = UIEdgeInsets(
+          top: 0,
+          left: 0,
+          bottom: PopoverUX.arrowSize.height,
+          right: 0
+        )
       }
     }
 
     let isPortrait = UIDevice.current.orientation.isPortrait
-    if addsConvenientDismissalMargins && isPortrait && containerView.arrowDirection == .up && outerMargins.bottom < convenientDismissalMargin {
+    if addsConvenientDismissalMargins && isPortrait && containerView.arrowDirection == .up && outerMargins
+      .bottom < convenientDismissalMargin {
       outerMargins.bottom = convenientDismissalMargin
     }
 
@@ -321,7 +346,11 @@ public class PopoverController: UIViewController {
 
     switch contentSizeBehavior {
     case .autoLayout:
-      contentSize = contentController.view.systemLayoutSizeFitting(CGSize(width: constrainedWidth, height: viewController.view.bounds.height - outerMargins.top - outerMargins.bottom))
+      contentSize = contentController.view
+        .systemLayoutSizeFitting(CGSize(
+          width: constrainedWidth,
+          height: viewController.view.bounds.height - outerMargins.top - outerMargins.bottom
+        ))
     case .preferredContentSize:
       contentSize = contentController.preferredContentSize
     case .fixedSize(let size):
@@ -349,7 +378,6 @@ public class PopoverController: UIViewController {
 
 // MARK: - Actions
 extension PopoverController {
-
   @objc private func tappedBackgroundOverlay(_ tap: UITapGestureRecognizer) {
     if tap.state == .ended {
       if contentController.popoverShouldDismiss(self) {
@@ -362,19 +390,25 @@ extension PopoverController {
   }
 
   @objc private func pannedPopover(_ pan: UIPanGestureRecognizer) {
-    func _computedOffsetBasedOnRubberBandingResistance(distance x: CGFloat, constant c: CGFloat = 0.55, dimension d: CGFloat) -> CGFloat {
+    func _computedOffsetBasedOnRubberBandingResistance(
+      distance x: CGFloat,
+      constant c: CGFloat = 0.55,
+      dimension d: CGFloat
+    ) -> CGFloat {
       /*
-             f(x, d, c) = (x * d * c) / (d + c * x)
+       f(x, d, c) = (x * d * c) / (d + c * x)
 
-             where,
-             x – distance from the edge
-             c – constant (UIScrollView uses 0.55)
-             d – dimension, either width or height
-             */
-      return (x * d * c) / (d + c * x)
+       where,
+       x – distance from the edge
+       c – constant (UIScrollView uses 0.55)
+       d – dimension, either width or height
+       */
+      (x * d * c) / (d + c * x)
     }
 
-    guard let context = presentationContext else { return }
+    guard let context = presentationContext else {
+      return
+    }
 
     var scale: CGFloat
     let rotationPercent: CGFloat
@@ -392,11 +426,11 @@ extension PopoverController {
     if scale > 1 {
       scale =
         1.0
-        + _computedOffsetBasedOnRubberBandingResistance(
-          distance: scale - 1.0,
-          constant: 0.15,
-          dimension: containerView.bounds.height
-        )
+          + _computedOffsetBasedOnRubberBandingResistance(
+            distance: scale - 1.0,
+            constant: 0.15,
+            dimension: containerView.bounds.height
+          )
     }
 
     let rotation = _computedOffsetBasedOnRubberBandingResistance(
@@ -405,7 +439,7 @@ extension PopoverController {
       dimension: containerView.bounds.width
     )
 
-    containerView.transform = .identity  // Reset to get unaltered frame
+    containerView.transform = .identity // Reset to get unaltered frame
     let translationDelta = anchorPointDelta(from: context, popoverRect: containerView.frame)
 
     containerView.transform = CGAffineTransform(translationX: translationDelta.x, y: translationDelta.y)
@@ -429,26 +463,33 @@ extension PopoverController {
         popoverDidDismiss?(self)
       } else {
         UIView.animate(
-          withDuration: 0.5, delay: 0, usingSpringWithDamping: 0.7, initialSpringVelocity: 0, options: [.beginFromCurrentState, .allowUserInteraction],
+          withDuration: 0.5, delay: 0, usingSpringWithDamping: 0.7, initialSpringVelocity: 0, options: [
+            .beginFromCurrentState,
+            .allowUserInteraction
+          ],
           animations: {
             self.containerView.transform = .identity
-          })
+          }
+        )
       }
     }
 
     if pan.state == .cancelled {
       UIView.animate(
-        withDuration: 0.5, delay: 0, usingSpringWithDamping: 0.7, initialSpringVelocity: 0, options: [.beginFromCurrentState, .allowUserInteraction],
+        withDuration: 0.5, delay: 0, usingSpringWithDamping: 0.7, initialSpringVelocity: 0, options: [
+          .beginFromCurrentState,
+          .allowUserInteraction
+        ],
         animations: {
           self.containerView.transform = .identity
-        })
+        }
+      )
     }
   }
 }
 
 // MARK: - BasicAnimationControllerDelegate
 extension PopoverController: BasicAnimationControllerDelegate {
-
   public func animatePresentation(context: UIViewControllerContextTransitioning) {
     guard let popoverContext = presentationContext else {
       context.completeTransition(false)
@@ -515,10 +556,14 @@ extension PopoverController: BasicAnimationControllerDelegate {
       .translatedBy(x: -translationDelta.x, y: -translationDelta.y)
 
     UIView.animate(
-      withDuration: 0.5, delay: 0, usingSpringWithDamping: 0.7, initialSpringVelocity: 0, options: [.beginFromCurrentState, .allowUserInteraction],
+      withDuration: 0.5, delay: 0, usingSpringWithDamping: 0.7, initialSpringVelocity: 0, options: [
+        .beginFromCurrentState,
+        .allowUserInteraction
+      ],
       animations: {
         self.containerView.transform = .identity
-      })
+      }
+    )
     context.completeTransition(true)
   }
 
@@ -543,9 +588,9 @@ extension PopoverController: BasicAnimationControllerDelegate {
     let oldTransform = containerView.transform
     let rotationAngle = atan2(oldTransform.b, oldTransform.a)
 
-    containerView.transform = .identity  // Reset to get unaltered frame
+    containerView.transform = .identity // Reset to get unaltered frame
     let translationDelta = anchorPointDelta(from: popoverContext, popoverRect: containerView.frame)
-    containerView.transform = oldTransform  // Make sure to animate transform from a possibly altered transform
+    containerView.transform = oldTransform // Make sure to animate transform from a possibly altered transform
 
     UIView.animate(
       withDuration: 0.15, delay: 0, options: [.beginFromCurrentState, .allowUserInteraction],
@@ -563,30 +608,38 @@ extension PopoverController: BasicAnimationControllerDelegate {
 
 // MARK: - UIViewControllerTransitioningDelegate
 extension PopoverController: UIViewControllerTransitioningDelegate {
-
-  public func animationController(forPresented presented: UIViewController, presenting: UIViewController, source: UIViewController) -> UIViewControllerAnimatedTransitioning? {
-    return BasicAnimationController(delegate: self, direction: .presenting)
+  public func animationController(
+    forPresented presented: UIViewController,
+    presenting: UIViewController,
+    source: UIViewController
+  ) -> UIViewControllerAnimatedTransitioning? {
+    BasicAnimationController(delegate: self, direction: .presenting)
   }
 
   public func animationController(forDismissed dismissed: UIViewController) -> UIViewControllerAnimatedTransitioning? {
-    return BasicAnimationController(delegate: self, direction: .dismissing)
+    BasicAnimationController(delegate: self, direction: .dismissing)
   }
 }
 
 extension PopoverController: UIGestureRecognizerDelegate {
-
   public func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
-    return contentController.isPanToDismissEnabled
+    contentController.isPanToDismissEnabled
   }
 }
 
 extension PopoverController: UINavigationControllerDelegate {
-  public func navigationController(_ navigationController: UINavigationController, willShow viewController: UIViewController, animated: Bool) {
-
+  public func navigationController(
+    _ navigationController: UINavigationController,
+    willShow viewController: UIViewController,
+    animated: Bool
+  ) {
     if case .preferredContentSize = contentSizeBehavior {
       var size = viewController.preferredContentSize
       size.width = min(size.width, UIScreen.main.bounds.width - outerMargins.left - outerMargins.right)
-      size.height = min(size.height, UIScreen.main.bounds.height - containerView.frame.origin.y - view.safeAreaInsets.bottom - arrowDistance)
+      size.height = min(
+        size.height,
+        UIScreen.main.bounds.height - containerView.frame.origin.y - view.safeAreaInsets.bottom - arrowDistance
+      )
       navigationController.preferredContentSize = size
     }
   }

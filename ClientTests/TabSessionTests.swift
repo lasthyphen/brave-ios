@@ -11,38 +11,52 @@ import WebKit
 import ObjectiveC.runtime
 @testable import Client
 
-private extension WKWebView {
-  class func swizzleMe() {
+extension WKWebView {
+  private class func swizzleMe() {
     let originalSelector = #selector(WKWebView.init(frame:configuration:))
     let swizzledSelector = #selector(WKWebView.reInit(frame:configuration:))
 
     let originalMethod = class_getInstanceMethod(self, originalSelector)!
     let swizzledMethod = class_getInstanceMethod(self, swizzledSelector)!
 
-    let didAddMethod = class_addMethod(self, originalSelector, method_getImplementation(swizzledMethod), method_getTypeEncoding(swizzledMethod))
+    let didAddMethod = class_addMethod(
+      self,
+      originalSelector,
+      method_getImplementation(swizzledMethod),
+      method_getTypeEncoding(swizzledMethod)
+    )
 
     if didAddMethod {
-      class_replaceMethod(self, swizzledSelector, method_getImplementation(originalMethod), method_getTypeEncoding(originalMethod))
+      class_replaceMethod(
+        self,
+        swizzledSelector,
+        method_getImplementation(originalMethod),
+        method_getTypeEncoding(originalMethod)
+      )
     } else {
-      method_exchangeImplementations(originalMethod, swizzledMethod);
+      method_exchangeImplementations(originalMethod, swizzledMethod)
     }
   }
 
   @objc
-  func reInit(frame: CGRect, configuration: WKWebViewConfiguration) -> WKWebView {
+  private func reInit(frame: CGRect, configuration: WKWebViewConfiguration) -> WKWebView {
     configuration.setValue(true, forKey: "alwaysRunsAtForegroundPriority")
     return reInit(frame: frame, configuration: configuration)
   }
 }
 
-private extension HTTPCookie {
-  class func filter(cookies: [HTTPCookie], for url: URL) -> [HTTPCookie]? {
-    guard let host = url.host?.lowercased() else { return nil }
+extension HTTPCookie {
+  fileprivate class func filter(cookies: [HTTPCookie], for url: URL) -> [HTTPCookie]? {
+    guard let host = url.host?.lowercased() else {
+      return nil
+    }
     return cookies.filter({ $0.validFor(host: host) })
   }
 
   private func validFor(host: String) -> Bool {
-    guard domain.hasPrefix(".") else { return host == domain }
+    guard domain.hasPrefix(".") else {
+      return host == domain
+    }
     return host == domain.dropFirst() || host.hasSuffix(domain)
   }
 }
@@ -57,11 +71,19 @@ private class WebViewNavigationAdapter: NSObject, WKNavigationDelegate {
     super.init()
   }
 
-  func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
+  func webView(
+    _ webView: WKWebView,
+    decidePolicyFor navigationAction: WKNavigationAction,
+    decisionHandler: @escaping (WKNavigationActionPolicy) -> Void
+  ) {
     decisionHandler(.allow)
   }
 
-  func webView(_ webView: WKWebView, decidePolicyFor navigationResponse: WKNavigationResponse, decisionHandler: @escaping (WKNavigationResponsePolicy) -> Void) {
+  func webView(
+    _ webView: WKWebView,
+    decidePolicyFor navigationResponse: WKNavigationResponse,
+    decisionHandler: @escaping (WKNavigationResponsePolicy) -> Void
+  ) {
     decisionHandler(.allow)
   }
 
@@ -118,13 +140,15 @@ class TabSessionTests: XCTestCase {
       modifiedSince: .distantPast,
       completionHandler: {
         group.leave()
-      })
+      }
+    )
 
     group.notify(
       queue: .main,
       execute: {
         completion()
-      })
+      }
+    )
   }
 
   func testPrivateTabSessionSharing() {
@@ -166,7 +190,8 @@ class TabSessionTests: XCTestCase {
         },
         didFinishListener: {
           group.leave()
-        })
+        }
+      )
       self.tabManager.addNavigationDelegate(webViewNavigationAdapter)
 
       group.notify(queue: .main) {
@@ -194,7 +219,8 @@ class TabSessionTests: XCTestCase {
 
               XCTAssertTrue(urlNames.isSubset(of: recordNames), "Data Store records do not match!")
               group.leave()
-            })
+            }
+          )
         }
 
         group.notify(queue: .main) {
@@ -218,7 +244,8 @@ class TabSessionTests: XCTestCase {
       ]
 
       self.tabManager.addTabsForURLs(urls.compactMap({ URL(string: $0) }), zombie: false, isPrivate: false)
-      self.tabManager.removeTabs(self.tabManager.allTabs.filter({ $0.url?.absoluteString.contains("localhost") ?? false }))
+      self.tabManager
+        .removeTabs(self.tabManager.allTabs.filter({ $0.url?.absoluteString.contains("localhost") ?? false }))
       if self.tabManager.allTabs.count != 4 {
         XCTFail("Error: Not all Tabs are created equally")
         return dataStoreExpectation.fulfill()
@@ -245,7 +272,8 @@ class TabSessionTests: XCTestCase {
         },
         didFinishListener: {
           group.leave()
-        })
+        }
+      )
       self.tabManager.addNavigationDelegate(webViewNavigationAdapter)
 
       group.notify(queue: .main) {
@@ -278,7 +306,8 @@ class TabSessionTests: XCTestCase {
 
               XCTAssertTrue(urlNames.isSubset(of: recordNames), "Data Store records do not match!")
               group.leave()
-            })
+            }
+          )
         }
 
         group.notify(queue: .main) {
@@ -328,7 +357,8 @@ class TabSessionTests: XCTestCase {
         },
         didFinishListener: {
           group.leave()
-        })
+        }
+      )
       self.tabManager.addNavigationDelegate(webViewNavigationAdapter)
 
       group.notify(queue: .main) {
@@ -351,7 +381,8 @@ class TabSessionTests: XCTestCase {
           },
           didFinishListener: {
             group.leave()
-          })
+          }
+        )
 
         self.tabManager.addNavigationDelegate(webViewNavigationAdapter)
         self.tabManager.addTabsForURLs([URL(string: "https://brave.com")!], zombie: false, isPrivate: true)
@@ -397,7 +428,8 @@ class TabSessionTests: XCTestCase {
                 }
 
                 group.leave()
-              })
+              }
+            )
           }
 
           group.notify(queue: .main) {
@@ -445,7 +477,8 @@ class TabSessionTests: XCTestCase {
         },
         didFinishListener: {
           group.leave()
-        })
+        }
+      )
       self.tabManager.addNavigationDelegate(webViewNavigationAdapter)
 
       // All requests finished loading.. switch to normal mode.. check the cookies..
@@ -457,7 +490,8 @@ class TabSessionTests: XCTestCase {
           },
           didFinishListener: {
             group.leave()
-          })
+          }
+        )
 
         self.tabManager.addNavigationDelegate(webViewNavigationAdapter)
         self.tabManager.addTabsForURLs([otherURL], zombie: false, isPrivate: false)
@@ -508,7 +542,8 @@ class TabSessionTests: XCTestCase {
                 XCTAssertFalse(urlNames.isSubset(of: recordNames), "Data Store leaking from private tab to normal tab!")
 
                 group.leave()
-              })
+              }
+            )
           }
 
           group.notify(queue: .main) {
@@ -568,7 +603,8 @@ class TabSessionTests: XCTestCase {
            if (typeof value == "undefined" || typeof value.indexOf == "undefined") {
              return false;
            }
-           if (value.indexOf("\(UserScriptManager.messageHandlerTokenString)") >= 0 || value.indexOf("\(UserScriptManager.messageHandlerTokenString)") >= 0) {
+           if (value.indexOf("\(UserScriptManager
+        .messageHandlerTokenString)") >= 0 || value.indexOf("\(UserScriptManager.messageHandlerTokenString)") >= 0) {
              return true;
            }
            return false;
@@ -640,7 +676,8 @@ class TabSessionTests: XCTestCase {
       },
       didFinishListener: {
         group.leave()
-      })
+      }
+    )
 
     self.tabManager.addNavigationDelegate(webViewNavigationAdapter)
 
@@ -650,17 +687,18 @@ class TabSessionTests: XCTestCase {
         XCTFail("WebView is not created yet")
         return
       }
-      webView.evaluateSafeJavaScript(functionName: javascript, contentWorld: .page, asFunction: false) { result, error in
-        guard let keys = result as? String else {
-          XCTFail("Javascript error while finding secret tokens")
+      webView
+        .evaluateSafeJavaScript(functionName: javascript, contentWorld: .page, asFunction: false) { result, error in
+          guard let keys = result as? String else {
+            XCTFail("Javascript error while finding secret tokens")
+            expectation.fulfill()
+            return
+          }
+          if !keys.isEmpty {
+            XCTFail("Secret tokens found!" + keys)
+          }
           expectation.fulfill()
-          return
         }
-        if !keys.isEmpty {
-          XCTFail("Secret tokens found!" + keys)
-        }
-        expectation.fulfill()
-      }
     }
 
     waitForExpectations(timeout: 60, handler: nil)
@@ -701,7 +739,8 @@ class TabSessionTests: XCTestCase {
         },
         didFinishListener: {
           group.leave()
-        })
+        }
+      )
       self.tabManager.addNavigationDelegate(webViewNavigationAdapter)
 
       // All requests finished loading.. switch to private mode.. check the cookies..
@@ -713,7 +752,8 @@ class TabSessionTests: XCTestCase {
           },
           didFinishListener: {
             group.leave()
-          })
+          }
+        )
 
         self.tabManager.addNavigationDelegate(webViewNavigationAdapter)
         self.tabManager.addTabsForURLs([otherURL], zombie: false, isPrivate: true)
@@ -763,7 +803,8 @@ class TabSessionTests: XCTestCase {
                 XCTAssertFalse(urlNames.isSubset(of: recordNames), "Data Store leaking from normal tab to private tab!")
 
                 group.leave()
-              })
+              }
+            )
           }
 
           group.notify(queue: .main) {

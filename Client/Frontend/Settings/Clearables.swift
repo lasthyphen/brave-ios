@@ -23,7 +23,7 @@ class ClearableError: MaybeErrorType {
     self.msg = msg
   }
 
-  var description: String { return msg }
+  var description: String { msg }
 }
 
 struct ClearableErrorType: MaybeErrorType {
@@ -34,16 +34,15 @@ struct ClearableErrorType: MaybeErrorType {
   }
 
   var description: String {
-    return "Couldn't clear: \(err)."
+    "Couldn't clear: \(err)."
   }
 }
 
 // Remove all cookies and website data stored by the site.
 // This includes localStorage, sessionStorage, and WebSQL/IndexedDB and web cache.
 class CookiesAndCacheClearable: Clearable {
-
   var label: String {
-    return Strings.cookies
+    Strings.cookies
   }
 
   func clear() -> Success {
@@ -51,9 +50,15 @@ class CookiesAndCacheClearable: Clearable {
     let result = Deferred<Maybe<()>>()
     // need event loop to run to autorelease UIWebViews fully
     DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-      WKWebsiteDataStore.default().removeData(ofTypes: WKWebsiteDataStore.allWebsiteDataTypes(), modifiedSince: Date(timeIntervalSinceReferenceDate: 0)) {
+      WKWebsiteDataStore.default().removeData(
+        ofTypes: WKWebsiteDataStore.allWebsiteDataTypes(),
+        modifiedSince: Date(timeIntervalSinceReferenceDate: 0)
+      ) {
         UserDefaults.standard.synchronize()
-        BraveWebView.sharedNonPersistentStore().removeData(ofTypes: WKWebsiteDataStore.allWebsiteDataTypes(), modifiedSince: Date(timeIntervalSinceReferenceDate: 0)) {
+        BraveWebView.sharedNonPersistentStore().removeData(
+          ofTypes: WKWebsiteDataStore.allWebsiteDataTypes(),
+          modifiedSince: Date(timeIntervalSinceReferenceDate: 0)
+        ) {
           UserDefaults.standard.synchronize()
           result.fill(Maybe<()>(success: ()))
         }
@@ -66,9 +71,8 @@ class CookiesAndCacheClearable: Clearable {
 // Clear the web cache. Note, this has to close all open tabs in order to ensure the data
 // cached in them isn't flushed to disk.
 class CacheClearable: Clearable {
-
   var label: String {
-    return Strings.cache
+    Strings.cache
   }
 
   func clear() -> Success {
@@ -82,16 +86,18 @@ class CacheClearable: Clearable {
         WKWebsiteDataTypeMemoryCache,
         WKWebsiteDataTypeFetchCache,
       ]
-      WKWebsiteDataStore.default().removeData(ofTypes: localStorageClearables, modifiedSince: Date(timeIntervalSinceReferenceDate: 0)) {
-        WebImageCacheManager.shared.clearDiskCache()
-        WebImageCacheManager.shared.clearMemoryCache()
-        WebImageCacheWithNoPrivacyProtectionManager.shared.clearDiskCache()
-        WebImageCacheWithNoPrivacyProtectionManager.shared.clearMemoryCache()
+      WKWebsiteDataStore.default()
+        .removeData(ofTypes: localStorageClearables, modifiedSince: Date(timeIntervalSinceReferenceDate: 0)) {
+          WebImageCacheManager.shared.clearDiskCache()
+          WebImageCacheManager.shared.clearMemoryCache()
+          WebImageCacheWithNoPrivacyProtectionManager.shared.clearDiskCache()
+          WebImageCacheWithNoPrivacyProtectionManager.shared.clearMemoryCache()
 
-        BraveWebView.sharedNonPersistentStore().removeData(ofTypes: localStorageClearables, modifiedSince: Date(timeIntervalSinceReferenceDate: 0)) {
-          result.fill(Maybe<()>(success: ()))
+          BraveWebView.sharedNonPersistentStore()
+            .removeData(ofTypes: localStorageClearables, modifiedSince: Date(timeIntervalSinceReferenceDate: 0)) {
+              result.fill(Maybe<()>(success: ()))
+            }
         }
-      }
     }
 
     return result
@@ -107,7 +113,7 @@ class HistoryClearable: Clearable {
   }
 
   var label: String {
-    return Strings.browsingHistory
+    Strings.browsingHistory
   }
 
   func clear() -> Success {
@@ -131,12 +137,12 @@ class PasswordsClearable: Clearable {
   }
 
   var label: String {
-    return Strings.savedLogins
+    Strings.savedLogins
   }
 
   func clear() -> Success {
     // Clear our storage
-    return profile.logins.removeAll() >>== { res in
+    profile.logins.removeAll() >>== { res in
       let storage = URLCredentialStorage.shared
       let credentials = storage.allCredentials
       for (space, credentials) in credentials {
@@ -152,7 +158,7 @@ class PasswordsClearable: Clearable {
 /// Clears all files in Downloads folder.
 class DownloadsClearable: Clearable {
   var label: String {
-    return Strings.downloadedFiles
+    Strings.downloadedFiles
   }
 
   func clear() -> Success {
@@ -172,12 +178,10 @@ class DownloadsClearable: Clearable {
     }
 
     return succeed()
-
   }
 }
 
 class BraveNewsClearable: Clearable {
-
   let feedDataSource: FeedDataSource
 
   init(feedDataSource: FeedDataSource) {
@@ -185,7 +189,7 @@ class BraveNewsClearable: Clearable {
   }
 
   var label: String {
-    return Strings.BraveNews.braveNews
+    Strings.BraveNews.braveNews
   }
 
   func clear() -> Success {
@@ -195,11 +199,10 @@ class BraveNewsClearable: Clearable {
 }
 
 class PlayListCacheClearable: Clearable {
-
   init() {}
 
   var label: String {
-    return Strings.PlayList.playlistOfflineDataToggleOption
+    Strings.PlayList.playlistOfflineDataToggleOption
   }
 
   func clear() -> Success {
@@ -222,11 +225,10 @@ class PlayListCacheClearable: Clearable {
 }
 
 class PlayListDataClearable: Clearable {
-
   init() {}
 
   var label: String {
-    return Strings.PlayList.playlistMediaAndOfflineDataToggleOption
+    Strings.PlayList.playlistMediaAndOfflineDataToggleOption
   }
 
   func clear() -> Success {
@@ -249,11 +251,10 @@ class PlayListDataClearable: Clearable {
 }
 
 class RecentSearchClearable: Clearable {
-
   init() {}
 
   var label: String {
-    return Strings.recentSearchClearDataToggleOption
+    Strings.recentSearchClearDataToggleOption
   }
 
   func clear() -> Success {

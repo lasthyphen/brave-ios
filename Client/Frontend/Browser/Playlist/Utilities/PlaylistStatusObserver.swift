@@ -27,14 +27,18 @@ class PlaylistPlayerStatusObserver: NSObject {
     currentItemObserver = player.observe(
       \AVPlayer.currentItem, options: [.new],
       changeHandler: { [weak self] _, change in
-        guard let self = self else { return }
+        guard let self = self else {
+          return
+        }
 
         if let newItem = change.newValue {
           self.item = newItem
           self.itemStatusObserver = newItem?.observe(
             \AVPlayerItem.status, options: [.new],
             changeHandler: { [weak self] _, change in
-              guard let self = self else { return }
+              guard let self = self else {
+                return
+              }
 
               let status = change.newValue ?? .unknown
               switch status {
@@ -50,8 +54,10 @@ class PlaylistPlayerStatusObserver: NSObject {
               @unknown default:
                 assertionFailure("Unknown Switch Case for AVPlayerItemStatus")
               }
-            })
+            }
+          )
         }
-      })
+      }
+    )
   }
 }

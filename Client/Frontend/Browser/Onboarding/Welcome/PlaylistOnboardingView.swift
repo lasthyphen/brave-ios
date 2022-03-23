@@ -60,11 +60,11 @@ struct PlaylistOnboardingView_Previews: PreviewProvider {
 #endif
 
 class PlaylistOnboardingViewController: UIHostingController<PlaylistOnboardingView> & PopoverContentComponent {
-
   init() {
     super.init(rootView: PlaylistOnboardingView())
   }
 
+  @available(*, unavailable)
   required init?(coder aDecoder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }

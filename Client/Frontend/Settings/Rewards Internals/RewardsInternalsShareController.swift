@@ -24,6 +24,7 @@ private class RewardsInternalsSharableCell: UITableViewCell, TableViewReusable {
       $0.userInterfaceStyle == .dark ? UIColor(white: 0.2, alpha: 1.0) : UIColor.braveOrange.withAlphaComponent(0.06)
     }
   }
+
   @available(*, unavailable)
   required init(coder: NSCoder) {
     fatalError()
@@ -46,9 +47,9 @@ class RewardsInternalsShareController: UITableViewController {
     self.sharables = sharables
     self.initiallySelectedSharables =
       initiallySelectedSharables
-      .compactMap { sharable in
-        initiallySelectedSharables.firstIndex(where: { $0.id == sharable.id })
-      }
+        .compactMap { sharable in
+          initiallySelectedSharables.firstIndex(where: { $0.id == sharable.id })
+        }
     // Ensure basic info is always selected
     if !initiallySelectedSharables.contains(.basic), let indexOfBasic = sharables.firstIndex(of: .basic) {
       self.initiallySelectedSharables.insert(indexOfBasic, at: 0)
@@ -87,7 +88,11 @@ class RewardsInternalsShareController: UITableViewController {
 
     progressIndiciator.sizeToFit()
 
-    navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: .cancel, target: self, action: #selector(tappedCancel))
+    navigationItem.leftBarButtonItem = UIBarButtonItem(
+      barButtonSystemItem: .cancel,
+      target: self,
+      action: #selector(tappedCancel)
+    )
   }
 
   @objc private func tappedCancel() {
@@ -101,7 +106,12 @@ class RewardsInternalsShareController: UITableViewController {
 
   override func viewDidLayoutSubviews() {
     super.viewDidLayoutSubviews()
-    progressIndiciator.frame = CGRect(x: 16, y: progressIndiciator.frame.origin.y, width: view.bounds.width - 32, height: 16)
+    progressIndiciator.frame = CGRect(
+      x: 16,
+      y: progressIndiciator.frame.origin.y,
+      width: view.bounds.width - 32,
+      height: 16
+    )
   }
 
   private let shareProgress = Progress()
@@ -134,7 +144,9 @@ class RewardsInternalsShareController: UITableViewController {
 
   private func share(_ senderIndexPath: IndexPath) {
     // create temp folder, zip, share
-    guard let selectedIndexPaths = tableView.indexPathsForSelectedRows else { return }
+    guard let selectedIndexPaths = tableView.indexPathsForSelectedRows else {
+      return
+    }
     let sharables = selectedIndexPaths.map { self.sharables[$0.row] }
 
     let dateFormatter = DateFormatter().then {
@@ -144,7 +156,11 @@ class RewardsInternalsShareController: UITableViewController {
       $0.dateStyle = .long
       $0.timeStyle = .long
     }
-    let builder = RewardsInternalsSharableBuilder(ledger: self.ledger, dateFormatter: dateFormatter, dateAndTimeFormatter: dateAndTimeFormatter)
+    let builder = RewardsInternalsSharableBuilder(
+      ledger: self.ledger,
+      dateFormatter: dateFormatter,
+      dateAndTimeFormatter: dateAndTimeFormatter
+    )
     do {
       if FileManager.default.fileExists(atPath: dropDirectory.path) {
         try FileManager.default.removeItem(at: dropDirectory)
@@ -160,20 +176,32 @@ class RewardsInternalsShareController: UITableViewController {
         sharable.generator.generateFiles(at: sharableFolder.path, using: builder) { error in
           defer { group.leave() }
           if let error = error {
-            log.error("Failed to generate files for the Rewards Intenrnals sharable with ID: \(sharable.id). Error: \(error)")
+            log
+              .error(
+                "Failed to generate files for the Rewards Intenrnals sharable with ID: \(sharable.id). Error: \(error)"
+              )
           }
         }
       }
       group.notify(queue: .global(qos: .userInitiated)) { [weak self] in
-        guard let self = self else { return }
+        guard let self = self else {
+          return
+        }
         do {
           if FileManager.default.fileExists(atPath: self.zipPath.path) {
             try FileManager.default.removeItem(at: self.zipPath)
           }
-          try FileManager.default.zipItem(at: self.dropDirectory, to: self.zipPath, shouldKeepParent: false, compressionMethod: .deflate, progress: self.shareProgress)
+          try FileManager.default.zipItem(
+            at: self.dropDirectory,
+            to: self.zipPath,
+            shouldKeepParent: false,
+            compressionMethod: .deflate,
+            progress: self.shareProgress
+          )
           DispatchQueue.main.async {
             let controller = UIActivityViewController(activityItems: [self.zipPath], applicationActivities: nil)
-            controller.popoverPresentationController?.sourceView = self.tableView.cellForRow(at: senderIndexPath) ?? self.tableView
+            controller.popoverPresentationController?.sourceView = self.tableView
+              .cellForRow(at: senderIndexPath) ?? self.tableView
             controller.popoverPresentationController?.permittedArrowDirections = [.up, .down]
             controller.completionWithItemsHandler = { _, _, _, _ in
               self.cleanup()
@@ -194,14 +222,14 @@ class RewardsInternalsShareController: UITableViewController {
   // MARK: - UITableViewDataSource
 
   override func numberOfSections(in tableView: UITableView) -> Int {
-    return 2
+    2
   }
 
   override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
     if section == 0 {
       return sharables.count
     }
-    return 1  // Share button
+    return 1 // Share button
   }
 
   override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -219,7 +247,7 @@ class RewardsInternalsShareController: UITableViewController {
   }
 
   override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
-    return indexPath.section == 0
+    indexPath.section == 0
   }
 
   // MARK: - UITableViewDelegate
@@ -235,7 +263,9 @@ class RewardsInternalsShareController: UITableViewController {
   override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
     if indexPath.section == 1 {
       tableView.deselectRow(at: indexPath, animated: true)
-      if isSharing { return }
+      if isSharing {
+        return
+      }
       share(indexPath)
     }
   }

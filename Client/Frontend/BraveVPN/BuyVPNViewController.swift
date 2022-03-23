@@ -11,9 +11,8 @@ import StoreKit
 private let log = Logger.browserLogger
 
 class BuyVPNViewController: UIViewController {
-
   private var buyVPNView: View {
-    return view as! View  // swiftlint:disable:this force_cast
+    view as! View // swiftlint:disable:this force_cast
   }
 
   override func loadView() {
@@ -33,7 +32,9 @@ class BuyVPNViewController: UIViewController {
       // Prevent dismissing the modal by swipe when the VPN is being configured
       navigationController?.isModalInPresentation = isLoading == true
 
-      if !isLoading { return }
+      if !isLoading {
+        return
+      }
 
       let overlay = UIView().then {
         $0.backgroundColor = UIColor.black.withAlphaComponent(0.5)
@@ -69,7 +70,8 @@ class BuyVPNViewController: UIViewController {
 
     navigationItem.rightBarButtonItem = .init(
       title: Strings.VPN.restorePurchases, style: .done,
-      target: self, action: #selector(restorePurchasesAction))
+      target: self, action: #selector(restorePurchasesAction)
+    )
 
     buyVPNView.monthlySubButton
       .addTarget(self, action: #selector(monthlySubscriptionAction), for: .touchUpInside)
@@ -144,7 +146,8 @@ extension BuyVPNViewController: IAPObserverDelegate {
           self.navigationController?.setViewControllers(
             [InstallVPNViewController()],
             animated:
-              true)
+            true
+          )
         }
 
         // get the receipt from the server
@@ -189,7 +192,8 @@ extension BuyVPNViewController: IAPObserverDelegate {
       let alert = UIAlertController(
         title: Strings.VPN.vpnErrorPurchaseFailedTitle,
         message: message,
-        preferredStyle: .alert)
+        preferredStyle: .alert
+      )
       let ok = UIAlertAction(title: Strings.OKString, style: .default, handler: nil)
       alert.addAction(ok)
       self.present(alert, animated: true)

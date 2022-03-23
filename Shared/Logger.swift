@@ -8,17 +8,23 @@ import XCGLogger
 public struct Logger {}
 
 // MARK: - Singleton Logger Instances
-public extension Logger {
-  static let logPII = false
+extension Logger {
+  public static let logPII = false
 
   /// Logger used for recording happenings with Sync, Accounts, Providers, Storage, and Profiles
-  static let syncLogger = RollingFileLogger(filenameRoot: "sync", logDirectoryPath: Logger.logFileDirectoryPath())
+  public static let syncLogger = RollingFileLogger(
+    filenameRoot: "sync",
+    logDirectoryPath: Logger.logFileDirectoryPath()
+  )
 
   /// Logger used for recording frontend/browser happenings
-  static let browserLogger = RollingFileLogger(filenameRoot: "browser", logDirectoryPath: Logger.logFileDirectoryPath())
+  public static let browserLogger = RollingFileLogger(
+    filenameRoot: "browser",
+    logDirectoryPath: Logger.logFileDirectoryPath()
+  )
 
   /// Logger used for things recorded on BraveRewards framework.
-  static let braveCoreLogger: RollingFileLogger = {
+  public static let braveCoreLogger: RollingFileLogger = {
     let logger = RollingFileLogger(filenameRoot: "bravecore", logDirectoryPath: nil)
     logger.identifier = "BraveCore"
     logger.newLogWithDate(
@@ -27,12 +33,13 @@ public extension Logger {
         // Same as debug log, Rewards framework handles function names in message
         destination.showFunctionName = false
         destination.showThreadName = false
-      })
+      }
+    )
 
     if !AppConstants.buildChannel.isPublic {
       // For rewards logs we want to show it only using the Apple System Log to make it visible
       // via console.app
-      logger.destinations.removeAll(where: { ($0 is ConsoleDestination) })
+      logger.destinations.removeAll(where: { $0 is ConsoleDestination })
 
       // Create a destination for the system console log (via NSLog)
       let systemDestination = AppleSystemLogDestination(identifier: "com.brave.ios.logs")
@@ -52,24 +59,27 @@ public extension Logger {
     return logger
   }()
 
-  static let braveSyncLogger = RollingFileLogger(filenameRoot: "bravesync", logDirectoryPath: Logger.logFileDirectoryPath())
+  public static let braveSyncLogger = RollingFileLogger(
+    filenameRoot: "bravesync",
+    logDirectoryPath: Logger.logFileDirectoryPath()
+  )
 
   /// Logger used for recording interactions with the keychain
-  static let keychainLogger: XCGLogger = Logger.fileLoggerWithName("keychain")
+  public static let keychainLogger: XCGLogger = Logger.fileLoggerWithName("keychain")
 
   /// Logger used for logging database errors such as corruption
-  static let corruptLogger: RollingFileLogger = {
+  public static let corruptLogger: RollingFileLogger = {
     let logger = RollingFileLogger(filenameRoot: "corruptLogger", logDirectoryPath: Logger.logFileDirectoryPath())
     logger.newLogWithDate(Date())
     return logger
   }()
 
   /**
-    Return the log file directory path. If the directory doesn't exist, make sure it exist first before returning the path.
+   Return the log file directory path. If the directory doesn't exist, make sure it exist first before returning the path.
 
-    :returns: Directory path where log files are stored
-    */
-  static func logFileDirectoryPath() -> String? {
+   :returns: Directory path where log files are stored
+   */
+  public static func logFileDirectoryPath() -> String? {
     if let cacheDir = NSSearchPathForDirectoriesInDomains(.cachesDirectory, .userDomainMask, true).first {
       let logDir = "\(cacheDir)/Logs"
       if !FileManager.default.fileExists(atPath: logDir) {
@@ -109,12 +119,12 @@ public extension Logger {
   }
 
   /**
-     Grabs all of the configured logs that write to disk and returns them in NSData format along with their
-     associated filename.
+   Grabs all of the configured logs that write to disk and returns them in NSData format along with their
+   associated filename.
 
-     - returns: Tuples of filenames to each file's contexts in a NSData object
-     */
-  static func diskLogFilenamesAndData() throws -> [(String, Data?)] {
+   - returns: Tuples of filenames to each file's contexts in a NSData object
+   */
+  public static func diskLogFilenamesAndData() throws -> [(String, Data?)] {
     var filenamesAndURLs = [(String, URL)]()
     filenamesAndURLs.append(("browser", urlForLogNamed("browser")!))
     filenamesAndURLs.append(("keychain", urlForLogNamed("keychain")!))

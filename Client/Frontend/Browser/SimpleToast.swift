@@ -10,8 +10,8 @@ struct SimpleToastUX {
   static let toastAnimationDuration = 0.5
   static let toastDefaultColor = UIColor.braveInfoBorder
   static let toastFont = UIFont.systemFont(ofSize: 15)
-  static let toastDismissAfter = DispatchTimeInterval.milliseconds(4500)  // 4.5 seconds.
-  static let toastDelayBefore = DispatchTimeInterval.milliseconds(0)  // 0 seconds
+  static let toastDismissAfter = DispatchTimeInterval.milliseconds(4500) // 4.5 seconds.
+  static let toastDelayBefore = DispatchTimeInterval.milliseconds(0) // 0 seconds
   static let bottomToolbarHeight = CGFloat(45)
 }
 
@@ -20,7 +20,7 @@ struct SimpleToast {
     let toast = self.createView()
     toast.text = text
     bottomContainer.addSubview(toast)
-    toast.snp.makeConstraints { (make) in
+    toast.snp.makeConstraints { make in
       make.width.equalTo(bottomContainer)
       make.left.equalTo(bottomContainer)
       make.height.equalTo(SimpleToastUX.toastHeight)
@@ -29,7 +29,7 @@ struct SimpleToast {
     animate(toast)
   }
 
-  fileprivate func createView() -> UILabel {
+  private func createView() -> UILabel {
     let toast = UILabel()
     toast.textColor = .white
     toast.backgroundColor = SimpleToastUX.toastDefaultColor
@@ -38,7 +38,7 @@ struct SimpleToast {
     return toast
   }
 
-  fileprivate func dismiss(_ toast: UIView) {
+  private func dismiss(_ toast: UIView) {
     UIView.animate(
       withDuration: SimpleToastUX.toastAnimationDuration,
       animations: {
@@ -53,7 +53,7 @@ struct SimpleToast {
     )
   }
 
-  fileprivate func animate(_ toast: UIView) {
+  private func animate(_ toast: UIView) {
     UIView.animate(
       withDuration: SimpleToastUX.toastAnimationDuration,
       animations: {
@@ -69,7 +69,8 @@ struct SimpleToast {
           deadline: dispatchTime,
           execute: {
             self.dismiss(toast)
-          })
+          }
+        )
       }
     )
   }

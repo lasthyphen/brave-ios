@@ -66,7 +66,9 @@ class CosmeticFiltersResourceDownloader {
 
       if !didInitialLoad {
         Task.detached(priority: .userInitiated) { [weak self] in
-          guard let self = self else { return }
+          guard let self = self else {
+            return
+          }
 
           // Load files from disk into the original engine engine
           do {
@@ -79,7 +81,9 @@ class CosmeticFiltersResourceDownloader {
       }
 
       Task.detached(priority: .userInitiated) { [weak self] in
-        guard let self = self else { return }
+        guard let self = self else {
+          return
+        }
 
         do {
           // All operations must be done on a temp engine,
@@ -90,7 +94,9 @@ class CosmeticFiltersResourceDownloader {
           let tempEngine = AdblockRustEngine()
 
           try await withThrowingTaskGroup(of: Void.self) { [weak self] group in
-            guard let self = self else { return }
+            guard let self = self else {
+              return
+            }
             group.addTask { try await self.downloadCosmeticSamples(with: tempEngine) }
             group.addTask { try await self.downloadResourceSamples(with: tempEngine) }
             try await group.waitForAll()
@@ -166,43 +172,48 @@ class CosmeticFiltersResourceDownloader {
     // file name of which the file will be saved on disk
     let fileName = type.identifier
 
-    async let completedDownloads = type.associatedFiles.asyncConcurrentCompactMap { [weak self] fileType -> CosmeticFilterNetworkResource? in
-      guard let self = self else { return nil }
+    async let completedDownloads = type.associatedFiles
+      .asyncConcurrentCompactMap { [weak self] fileType -> CosmeticFilterNetworkResource? in
+        guard let self = self else {
+          return nil
+        }
 
-      let fileExtension = fileType.rawValue
-      let etagExtension = fileExtension + ".etag"
+        let fileExtension = fileType.rawValue
+        let etagExtension = fileExtension + ".etag"
 
-      guard let resourceName = type.resourceName(for: fileType),
-        var url = URL(string: CosmeticFiltersResourceDownloader.endpoint)
-      else {
-        return nil
+        guard let resourceName = type.resourceName(for: fileType),
+              var url = URL(string: CosmeticFiltersResourceDownloader.endpoint)
+        else {
+          return nil
+        }
+
+        url.appendPathComponent(resourceName)
+        url.appendPathExtension(fileExtension)
+
+        var headers = [String: String]()
+        if let servicesKeyValue = Bundle.main.getPlistString(for: self.servicesKeyName) {
+          headers[self.servicesKeyHeaderValue] = servicesKeyValue
+        }
+
+        let etag = self.fileFromDocumentsAsString("\(fileName).\(etagExtension)", inFolder: folderName)
+
+        let resource = try await nm.downloadResource(
+          with: url,
+          resourceType: .cached(etag: etag),
+          checkLastServerSideModification: !AppConstants.buildChannel.isPublic,
+          customHeaders: headers
+        )
+
+        if resource.data.isEmpty {
+          return nil
+        }
+
+        return CosmeticFilterNetworkResource(
+          resource: resource,
+          fileType: fileType,
+          type: type
+        )
       }
-
-      url.appendPathComponent(resourceName)
-      url.appendPathExtension(fileExtension)
-
-      var headers = [String: String]()
-      if let servicesKeyValue = Bundle.main.getPlistString(for: self.servicesKeyName) {
-        headers[self.servicesKeyHeaderValue] = servicesKeyValue
-      }
-
-      let etag = self.fileFromDocumentsAsString("\(fileName).\(etagExtension)", inFolder: folderName)
-
-      let resource = try await nm.downloadResource(
-        with: url,
-        resourceType: .cached(etag: etag),
-        checkLastServerSideModification: !AppConstants.buildChannel.isPublic,
-        customHeaders: headers)
-
-      if resource.data.isEmpty {
-        return nil
-      }
-
-      return CosmeticFilterNetworkResource(
-        resource: resource,
-        fileType: fileType,
-        type: type)
-    }
 
     if try await self.writeFilesToDisk(resources: completedDownloads, name: fileName) {
       try await self.setUpFiles(into: engine, resources: completedDownloads)
@@ -216,7 +227,9 @@ class CosmeticFiltersResourceDownloader {
     }
 
     let fileUrl = folderUrl.appendingPathComponent(name)
-    guard let data = FileManager.default.contents(atPath: fileUrl.path) else { return nil }
+    guard let data = FileManager.default.contents(atPath: fileUrl.path) else {
+      return nil
+    }
     return String(data: data, encoding: .utf8)
   }
 
@@ -230,25 +243,30 @@ class CosmeticFiltersResourceDownloader {
       fileSaveCompletions.append(
         fm.writeToDiskInFolder(
           $0.resource.data, fileName: fileName,
-          folderName: folderName))
+          folderName: folderName
+        )
+      )
 
       if let etag = $0.resource.etag, let data = etag.data(using: .utf8) {
         let etagFileName = fileName + ".etag"
         fileSaveCompletions.append(
           fm.writeToDiskInFolder(
             data, fileName: etagFileName,
-            folderName: folderName))
+            folderName: folderName
+          )
+        )
       }
 
       if let lastModified = $0.resource.lastModifiedTimestamp,
-        let data = String(lastModified).data(using: .utf8) {
+         let data = String(lastModified).data(using: .utf8) {
         let lastModifiedFileName = fileName + ".lastmodified"
         fileSaveCompletions.append(
           fm.writeToDiskInFolder(
             data, fileName: lastModifiedFileName,
-            folderName: folderName))
+            folderName: folderName
+          )
+        )
       }
-
     }
 
     // Returning true if all file saves completed succesfully
@@ -265,12 +283,14 @@ class CosmeticFiltersResourceDownloader {
         try await self.setDataFile(
           into: engine,
           data: $0.resource.data,
-          id: $0.type.identifier)
+          id: $0.type.identifier
+        )
       case .json:
         try await self.setJSONFile(
           into: engine,
           data: $0.resource.data,
-          id: $0.type.identifier)
+          id: $0.type.identifier
+        )
       case .tgz:
         break
       }

@@ -75,7 +75,10 @@ public class PlaylistThumbnailRenderer {
     favIconGenerator = nil
   }
 
-  private func bind(_ block: @escaping (URL, @escaping (UIImage?) -> Void) -> Void, url: URL) -> Future<UIImage, Error> {
+  private func bind(
+    _ block: @escaping (URL, @escaping (UIImage?) -> Void) -> Void,
+    url: URL
+  ) -> Future<UIImage, Error> {
     Future { promise in
       block(url, { image in
         if let image = image {
@@ -102,7 +105,8 @@ public class PlaylistThumbnailRenderer {
         DispatchQueue.main.async {
           completion(image)
         }
-      })
+      }
+    )
   }
 
   private func loadAssetThumbnail(url: URL, completion: @escaping (UIImage?) -> Void) {
@@ -175,7 +179,9 @@ private class HLSThumbnailGenerator {
     ])
 
     self.observer = self.currentItem?.observe(\.status) { [weak self] item, _ in
-      guard let self = self else { return }
+      guard let self = self else {
+        return
+      }
 
       if item.status == .readyToPlay && self.state == .loading {
         self.state = .ready
@@ -216,7 +222,9 @@ private class HLSThumbnailGenerator {
     queue.async {
       let time = CMTimeMakeWithSeconds(time, preferredTimescale: 1)
       self.player?.seek(to: time) { [weak self] finished in
-        guard let self = self else { return }
+        guard let self = self else {
+          return
+        }
 
         if finished {
           self.queue.async {
@@ -242,7 +250,8 @@ private class HLSThumbnailGenerator {
     let quartzFrame = CGRect(
       x: 0, y: 0,
       width: CVPixelBufferGetWidth(buffer),
-      height: CVPixelBufferGetHeight(buffer))
+      height: CVPixelBufferGetHeight(buffer)
+    )
 
     if let cgImage = CIContext().createCGImage(ciImage, from: quartzFrame) {
       let result = UIImage(cgImage: cgImage)
@@ -256,7 +265,6 @@ private class HLSThumbnailGenerator {
       }
     }
   }
-
 }
 
 // MARK: - FavIconImageRenderer
@@ -274,12 +282,12 @@ private class FavIconImageRenderer {
     task = DispatchWorkItem {
       let domain = Domain.getOrCreate(forUrl: siteURL, persistent: false)
       var faviconFetcher: FaviconFetcher? = FaviconFetcher(siteURL: siteURL, kind: .favicon, domain: domain)
-      faviconFetcher?.load() { [weak self] _, attributes in
+      faviconFetcher?.load { [weak self] _, attributes in
         faviconFetcher = nil
 
         guard let self = self,
-          let cancellable = self.task,
-          !cancellable.isCancelled
+              let cancellable = self.task,
+              !cancellable.isCancelled
         else {
           completion?(nil)
           return
@@ -287,12 +295,13 @@ private class FavIconImageRenderer {
 
         if let image = attributes.image {
           if let backgroundColor = attributes.backgroundColor,
-            let cgImage = image.cgImage {
+             let cgImage = image.cgImage {
             // attributes.includesPadding sometimes returns 0 for icons that should. It's better this way to always include the padding.
             let padding = 4.0
             let size = CGSize(
               width: image.size.width + padding,
-              height: image.size.height + padding)
+              height: image.size.height + padding
+            )
 
             let finalImage = self.renderOnImageContext(size: size) { context, rect in
               context.saveGState()
@@ -325,18 +334,23 @@ private class FavIconImageRenderer {
 
           let padding = 4.0
           let finalImage = self.renderOnImageContext { context, rect in
-            guard let font = label.font else { return }
+            guard let font = label.font else {
+              return
+            }
             var fontSize = font.pointSize
 
             // Estimate the size of the font required to fit the context's bounds + padding
             // Usually we can do this by iterating and calculating the size that fits
             // But this is a very good estimated size
             let newSize = text.size(withAttributes: [.font: font.withSize(fontSize)])
-            guard newSize.width > 0.0 && newSize.height > 0.0 else { return }
+            guard newSize.width > 0.0 && newSize.height > 0.0 else {
+              return
+            }
 
             let ratio = min(
               (rect.size.width - padding) / newSize.width,
-              (rect.size.height - padding) / newSize.height)
+              (rect.size.height - padding) / newSize.height
+            )
             fontSize *= ratio
 
             if fontSize < label.font.pointSize * 0.5 {
@@ -360,7 +374,8 @@ private class FavIconImageRenderer {
               withAttributes: [
                 .font: newFont,
                 .foregroundColor: UIColor.white,
-              ])
+              ]
+            )
           }
 
           completion?(finalImage)

@@ -11,10 +11,26 @@ extension TabTrayController {
 
     let arrowCommands: [UIKeyCommand] =
       [
-        UIKeyCommand(input: UIKeyCommand.inputLeftArrow, modifierFlags: [], action: #selector(didChangeSelectedTabKeyCommand(sender:))),
-        UIKeyCommand(input: UIKeyCommand.inputRightArrow, modifierFlags: [], action: #selector(didChangeSelectedTabKeyCommand(sender:))),
-        UIKeyCommand(input: UIKeyCommand.inputDownArrow, modifierFlags: [], action: #selector(didChangeSelectedTabKeyCommand(sender:))),
-        UIKeyCommand(input: UIKeyCommand.inputUpArrow, modifierFlags: [], action: #selector(didChangeSelectedTabKeyCommand(sender:))),
+        UIKeyCommand(
+          input: UIKeyCommand.inputLeftArrow,
+          modifierFlags: [],
+          action: #selector(didChangeSelectedTabKeyCommand(sender:))
+        ),
+        UIKeyCommand(
+          input: UIKeyCommand.inputRightArrow,
+          modifierFlags: [],
+          action: #selector(didChangeSelectedTabKeyCommand(sender:))
+        ),
+        UIKeyCommand(
+          input: UIKeyCommand.inputDownArrow,
+          modifierFlags: [],
+          action: #selector(didChangeSelectedTabKeyCommand(sender:))
+        ),
+        UIKeyCommand(
+          input: UIKeyCommand.inputUpArrow,
+          modifierFlags: [],
+          action: #selector(didChangeSelectedTabKeyCommand(sender:))
+        ),
       ]
 
     arrowCommands.forEach {
@@ -24,16 +40,40 @@ extension TabTrayController {
     }
 
     return [
-      UIKeyCommand(title: toggleText, action: #selector(didTogglePrivateModeKeyCommand), input: "`", modifierFlags: .command),
+      UIKeyCommand(
+        title: toggleText,
+        action: #selector(didTogglePrivateModeKeyCommand),
+        input: "`",
+        modifierFlags: .command
+      ),
       UIKeyCommand(input: "w", modifierFlags: .command, action: #selector(didCloseTabKeyCommand)),
-      UIKeyCommand(title: Strings.closeTabFromTabTrayKeyCodeTitle, action: #selector(didCloseTabKeyCommand), input: "\u{8}", modifierFlags: []),
-      UIKeyCommand(title: Strings.closeAllTabsFromTabTrayKeyCodeTitle, action: #selector(didCloseAllTabsKeyCommand), input: "w", modifierFlags: [.command, .shift]),
-      UIKeyCommand(title: Strings.openSelectedTabFromTabTrayKeyCodeTitle, action: #selector(didEnterTabKeyCommand), input: "\r", modifierFlags: []),
+      UIKeyCommand(
+        title: Strings.closeTabFromTabTrayKeyCodeTitle,
+        action: #selector(didCloseTabKeyCommand),
+        input: "\u{8}",
+        modifierFlags: []
+      ),
+      UIKeyCommand(
+        title: Strings.closeAllTabsFromTabTrayKeyCodeTitle,
+        action: #selector(didCloseAllTabsKeyCommand),
+        input: "w",
+        modifierFlags: [.command, .shift]
+      ),
+      UIKeyCommand(
+        title: Strings.openSelectedTabFromTabTrayKeyCodeTitle,
+        action: #selector(didEnterTabKeyCommand),
+        input: "\r",
+        modifierFlags: []
+      ),
       UIKeyCommand(input: "\\", modifierFlags: [.command, .shift], action: #selector(didEnterTabKeyCommand)),
       UIKeyCommand(input: "\t", modifierFlags: [.command, .alternate], action: #selector(didEnterTabKeyCommand)),
-      UIKeyCommand(title: Strings.openNewTabFromTabTrayKeyCodeTitle, action: #selector(didOpenNewTabKeyCommand), input: "t", modifierFlags: .command),
+      UIKeyCommand(
+        title: Strings.openNewTabFromTabTrayKeyCodeTitle,
+        action: #selector(didOpenNewTabKeyCommand),
+        input: "t",
+        modifierFlags: .command
+      ),
     ] + arrowCommands
-
   }
 
   @objc func didTogglePrivateModeKeyCommand() {
@@ -60,7 +100,9 @@ extension TabTrayController {
 
   @objc func didChangeSelectedTabKeyCommand(sender: UIKeyCommand) {
     let step: Int
-    guard let input = sender.input else { return }
+    guard let input = sender.input else {
+      return
+    }
 
     let numberOfColumns = tabTrayView.numberOfColumns
 
@@ -78,8 +120,10 @@ extension TabTrayController {
     }
 
     guard let selectedTab = tabManager.selectedTab,
-      let currentIndex = dataSource.indexPath(for: selectedTab)
-    else { return }
+          let currentIndex = dataSource.indexPath(for: selectedTab)
+    else {
+      return
+    }
 
     let tabsCount = tabTrayView.collectionView.numberOfItems(inSection: 0)
     let nextItem = max(0, min(currentIndex.row + step, tabsCount - 1))
@@ -92,6 +136,5 @@ extension TabTrayController {
       // In all other cases when a tab selection changes, the tab tray is dismissed.
       forceReload()
     }
-
   }
 }

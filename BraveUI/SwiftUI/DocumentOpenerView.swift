@@ -37,18 +37,22 @@ public struct DocumentOpenerView: UIViewControllerRepresentable {
     picker.delegate = context.coordinator
     return picker
   }
+
   public func updateUIViewController(_ uiViewController: UIViewControllerType, context: Context) {
     uiViewController.allowsMultipleSelection = allowsMultipleSelection
     uiViewController.directoryURL = initialDirectoryURL
   }
+
   public func makeCoordinator() -> Coordinator {
     Coordinator(onCompletion)
   }
+
   public class Coordinator: NSObject, UIDocumentPickerDelegate {
     var onCompletion: ([URL]) -> Void
     init(_ completion: @escaping ([URL]) -> Void) {
       onCompletion = completion
     }
+
     public func documentPicker(_ controller: UIDocumentPickerViewController, didPickDocumentsAt urls: [URL]) {
       DispatchQueue.main.async {
         self.onCompletion(urls)

@@ -7,7 +7,6 @@ import XCTest
 @testable import Client
 
 class DomainUserScriptTests: XCTestCase {
-
   func testBraveSearchAPIAvailability() throws {
     let goodURLs = [
       URL(string: "https://search.brave.com"),
@@ -34,7 +33,6 @@ class DomainUserScriptTests: XCTestCase {
   }
 
   func testBraveTalkAPIAvailability() throws {
-
     let goodURLs = [
       URL(string: "https://talk.brave.com"),
       URL(string: "https://beta.talk.brave.com"),

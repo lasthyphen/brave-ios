@@ -16,14 +16,18 @@ class FocusHelper: TabContentScript {
   }
 
   static func name() -> String {
-    return "FocusHelper"
+    "FocusHelper"
   }
 
   func scriptMessageHandlerName() -> String? {
-    return "focusHelper"
+    "focusHelper"
   }
 
-  func userContentController(_ userContentController: WKUserContentController, didReceiveScriptMessage message: WKScriptMessage, replyHandler: (Any?, String?) -> Void) {
+  func userContentController(
+    _ userContentController: WKUserContentController,
+    didReceiveScriptMessage message: WKScriptMessage,
+    replyHandler: (Any?, String?) -> Void
+  ) {
     defer { replyHandler(nil, nil) }
 
     guard let body = message.body as? [String: AnyObject] else {
@@ -40,7 +44,7 @@ class FocusHelper: TabContentScript {
     }
 
     guard let _ = data["elementType"],
-      let eventType = data["eventType"]
+          let eventType = data["eventType"]
     else {
       return log.error("FocusHelper.js sent wrong keys for message")
     }

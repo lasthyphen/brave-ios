@@ -66,7 +66,7 @@ class PlaylistMediaStreamer {
 
   private func streamingFallback(_ item: PlaylistInfo) -> Combine.Deferred<AnyPublisher<Void, PlaybackError>> {
     // Fallback to web stream
-    return Deferred {
+    Deferred {
       var cancelled = false
 
       return Future { [weak self] resolver in
@@ -78,7 +78,9 @@ class PlaylistMediaStreamer {
         self.webLoader = PlaylistWebLoader(
           certStore: self.certStore,
           handler: { [weak self] newItem in
-            guard let self = self else { return }
+            guard let self = self else {
+              return
+            }
             defer {
               // Destroy the web loader when the callback is complete.
               self.webLoader?.removeFromSuperview()
@@ -117,8 +119,8 @@ class PlaylistMediaStreamer {
   // Would be nice if AVPlayer could detect the mime-type from the URL for my delegate without a head request..
   // This function only exists because I can't figure out why videos from URLs don't play unless I explicitly specify a mime-type..
   private func canStreamURL(_ url: URL) -> Combine.Deferred<AnyPublisher<Bool, PlaybackError>> {
-    return Deferred {
-      return Future { resolver in
+    Deferred {
+      Future { resolver in
         PlaylistMediaStreamer.getMimeType(url) { mimeType in
           if let mimeType = mimeType {
             resolver(.success(!mimeType.isEmpty))
@@ -177,8 +179,9 @@ class PlaylistMediaStreamer {
         requestHandler: { _ -> UIImage in
           // Do not resize image here.
           // According to Apple it isn't necessary to use expensive resize operations
-          return image
-        })
+          image
+        }
+      )
       setNowPlayingMediaArtwork(artwork: artwork)
     } else {
       setNowPlayingMediaArtwork(artwork: nil)
@@ -200,7 +203,10 @@ class PlaylistMediaStreamer {
       // https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Range
       request.addValue("bytes=0-1", forHTTPHeaderField: "Range")
       request.addValue(UUID().uuidString, forHTTPHeaderField: "X-Playback-Session-Id")
-      request.addValue(UserAgent.shouldUseDesktopMode ? UserAgent.desktop : UserAgent.mobile, forHTTPHeaderField: "User-Agent")
+      request.addValue(
+        UserAgent.shouldUseDesktopMode ? UserAgent.desktop : UserAgent.mobile,
+        forHTTPHeaderField: "User-Agent"
+      )
       return request
     }()
 
@@ -212,7 +218,8 @@ class PlaylistMediaStreamer {
           return completion(nil)
         }
 
-        if let response = response as? HTTPURLResponse, response.statusCode == 302 || response.statusCode >= 200 && response.statusCode <= 299 {
+        if let response = response as? HTTPURLResponse,
+           response.statusCode == 302 || response.statusCode >= 200 && response.statusCode <= 299 {
           if let contentType = response.allHeaderFields["Content-Type"] as? String {
             completion(contentType)
             return

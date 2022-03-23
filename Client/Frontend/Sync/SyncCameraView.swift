@@ -69,6 +69,7 @@ class SyncCameraView: UIView, AVCaptureMetadataOutputObjectsDelegate {
     return button
   }
 
+  @available(*, unavailable)
   required init?(coder aDecoder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }
@@ -137,7 +138,8 @@ class SyncCameraView: UIView, AVCaptureMetadataOutputObjectsDelegate {
             self.bringSubviewToFront(self.openSettingsButton)
           }
         }
-      })
+      }
+    )
   }
 
   func startRunning() {
@@ -148,9 +150,14 @@ class SyncCameraView: UIView, AVCaptureMetadataOutputObjectsDelegate {
     captureSession?.stopRunning()
   }
 
-  func metadataOutput(_ output: AVCaptureMetadataOutput, didOutput metadataObjects: [AVMetadataObject], from connection: AVCaptureConnection) {
-
-    if metadataObjects.isEmpty { return }
+  func metadataOutput(
+    _ output: AVCaptureMetadataOutput,
+    didOutput metadataObjects: [AVMetadataObject],
+    from connection: AVCaptureConnection
+  ) {
+    if metadataObjects.isEmpty {
+      return
+    }
 
     guard let metadataObj = metadataObjects[0] as? AVMetadataMachineReadableCodeObject else {
       assertionFailure("Could not cast metadataObj to AVMetadataMachineReadableCodeObject")

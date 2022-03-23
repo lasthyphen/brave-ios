@@ -32,7 +32,17 @@ public struct PlaylistInfo: Codable {
     self.tagId = ""
   }
 
-  public init(name: String, src: String, pageSrc: String, pageTitle: String, mimeType: String, duration: TimeInterval, detected: Bool, dateAdded: Date, tagId: String) {
+  public init(
+    name: String,
+    src: String,
+    pageSrc: String,
+    pageTitle: String,
+    mimeType: String,
+    duration: TimeInterval,
+    detected: Bool,
+    dateAdded: Date,
+    tagId: String
+  ) {
     self.name = name
     self.src = src
     self.pageSrc = pageSrc

@@ -15,7 +15,6 @@ private let log = Logger.browserLogger
 // MARK: - Core Migration Browser Extension
 
 extension BrowserViewController {
-
   func doSyncMigration() {
     // We stop ever attempting migration after 3 times.
     if Preferences.Chromium.syncV2ObjectMigrationCount.value < 3 {
@@ -25,7 +24,8 @@ extension BrowserViewController {
             let alert = UIAlertController(
               title: error.failureReason,
               message: error.localizedDescription,
-              preferredStyle: .alert)
+              preferredStyle: .alert
+            )
             alert.addAction(UIAlertAction(title: Strings.OKString, style: .default, handler: nil))
             self.present(alert, animated: true)
           }
@@ -52,7 +52,9 @@ extension BrowserViewController {
       return BookmarksInterstitialPageHandler.showBookmarksPage(tabManager: self.tabManager, url: url)
     }
 
-    guard let migrator = migration?.braveCoreSyncObjectsMigrator else { return }
+    guard let migrator = migration?.braveCoreSyncObjectsMigrator else {
+      return
+    }
 
     migrator.migrate { error in
       Preferences.Chromium.syncV2ObjectMigrationCount.value += 1

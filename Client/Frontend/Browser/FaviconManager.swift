@@ -11,11 +11,10 @@ import Deferred
 import Sync
 
 class FaviconManager: TabContentScript {
-
   let profile: Profile!
   weak var tab: Tab?
 
-  static let maximumFaviconSize = 1 * 1024 * 1024  // 1 MiB file size limit
+  static let maximumFaviconSize = 1 * 1024 * 1024 // 1 MiB file size limit
 
   init(tab: Tab, profile: Profile) {
     self.profile = profile
@@ -30,20 +29,20 @@ class FaviconManager: TabContentScript {
   }
 
   class func name() -> String {
-    return "FaviconsManager"
+    "FaviconsManager"
   }
 
   func scriptMessageHandlerName() -> String? {
-    return "faviconsMessageHandler"
+    "faviconsMessageHandler"
   }
 
   fileprivate func loadFavicons(_ tab: Tab, profile: Profile, favicons: [Favicon]) -> Deferred<[Maybe<Favicon>]> {
     var deferreds: [() -> Deferred<Maybe<Favicon>>]
     deferreds = favicons.map { favicon in
-      return { [weak tab] () -> Deferred<Maybe<Favicon>> in
+      { [weak tab] () -> Deferred<Maybe<Favicon>> in
         if let tab = tab,
-          let url = URL(string: favicon.url),
-          let currentURL = tab.url {
+           let url = URL(string: favicon.url),
+           let currentURL = tab.url {
           return self.getFavicon(tab, iconUrl: url, currentURL: currentURL, icon: favicon, profile: profile)
         } else {
           return deferMaybe(FaviconError())
@@ -53,7 +52,13 @@ class FaviconManager: TabContentScript {
     return all(deferreds.map({ $0() }))
   }
 
-  func getFavicon(_ tab: Tab, iconUrl: URL, currentURL: URL, icon: Favicon, profile: Profile) -> Deferred<Maybe<Favicon>> {
+  func getFavicon(
+    _ tab: Tab,
+    iconUrl: URL,
+    currentURL: URL,
+    icon: Favicon,
+    profile: Profile
+  ) -> Deferred<Maybe<Favicon>> {
     let deferred = Deferred<Maybe<Favicon>>()
     let manager = SDWebImageManager.shared()
     let options: [SDWebImageOptions] = tab.isPrivate ? [.lowPriority, .cacheMemoryOnly] : [.lowPriority]
@@ -89,18 +94,22 @@ class FaviconManager: TabContentScript {
     var fetch: SDWebImageOperation?
     fetch = manager.loadImage(
       with: iconUrl, options: SDWebImageOptions(options),
-      progress: { (receivedSize, expectedSize, _) in
+      progress: { receivedSize, expectedSize, _ in
         if receivedSize > FaviconManager.maximumFaviconSize || expectedSize > FaviconManager.maximumFaviconSize {
           fetch?.cancel()
         }
       },
-      completed: { (img, _, _, _, _, url) in
+      completed: { img, _, _, _, _, url in
         loadImageCompleted(img, url)
-      })
+      }
+    )
     return deferred
   }
 
-  func userContentController(_ userContentController: WKUserContentController, didReceiveScriptMessage message: WKScriptMessage) {
+  func userContentController(
+    _ userContentController: WKUserContentController,
+    didReceiveScriptMessage message: WKScriptMessage
+  ) {
     self.tab?.favicons.removeAll(keepingCapacity: false)
     if let tab = self.tab, let currentURL = tab.url {
       var favicons = [Favicon]()
@@ -113,7 +122,7 @@ class FaviconManager: TabContentScript {
         }
       }
       loadFavicons(tab, profile: profile, favicons: favicons).uponQueue(.main) { result in
-        let results = result.flatMap({ $0.successValue })
+        let results = result.flatMap(\.successValue)
         let faviconsReadOnly = favicons
         if results.count == 1 && faviconsReadOnly[0].type == .guess {
           // No favicon is indicated in the HTML
@@ -140,6 +149,6 @@ class FaviconManager: TabContentScript {
 
 class FaviconError: MaybeErrorType {
   internal var description: String {
-    return "No Image Loaded"
+    "No Image Loaded"
   }
 }

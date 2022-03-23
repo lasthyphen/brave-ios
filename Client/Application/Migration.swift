@@ -12,7 +12,6 @@ import BraveCore
 private let log = Logger.browserLogger
 
 class Migration {
-
   private(set) public var braveCoreSyncObjectsMigrator: BraveCoreMigrator?
   private let braveCore: BraveCoreMain
 
@@ -21,7 +20,8 @@ class Migration {
   }
 
   public static var isChromiumMigrationCompleted: Bool {
-    return Preferences.Chromium.syncV2BookmarksMigrationCompleted.value && Preferences.Chromium.syncV2HistoryMigrationCompleted.value && Preferences.Chromium.syncV2PasswordMigrationCompleted.value
+    Preferences.Chromium.syncV2BookmarksMigrationCompleted.value && Preferences.Chromium.syncV2HistoryMigrationCompleted
+      .value && Preferences.Chromium.syncV2PasswordMigrationCompleted.value
   }
 
   func launchMigrations(keyPrefix: String, profile: Profile) {
@@ -91,7 +91,8 @@ class Migration {
     FileManager.default.moveFile(
       sourceName: "CookiesData.json", sourceLocation: .documentDirectory,
       destinationName: "CookiesData.json",
-      destinationLocation: .applicationSupportDirectory)
+      destinationLocation: .applicationSupportDirectory
+    )
   }
 
   private func movePlaylistV1Items() {
@@ -102,7 +103,7 @@ class Migration {
     }
 
     guard let libraryPath = FileManager.default.urls(for: .libraryDirectory, in: .userDomainMask).first,
-      let playlistDirectory = PlaylistDownloadManager.playlistDirectory
+          let playlistDirectory = PlaylistDownloadManager.playlistDirectory
     else {
       return
     }
@@ -112,16 +113,18 @@ class Migration {
       let urls = try FileManager.default.contentsOfDirectory(
         at: libraryPath,
         includingPropertiesForKeys: nil,
-        options: [.skipsHiddenFiles])
+        options: [.skipsHiddenFiles]
+      )
       for url in urls where url.absoluteString.contains("com.apple.UserManagedAssets") {
         do {
           let assets = try FileManager.default.contentsOfDirectory(
             at: url,
             includingPropertiesForKeys: nil,
-            options: [.skipsHiddenFiles])
+            options: [.skipsHiddenFiles]
+          )
           assets.forEach({
             if let item = PlaylistItem.cachedItem(cacheURL: $0),
-              let pageSrc = item.pageSrc {
+               let pageSrc = item.pageSrc {
               let destination = playlistDirectory.appendingPathComponent($0.lastPathComponent)
 
               do {
@@ -152,7 +155,7 @@ class Migration {
     func migrateItemsToSavedFolder(folderUUID: String) {
       let items = PlaylistItem.getItems(parentFolder: nil)
       if !items.isEmpty {
-        PlaylistItem.moveItems(items: items.map({ $0.objectID }), to: folderUUID)
+        PlaylistItem.moveItems(items: items.map(\.objectID), to: folderUUID)
       }
 
       Preferences.Migration.playlistV2FoldersInitialMigrationCompleted.value = true
@@ -161,7 +164,10 @@ class Migration {
     if PlaylistFolder.getFolder(uuid: PlaylistFolder.savedFolderUUID) != nil {
       migrateItemsToSavedFolder(folderUUID: PlaylistFolder.savedFolderUUID)
     } else {
-      PlaylistFolder.addFolder(title: Strings.PlaylistFolders.playlistSavedFolderTitle, uuid: PlaylistFolder.savedFolderUUID) { uuid in
+      PlaylistFolder.addFolder(
+        title: Strings.PlaylistFolders.playlistSavedFolderTitle,
+        uuid: PlaylistFolder.savedFolderUUID
+      ) { uuid in
         if PlaylistFolder.getFolder(uuid: uuid) != nil {
           migrateItemsToSavedFolder(folderUUID: uuid)
         } else {
@@ -181,7 +187,9 @@ class Migration {
       movePlaylistV2Items()
     }
 
-    if Preferences.Migration.coreDataCompleted.value { return }
+    if Preferences.Migration.coreDataCompleted.value {
+      return
+    }
 
     // In 1.6.6 we included private tabs in CoreData (temporarely) until the user did one of the following:
     //  - Cleared private data
@@ -198,9 +206,9 @@ class Migration {
   }
 }
 
-fileprivate extension Preferences {
+extension Preferences {
   /// Migration preferences
-  final class Migration {
+  fileprivate final class Migration {
     static let completed = Option<Bool>(key: "migration.completed", default: false)
     /// Old app versions were using documents directory to store app files, database, adblock files.
     /// These files are now moved to 'Application Support' folder, and documents directory is left
@@ -219,11 +227,12 @@ fileprivate extension Preferences {
     // then do CRUD operations on the db if needed.
     static let coreDataCompleted = Option<Bool>(
       key: "migration.cd-completed",
-      default: Preferences.Migration.completed.value)
+      default: Preferences.Migration.completed.value
+    )
   }
 
   /// Migrate the users preferences from prior versions of the app (<2.0)
-  class func migratePreferences(keyPrefix: String) {
+  fileprivate class func migratePreferences(keyPrefix: String) {
     if Preferences.Migration.completed.value {
       return
     }
@@ -265,7 +274,6 @@ fileprivate extension Preferences {
 
     // Solely for 1.6.6 -> 1.7 migration
     if let pinLockInfo = KeychainWrapper.standard.object(forKey: "pinLockInfo") as? AuthenticationKeychainInfo {
-
       // Checks if browserLock was enabled in old app (1.6.6)
       let browserLockKey = "\(keyPrefix)browserLock"
       let isBrowserLockEnabled = Preferences.defaultContainer.bool(forKey: browserLockKey)

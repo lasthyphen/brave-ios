@@ -12,7 +12,6 @@ import BraveShared
 private let log = Logger.browserLogger
 
 class BookmarksInterstitialPageHandler {
-
   class func showBookmarksPage(tabManager: TabManager, url: URL) -> Bool {
     if !FileManager.default.fileExists(atPath: url.absoluteString) {
       return false
@@ -38,13 +37,14 @@ extension BookmarksInterstitialPageHandler {
     let registerHandler = { (page: String) in
       webServer.registerHandlerForMethod(
         "GET", module: "interstitial", resource: page,
-        handler: { (request) -> GCDWebServerResponse? in
+        handler: { request -> GCDWebServerResponse? in
           guard let url = request?.url, request?.headers["X-REQUEST-INTERSTITIAL-INFO"]?.isEmpty == false else {
             return GCDWebServerResponse(statusCode: 404)
           }
 
           return BookmarksInterstitialPageHandler.responseForURL(url, headers: request?.headers ?? [:])
-        })
+        }
+      )
     }
 
     webServer.registerMainBundleResource("Bookmarks.html", module: "interstitial")

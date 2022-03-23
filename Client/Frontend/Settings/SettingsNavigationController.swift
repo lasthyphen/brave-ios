@@ -23,15 +23,15 @@ class SettingsNavigationController: UINavigationController {
   }
 
   override var supportedInterfaceOrientations: UIInterfaceOrientationMask {
-    return .portrait
+    .portrait
   }
 
   override var preferredInterfaceOrientationForPresentation: UIInterfaceOrientation {
-    return .portrait
+    .portrait
   }
 
   override var shouldAutorotate: Bool {
-    return false
+    false
   }
 }
 
@@ -41,6 +41,6 @@ protocol PresentingModalViewControllerDelegate {
 
 class ModalSettingsNavigationController: UINavigationController {
   override var preferredStatusBarStyle: UIStatusBarStyle {
-    return .default
+    .default
   }
 }

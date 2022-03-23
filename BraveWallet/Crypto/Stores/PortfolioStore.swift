@@ -41,6 +41,7 @@ public class PortfolioStore: ObservableObject {
       }
     }
   }
+
   /// A set of balances of your portfolio's visible assets based on `timeframe`
   @Published private(set) var historicalBalances: [BalanceTimePrice] = []
   /// Whether or not balances are still currently loading
@@ -88,7 +89,11 @@ public class PortfolioStore: ObservableObject {
   }
 
   /// Fetches the balances for a given list of tokens for each of the given accounts, giving a dictionary with a balance for each token symbol.
-  private func fetchBalances(for tokens: [BraveWallet.BlockchainToken], accounts: [BraveWallet.AccountInfo], completion: @escaping ([String: Double]) -> Void) {
+  private func fetchBalances(
+    for tokens: [BraveWallet.BlockchainToken],
+    accounts: [BraveWallet.AccountInfo],
+    completion: @escaping ([String: Double]) -> Void
+  ) {
     var balances: [String: Double] = [:]
     let group = DispatchGroup()
     for account in accounts {
@@ -108,7 +113,8 @@ public class PortfolioStore: ObservableObject {
       queue: .main,
       execute: {
         completion(balances)
-      })
+      }
+    )
   }
 
   /// Fetches the prices for a given list of symbols, giving a dictionary with the price for each symbol
@@ -126,7 +132,10 @@ public class PortfolioStore: ObservableObject {
   }
 
   /// Fetches the price history for the given symbols, giving a dictionary with the price history for each symbol
-  private func fetchPriceHistory(for symbols: [String], completion: @escaping ([String: [BraveWallet.AssetTimePrice]]) -> Void) {
+  private func fetchPriceHistory(
+    for symbols: [String],
+    completion: @escaping ([String: [BraveWallet.AssetTimePrice]]) -> Void
+  ) {
     var priceHistories: [String: [BraveWallet.AssetTimePrice]] = [:]
     let group = DispatchGroup()
     for symbol in symbols {
@@ -138,7 +147,9 @@ public class PortfolioStore: ObservableObject {
         timeframe: timeframe
       ) { success, history in
         defer { group.leave() }
-        guard success else { return }
+        guard success else {
+          return
+        }
         priceHistories[symbol] = history.sorted(by: { $0.date < $1.date })
       }
     }
@@ -146,7 +157,8 @@ public class PortfolioStore: ObservableObject {
       queue: .main,
       execute: {
         completion(priceHistories)
-      })
+      }
+    )
   }
 
   func update() {
@@ -163,7 +175,7 @@ public class PortfolioStore: ObservableObject {
         keyringService.defaultKeyringInfo { [self] keyring in
           fetchBalances(for: visibleTokens, accounts: keyring.accountInfos) { [self] fetchedBalances in
             balances = fetchedBalances
-            let nonZeroBalanceTokens = balances.filter { $1 > 0 }.map { $0.key }
+            let nonZeroBalanceTokens = balances.filter { $1 > 0 }.map(\.key)
             fetchPriceHistory(for: nonZeroBalanceTokens) { fetchedPriceHistories in
               defer { dispatchGroup.leave() }
               priceHistories = fetchedPriceHistories
@@ -192,17 +204,17 @@ public class PortfolioStore: ObservableObject {
           // Compute balance based on current prices
           let currentBalance =
             userVisibleAssets
-            .compactMap {
-              if let price = Double($0.price) {
-                return $0.decimalBalance * price
+              .compactMap {
+                if let price = Double($0.price) {
+                  return $0.decimalBalance * price
+                }
+                return nil
               }
-              return nil
-            }
-            .reduce(0.0, +)
+              .reduce(0.0, +)
           balance = numberFormatter.string(from: NSNumber(value: currentBalance)) ?? "–"
           // Compute historical balances based on historical prices and current balances
-          let assets = userVisibleAssets.filter { !$0.history.isEmpty }  // [[AssetTimePrice]]
-          let minCount = assets.map(\.history.count).min() ?? 0  // Shortest array count
+          let assets = userVisibleAssets.filter { !$0.history.isEmpty } // [[AssetTimePrice]]
+          let minCount = assets.map(\.history.count).min() ?? 0 // Shortest array count
           historicalBalances = (0..<minCount).map { index in
             let value = assets.reduce(0.0, {
               $0 + ((Double($1.history[index].price) ?? 0.0) * $1.decimalBalance)
@@ -239,21 +251,28 @@ extension PortfolioStore: BraveWalletKeyringServiceObserver {
   public func accountsChanged() {
     update()
   }
+
   public func backedUp() {
   }
+
   public func keyringCreated(_ keyringId: String) {
   }
+
   public func keyringRestored(_ keyringId: String) {
   }
+
   public func locked() {
   }
+
   public func unlocked() {
     DispatchQueue.main.async { [self] in
       update()
     }
   }
+
   public func autoLockMinutesChanged() {
   }
+
   public func selectedAccountChanged(_ coinType: BraveWallet.CoinType) {
   }
 }

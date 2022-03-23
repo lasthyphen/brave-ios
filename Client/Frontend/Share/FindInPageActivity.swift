@@ -13,11 +13,11 @@ class FindInPageActivity: UIActivity {
   }
 
   override var activityTitle: String? {
-    return Strings.findInPage
+    Strings.findInPage
   }
 
   override var activityImage: UIImage? {
-    return #imageLiteral(resourceName: "shareFindInPage")
+    #imageLiteral(resourceName: "shareFindInPage")
   }
 
   override func perform() {
@@ -26,6 +26,6 @@ class FindInPageActivity: UIActivity {
   }
 
   override func canPerform(withActivityItems activityItems: [Any]) -> Bool {
-    return true
+    true
   }
 }

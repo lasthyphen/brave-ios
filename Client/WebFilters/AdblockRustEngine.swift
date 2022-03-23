@@ -10,7 +10,7 @@ import BraveCore
 
 extension Data {
   fileprivate var int8Array: [Int8] {
-    return self.map { Int8(bitPattern: $0) }
+    self.map { Int8(bitPattern: $0) }
   }
 }
 
@@ -44,7 +44,8 @@ public class AdblockRustEngine {
       engine, requestUrl, requestHost,
       sourceHost, thirdPartyRequest, "script",
       &didMatchRule, &didMatchException, &didMatchImportant,
-      UnsafeMutablePointer(mutating: &emptyPointer))
+      UnsafeMutablePointer(mutating: &emptyPointer)
+    )
     return didMatchRule
   }
 
@@ -55,7 +56,9 @@ public class AdblockRustEngine {
     deserializationPending = true
 
     let status = engine_deserialize(engine, data.int8Array, data.count)
-    if !status { assertionFailure("Failed to deserialize engine") }
+    if !status {
+      assertionFailure("Failed to deserialize engine")
+    }
 
     deserializationPending = false
     return status

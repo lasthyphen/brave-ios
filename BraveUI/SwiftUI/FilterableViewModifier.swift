@@ -45,9 +45,11 @@ private class SearchDelegate: NSObject, UISearchBarDelegate, ObservableObject {
   func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
     query = searchText
   }
+
   func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
     query = ""
   }
+
   func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
     onSubmit?()
   }
@@ -66,9 +68,9 @@ private struct SearchableViewModifier_FB9812596: ViewModifier {
       placement: .navigationBarDrawer(displayMode: .always),
       prompt: prompt.map { Text($0) }
     )
-    .onSubmit(of: .search) {
-      onSubmit?()
-    }
+      .onSubmit(of: .search) {
+        onSubmit?()
+      }
   }
 }
 

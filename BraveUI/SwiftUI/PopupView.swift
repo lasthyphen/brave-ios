@@ -7,7 +7,8 @@ import Foundation
 import SwiftUI
 
 /// Presents a SwiftUI view heirarchy in a popup that displays in the center of the screen
-public class PopupViewController<Content: View>: UIViewController, UIViewControllerTransitioningDelegate, BasicAnimationControllerDelegate {
+public class PopupViewController<Content: View>: UIViewController, UIViewControllerTransitioningDelegate,
+BasicAnimationControllerDelegate {
   private let hostingController: UIHostingController<PopupView<Content>>
 
   private let backgroundView = UIView().then {
@@ -77,7 +78,11 @@ public class PopupViewController<Content: View>: UIViewController, UIViewControl
     BasicAnimationController(delegate: self, direction: .dismissing)
   }
 
-  public func animationController(forPresented presented: UIViewController, presenting: UIViewController, source: UIViewController) -> UIViewControllerAnimatedTransitioning? {
+  public func animationController(
+    forPresented presented: UIViewController,
+    presenting: UIViewController,
+    source: UIViewController
+  ) -> UIViewControllerAnimatedTransitioning? {
     BasicAnimationController(delegate: self, direction: .presenting)
   }
 }

@@ -9,7 +9,6 @@ import BraveUI
 import Shared
 
 class LoginAuthViewController: UITableViewController {
-
   private let windowProtection: WindowProtection?
 
   // MARK: Lifecycle
@@ -20,6 +19,7 @@ class LoginAuthViewController: UITableViewController {
     super.init(nibName: nil, bundle: nil)
   }
 
+  @available(*, unavailable)
   required init?(coder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }
@@ -36,16 +36,20 @@ class LoginAuthViewController: UITableViewController {
     NotificationCenter.default.do {
       $0.addObserver(
         self, selector: #selector(removeBackgroundedBlur),
-        name: UIApplication.willEnterForegroundNotification, object: nil)
+        name: UIApplication.willEnterForegroundNotification, object: nil
+      )
       $0.addObserver(
         self, selector: #selector(removeBackgroundedBlur),
-        name: UIApplication.didBecomeActiveNotification, object: nil)
+        name: UIApplication.didBecomeActiveNotification, object: nil
+      )
       $0.addObserver(
         self, selector: #selector(blurContents),
-        name: UIApplication.willResignActiveNotification, object: nil)
+        name: UIApplication.willResignActiveNotification, object: nil
+      )
       $0.addObserver(
         self, selector: #selector(blurContents),
-        name: UIApplication.didEnterBackgroundNotification, object: nil)
+        name: UIApplication.didEnterBackgroundNotification, object: nil
+      )
     }
   }
 
@@ -74,7 +78,8 @@ class LoginAuthViewController: UITableViewController {
     let alert = UIAlertController(
       title: Strings.Login.loginInfoSetPasscodeAlertTitle,
       message: Strings.Login.loginInfoSetPasscodeAlertDescription,
-      preferredStyle: .alert)
+      preferredStyle: .alert
+    )
 
     alert.addAction(UIAlertAction(title: Strings.OKString, style: .default, handler: nil))
 

@@ -4,7 +4,7 @@
 
 import Foundation
 
-fileprivate func getDate(dayOffset: Int) -> Date {
+private func getDate(dayOffset: Int) -> Date {
   let calendar = Calendar(identifier: .gregorian)
   let components = calendar.dateComponents([.year, .month, .day], from: Date())
   let today = calendar.date(from: components)!
@@ -22,7 +22,7 @@ public struct DateGroupedTableData<T: Equatable> {
   var older: [(T, TimeInterval)] = []
 
   public var isEmpty: Bool {
-    return today.isEmpty && yesterday.isEmpty && lastWeek.isEmpty && older.isEmpty
+    today.isEmpty && yesterday.isEmpty && lastWeek.isEmpty && older.isEmpty
   }
 
   public init() {}
@@ -71,13 +71,13 @@ public struct DateGroupedTableData<T: Equatable> {
   public func itemsForSection(_ section: Int) -> [T] {
     switch section {
     case 0:
-      return today.map({ $0.0 })
+      return today.map(\.0)
     case 1:
-      return yesterday.map({ $0.0 })
+      return yesterday.map(\.0)
     case 2:
-      return lastWeek.map({ $0.0 })
+      return lastWeek.map(\.0)
     default:
-      return older.map({ $0.0 })
+      return older.map(\.0)
     }
   }
 }

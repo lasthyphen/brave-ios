@@ -17,6 +17,7 @@ public class SendTokenStore: ObservableObject {
       fetchAssetBalance()
     }
   }
+
   /// The current selected token balance. Default with nil value.
   @Published var selectedSendTokenBalance: Double?
   /// A boolean indicates if this store is making an unapproved tx
@@ -29,9 +30,11 @@ public class SendTokenStore: ObservableObject {
         withTimeInterval: 0.25, repeats: false,
         block: { [weak self] _ in
           self?.validateSendAddress()
-        })
+        }
+      )
     }
   }
+
   /// An error for input send address. Nil for no error.
   @Published var addressError: AddressError?
 
@@ -89,7 +92,9 @@ public class SendTokenStore: ObservableObject {
 
   func fetchAssets() {
     rpcService.network { [weak self] network in
-      guard let self = self else { return }
+      guard let self = self else {
+        return
+      }
       self.walletService.userAssets(network.chainId) { tokens in
         self.userAssets = tokens
 
@@ -138,11 +143,11 @@ public class SendTokenStore: ObservableObject {
       let balanceFormatter = WeiFormatter(decimalFormatStyle: .balance)
       func updateBalance(_ status: BraveWallet.ProviderError, _ balance: String) {
         guard status == .success,
-          let decimalString = balanceFormatter.decimalString(
-            for: balance.removingHexPrefix,
-            radix: .hex,
-            decimals: Int(token.decimals)
-          ), !decimalString.isEmpty, let decimal = Double(decimalString)
+              let decimalString = balanceFormatter.decimalString(
+                for: balance.removingHexPrefix,
+                radix: .hex,
+                decimals: Int(token.decimals)
+              ), !decimalString.isEmpty, let decimal = Double(decimalString)
         else {
           return
         }
@@ -197,7 +202,13 @@ public class SendTokenStore: ObservableObject {
     from address: String,
     completion: @escaping (_ success: Bool) -> Void
   ) {
-    let eip1559Data = BraveWallet.TxData1559(baseData: baseData, chainId: chainId, maxPriorityFeePerGas: "", maxFeePerGas: "", gasEstimation: nil)
+    let eip1559Data = BraveWallet.TxData1559(
+      baseData: baseData,
+      chainId: chainId,
+      maxPriorityFeePerGas: "",
+      maxFeePerGas: "",
+      gasEstimation: nil
+    )
     let txDataUnion = BraveWallet.TxDataUnion(ethTxData1559: eip1559Data)
     self.txService.addUnapprovedTransaction(txDataUnion, from: address) { success, txMetaId, errorMessage in
       completion(success)
@@ -231,14 +242,25 @@ public class SendTokenStore: ObservableObject {
       let token = selectedSendToken,
       let weiHexString = weiFormatter.weiString(from: amount, radix: .hex, decimals: Int(token.decimals)),
       let fromAddress = currentAccountAddress
-    else { return }
+    else {
+      return
+    }
 
     isMakingTx = true
     rpcService.network { [weak self] network in
-      guard let self = self else { return }
+      guard let self = self else {
+        return
+      }
 
       if token.contractAddress.isEmpty {
-        let baseData = BraveWallet.TxData(nonce: "", gasPrice: "", gasLimit: "", to: self.sendAddress, value: "0x\(weiHexString)", data: .init())
+        let baseData = BraveWallet.TxData(
+          nonce: "",
+          gasPrice: "",
+          gasLimit: "",
+          to: self.sendAddress,
+          value: "0x\(weiHexString)",
+          data: .init()
+        )
         if network.isEip1559 {
           self.makeEIP1559Tx(chainId: network.chainId, baseData: baseData, from: fromAddress) { success in
             self.isMakingTx = false
@@ -257,7 +279,14 @@ public class SendTokenStore: ObservableObject {
             completion(false)
             return
           }
-          let baseData = BraveWallet.TxData(nonce: "", gasPrice: "", gasLimit: "", to: token.contractAddress, value: "0x0", data: data)
+          let baseData = BraveWallet.TxData(
+            nonce: "",
+            gasPrice: "",
+            gasLimit: "",
+            to: token.contractAddress,
+            value: "0x0",
+            data: data
+          )
           if network.isEip1559 {
             self.makeEIP1559Tx(chainId: network.chainId, baseData: baseData, from: fromAddress) { success in
               self.isMakingTx = false

@@ -8,7 +8,6 @@ import Data
 import Shared
 
 class LinkPreviewViewController: UIViewController {
-
   let url: URL
 
   init(url: URL) {
@@ -30,7 +29,9 @@ class LinkPreviewViewController: UIViewController {
 
     BlocklistName.blocklists(forDomain: domain).on.forEach {
       ContentBlockerHelper.ruleStore.lookUpContentRuleList(forIdentifier: $0.filename) { rule, _ in
-        guard let rule = rule else { return }
+        guard let rule = rule else {
+          return
+        }
         wk.configuration.userContentController.add(rule)
       }
     }

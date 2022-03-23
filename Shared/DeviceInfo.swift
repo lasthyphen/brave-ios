@@ -6,7 +6,28 @@ import UIKit
 
 open class DeviceInfo {
   // List of device names that don't support advanced visual settings
-  static let lowGraphicsQualityModels = ["iPad", "iPad1,1", "iPhone1,1", "iPhone1,2", "iPhone2,1", "iPhone3,1", "iPhone3,2", "iPhone3,3", "iPod1,1", "iPod2,1", "iPod2,2", "iPod3,1", "iPod4,1", "iPad2,1", "iPad2,2", "iPad2,3", "iPad2,4", "iPad3,1", "iPad3,2", "iPad3,3"]
+  static let lowGraphicsQualityModels = [
+    "iPad",
+    "iPad1,1",
+    "iPhone1,1",
+    "iPhone1,2",
+    "iPhone2,1",
+    "iPhone3,1",
+    "iPhone3,2",
+    "iPhone3,3",
+    "iPod1,1",
+    "iPod2,1",
+    "iPod2,2",
+    "iPod3,1",
+    "iPod4,1",
+    "iPad2,1",
+    "iPad2,2",
+    "iPad2,3",
+    "iPad2,4",
+    "iPad3,1",
+    "iPad3,2",
+    "iPad3,3"
+  ]
 
   public static var specificModelName: String {
     var systemInfo = utsname()
@@ -28,7 +49,7 @@ open class DeviceInfo {
 
   /// Return the client name, which can be either "Fennec on Stefan's iPod" or simply "Stefan's iPod" if the application display name cannot be obtained.
   open class func defaultClientName() -> String {
-    return String(format: Strings.appAndDeviceNameFormat, AppInfo.displayName, UIDevice.current.name)
+    String(format: Strings.appAndDeviceNameFormat, AppInfo.displayName, UIDevice.current.name)
   }
 
   open class func clientIdentifier(_ prefs: Prefs) -> String {
@@ -41,11 +62,11 @@ open class DeviceInfo {
   }
 
   open class func deviceModel() -> String {
-    return UIDevice.current.model
+    UIDevice.current.model
   }
 
   open class func isSimulator() -> Bool {
-    return ProcessInfo.processInfo.environment["SIMULATOR_ROOT"] != nil
+    ProcessInfo.processInfo.environment["SIMULATOR_ROOT"] != nil
   }
 
   open class func isBlurSupported() -> Bool {
@@ -54,7 +75,7 @@ open class DeviceInfo {
     // 1. http://stackoverflow.com/questions/21603475/how-can-i-detect-if-the-iphone-my-app-is-on-is-going-to-use-a-simple-transparen
     // 2. https://gist.github.com/conradev/8655650
     // Thus, testing has to take place on actual devices.
-    return !lowGraphicsQualityModels.contains(specificModelName)
+    !lowGraphicsQualityModels.contains(specificModelName)
   }
 
   open class func hasConnectivity() -> Bool {
@@ -79,5 +100,11 @@ open class DeviceInfo {
 }
 
 extension Strings {
-  public static let appAndDeviceNameFormat = NSLocalizedString("AppAndDeviceNameFormat", tableName: "Shared", bundle: Bundle.shared, value: "%@ on %@", comment: "A brief descriptive name for this app on this device, used for Send Tab and Synced Tabs. The first argument is the app name. The second argument is the device name.")
+  public static let appAndDeviceNameFormat = NSLocalizedString(
+    "AppAndDeviceNameFormat",
+    tableName: "Shared",
+    bundle: Bundle.shared,
+    value: "%@ on %@",
+    comment: "A brief descriptive name for this app on this device, used for Send Tab and Synced Tabs. The first argument is the app name. The second argument is the device name."
+  )
 }

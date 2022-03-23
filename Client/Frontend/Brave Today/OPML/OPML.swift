@@ -18,6 +18,7 @@ struct OPML: Equatable {
     /// The URL of this feed
     var xmlUrl: String?
   }
+
   /// The title of the subscription list
   var title: String?
   /// A list of all the feeds contained in the list
@@ -33,18 +34,19 @@ class OPMLParser {
   /// Parses the data passed and returns an OPML object
   static func parse(data: Data) -> OPML? {
     guard let document = try? XMLDocument(data: data),
-      let _ = document.firstChild(xpath: "//opml")
+          let _ = document.firstChild(xpath: "//opml")
     else {
       log.warning("Failed to parse XML document")
       return nil
     }
     let title = document.firstChild(xpath: "//head/title")?.stringValue
-    let outlines = document.xpath("//outline[contains(@type, \"rss\") and not(contains(@isComment, \"true\"))]").map { element in
-      OPML.Outline(
-        text: element["text"],
-        xmlUrl: element["xmlUrl"]
-      )
-    }
+    let outlines = document.xpath("//outline[contains(@type, \"rss\") and not(contains(@isComment, \"true\"))]")
+      .map { element in
+        OPML.Outline(
+          text: element["text"],
+          xmlUrl: element["xmlUrl"]
+        )
+      }
     return OPML(title: title, outlines: outlines)
   }
 }

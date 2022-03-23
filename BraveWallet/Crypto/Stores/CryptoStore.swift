@@ -18,6 +18,7 @@ public class CryptoStore: ObservableObject {
       }
     }
   }
+
   @Published var isPresentingAssetSearch: Bool = false
   @Published var isPresentingTransactionConfirmations: Bool = false {
     didSet {
@@ -26,6 +27,7 @@ public class CryptoStore: ObservableObject {
       }
     }
   }
+
   @Published private(set) var hasUnapprovedTransactions: Bool = false
   
   private let keyringService: BraveWalletKeyringService
@@ -222,9 +224,11 @@ extension CryptoStore: BraveWalletTxServiceObserver {
   public func onNewUnapprovedTx(_ txInfo: BraveWallet.TransactionInfo) {
     fetchUnapprovedTransactions()
   }
+
   public func onUnapprovedTxUpdated(_ txInfo: BraveWallet.TransactionInfo) {
     fetchUnapprovedTransactions()
   }
+
   public func onTransactionStatusChanged(_ txInfo: BraveWallet.TransactionInfo) {
     fetchUnapprovedTransactions()
   }
@@ -233,21 +237,29 @@ extension CryptoStore: BraveWalletTxServiceObserver {
 extension CryptoStore: BraveWalletKeyringServiceObserver {
   public func keyringReset() {
   }
+
   public func keyringCreated(_ keyringId: String) {
   }
+
   public func keyringRestored(_ keyringId: String) {
   }
+
   public func locked() {
     isPresentingTransactionConfirmations = false
   }
+
   public func unlocked() {
   }
+
   public func backedUp() {
   }
+
   public func accountsChanged() {
   }
+
   public func autoLockMinutesChanged() {
   }
+
   public func selectedAccountChanged(_ coinType: BraveWallet.CoinType) {
   }
 }

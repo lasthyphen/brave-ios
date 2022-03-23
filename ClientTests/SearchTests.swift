@@ -2,11 +2,10 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-//import GCDWebServers
+// import GCDWebServers
 @testable import Client
 import UIKit
 import Shared
-
 import XCTest
 
 class SearchTests: XCTestCase {
@@ -17,10 +16,16 @@ class SearchTests: XCTestCase {
     XCTAssertEqual(engine.shortName, "Google")
 
     // Test regular search queries.
-    XCTAssertEqual(engine.searchURLForQuery("foobar")!.absoluteString, "https://www.google.com/search?q=foobar&ie=utf-8&oe=utf-8")
+    XCTAssertEqual(
+      engine.searchURLForQuery("foobar")!.absoluteString,
+      "https://www.google.com/search?q=foobar&ie=utf-8&oe=utf-8"
+    )
 
     // Test search suggestion queries.
-    XCTAssertEqual(engine.suggestURLForQuery("foobar")!.absoluteString, "https://www.google.com/complete/search?client=firefox&q=foobar")
+    XCTAssertEqual(
+      engine.suggestURLForQuery("foobar")!.absoluteString,
+      "https://www.google.com/complete/search?client=firefox&q=foobar"
+    )
   }
 
   func testURIFixup() {
@@ -104,7 +109,10 @@ class SearchTests: XCTestCase {
     // create URL
     let searchTerm = "Foo Bar"
     let encodedSeachTerm = searchTerm.replacingOccurrences(of: " ", with: "+")
-    let googleSearchURL = URL(string: "https://www.google.com/search?q=\(encodedSeachTerm)&ie=utf-8&oe=utf-8&gws_rd=cr&ei=I0UyVp_qK4HtUoytjagM")
+    let googleSearchURL =
+      URL(
+        string: "https://www.google.com/search?q=\(encodedSeachTerm)&ie=utf-8&oe=utf-8&gws_rd=cr&ei=I0UyVp_qK4HtUoytjagM"
+      )
     let duckDuckGoSearchURL = URL(string: "https://duckduckgo.com/?q=\(encodedSeachTerm)&ia=about")
     let invalidSearchURL = URL(string: "https://www.google.co.uk")
 
@@ -116,7 +124,11 @@ class SearchTests: XCTestCase {
 
     // check that it matches given a different configuration
     file = Bundle.main.path(forResource: "duckduckgo", ofType: "xml", inDirectory: "SearchPlugins/")
-    let duckDuckGoEngine: OpenSearchEngine! = parser.parse(file!, engineID: "duckduckgo", referenceURL: "duckduckgo.com/opensearch")
+    let duckDuckGoEngine: OpenSearchEngine! = parser.parse(
+      file!,
+      engineID: "duckduckgo",
+      referenceURL: "duckduckgo.com/opensearch"
+    )
     XCTAssertEqual(searchTerm, duckDuckGoEngine.queryForSearchURL(duckDuckGoSearchURL))
 
     // check it doesn't match search URLs for different configurations

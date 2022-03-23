@@ -56,7 +56,7 @@ enum DefaultEngineType: String {
  * is not thread-safe -- you should only access it on a single thread (usually, the main thread)!
  */
 class SearchEngines {
-  fileprivate let fileAccessor: FileAccessor
+  private let fileAccessor: FileAccessor
 
   private let initialSearchEngines: InitialSearchEngines
   private let locale: Locale
@@ -79,7 +79,7 @@ class SearchEngines {
     let engineType = type ?? (PrivateBrowsingManager.shared.isPrivateBrowsing ? .privateMode : .standard)
 
     if let name = engineType.option.value,
-      let defaultEngine = orderedEngines.first(where: { $0.engineID == name || $0.shortName == name }) {
+       let defaultEngine = orderedEngines.first(where: { $0.engineID == name || $0.shortName == name }) {
       return defaultEngine
     }
 
@@ -103,9 +103,9 @@ class SearchEngines {
     // Sort engines, priority engine at first place
     var newlyOrderedEngines =
       orderedEngines
-      .filter { engine in engine.shortName != defEngine.shortName }
-      .sorted { e1, e2 in e1.shortName < e2.shortName }
-      .sorted { e, _ in e.engineID == priorityEngine }
+        .filter { engine in engine.shortName != defEngine.shortName }
+        .sorted { e1, e2 in e1.shortName < e2.shortName }
+        .sorted { e, _ in e.engineID == priorityEngine }
 
     newlyOrderedEngines.insert(defEngine, at: 0)
     orderedEngines = newlyOrderedEngines
@@ -131,15 +131,14 @@ class SearchEngines {
       newlyOrderedEngines.insert(defaultEngine(forType: type), at: 0)
       orderedEngines = newlyOrderedEngines
     }
-
   }
 
   func isEngineDefault(_ engine: OpenSearchEngine, type: DefaultEngineType? = nil) -> Bool {
-    return defaultEngine(forType: type).shortName == engine.shortName
+    defaultEngine(forType: type).shortName == engine.shortName
   }
 
   // The keys of this dictionary are used as a set.
-  fileprivate var disabledEngineNames: [String: Bool]! {
+  private var disabledEngineNames: [String: Bool]! {
     didSet {
       Preferences.Search.disabledEngines.value = Array(self.disabledEngineNames.keys)
     }
@@ -147,38 +146,36 @@ class SearchEngines {
 
   var orderedEngines: [OpenSearchEngine]! {
     didSet {
-      Preferences.Search.orderedEngines.value = self.orderedEngines.map { $0.shortName }
+      Preferences.Search.orderedEngines.value = self.orderedEngines.map(\.shortName)
     }
   }
 
   var quickSearchEngines: [OpenSearchEngine]! {
-    get {
-      return self.orderedEngines.filter({ (engine) in self.isEngineEnabled(engine) })
-    }
+    self.orderedEngines.filter({ engine in self.isEngineEnabled(engine) })
   }
 
   var shouldShowSearchSuggestionsOptIn: Bool {
-    get { return Preferences.Search.shouldShowSuggestionsOptIn.value }
+    get { Preferences.Search.shouldShowSuggestionsOptIn.value }
     set { Preferences.Search.shouldShowSuggestionsOptIn.value = newValue }
   }
 
   var shouldShowSearchSuggestions: Bool {
-    get { return Preferences.Search.showSuggestions.value }
+    get { Preferences.Search.showSuggestions.value }
     set { Preferences.Search.showSuggestions.value = newValue }
   }
 
   var shouldShowRecentSearchesOptIn: Bool {
-    get { return Preferences.Search.shouldShowRecentSearchesOptIn.value }
+    get { Preferences.Search.shouldShowRecentSearchesOptIn.value }
     set { Preferences.Search.shouldShowRecentSearchesOptIn.value = newValue }
   }
 
   var shouldShowRecentSearches: Bool {
-    get { return Preferences.Search.shouldShowRecentSearches.value }
+    get { Preferences.Search.shouldShowRecentSearches.value }
     set { Preferences.Search.shouldShowRecentSearches.value = newValue }
   }
 
   func isEngineEnabled(_ engine: OpenSearchEngine) -> Bool {
-    return disabledEngineNames.index(forKey: engine.shortName) == nil
+    disabledEngineNames.index(forKey: engine.shortName) == nil
   }
 
   func enableEngine(_ engine: OpenSearchEngine) {
@@ -226,10 +223,10 @@ class SearchEngines {
   }
 
   func queryForSearchURL(_ url: URL?) -> String? {
-    return defaultEngine().queryForSearchURL(url)
+    defaultEngine().queryForSearchURL(url)
   }
 
-  fileprivate func getDisabledEngineNames() -> [String: Bool] {
+  private func getDisabledEngineNames() -> [String: Bool] {
     if let disabledEngineNames = Preferences.Search.disabledEngines.value {
       var disabledEngineDict = [String: Bool]()
       for engineName in disabledEngineNames {
@@ -241,12 +238,12 @@ class SearchEngines {
     }
   }
 
-  fileprivate func customEngineFilePath() -> String {
-    let profilePath = try! self.fileAccessor.getAndEnsureDirectory() as NSString  // swiftlint:disable:this force_try
+  private func customEngineFilePath() -> String {
+    let profilePath = try! self.fileAccessor.getAndEnsureDirectory() as NSString // swiftlint:disable:this force_try
     return profilePath.appendingPathComponent(customSearchEnginesFileName)
   }
 
-  fileprivate lazy var customEngines: [OpenSearchEngine] = {
+  private lazy var customEngines: [OpenSearchEngine] = {
     do {
       let data = try Data(contentsOf: URL(fileURLWithPath: customEngineFilePath()))
       return (try NSKeyedUnarchiver.unarchiveTopLevelObjectWithData(data) as? [OpenSearchEngine]) ?? []
@@ -256,7 +253,7 @@ class SearchEngines {
     }
   }()
 
-  fileprivate func saveCustomEngines() throws {
+  private func saveCustomEngines() throws {
     do {
       let data = try NSKeyedArchiver.archivedData(withRootObject: customEngines, requiringSecureCoding: true)
       try data.write(to: URL(fileURLWithPath: customEngineFilePath()))
@@ -297,22 +294,27 @@ class SearchEngines {
 
     let se = InitialSearchEngines(locale: locale)
     let engines = isOnboarding ? se.onboardingEngines : se.engines
-    let engineIdentifiers: [(id: String, reference: String?)] = engines.map { (id: ($0.customId ?? $0.id.rawValue).lowercased(), reference: $0.reference) }
+    let engineIdentifiers: [(id: String, reference: String?)] = engines
+      .map { (id: ($0.customId ?? $0.id.rawValue).lowercased(), reference: $0.reference) }
     assert(!engineIdentifiers.isEmpty, "No search engines")
 
-    return engineIdentifiers.map({ (name: $0.id, path: pluginDirectory.appendingPathComponent("\($0.id).xml").path, reference: $0.reference) })
+    return engineIdentifiers
+      .map({ (name: $0.id, path: pluginDirectory.appendingPathComponent("\($0.id).xml").path, reference: $0.reference)
+      })
       .filter({ FileManager.default.fileExists(atPath: $0.path) })
       .compactMap({ parser.parse($0.path, engineID: $0.name, referenceURL: $0.reference) })
   }
 
   /// Get all known search engines, possibly as ordered by the user.
-  fileprivate func getOrderedEngines() -> [OpenSearchEngine] {
-    let selectedSearchEngines = [Preferences.Search.defaultEngineName, Preferences.Search.defaultPrivateEngineName].compactMap { $0.value }
+  private func getOrderedEngines() -> [OpenSearchEngine] {
+    let selectedSearchEngines = [Preferences.Search.defaultEngineName, Preferences.Search.defaultPrivateEngineName]
+      .compactMap(\.value)
     let unorderedEngines =
       SearchEngines.getUnorderedBundledEngines(
         for: selectedSearchEngines,
         isOnboarding: false,
-        locale: locale) + customEngines
+        locale: locale
+      ) + customEngines
 
     // might not work to change the default.
     guard let orderedEngineNames = Preferences.Search.orderedEngines.value else {
@@ -369,11 +371,11 @@ class SearchEngines {
   /// Function for creating Yahoo / Yahoo JAPAN as OpenSearchEngine and setting as default
   /// - Parameter isJapan: The boolean to determine Yahoo Engine for JP locale
   private func createDefaultYahooCustomEngine(isJapan: Bool, forType type: DefaultEngineType) {
-
     // MARK: SearchEngineDetails
 
     enum SearchEngineDetails {
-      case yahoo, yahooJapan
+      case yahoo
+      case yahooJapan
 
       var engineName: String {
         switch self {
@@ -414,7 +416,8 @@ class SearchEngines {
       shortName: engineDetails.engineName,
       image: engineDetails.searchEngineImage,
       searchTemplate: engineDetails.engineTemplate,
-      isCustomEngine: true)
+      isCustomEngine: true
+    )
 
     let customMigrationEngineCreated = customEngines.first(where: {
       $0.shortName == searchEngine.shortName

@@ -8,21 +8,21 @@ private let base = 36
 private let tMin = 1
 private let tMax = 26
 private let initialBias = 72
-private let initialN: Int = 128  // 0x80
-private let delimiter: Character = "-";  // '\x2D'
+private let initialN: Int = 128 // 0x80
+private let delimiter: Character = "-" // '\x2D'
 private let prefixPunycode = "xn--"
 private let asciiPunycode = Array("abcdefghijklmnopqrstuvwxyz0123456789")
 
 extension String {
-  fileprivate func toValue(_ index: Int) -> Character {
-    return asciiPunycode[index]
+  private func toValue(_ index: Int) -> Character {
+    asciiPunycode[index]
   }
 
-  fileprivate func toIndex(_ value: Character) -> Int {
-    return asciiPunycode.firstIndex(of: value)!
+  private func toIndex(_ value: Character) -> Int {
+    asciiPunycode.firstIndex(of: value)!
   }
 
-  fileprivate func adapt(_ delta: Int, numPoints: Int, firstTime: Bool) -> Int {
+  private func adapt(_ delta: Int, numPoints: Int, firstTime: Bool) -> Int {
     let skew = 38
     let damp = firstTime ? 700 : 2
     var delta = delta
@@ -36,7 +36,7 @@ extension String {
     return k + ((base - tMin + 1) * delta) / (delta + skew)
   }
 
-  fileprivate func encode(_ input: String) -> String {
+  private func encode(_ input: String) -> String {
     var output = ""
     var d: Int = 0
     var extendedChars = [Int]()
@@ -116,7 +116,7 @@ extension String {
     return output
   }
 
-  fileprivate func decode(_ punycode: String) -> String {
+  private func decode(_ punycode: String) -> String {
     let input = Array(punycode)
     var output = [Character]()
     var i = 0
@@ -146,7 +146,7 @@ extension String {
         k += base
       }
       outputLength += 1
-      bias = adapt(i - oldi, numPoints: outputLength, firstTime: (oldi == 0))
+      bias = adapt(i - oldi, numPoints: outputLength, firstTime: oldi == 0)
       n = n + i / outputLength
       i = i % outputLength
       output.insert(Character(UnicodeScalar(n)!), at: i)
@@ -155,7 +155,7 @@ extension String {
     return String(output)
   }
 
-  fileprivate func isValidUnicodeScala(_ s: String) -> Bool {
+  private func isValidUnicodeScala(_ s: String) -> Bool {
     for c in s.unicodeScalars {
       let ci = Int(c.value)
       if ci >= initialN {
@@ -165,8 +165,8 @@ extension String {
     return true
   }
 
-  fileprivate func isValidPunycodeScala(_ s: String) -> Bool {
-    return s.hasPrefix(prefixPunycode)
+  private func isValidPunycodeScala(_ s: String) -> Bool {
+    s.hasPrefix(prefixPunycode)
   }
 
   public func utf8HostToAscii() -> String {

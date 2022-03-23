@@ -15,7 +15,7 @@ extension UIAction {
   ///   2. Ensure that if the view which has shown the context menu were to be removed from the view
   ///      heirarchy as a result of the action, that the context menu does not crash on dismissal.
   static func deferredActionHandler(_ handler: @escaping UIActionHandler) -> UIActionHandler {
-    return { action in
+    { action in
       DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
         handler(action)
       }

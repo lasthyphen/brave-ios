@@ -10,7 +10,8 @@ class InsetButton: UIButton {
     let size = super.intrinsicContentSize
     return CGSize(
       width: size.width + titleEdgeInsets.left + titleEdgeInsets.right,
-      height: size.height + titleEdgeInsets.top + titleEdgeInsets.bottom)
+      height: size.height + titleEdgeInsets.top + titleEdgeInsets.bottom
+    )
   }
 
   func addTrailingImageIcon(image: UIImage, inset: CGFloat = 15) {

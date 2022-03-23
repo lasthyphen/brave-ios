@@ -21,7 +21,8 @@ extension URLSession {
         url,
         method: method,
         parameters: parameters,
-        encoding: encoding)
+        encoding: encoding
+      )
 
       let task = self.dataTask(with: request) { data, response, error in
         if let error = error {
@@ -29,7 +30,11 @@ extension URLSession {
         }
 
         guard let data = data else {
-          return completion(.failure(NSError(domain: "com.brave.url.session.build-request", code: -1, userInfo: [NSLocalizedDescriptionKey: "No data returned from the server"])))
+          return completion(.failure(NSError(
+            domain: "com.brave.url.session.build-request",
+            code: -1,
+            userInfo: [NSLocalizedDescriptionKey: "No data returned from the server"]
+          )))
         }
 
         do {
@@ -68,7 +73,6 @@ extension URLSession {
     parameters: [String: Any],
     encoding: ParameterEncoding
   ) throws -> URLRequest {
-
     var request = URLRequest(url: url)
     request.httpMethod = method.rawValue
     headers.forEach({ request.setValue($0.value, forHTTPHeaderField: $0.key) })
@@ -87,7 +91,8 @@ extension URLSession {
             domain: "com.brave.url.session.build-request", code: -1,
             userInfo: [
               NSLocalizedDescriptionKey: "Invalid Parameter cannot be serialized to query url: \(item.key)"
-            ])
+            ]
+          )
         }
       }
 

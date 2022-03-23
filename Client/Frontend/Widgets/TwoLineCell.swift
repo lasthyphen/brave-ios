@@ -23,11 +23,11 @@ class TwoLineTableViewCell: UITableViewCell, TableViewReusable {
 
   // Override the default labels with our own to disable default UITableViewCell label behaviours like dynamic type
   override var textLabel: UILabel? {
-    return _textLabel
+    _textLabel
   }
 
   override var detailTextLabel: UILabel? {
-    return _detailTextLabel
+    _detailTextLabel
   }
 
   override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
@@ -36,14 +36,25 @@ class TwoLineTableViewCell: UITableViewCell, TableViewReusable {
     contentView.addSubview(_textLabel)
     contentView.addSubview(_detailTextLabel)
 
-    twoLineHelper.setUpViews(contentView, textLabel: textLabel!, detailTextLabel: detailTextLabel!, imageView: imageView!)
+    twoLineHelper.setUpViews(
+      contentView,
+      textLabel: textLabel!,
+      detailTextLabel: detailTextLabel!,
+      imageView: imageView!
+    )
 
     indentationWidth = 0
     layoutMargins = .zero
 
-    separatorInset = UIEdgeInsets(top: 0, left: TwoLineCellUX.imageSize + 2 * TwoLineCellUX.borderViewMargin, bottom: 0, right: 0)
+    separatorInset = UIEdgeInsets(
+      top: 0,
+      left: TwoLineCellUX.imageSize + 2 * TwoLineCellUX.borderViewMargin,
+      bottom: 0,
+      right: 0
+    )
   }
 
+  @available(*, unavailable)
   required init?(coder aDecoder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }
@@ -58,7 +69,12 @@ class TwoLineTableViewCell: UITableViewCell, TableViewReusable {
     self.textLabel!.alpha = 1
     self.imageView!.alpha = 1
     self.selectionStyle = .default
-    separatorInset = UIEdgeInsets(top: 0, left: TwoLineCellUX.imageSize + 2 * TwoLineCellUX.borderViewMargin, bottom: 0, right: 0)
+    separatorInset = UIEdgeInsets(
+      top: 0,
+      left: TwoLineCellUX.imageSize + 2 * TwoLineCellUX.borderViewMargin,
+      bottom: 0,
+      right: 0
+    )
     twoLineHelper.setupDynamicFonts()
   }
 
@@ -101,7 +117,12 @@ class SiteTableViewCell: TwoLineTableViewCell {
     super.init(style: .subtitle, reuseIdentifier: reuseIdentifier)
     backgroundColor = .secondaryBraveBackground
 
-    twoLineHelper.setUpViews(contentView, textLabel: textLabel!, detailTextLabel: detailTextLabel!, imageView: imageView!)
+    twoLineHelper.setUpViews(
+      contentView,
+      textLabel: textLabel!,
+      detailTextLabel: detailTextLabel!,
+      imageView: imageView!
+    )
   }
 
   override func layoutSubviews() {
@@ -109,6 +130,7 @@ class SiteTableViewCell: TwoLineTableViewCell {
     twoLineHelper.layoutSubviews(accessoryWidth: self.contentView.frame.origin.x)
   }
 
+  @available(*, unavailable)
   required init?(coder aDecoder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }
@@ -122,8 +144,10 @@ class BookmarkTableViewCell: TwoLineTableViewCell {
   override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
     super.init(style: .subtitle, reuseIdentifier: reuseIdentifier)
     guard let textLabel = textLabel, let detailTextLabel = detailTextLabel,
-      let imageView = imageView
-    else { return }
+          let imageView = imageView
+    else {
+      return
+    }
 
     backgroundColor = .secondaryBraveBackground
 
@@ -131,7 +155,8 @@ class BookmarkTableViewCell: TwoLineTableViewCell {
       contentView,
       textLabel: textLabel,
       detailTextLabel: detailTextLabel,
-      imageView: imageView)
+      imageView: imageView
+    )
   }
 
   override func layoutSubviews() {
@@ -139,6 +164,7 @@ class BookmarkTableViewCell: TwoLineTableViewCell {
     twoLineHelper.layoutSubviews(accessoryWidth: self.contentView.frame.origin.x)
   }
 
+  @available(*, unavailable)
   required init?(coder aDecoder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }
@@ -158,17 +184,22 @@ class TwoLineHeaderFooterView: UITableViewHeaderFooterView {
 
   // Yes, this is strange.
   override var textLabel: UILabel? {
-    return _textLabel
+    _textLabel
   }
 
   // Yes, this is strange.
   override var detailTextLabel: UILabel? {
-    return _detailTextLabel
+    _detailTextLabel
   }
 
   override init(reuseIdentifier: String?) {
     super.init(reuseIdentifier: reuseIdentifier)
-    twoLineHelper.setUpViews(contentView, textLabel: _textLabel, detailTextLabel: _detailTextLabel, imageView: imageView)
+    twoLineHelper.setUpViews(
+      contentView,
+      textLabel: _textLabel,
+      detailTextLabel: _detailTextLabel,
+      imageView: imageView
+    )
 
     contentView.addSubview(_textLabel)
     contentView.addSubview(_detailTextLabel)
@@ -177,6 +208,7 @@ class TwoLineHeaderFooterView: UITableViewHeaderFooterView {
     layoutMargins = .zero
   }
 
+  @available(*, unavailable)
   required init?(coder aDecoder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }
@@ -221,7 +253,7 @@ private class TwoLineCellHelper {
     setupDynamicFonts()
 
     imageView.contentMode = .scaleAspectFill
-    imageView.layer.cornerRadius = 6  // hmm
+    imageView.layer.cornerRadius = 6 // hmm
     imageView.layer.cornerCurve = .continuous
     imageView.layer.masksToBounds = true
   }
@@ -248,20 +280,40 @@ private class TwoLineCellHelper {
 
     textLabel.frame = CGRect(
       x: textLeft, y: (height - contentHeight) / 2,
-      width: container.frame.width - textLeft - TwoLineCellUX.borderViewMargin - textRightInset, height: textLabelHeight)
+      width: container.frame.width - textLeft - TwoLineCellUX.borderViewMargin - textRightInset,
+      height: textLabelHeight
+    )
     detailTextLabel.frame = CGRect(
       x: textLeft, y: textLabel.frame.maxY + TwoLineCellUX.detailTextTopMargin,
-      width: container.frame.width - textLeft - TwoLineCellUX.borderViewMargin - textRightInset, height: detailTextLabelHeight)
+      width: container.frame.width - textLeft - TwoLineCellUX.borderViewMargin - textRightInset,
+      height: detailTextLabelHeight
+    )
 
     // Like the comment above, this is not ideal. This code should probably be refactored to use autolayout. That will remove a lot of the pixel math and remove code duplication.
 
     if UIApplication.shared.userInterfaceLayoutDirection == .leftToRight {
-      imageView.frame = CGRect(x: TwoLineCellUX.borderViewMargin, y: (height - TwoLineCellUX.imageSize) / 2, width: TwoLineCellUX.imageSize, height: TwoLineCellUX.imageSize)
+      imageView.frame = CGRect(
+        x: TwoLineCellUX.borderViewMargin,
+        y: (height - TwoLineCellUX.imageSize) / 2,
+        width: TwoLineCellUX.imageSize,
+        height: TwoLineCellUX.imageSize
+      )
     } else {
-      imageView.frame = CGRect(x: container.frame.width - TwoLineCellUX.imageSize - TwoLineCellUX.borderViewMargin, y: (height - TwoLineCellUX.imageSize) / 2, width: TwoLineCellUX.imageSize, height: TwoLineCellUX.imageSize)
+      imageView.frame = CGRect(
+        x: container.frame.width - TwoLineCellUX.imageSize - TwoLineCellUX.borderViewMargin,
+        y: (height - TwoLineCellUX.imageSize) / 2,
+        width: TwoLineCellUX.imageSize,
+        height: TwoLineCellUX.imageSize
+      )
 
-      textLabel.frame = textLabel.frame.offsetBy(dx: -(TwoLineCellUX.imageSize + TwoLineCellUX.borderViewMargin - textRightInset), dy: 0)
-      detailTextLabel.frame = detailTextLabel.frame.offsetBy(dx: -(TwoLineCellUX.imageSize + TwoLineCellUX.borderViewMargin - textRightInset), dy: 0)
+      textLabel.frame = textLabel.frame.offsetBy(
+        dx: -(TwoLineCellUX.imageSize + TwoLineCellUX.borderViewMargin - textRightInset),
+        dy: 0
+      )
+      detailTextLabel.frame = detailTextLabel.frame.offsetBy(
+        dx: -(TwoLineCellUX.imageSize + TwoLineCellUX.borderViewMargin - textRightInset),
+        dy: 0
+      )
 
       // If the cell has an accessory, shift them all to the left even more. Only required on RTL.
       if accessoryWidth != 0 {

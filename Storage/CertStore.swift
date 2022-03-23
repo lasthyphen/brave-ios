@@ -7,7 +7,7 @@ import UIKit
 
 /// In-memory certificate store.
 open class CertStore {
-  fileprivate var keys = Set<String>()
+  private var keys = Set<String>()
 
   public init() {}
 
@@ -23,7 +23,7 @@ open class CertStore {
     return keys.contains(key)
   }
 
-  fileprivate func keyForData(_ data: Data, origin: String) -> String {
-    return "\(origin)/\(data.sha256.hexEncodedString)"
+  private func keyForData(_ data: Data, origin: String) -> String {
+    "\(origin)/\(data.sha256.hexEncodedString)"
   }
 }

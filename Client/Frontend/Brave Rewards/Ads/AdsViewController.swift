@@ -43,7 +43,7 @@ public class AdsViewController: UIViewController {
       $0.trailing.lessThanOrEqualTo(view).inset(8)
       $0.centerX.equalTo(view)
       $0.top.equalTo(view.safeAreaLayoutGuide.snp.top)
-      $0.top.greaterThanOrEqualTo(view).offset(4)  // Makes sure in landscape its at least 4px from the top
+      $0.top.greaterThanOrEqualTo(view).offset(4) // Makes sure in landscape its at least 4px from the top
 
       if UIDevice.current.userInterfaceIdiom != .pad {
         $0.width.equalTo(view).priority(.high)
@@ -124,25 +124,34 @@ public class AdsViewController: UIViewController {
     dismissTimers[adView] = Timer.scheduledTimer(
       withTimeInterval: dismissInterval, repeats: false,
       block: { [weak self] _ in
-        guard let self = self, let handler = self.displayedAds[adView] else { return }
+        guard let self = self, let handler = self.displayedAds[adView] else {
+          return
+        }
         self.hide(adView: adView)
         handler.handler(handler.ad, .timedOut)
-      })
+      }
+    )
   }
 
   @objc private func touchDownAdView(_ sender: AdContentButton) {
-    guard let adView = sender.superview as? AdView else { return }
+    guard let adView = sender.superview as? AdView else {
+      return
+    }
     // Make sure the ad doesnt disappear under the users finger
     dismissTimers[adView]?.invalidate()
   }
 
   @objc private func touchUpOutsideAdView(_ sender: AdContentButton) {
-    guard let adView = sender.superview as? AdView else { return }
+    guard let adView = sender.superview as? AdView else {
+      return
+    }
     setupTimeoutTimer(for: adView)
   }
 
   @objc private func tappedAdView(_ sender: AdContentButton) {
-    guard let adView = sender.superview as? AdView else { return }
+    guard let adView = sender.superview as? AdView else {
+      return
+    }
 
     if sender.transform.tx != 0 {
       adView.setSwipeTranslation(0, animated: true) {
@@ -151,22 +160,32 @@ public class AdsViewController: UIViewController {
       return
     }
 
-    guard let displayedAd = displayedAds[adView] else { return }
+    guard let displayedAd = displayedAds[adView] else {
+      return
+    }
     hide(adView: adView)
     displayedAd.handler(displayedAd.ad, .opened)
   }
 
   @objc private func tappedOpen(_ sender: AdSwipeButton) {
-    guard let adView = sender.superview as? AdView else { return }
-    guard let displayedAd = displayedAds[adView] else { return }
+    guard let adView = sender.superview as? AdView else {
+      return
+    }
+    guard let displayedAd = displayedAds[adView] else {
+      return
+    }
     hide(adView: adView)
     adView.setSwipeTranslation(0, animated: true)
     displayedAd.handler(displayedAd.ad, .opened)
   }
 
   @objc private func tappedDisliked(_ sender: AdSwipeButton) {
-    guard let adView = sender.superview as? AdView else { return }
-    guard let displayedAd = displayedAds[adView] else { return }
+    guard let adView = sender.superview as? AdView else {
+      return
+    }
+    guard let displayedAd = displayedAds[adView] else {
+      return
+    }
     hide(adView: adView)
     adView.setSwipeTranslation(0, animated: true)
     displayedAd.handler(displayedAd.ad, .disliked)
@@ -174,12 +193,14 @@ public class AdsViewController: UIViewController {
 
   // Distance travelled after decelerating to zero velocity at a constant rate
   func project(initialVelocity: CGFloat, decelerationRate: CGFloat) -> CGFloat {
-    return (initialVelocity / 1000.0) * decelerationRate / (1.0 - decelerationRate)
+    (initialVelocity / 1000.0) * decelerationRate / (1.0 - decelerationRate)
   }
 
   private var panState: CGPoint = .zero
   @objc private func dismissPannedAdView(_ pan: UIPanGestureRecognizer) {
-    guard let adView = pan.view as? AdView else { return }
+    guard let adView = pan.view as? AdView else {
+      return
+    }
     switch pan.state {
     case .began:
       panState = adView.center
@@ -190,9 +211,14 @@ public class AdsViewController: UIViewController {
     case .ended:
       let velocity = pan.velocity(in: adView).y
       let y = min(panState.y, panState.y + pan.translation(in: adView).y)
-      let projected = project(initialVelocity: velocity, decelerationRate: UIScrollView.DecelerationRate.normal.rawValue)
+      let projected = project(
+        initialVelocity: velocity,
+        decelerationRate: UIScrollView.DecelerationRate.normal.rawValue
+      )
       if y + projected < 0 {
-        guard let displayedAd = self.displayedAds[adView] else { return }
+        guard let displayedAd = self.displayedAds[adView] else {
+          return
+        }
         hide(adView: adView, velocity: velocity)
         displayedAd.handler(displayedAd.ad, .dismissed)
         break
@@ -214,7 +240,9 @@ public class AdsViewController: UIViewController {
 
   private var swipeState: CGFloat = 0
   @objc private func swipePannedAdView(_ pan: UIPanGestureRecognizer) {
-    guard let adView = pan.view as? AdView else { return }
+    guard let adView = pan.view as? AdView else {
+      return
+    }
     switch pan.state {
     case .began:
       swipeState = adView.adContentButton.transform.tx
@@ -237,17 +265,26 @@ public class AdsViewController: UIViewController {
     case .ended:
       let velocity = pan.velocity(in: adView).x
       let tx = swipeState + pan.translation(in: adView).x
-      let projected = project(initialVelocity: velocity, decelerationRate: UIScrollView.DecelerationRate.normal.rawValue)
-      if /*tx > actionTriggerThreshold ||*/
-      tx < -actionTriggerThreshold {
-        guard let displayedAd = displayedAds[adView] else { break }
+      let projected = project(
+        initialVelocity: velocity,
+        decelerationRate: UIScrollView.DecelerationRate.normal.rawValue
+      )
+      if /* tx > actionTriggerThreshold || */
+        tx < -actionTriggerThreshold {
+        guard let displayedAd = displayedAds[adView] else {
+          break
+        }
         adView.setSwipeTranslation(0, animated: true, panVelocity: velocity)
         hide(adView: adView)
         displayedAd.handler(displayedAd.ad, tx > 0 ? .opened : .disliked)
         break
-      } else if /*tx + projected > actionRestThreshold ||*/
-      tx + projected < -actionRestThreshold {
-        adView.setSwipeTranslation((tx + projected) > 0 ? actionRestThreshold : -actionRestThreshold, animated: true, panVelocity: velocity)
+      } else if /* tx + projected > actionRestThreshold || */
+        tx + projected < -actionRestThreshold {
+        adView.setSwipeTranslation(
+          (tx + projected) > 0 ? actionRestThreshold : -actionRestThreshold,
+          animated: true,
+          panVelocity: velocity
+        )
         break
       }
       fallthrough
@@ -300,7 +337,6 @@ extension AdsViewController {
 }
 
 extension AdsViewController: UIGestureRecognizerDelegate {
-
   public func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
     if let pan = gestureRecognizer as? UIPanGestureRecognizer {
       let velocity = pan.velocity(in: pan.view)
@@ -321,9 +357,11 @@ extension AdsViewController: UIGestureRecognizerDelegate {
 }
 
 extension AdsViewController {
-
   /// Display a "My First Ad" on a presenting controller and be notified if they tap it
-  public static func displayFirstAd(on presentingController: UIViewController, completion: @escaping (AdsNotificationHandler.Action, URL) -> Void) {
+  public static func displayFirstAd(
+    on presentingController: UIViewController,
+    completion: @escaping (AdsNotificationHandler.Action, URL) -> Void
+  ) {
     let adsViewController = AdsViewController()
 
     guard let window = presentingController.view.window else {
@@ -348,11 +386,12 @@ extension AdsViewController {
 
     adsViewController.display(
       ad: notification,
-      handler: { (notification, action) in
+      handler: { notification, action in
         completion(action, targetURL)
       },
       animatedOut: {
         adsViewController.view.removeFromSuperview()
-      })
+      }
+    )
   }
 }

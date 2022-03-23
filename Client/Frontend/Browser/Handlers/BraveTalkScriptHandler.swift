@@ -37,8 +37,8 @@ class BraveTalkScriptHandler: TabContentScript {
     let allowedHosts = DomainUserScript.braveTalk.associatedDomains
 
     guard let requestHost = message.frameInfo.request.url?.host,
-      allowedHosts.contains(requestHost),
-      message.frameInfo.isMainFrame
+          allowedHosts.contains(requestHost),
+          message.frameInfo.isMainFrame
     else {
       log.error("Backup search request called from disallowed host")
       return
@@ -48,7 +48,6 @@ class BraveTalkScriptHandler: TabContentScript {
   }
 
   private func handleBraveRequestAdsEnabled() {
-
     guard let rewards = rewards, !PrivateBrowsingManager.shared.isPrivateBrowsing else {
       callback(result: false)
       return

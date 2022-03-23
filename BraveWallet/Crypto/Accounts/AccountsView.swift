@@ -40,7 +40,7 @@ struct AccountsView: View {
           settingsStore: cryptoStore.settingsStore,
           networkStore: cryptoStore.networkStore
         )
-        .resetListHeaderStyle()
+          .resetListHeaderStyle()
       ) {
       }
       Section(
@@ -92,7 +92,9 @@ struct AccountsView: View {
       NavigationLink(
         isActive: Binding(
           get: { selectedAccount != nil },
-          set: { if !$0 { selectedAccount = nil } }
+          set: { if !$0 {
+            selectedAccount = nil
+          } }
         ),
         destination: {
           if let account = selectedAccount {
@@ -101,14 +103,15 @@ struct AccountsView: View {
               activityStore: cryptoStore.accountActivityStore(for: account),
               networkStore: cryptoStore.networkStore
             )
-            .onDisappear {
-              cryptoStore.closeAccountActivityStore(for: account)
-            }
+              .onDisappear {
+                cryptoStore.closeAccountActivityStore(for: account)
+              }
           }
         },
         label: {
           EmptyView()
-        })
+        }
+      )
     )
     .listStyle(InsetGroupedListStyle())
     .osAvailabilityModifiers { content in

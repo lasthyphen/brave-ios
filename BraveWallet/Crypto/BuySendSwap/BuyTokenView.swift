@@ -26,10 +26,10 @@ struct BuyTokenView: View {
             keyringStore: keyringStore,
             networkStore: networkStore
           )
-          .listRowBackground(Color.clear)
-          .resetListHeaderStyle()
-          .padding(.top)
-          .padding(.bottom, -16)  // Get it a bit closer
+            .listRowBackground(Color.clear)
+            .resetListHeaderStyle()
+            .padding(.top)
+            .padding(.bottom, -16) // Get it a bit closer
         ) {
         }
         if networkStore.selectedChain.chainId == BraveWallet.MainnetChainId {
@@ -84,7 +84,10 @@ struct BuyTokenView: View {
             VStack(alignment: .leading, spacing: 4.0) {
               Text(Strings.Wallet.buyTestTitle)
                 .font(.headline)
-              Text(String.localizedStringWithFormat(Strings.Wallet.buyTestDescription, networkStore.selectedChain.chainName))
+              Text(
+                String
+                  .localizedStringWithFormat(Strings.Wallet.buyTestDescription, networkStore.selectedChain.chainName)
+              )
                 .font(.subheadline)
                 .foregroundColor(Color(.secondaryBraveLabel))
             }
@@ -94,19 +97,19 @@ struct BuyTokenView: View {
           .listRowBackground(Color(.clear))
           Section(
             header:
-              Button(action: {
-                buyTokenStore.fetchTestFaucetUrl { urlString in
-                  guard let urlString = urlString, let url = URL(string: urlString) else {
-                    return
-                  }
-                  openWalletURL?(url)
+            Button(action: {
+              buyTokenStore.fetchTestFaucetUrl { urlString in
+                guard let urlString = urlString, let url = URL(string: urlString) else {
+                  return
                 }
-              }) {
-                Text(Strings.Wallet.buyTestButtonTitle)
+                openWalletURL?(url)
               }
-              .buttonStyle(BraveFilledButtonStyle(size: .normal))
-              .frame(maxWidth: .infinity)
-              .resetListHeaderStyle()
+            }) {
+              Text(Strings.Wallet.buyTestButtonTitle)
+            }
+            .buttonStyle(BraveFilledButtonStyle(size: .normal))
+            .frame(maxWidth: .infinity)
+            .resetListHeaderStyle()
           ) {
           }
         }
@@ -138,7 +141,7 @@ struct BuyTokenView_Previews: PreviewProvider {
       networkStore: .previewStore,
       buyTokenStore: .previewStore
     )
-    .previewColorSchemes()
+      .previewColorSchemes()
   }
 }
 #endif

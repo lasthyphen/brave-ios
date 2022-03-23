@@ -31,7 +31,7 @@ struct BackupNotifyView: View {
       Button(action: onDismiss) {
         closeImage
           .foregroundColor(Color(.braveLabel))
-          .padding(12)  // To make the hit-area a bit bigger
+          .padding(12) // To make the hit-area a bit bigger
       }
     }
     .frame(maxWidth: .infinity)

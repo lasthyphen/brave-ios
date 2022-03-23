@@ -12,7 +12,13 @@ protocol BookmarksV2FetchResultsDelegate: AnyObject {
 
   func controllerDidChangeContent(_ controller: BookmarksV2FetchResultsController)
 
-  func controller(_ controller: BookmarksV2FetchResultsController, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?)
+  func controller(
+    _ controller: BookmarksV2FetchResultsController,
+    didChange anObject: Any,
+    at indexPath: IndexPath?,
+    for type: NSFetchedResultsChangeType,
+    newIndexPath: IndexPath?
+  )
 
   func controllerDidReloadContents(_ controller: BookmarksV2FetchResultsController)
 }
@@ -41,19 +47,22 @@ class Bookmarkv2Fetcher: NSObject, BookmarksV2FetchResultsController {
 
     self.bookmarkModelListener = api.add(
       BookmarkModelStateObserver { [weak self] _ in
-        guard let self = self else { return }
+        guard let self = self else {
+          return
+        }
         DispatchQueue.main.async {
           self.delegate?.controllerDidReloadContents(self)
         }
-      })
+      }
+    )
   }
 
   var fetchedObjects: [Bookmarkv2]? {
-    return children
+    children
   }
 
   var fetchedObjectsCount: Int {
-    return children.count
+    children.count
   }
 
   func performFetch() throws {
@@ -79,13 +88,14 @@ class Bookmarkv2Fetcher: NSObject, BookmarksV2FetchResultsController {
           domain: "brave.core.migrator", code: -1,
           userInfo: [
             NSLocalizedFailureReasonErrorKey: "Invalid Bookmark Nodes"
-          ])
+          ]
+        )
       }
     }
   }
 
   func object(at indexPath: IndexPath) -> Bookmarkv2? {
-    return children[safe: indexPath.row]
+    children[safe: indexPath.row]
   }
 }
 
@@ -104,19 +114,22 @@ class Bookmarkv2ExclusiveFetcher: NSObject, BookmarksV2FetchResultsController {
 
     self.bookmarkModelListener = api.add(
       BookmarkModelStateObserver { [weak self] _ in
-        guard let self = self else { return }
+        guard let self = self else {
+          return
+        }
         DispatchQueue.main.async {
           self.delegate?.controllerDidReloadContents(self)
         }
-      })
+      }
+    )
   }
 
   var fetchedObjects: [Bookmarkv2]? {
-    return children
+    children
   }
 
   var fetchedObjectsCount: Int {
-    return children.count
+    children.count
   }
 
   func performFetch() throws {
@@ -139,12 +152,13 @@ class Bookmarkv2ExclusiveFetcher: NSObject, BookmarksV2FetchResultsController {
         domain: "brave.core.migrator", code: -1,
         userInfo: [
           NSLocalizedFailureReasonErrorKey: "Invalid Bookmark Nodes"
-        ])
+        ]
+      )
     }
   }
 
   func object(at indexPath: IndexPath) -> Bookmarkv2? {
-    return children[safe: indexPath.row]
+    children[safe: indexPath.row]
   }
 
   private func getNestedFolders(_ node: BookmarkNode, guid: String?) -> [Bookmarkv2] {

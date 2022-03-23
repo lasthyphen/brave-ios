@@ -1,0 +1,80 @@
+--swiftversion 5.5
+--exclude **/ThirdParty
+
+# base rules
+--disable all
+--enable \
+  anyObjectProtocol, \
+  assertionFailures, \
+  blankLinesAtEndOfScope, \    # Possibly contested
+  blankLinesAtStartOfScope, \  # Possibly contested because it removes first empty line of classes/structs as well
+  blankLinesBetweenImports, \
+  blankLinesBetweenScopes, \
+  braces, \
+  consecutiveBlankLines, \
+  consecutiveSpaces, \
+  duplicateImports, \
+  extensionAccessControl, \
+  indent, \
+  initCoderUnavailable, \
+  linebreakAtEndOfFile, \
+  preferKeyPath, \
+  redundantBreak, \
+  redundantClosure, \
+  redundantFileprivate, \
+  redundantGet, \
+  redundantLet, \
+  redundantLetError, \
+  redundantNilInit, \
+  redundantObjc, \
+  redundantParens, \
+  redundantPattern, \
+  redundantReturn, \        # Possibly contested
+  semicolons, \
+  spaceAroundBraces, \ 
+  spaceAroundComments, \
+  spaceAroundGenerics, \
+  spaceAroundOperators, \
+  spaceAroundParens, \
+  spaceInsideBraces, \
+  spaceInsideComments, \
+  spaceInsideGenerics, \
+  spaceInsideParens, \
+  strongifiedSelf, \
+  todos, \
+  trailingSpace, \
+  typeSugar, \
+  wrap, \
+  wrapArguments, \          # Possibly contested
+  wrapConditionalBodies, \  # Possibly contested
+  wrapEnumCases, \          # Possibly contested
+  yodaConditions
+
+
+# indent
+--indent 2
+--tabwidth 2 
+--ifdef no-indent 
+--xcodeindentation enabled
+
+# extensionAccessControl
+--extensionacl on-declarations
+
+# semicolons
+--semicolons never
+
+# spaceAroundOperators
+--ranges no-space
+
+# trailingSpace
+--trimwhitespace nonblank-lines
+
+# wrap
+--maxwidth 120            # Possibly contested
+--assetliterals actual-width
+--wrapternary before-operators
+
+# wrapArguments
+--wraparguments before-first
+--wrapparameters before-first
+--wrapcollections before-first

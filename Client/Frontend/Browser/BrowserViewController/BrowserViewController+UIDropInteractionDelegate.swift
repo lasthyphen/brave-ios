@@ -9,7 +9,8 @@ import Storage
 extension BrowserViewController: UIDropInteractionDelegate {
   func dropInteraction(_ interaction: UIDropInteraction, canHandle session: UIDropSession) -> Bool {
     // Prevent tabs from being dragged and dropped into the address bar.
-    if let localDragSession = session.localDragSession, let item = localDragSession.items.first, let _ = item.localObject {
+    if let localDragSession = session.localDragSession, let item = localDragSession.items.first,
+       let _ = item.localObject {
       return false
     }
 
@@ -17,7 +18,7 @@ extension BrowserViewController: UIDropInteractionDelegate {
   }
 
   func dropInteraction(_ interaction: UIDropInteraction, sessionDidUpdate session: UIDropSession) -> UIDropProposal {
-    return UIDropProposal(operation: .copy)
+    UIDropProposal(operation: .copy)
   }
 
   func dropInteraction(_ interaction: UIDropInteraction, performDrop session: UIDropSession) {

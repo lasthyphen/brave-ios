@@ -6,7 +6,6 @@
 import XCTest
 
 class DisplayTextFieldTest: XCTestCase {
-
   func testRightAlignedTLD() {
     let textField = DisplayTextField(frame: CGRect(width: 250, height: 44))
 
@@ -18,9 +17,7 @@ class DisplayTextFieldTest: XCTestCase {
       URL(string: "http://myaccountsecure.testmycase.co.uk")!,
     ]
     urlCases.forEach({ textField.assertWidth(text: $0.schemelessAbsoluteString, hostString: $0.host ?? "") })
-
   }
-
 }
 
 extension DisplayTextField {

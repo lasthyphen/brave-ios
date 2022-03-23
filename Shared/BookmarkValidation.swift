@@ -12,13 +12,19 @@ public struct BookmarkValidation {
       return BookmarkValidation.validateTitle(title)
     }
 
-    guard let url = url else { return false }
+    guard let url = url else {
+      return false
+    }
     return BookmarkValidation.validateTitle(title) && BookmarkValidation.validateUrl(url)
   }
 
   public static func validateBookmarklet(title: String?, url: String?) -> Bool {
-    guard let url = url else { return validateTitle(title) }
-    if !url.isBookmarklet { return false }
+    guard let url = url else {
+      return validateTitle(title)
+    }
+    if !url.isBookmarklet {
+      return false
+    }
     guard let javascriptCode = url.bookmarkletCodeComponent else {
       return false
     }
@@ -41,11 +47,13 @@ public struct BookmarkValidation {
   }
 
   private static func validateTitle(_ title: String?) -> Bool {
-    guard let title = title else { return false }
+    guard let title = title else {
+      return false
+    }
     return !title.isEmpty
   }
 
   private static func validateUrl(_ urlString: String) -> Bool {
-    return URL(string: urlString)?.schemeIsValid == true
+    URL(string: urlString)?.schemeIsValid == true
   }
 }

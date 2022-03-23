@@ -23,13 +23,16 @@ private class WalletWebImageManager: ObservableObject {
     operation = manager.loadImage(
       with: url, options: options, progress: nil,
       completed: { [weak self] image, data, error, _, finished, _ in
-        guard let self = self else { return }
+        guard let self = self else {
+          return
+        }
         self.image = image
         self.error = error
         if finished {
           self.isFinished = true
         }
-      })
+      }
+    )
   }
 
   func cancel() {

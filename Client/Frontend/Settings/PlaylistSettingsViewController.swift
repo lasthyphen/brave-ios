@@ -46,7 +46,6 @@ enum PlayListDownloadType: String, CaseIterable, RepresentableOptionType {
 // MARK: - PlaylistSettingsViewController
 
 class PlaylistSettingsViewController: TableViewController {
-
   // MARK: Lifecycle
 
   init() {
@@ -66,7 +65,10 @@ class PlaylistSettingsViewController: TableViewController {
     dataSource.sections = [
       Section(
         rows: [
-          .boolRow(title: Strings.PlayList.urlBarButtonOptionTitle, option: Preferences.Playlist.enablePlaylistURLBarButton)
+          .boolRow(
+            title: Strings.PlayList.urlBarButtonOptionTitle,
+            option: Preferences.Playlist.enablePlaylistURLBarButton
+          )
         ],
         footer: .title(Strings.PlayList.urlBarButtonOptionFooter)
       ),
@@ -80,7 +82,8 @@ class PlaylistSettingsViewController: TableViewController {
         rows: [
           .boolRow(
             title: Strings.PlayList.playlistLongPressSettingsOptionTitle,
-            option: Preferences.Playlist.enableLongPressAddToPlaylist)
+            option: Preferences.Playlist.enableLongPressAddToPlaylist
+          )
         ],
         footer: .title(Strings.PlayList.playlistLongPressSettingsOptionFooterText)
       ),
@@ -88,7 +91,8 @@ class PlaylistSettingsViewController: TableViewController {
         rows: [
           .boolRow(
             title: Strings.PlayList.playlistAutoPlaySettingsOptionTitle,
-            option: Preferences.Playlist.firstLoadAutoPlay)
+            option: Preferences.Playlist.firstLoadAutoPlay
+          )
         ],
         footer: .title(Strings.PlayList.playlistAutoPlaySettingsOptionFooterText)
       ),
@@ -96,12 +100,14 @@ class PlaylistSettingsViewController: TableViewController {
 
     var autoDownloadSection = Section(
       rows: [],
-      footer: .title(Strings.PlayList.playlistAutoSaveSettingsFooterText))
+      footer: .title(Strings.PlayList.playlistAutoSaveSettingsFooterText)
+    )
     var row = Row(
       text: Strings.PlayList.playlistAutoSaveSettingsTitle,
       detailText: PlayListDownloadType(rawValue: Preferences.Playlist.autoDownloadVideo.value)?.displayString,
       accessory: .disclosureIndicator,
-      cellClass: MultilineSubtitleCell.self)
+      cellClass: MultilineSubtitleCell.self
+    )
 
     row.selection = { [unowned self] in
       let optionsViewController = OptionSelectionViewController<PlayListDownloadType>(
@@ -127,10 +133,12 @@ class PlaylistSettingsViewController: TableViewController {
         rows: [
           .boolRow(
             title: Strings.PlayList.playlistStartPlaybackSettingsOptionTitle,
-            option: Preferences.Playlist.playbackLeftOff)
+            option: Preferences.Playlist.playbackLeftOff
+          )
         ],
         footer: .title(Strings.PlayList.playlistStartPlaybackSettingsFooterText)
-      ))
+      )
+    )
 
     if UIDevice.current.userInterfaceIdiom == .pad {
       var sideSelectionSection = Section(rows: [])
@@ -138,7 +146,8 @@ class PlaylistSettingsViewController: TableViewController {
         text: Strings.PlayList.playlistSidebarLocationTitle,
         detailText: PlayListSide(rawValue: Preferences.Playlist.listViewSide.value)?.displayString,
         accessory: .disclosureIndicator,
-        cellClass: MultilineSubtitleCell.self)
+        cellClass: MultilineSubtitleCell.self
+      )
 
       row.selection = { [unowned self] in
         let optionsViewController = OptionSelectionViewController<PlayListSide>(
@@ -167,8 +176,10 @@ class PlaylistSettingsViewController: TableViewController {
             .boolRow(
               title: Strings.PlayList.playlistWebCompatibilityTitle,
               detailText: Strings.PlayList.playlistWebCompatibilityDescription,
-              option: Preferences.Playlist.webMediaSourceCompatibility)
-          ])
+              option: Preferences.Playlist.webMediaSourceCompatibility
+            )
+          ]
+        )
       )
     }
 
@@ -182,19 +193,24 @@ class PlaylistSettingsViewController: TableViewController {
               let alert = UIAlertController(
                 title: Strings.PlayList.playlistResetAlertTitle,
                 message: Strings.PlayList.playlistResetPlaylistOptionFooterText,
-                preferredStyle: style)
+                preferredStyle: style
+              )
 
               alert.addAction(
                 UIAlertAction(
                   title: Strings.PlayList.playlistResetAlertTitle, style: .default,
                   handler: { _ in
                     PlaylistManager.shared.deleteAllItems(cacheOnly: false)
-                  }))
+                  }
+                )
+              )
               alert.addAction(UIAlertAction(title: Strings.cancelButtonTitle, style: .cancel, handler: nil))
               self.present(alert, animated: true, completion: nil)
-            }, cellClass: ButtonCell.self)
+            }, cellClass: ButtonCell.self
+          )
         ],
-        footer: .title(Strings.PlayList.playlistResetPlaylistOptionFooterText))
+        footer: .title(Strings.PlayList.playlistResetPlaylistOptionFooterText)
+      )
     )
 
     if !AppConstants.buildChannel.isPublic {

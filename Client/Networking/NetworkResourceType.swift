@@ -10,7 +10,7 @@ enum NetworkResourceType {
 
   func isCached() -> Bool {
     switch self {
-    case .cached(_): return true
+    case .cached: return true
     default: return false
     }
   }

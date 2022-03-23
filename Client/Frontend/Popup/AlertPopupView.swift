@@ -14,7 +14,7 @@ class AlertPopupView: PopupView {
   fileprivate var textField: UITextField?
 
   var text: String? {
-    return textField?.text
+    textField?.text
   }
 
   fileprivate let kAlertPopupScreenFraction: CGFloat = 0.8
@@ -22,7 +22,8 @@ class AlertPopupView: PopupView {
 
   init(
     imageView: UIView?, title: String, message: String, inputType: UIKeyboardType? = nil,
-    secureInput: Bool = false, inputPlaceholder: String? = nil, titleWeight: UIFont.Weight = UIFont.Weight.bold, titleSize: CGFloat = 24, dismissHandler: (() -> Bool)? = nil
+    secureInput: Bool = false, inputPlaceholder: String? = nil, titleWeight: UIFont.Weight = UIFont.Weight.bold,
+    titleSize: CGFloat = 24, dismissHandler: (() -> Bool)? = nil
   ) {
     super.init(frame: CGRect.zero)
 
@@ -63,7 +64,10 @@ class AlertPopupView: PopupView {
       textField = UITextField(frame: CGRect.zero).then {
         $0.keyboardType = inputType
         $0.textColor = .braveLabel
-        $0.attributedPlaceholder = NSAttributedString(string: inputPlaceholder ?? "", attributes: [.foregroundColor: UIColor.secondaryBraveLabel])
+        $0.attributedPlaceholder = NSAttributedString(
+          string: inputPlaceholder ?? "",
+          attributes: [.foregroundColor: UIColor.secondaryBraveLabel]
+        )
         $0.autocorrectionType = .no
         $0.autocapitalizationType = .none
         $0.layer.cornerRadius = 4
@@ -121,13 +125,17 @@ class AlertPopupView: PopupView {
     var imageFrame: CGRect = dialogImage?.frame ?? CGRect.zero
     if let dialogImage = dialogImage {
       let dialogImageSize = dialogImage.frame.size
-      imageFrame.size = CGSize(width: dialogImageSize.width * resizePercentage, height: dialogImageSize.height * resizePercentage)
+      imageFrame.size = CGSize(
+        width: dialogImageSize.width * resizePercentage,
+        height: dialogImageSize.height * resizePercentage
+      )
       imageFrame.origin.x = (width - imageFrame.width) / 2.0
       imageFrame.origin.y = kPadding * 2.0 * resizePercentage
       dialogImage.frame = imageFrame
     }
 
-    var titleLabelSize: CGSize = titleLabel.sizeThatFits(CGSize(width: width - kPadding * 3.0, height: CGFloat.greatestFiniteMagnitude))
+    var titleLabelSize: CGSize = titleLabel
+      .sizeThatFits(CGSize(width: width - kPadding * 3.0, height: CGFloat.greatestFiniteMagnitude))
     titleLabelSize.height = titleLabelSize.height * resizePercentage
     var titleLabelFrame: CGRect = titleLabel.frame
     titleLabelFrame.size = titleLabelSize
@@ -135,7 +143,8 @@ class AlertPopupView: PopupView {
     titleLabelFrame.origin.y = imageFrame.maxY + kPadding * resizePercentage
     titleLabel.frame = titleLabelFrame
 
-    var messageLabelSize: CGSize = messageLabel.sizeThatFits(CGSize(width: width - kPadding * 4.0, height: CGFloat.greatestFiniteMagnitude))
+    var messageLabelSize: CGSize = messageLabel
+      .sizeThatFits(CGSize(width: width - kPadding * 4.0, height: CGFloat.greatestFiniteMagnitude))
     messageLabelSize.height = messageLabelSize.height * resizePercentage
     var messageLabelFrame: CGRect = messageLabel.frame
     messageLabelFrame.size = messageLabelSize
@@ -166,6 +175,7 @@ class AlertPopupView: PopupView {
     updateSubviews()
   }
 
+  @available(*, unavailable)
   required init(coder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }

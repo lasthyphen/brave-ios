@@ -22,7 +22,7 @@ enum ActivityType: String {
   case openPlayList = "OpenPlayList"
 
   var identifier: String {
-    return "\(Bundle.main.bundleIdentifier ?? "").\(self.rawValue)"
+    "\(Bundle.main.bundleIdentifier ?? "").\(self.rawValue)"
   }
 
   /// The activity title for designated  type
@@ -80,7 +80,6 @@ enum ActivityType: String {
 
 /// Singleton Manager handles creation and action for Activities
 class ActivityShortcutManager: NSObject {
-
   /// Custom Intent Types
   enum IntentType {
     case openWebsite
@@ -123,7 +122,11 @@ class ActivityShortcutManager: NSObject {
   private func handleActivityDetails(type: ActivityType, using bvc: BrowserViewController) {
     switch type {
     case .newTab:
-      bvc.openBlankNewTab(attemptLocationFieldFocus: false, isPrivate: PrivateBrowsingManager.shared.isPrivateBrowsing, isExternal: true)
+      bvc.openBlankNewTab(
+        attemptLocationFieldFocus: false,
+        isPrivate: PrivateBrowsingManager.shared.isPrivateBrowsing,
+        isExternal: true
+      )
       bvc.popToBVC()
     case .newPrivateTab:
       bvc.openBlankNewTab(attemptLocationFieldFocus: false, isPrivate: true, isExternal: true)
@@ -131,12 +134,18 @@ class ActivityShortcutManager: NSObject {
     case .clearBrowsingHistory:
       bvc.clearHistoryAndOpenNewTab()
     case .enableBraveVPN:
-      bvc.openBlankNewTab(attemptLocationFieldFocus: false, isPrivate: PrivateBrowsingManager.shared.isPrivateBrowsing, isExternal: true)
+      bvc.openBlankNewTab(
+        attemptLocationFieldFocus: false,
+        isPrivate: PrivateBrowsingManager.shared.isPrivateBrowsing,
+        isExternal: true
+      )
       bvc.popToBVC()
 
       switch BraveVPN.vpnState {
       case .notPurchased, .purchased, .expired:
-        guard let enableVPNController = BraveVPN.vpnState.enableVPNDestinationVC else { return }
+        guard let enableVPNController = BraveVPN.vpnState.enableVPNDestinationVC else {
+          return
+        }
 
         bvc.openInsideSettingsNavigation(with: enableVPNController)
       case .installed(let connected):
@@ -154,7 +163,9 @@ class ActivityShortcutManager: NSObject {
         bvc.openBlankNewTab(attemptLocationFieldFocus: false, isPrivate: false, isExternal: true)
         bvc.popToBVC()
 
-        guard let newTabPageController = bvc.tabManager.selectedTab?.newTabPageViewController else { return }
+        guard let newTabPageController = bvc.tabManager.selectedTab?.newTabPageViewController else {
+          return
+        }
         newTabPageController.scrollToBraveNews()
       } else {
         let controller = BraveNewsSettingsViewController(dataSource: bvc.feedDataSource, rewards: bvc.rewards)

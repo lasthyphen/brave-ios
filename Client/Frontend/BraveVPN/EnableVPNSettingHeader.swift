@@ -8,7 +8,6 @@ import Shared
 import BraveShared
 
 class EnableVPNSettingHeader: UIView {
-
   var enableVPNTapped: (() -> Void)?
   var dismissHeaderTapped: (() -> Void)?
 
@@ -35,7 +34,6 @@ class EnableVPNSettingHeader: UIView {
   }
 
   private let enableButton = RoundInterfaceButton(type: .roundedRect).then {
-
     let title = { () -> String in
       switch BraveVPN.vpnState {
       case .notPurchased:

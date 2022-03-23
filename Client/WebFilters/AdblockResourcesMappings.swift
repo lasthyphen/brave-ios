@@ -17,8 +17,37 @@ struct AdblockResourcesMappings {
 }
 
 enum ResourceLocale: String {
-  case ar, bg, zh, cs, de, da, et, fi, fr, el, hu, id, hi, fa, `is`, he, it, ja, ko, lt, lv, nl,
-    pl, ru, uk, be, es, sl, sv, tr, vi
+  case ar
+  case bg
+  case zh
+  case cs
+  case de
+  case da
+  case et
+  case fi
+  case fr
+  case el
+  case hu
+  case id
+  case hi
+  case fa
+  case `is`
+  case he
+  case it
+  case ja
+  case ko
+  case lt
+  case lv
+  case nl
+  case pl
+  case ru
+  case uk
+  case be
+  case es
+  case sl
+  case sv
+  case tr
+  case vi
 
   func resourceName(for fileType: FileType) -> String {
     switch self {

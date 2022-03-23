@@ -27,6 +27,7 @@ class FeedGroupView: UIView {
     $0.textColor = .white
     $0.numberOfLines = 0
   }
+
   /// The buttons that contain each feed view
   private let buttons: [SpringButton]
   /// The feeds that are displayed within the list
@@ -60,14 +61,14 @@ class FeedGroupView: UIView {
 
     super.init(frame: .zero)
 
-    zip(buttons.indices, buttons).forEach { (index, button) in
+    zip(buttons.indices, buttons).forEach { index, button in
       button.addTarget(self, action: #selector(tappedButton(_:)), for: .touchUpInside)
       let contextMenuDelegate = FeedContextMenuDelegate(
         performedPreviewAction: { [weak self] in
           self?.actionHandler?(index, .opened())
         },
         menu: { [weak self] in
-          return self?.contextMenu?.menu?(index)
+          self?.contextMenu?.menu?(index)
         },
         padPreview: true
       )
@@ -93,7 +94,8 @@ class FeedGroupView: UIView {
           let transform: ([UIView]) -> [UIView] = transformItems ?? { views in views }
           let groupViews = transform(buttons)
           groupViews.forEach($0.addArrangedSubview)
-        })
+        }
+      )
     )
 
     addSubview(backgroundView)
@@ -146,12 +148,14 @@ class DealsFeedGroupView: FeedGroupView, FeedCardContent {
           }
           $0.isUserInteractionEnabled = false
           $0.isAccessibilityElement = false
-        }),
+        }
+      ),
       .view(
         FeedCardFooterButton().then {
           $0.label.text = Strings.BraveNews.moreBraveOffers
           $0.addTarget(self, action: #selector(tappedMoreOffers), for: .touchUpInside)
-        })
+        }
+      )
     )
   }
 
@@ -186,12 +190,14 @@ class NumberedFeedGroupView: FeedGroupView, FeedCardContent {
                   $0.textColor = UIColor(white: 1.0, alpha: 0.4)
                   $0.setContentHuggingPriority(.required, for: .horizontal)
                   $0.isAccessibilityElement = false
-                }),
+                }
+              ),
               .view(view.element)
             )
           }
         }
-      })
+      }
+    )
   }
 }
 

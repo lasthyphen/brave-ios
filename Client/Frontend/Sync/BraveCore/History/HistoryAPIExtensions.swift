@@ -11,7 +11,6 @@ import CoreData
 import Shared
 
 extension BraveHistoryAPI {
-
   // MARK: Internal
 
   func add(url: URL, title: String, dateAdded: Date, isURLTyped: Bool = true) {
@@ -20,7 +19,7 @@ extension BraveHistoryAPI {
   }
 
   func frc() -> HistoryV2FetchResultsController? {
-    return Historyv2Fetcher(historyAPI: self)
+    Historyv2Fetcher(historyAPI: self)
   }
 
   func suffix(_ maxLength: Int, _ completion: @escaping ([HistoryNode]) -> Void) {
@@ -28,7 +27,8 @@ extension BraveHistoryAPI {
       withQuery: nil, maxCount: UInt(max(20, maxLength)),
       completion: { historyResults in
         completion(historyResults.map { $0 })
-      })
+      }
+    )
   }
 
   func byFrequency(query: String, completion: @escaping ([HistoryNode]) -> Void) {
@@ -40,7 +40,8 @@ extension BraveHistoryAPI {
       withQuery: query, maxCount: 200,
       completion: { historyResults in
         completion(historyResults.map { $0 })
-      })
+      }
+    )
   }
 
   func update(_ historyNode: HistoryNode, customTitle: String?, dateAdded: Date?) {
@@ -61,14 +62,18 @@ extension BraveHistoryAPI {
 
   private var observer: HistoryServiceListener? {
     get { objc_getAssociatedObject(self, &AssociatedObjectKeys.serviceStateListener) as? HistoryServiceListener }
-    set { objc_setAssociatedObject(self, &AssociatedObjectKeys.serviceStateListener, newValue, .OBJC_ASSOCIATION_RETAIN_NONATOMIC) }
+    set { objc_setAssociatedObject(
+      self,
+      &AssociatedObjectKeys.serviceStateListener,
+      newValue,
+      .OBJC_ASSOCIATION_RETAIN_NONATOMIC
+    ) }
   }
 }
 
 // MARK: Brave-Core Only
 
 extension BraveHistoryAPI {
-
   func waitForHistoryServiceLoaded(_ completion: @escaping () -> Void) {
     if isBackendLoaded {
       DispatchQueue.main.async {
@@ -85,7 +90,8 @@ extension BraveHistoryAPI {
               completion()
             }
           }
-        }))
+        })
+      )
     }
   }
 }

@@ -15,7 +15,6 @@ import SwiftKeychainWrapper
 private let log = Logger.browserLogger
 
 class WindowProtection {
-
   private class LockedViewController: UIViewController {
     let backgroundView = UIVisualEffectView(effect: UIBlurEffect(style: .systemThickMaterial))
     let lockImageView = UIImageView(image: UIImage(imageLiteralResourceName: "browser-lock-icon"))
@@ -71,7 +70,7 @@ class WindowProtection {
   var isPassCodeAvailable: Bool {
     var error: NSError?
     if !context.canEvaluatePolicy(.deviceOwnerAuthentication, error: &error),
-      (error as? LAError)?.code == .passcodeNotSet {
+       (error as? LAError)?.code == .passcodeNotSet {
       return false
     }
 
@@ -79,7 +78,9 @@ class WindowProtection {
   }
 
   init?(window: UIWindow) {
-    guard let scene = window.windowScene else { return nil }
+    guard let scene = window.windowScene else {
+      return nil
+    }
     protectedWindow = window
 
     passcodeWindow = UIWindow(windowScene: scene)
@@ -90,17 +91,24 @@ class WindowProtection {
 
     NotificationCenter.default.publisher(for: UIApplication.didEnterBackgroundNotification)
       .sink(receiveValue: { [weak self] _ in
-        guard let self = self else { return }
+        guard let self = self else {
+          return
+        }
         // Update visibility when entering background
-        self.isVisible = Preferences.Privacy.lockWithPasscode.value && self.context.canEvaluatePolicy(.deviceOwnerAuthentication, error: nil)
+        self.isVisible = Preferences.Privacy.lockWithPasscode.value && self.context.canEvaluatePolicy(
+          .deviceOwnerAuthentication,
+          error: nil
+        )
       })
       .store(in: &cancellables)
 
     NotificationCenter.default.publisher(for: UIApplication.willEnterForegroundNotification)
       .merge(with: NotificationCenter.default.publisher(for: UIApplication.didFinishLaunchingNotification))
       .sink(receiveValue: { [weak self] _ in
-        guard let self = self else { return }
-        self.context = LAContext()  // Reset context for new session
+        guard let self = self else {
+          return
+        }
+        self.context = LAContext() // Reset context for new session
         self.updateVisibleStatusForForeground()
       })
       .store(in: &cancellables)
@@ -118,7 +126,7 @@ class WindowProtection {
   private func updateVisibleStatusForForeground(_ determineLockWithPasscode: Bool = true) {
     var error: NSError?
     if !context.canEvaluatePolicy(.deviceOwnerAuthentication, error: &error),
-      (error as? LAError)?.code == .passcodeNotSet {
+       (error as? LAError)?.code == .passcodeNotSet {
       // User no longer has a passcode set so we can't evaluate the auth policy
       isVisible = false
       return
@@ -141,26 +149,31 @@ class WindowProtection {
       return
     }
     lockedViewController.unlockButton.isHidden = true
-    context.evaluatePolicy(.deviceOwnerAuthentication, localizedReason: Strings.authenticationLoginsTouchReason) { success, error in
-      DispatchQueue.main.async { [self] in
-        if success {
-          UIView.animate(
-            withDuration: 0.1,
-            animations: { [self] in
-              lockedViewController.view.alpha = 0.0
-            },
-            completion: { [self] _ in
-              isVisible = false
-              lockedViewController.view.alpha = 1.0
-            })
-        } else {
-          lockedViewController.unlockButton.isHidden = false
-          if let error = error {
-            log.error("Failed to unlock browser using local authentication: \(error.localizedDescription)")
+    context
+      .evaluatePolicy(
+        .deviceOwnerAuthentication,
+        localizedReason: Strings.authenticationLoginsTouchReason
+      ) { success, error in
+        DispatchQueue.main.async { [self] in
+          if success {
+            UIView.animate(
+              withDuration: 0.1,
+              animations: { [self] in
+                lockedViewController.view.alpha = 0.0
+              },
+              completion: { [self] _ in
+                isVisible = false
+                lockedViewController.view.alpha = 1.0
+              }
+            )
+          } else {
+            lockedViewController.unlockButton.isHidden = false
+            if let error = error {
+              log.error("Failed to unlock browser using local authentication: \(error.localizedDescription)")
+            }
           }
         }
       }
-    }
   }
 
   func presentAuthenticationForViewController(determineLockWithPasscode: Bool = true) {

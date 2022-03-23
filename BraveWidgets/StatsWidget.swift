@@ -35,10 +35,12 @@ private struct StatsProvider: TimelineProvider {
   func placeholder(in context: Context) -> Entry {
     Entry(date: Date(), statData: [])
   }
+
   func getSnapshot(in context: Context, completion: @escaping (Entry) -> Void) {
     let entry = Entry(date: Date(), statData: stats)
     completion(entry)
   }
+
   func getTimeline(in context: Context, completion: @escaping (Timeline<Entry>) -> Void) {
     let entry = Entry(date: Date(), statData: stats)
     let timeline = Timeline(entries: [entry], policy: .never)

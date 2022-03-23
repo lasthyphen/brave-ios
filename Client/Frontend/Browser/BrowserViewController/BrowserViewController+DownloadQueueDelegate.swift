@@ -20,11 +20,16 @@ extension BrowserViewController: DownloadQueueDelegate {
           if buttonPressed, !downloadQueue.isEmpty {
             downloadQueue.cancelAll()
 
-            let downloadCancelledToast = ButtonToast(labelText: Strings.downloadCancelledToastLabelText, backgroundColor: UIColor.braveLabel, textAlignment: .center)
+            let downloadCancelledToast = ButtonToast(
+              labelText: Strings.downloadCancelledToastLabelText,
+              backgroundColor: UIColor.braveLabel,
+              textAlignment: .center
+            )
 
             self.show(toast: downloadCancelledToast)
           }
-        })
+        }
+      )
 
       show(toast: downloadToast, duration: nil)
       return
@@ -34,7 +39,11 @@ extension BrowserViewController: DownloadQueueDelegate {
     downloadToast.addDownload(download)
   }
 
-  func downloadQueue(_ downloadQueue: DownloadQueue, didDownloadCombinedBytes combinedBytesDownloaded: Int64, combinedTotalBytesExpected: Int64?) {
+  func downloadQueue(
+    _ downloadQueue: DownloadQueue,
+    didDownloadCombinedBytes combinedBytesDownloaded: Int64,
+    combinedTotalBytesExpected: Int64?
+  ) {
     downloadToast?.combinedBytesDownloaded = combinedBytesDownloaded
   }
 
@@ -54,18 +63,25 @@ extension BrowserViewController: DownloadQueueDelegate {
         let downloadCompleteToast = ButtonToast(
           labelText: download.filename, imageName: "check", buttonText: Strings.downloadsButtonTitle,
           completion: { buttonPressed in
-            guard buttonPressed else { return }
+            guard buttonPressed else {
+              return
+            }
 
             FileManager.default.openBraveDownloadsFolder { [weak self] success in
               if !success {
                 self?.displayOpenDownloadsError()
               }
             }
-          })
+          }
+        )
 
         self.show(toast: downloadCompleteToast, duration: DispatchTimeInterval.seconds(8))
       } else {
-        let downloadFailedToast = ButtonToast(labelText: Strings.downloadFailedToastLabelText, backgroundColor: UIColor.braveLabel, textAlignment: .center)
+        let downloadFailedToast = ButtonToast(
+          labelText: Strings.downloadFailedToastLabelText,
+          backgroundColor: UIColor.braveLabel,
+          textAlignment: .center
+        )
 
         self.show(toast: downloadFailedToast, duration: nil)
       }
@@ -76,7 +92,8 @@ extension BrowserViewController: DownloadQueueDelegate {
     let alert = UIAlertController(
       title: Strings.genericErrorTitle,
       message: Strings.openDownloadsFolderErrorDescription,
-      preferredStyle: .alert)
+      preferredStyle: .alert
+    )
     alert.addAction(UIAlertAction(title: Strings.PlayList.okayButtonTitle, style: .default, handler: nil))
 
     present(alert, animated: true, completion: nil)

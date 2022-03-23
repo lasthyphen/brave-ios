@@ -7,7 +7,7 @@ import SnapKit
 import UIKit
 import WebKit
 
-let DefaultTimeoutTimeInterval = 10.0  // Seconds.  We'll want some telemetry on load times in the wild.
+let DefaultTimeoutTimeInterval = 10.0 // Seconds.  We'll want some telemetry on load times in the wild.
 
 /**
  * A controller that manages a single web view and provides a way for
@@ -29,7 +29,8 @@ class SettingsContentViewController: UIViewController, WKNavigationDelegate {
           completion: { finished in
             self.interstitialView.removeFromSuperview()
             self.interstitialSpinnerView.stopAnimating()
-          })
+          }
+        )
       }
     }
   }
@@ -45,7 +46,8 @@ class SettingsContentViewController: UIViewController, WKNavigationDelegate {
           completion: { finished in
             self.interstitialSpinnerView.removeFromSuperview()
             self.interstitialSpinnerView.stopAnimating()
-          })
+          }
+        )
       }
     }
   }
@@ -63,7 +65,13 @@ class SettingsContentViewController: UIViewController, WKNavigationDelegate {
       return
     }
     if timeout > 0 {
-      self.timer = Timer.scheduledTimer(timeInterval: timeout, target: self, selector: #selector(didTimeOut), userInfo: nil, repeats: false)
+      self.timer = Timer.scheduledTimer(
+        timeInterval: timeout,
+        target: self,
+        selector: #selector(didTimeOut),
+        userInfo: nil,
+        repeats: false
+      )
     } else {
       self.timer = nil
     }
@@ -77,6 +85,7 @@ class SettingsContentViewController: UIViewController, WKNavigationDelegate {
     super.init(nibName: nil, bundle: nil)
   }
 
+  @available(*, unavailable)
   required init?(coder aDecoder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }
@@ -138,7 +147,6 @@ class SettingsContentViewController: UIViewController, WKNavigationDelegate {
 
     spinner.snp.makeConstraints { make in
       make.center.equalTo(view)
-      return
     }
 
     error.snp.makeConstraints { make in
@@ -146,7 +154,6 @@ class SettingsContentViewController: UIViewController, WKNavigationDelegate {
       make.left.equalTo(view.snp.left).offset(20)
       make.right.equalTo(view.snp.right).offset(-20)
       make.height.equalTo(44)
-      return
     }
 
     return (view, spinner, error)
@@ -157,9 +164,14 @@ class SettingsContentViewController: UIViewController, WKNavigationDelegate {
     self.isError = true
   }
 
-  func webView(_ webView: WKWebView, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
+  func webView(
+    _ webView: WKWebView,
+    didReceive challenge: URLAuthenticationChallenge,
+    completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void
+  ) {
     // If this is a request to our local web server, use our private credentials.
-    if challenge.protectionSpace.host == "localhost" && challenge.protectionSpace.port == Int(WebServer.sharedInstance.server.port) {
+    if challenge.protectionSpace.host == "localhost" && challenge.protectionSpace
+      .port == Int(WebServer.sharedInstance.server.port) {
       completionHandler(.useCredential, WebServer.sharedInstance.credentials)
       return
     }

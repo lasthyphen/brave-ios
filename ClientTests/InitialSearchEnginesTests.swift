@@ -9,10 +9,9 @@ import XCTest
 private typealias SE = InitialSearchEngines
 
 class InitialSearchEnginesTests: XCTestCase {
-
   func testDefaultValues() throws {
     let unknownLocaleSE = SE(locale: Locale(identifier: "xx_XX"))
-    let engines = unknownLocaleSE.engines.map { $0.id }
+    let engines = unknownLocaleSE.engines.map(\.id)
 
     XCTAssertEqual(
       engines,
@@ -23,7 +22,8 @@ class InitialSearchEnginesTests: XCTestCase {
         .duckduckgo,
         .qwant,
         .startpage,
-      ])
+      ]
+    )
 
     XCTAssertEqual(unknownLocaleSE.defaultSearchEngine, .google)
     XCTAssertNil(unknownLocaleSE.priorityEngine)
@@ -36,7 +36,6 @@ class InitialSearchEnginesTests: XCTestCase {
   // MARK: - Locale overrides
 
   func testYandexRegions() throws {
-
     for region in InitialSearchEngines.yandexDefaultRegions {
       let localeSE = SE(locale: Locale(identifier: "ru_\(region)"))
       XCTAssertEqual(localeSE.defaultSearchEngine, .yandex)
@@ -48,7 +47,7 @@ class InitialSearchEnginesTests: XCTestCase {
   func testEnUS() throws {
     let localeSE = SE(locale: Locale(identifier: "en_US"))
 
-    let availableEngines = localeSE.engines.map { $0.id }
+    let availableEngines = localeSE.engines.map(\.id)
     XCTAssertEqual(
       availableEngines,
       [
@@ -59,9 +58,10 @@ class InitialSearchEnginesTests: XCTestCase {
         .qwant,
         .startpage,
         .ecosia,
-      ])
+      ]
+    )
 
-    let onboardingEngines = localeSE.onboardingEngines.map { $0.id }
+    let onboardingEngines = localeSE.onboardingEngines.map(\.id)
     XCTAssertEqual(
       onboardingEngines,
       [
@@ -71,7 +71,8 @@ class InitialSearchEnginesTests: XCTestCase {
         .qwant,
         .startpage,
         .ecosia,
-      ])
+      ]
+    )
 
     XCTAssertEqual(localeSE.defaultSearchEngine, .braveSearch)
     XCTAssertNil(localeSE.priorityEngine)
@@ -79,7 +80,7 @@ class InitialSearchEnginesTests: XCTestCase {
 
   func testJaJP() throws {
     let localeSE = SE(locale: Locale(identifier: "ja_JP"))
-    let availableEngines = localeSE.engines.map { $0.id }
+    let availableEngines = localeSE.engines.map(\.id)
 
     XCTAssertEqual(
       availableEngines,
@@ -90,9 +91,10 @@ class InitialSearchEnginesTests: XCTestCase {
         .duckduckgo,
         .qwant,
         .startpage,
-      ])
+      ]
+    )
 
-    let onboardingEngines = localeSE.onboardingEngines.map { $0.id }
+    let onboardingEngines = localeSE.onboardingEngines.map(\.id)
     XCTAssertEqual(
       onboardingEngines,
       [
@@ -101,7 +103,8 @@ class InitialSearchEnginesTests: XCTestCase {
         .duckduckgo,
         .qwant,
         .startpage,
-      ])
+      ]
+    )
 
     XCTAssertEqual(localeSE.defaultSearchEngine, .google)
     XCTAssertNil(localeSE.priorityEngine)
@@ -109,7 +112,7 @@ class InitialSearchEnginesTests: XCTestCase {
 
   func testEnGB() throws {
     let localeSE = SE(locale: Locale(identifier: "en_GB"))
-    let availableEngines = localeSE.engines.map { $0.id }
+    let availableEngines = localeSE.engines.map(\.id)
     XCTAssertEqual(
       availableEngines,
       [
@@ -120,9 +123,10 @@ class InitialSearchEnginesTests: XCTestCase {
         .qwant,
         .startpage,
         .ecosia,
-      ])
+      ]
+    )
 
-    let onboardingEngines = localeSE.onboardingEngines.map { $0.id }
+    let onboardingEngines = localeSE.onboardingEngines.map(\.id)
     XCTAssertEqual(
       onboardingEngines,
       [
@@ -132,7 +136,8 @@ class InitialSearchEnginesTests: XCTestCase {
         .qwant,
         .startpage,
         .ecosia,
-      ])
+      ]
+    )
 
     XCTAssertEqual(localeSE.defaultSearchEngine, .braveSearch)
     XCTAssertNil(localeSE.priorityEngine)
@@ -141,7 +146,7 @@ class InitialSearchEnginesTests: XCTestCase {
   func testDeDE() throws {
     let localeSE = SE(locale: Locale(identifier: "de_DE"))
 
-    let availableEngines = localeSE.engines.map { $0.id }
+    let availableEngines = localeSE.engines.map(\.id)
     XCTAssertEqual(
       availableEngines,
       [
@@ -152,9 +157,10 @@ class InitialSearchEnginesTests: XCTestCase {
         .qwant,
         .startpage,
         .ecosia,
-      ])
+      ]
+    )
 
-    let onboardingEngines = localeSE.onboardingEngines.map { $0.id }
+    let onboardingEngines = localeSE.onboardingEngines.map(\.id)
     XCTAssertEqual(
       onboardingEngines,
       [
@@ -164,7 +170,8 @@ class InitialSearchEnginesTests: XCTestCase {
         .qwant,
         .startpage,
         .ecosia,
-      ])
+      ]
+    )
 
     XCTAssertEqual(localeSE.defaultSearchEngine, .braveSearch)
     XCTAssertNil(localeSE.priorityEngine)
@@ -173,7 +180,7 @@ class InitialSearchEnginesTests: XCTestCase {
   func testFrFR() throws {
     let localeSE = SE(locale: Locale(identifier: "fr_FR"))
 
-    let availableEngines = localeSE.engines.map { $0.id }
+    let availableEngines = localeSE.engines.map(\.id)
     XCTAssertEqual(
       availableEngines,
       [
@@ -184,9 +191,10 @@ class InitialSearchEnginesTests: XCTestCase {
         .qwant,
         .startpage,
         .ecosia,
-      ])
+      ]
+    )
 
-    let onboardingEngines = localeSE.onboardingEngines.map { $0.id }
+    let onboardingEngines = localeSE.onboardingEngines.map(\.id)
     XCTAssertEqual(
       onboardingEngines,
       [
@@ -196,7 +204,8 @@ class InitialSearchEnginesTests: XCTestCase {
         .qwant,
         .startpage,
         .ecosia,
-      ])
+      ]
+    )
 
     XCTAssertEqual(localeSE.defaultSearchEngine, .braveSearch)
     XCTAssertNil(localeSE.priorityEngine)
@@ -205,7 +214,7 @@ class InitialSearchEnginesTests: XCTestCase {
   func testPlPL() throws {
     let unknownLocaleSE = SE(locale: Locale(identifier: "pl_PL"))
 
-    let availableEngines = unknownLocaleSE.engines.map { $0.id }
+    let availableEngines = unknownLocaleSE.engines.map(\.id)
     XCTAssertEqual(
       availableEngines,
       [
@@ -215,9 +224,10 @@ class InitialSearchEnginesTests: XCTestCase {
         .duckduckgo,
         .qwant,
         .startpage,
-      ])
+      ]
+    )
 
-    let onboardingEngines = unknownLocaleSE.onboardingEngines.map { $0.id }
+    let onboardingEngines = unknownLocaleSE.onboardingEngines.map(\.id)
     XCTAssertEqual(
       onboardingEngines,
       [
@@ -226,7 +236,8 @@ class InitialSearchEnginesTests: XCTestCase {
         .duckduckgo,
         .qwant,
         .startpage,
-      ])
+      ]
+    )
 
     XCTAssertEqual(unknownLocaleSE.defaultSearchEngine, .google)
     XCTAssertNil(unknownLocaleSE.priorityEngine)
@@ -235,7 +246,7 @@ class InitialSearchEnginesTests: XCTestCase {
   func testRuRu() throws {
     let russianLocale = SE(locale: Locale(identifier: "ru_RU"))
 
-    let availableEngines = russianLocale.engines.map { $0.id }
+    let availableEngines = russianLocale.engines.map(\.id)
     XCTAssertEqual(
       availableEngines,
       [
@@ -246,9 +257,10 @@ class InitialSearchEnginesTests: XCTestCase {
         .duckduckgo,
         .qwant,
         .startpage,
-      ])
+      ]
+    )
 
-    let onboardingEngines = russianLocale.onboardingEngines.map { $0.id }
+    let onboardingEngines = russianLocale.onboardingEngines.map(\.id)
     XCTAssertEqual(
       onboardingEngines,
       [
@@ -258,7 +270,8 @@ class InitialSearchEnginesTests: XCTestCase {
         .duckduckgo,
         .qwant,
         .startpage,
-      ])
+      ]
+    )
 
     XCTAssertEqual(russianLocale.defaultSearchEngine, .yandex)
     XCTAssertNil(russianLocale.priorityEngine)

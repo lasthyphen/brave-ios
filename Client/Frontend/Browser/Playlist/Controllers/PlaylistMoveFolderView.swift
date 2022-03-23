@@ -57,7 +57,11 @@ private struct PlaylistFolderView: View {
     HStack {
       HStack(spacing: 10.0) {
         Image(systemName: "folder")
-          .foregroundColor(isSourceFolder ? Color(.braveDisabled.resolvedColor(with: .init(userInterfaceStyle: .light))) : Color(.braveOrange))
+          .foregroundColor(
+            isSourceFolder
+              ? Color(.braveDisabled.resolvedColor(with: .init(userInterfaceStyle: .light)))
+              : Color(.braveOrange)
+          )
           .frame(width: imageSize)
 
         VStack(alignment: .leading) {
@@ -67,7 +71,9 @@ private struct PlaylistFolderView: View {
             Text(folder.title ?? "")
               .font(.body)
               .foregroundColor(.white)
-            Text("\(itemCount == 1 ? Strings.PlaylistFolders.playlistFolderSubtitleItemSingleCount : String.localizedStringWithFormat(Strings.PlaylistFolders.playlistFolderSubtitleItemCount, itemCount))")
+            Text("\(itemCount == 1
+              ? Strings.PlaylistFolders.playlistFolderSubtitleItemSingleCount
+              : String.localizedStringWithFormat(Strings.PlaylistFolders.playlistFolderSubtitleItemCount, itemCount))")
               .font(.footnote)
               .foregroundColor(Color(.secondaryBraveLabel))
           }
@@ -105,7 +111,7 @@ struct PlaylistMoveFolderView: View {
   @State private var selectedFolder = PlaylistManager.shared.currentFolder
 
   private var isMoveDisabled: Bool {
-    return selectedFolder?.uuid == PlaylistManager.shared.currentFolder?.uuid
+    selectedFolder?.uuid == PlaylistManager.shared.currentFolder?.uuid
   }
 
   private var itemDescription: String {
@@ -121,7 +127,11 @@ struct PlaylistMoveFolderView: View {
       return String.localizedStringWithFormat(Strings.PlaylistFolders.playlistFolderMoveItemDescription, title)
     }
 
-    return String.localizedStringWithFormat(Strings.PlaylistFolders.playlistFolderMoveMultipleItemDescription, title, selectedItems.count - 1)
+    return String.localizedStringWithFormat(
+      Strings.PlaylistFolders.playlistFolderMoveMultipleItemDescription,
+      title,
+      selectedItems.count - 1
+    )
   }
 
   var selectedItems: [PlaylistItem]
@@ -132,37 +142,35 @@ struct PlaylistMoveFolderView: View {
     NavigationView {
       List {
         Section(
-          header: {
-            HStack(spacing: 12.0) {
-              if selectedItems.count > 1,
-                let firstItem = selectedItems[safe: 0],
-                let secondItem = selectedItems[safe: 1] {
-                ZStack {
-                  PlaylistFolderImage(item: firstItem)
-                    .rotationEffect(.degrees(5.0))
-                  PlaylistFolderImage(item: secondItem).rotationEffect(.degrees(-5.0))
-                }
-
-                Text(itemDescription)
-                  .lineLimit(2)
-                  .font(.body)
-                  .foregroundColor(.white)
-                  .textCase(.none)
-                  .fixedSize(horizontal: false, vertical: true)
-              } else if let item = selectedItems.first {
-                PlaylistFolderImage(item: item)
-                Text(item.name ?? Strings.PlaylistFolders.playlistFolderMoveItemWithNoNameTitle)
-                  .lineLimit(2)
-                  .font(.body)
-                  .foregroundColor(.white)
-                  .textCase(.none)
+          header: HStack(spacing: 12.0) {
+            if selectedItems.count > 1,
+               let firstItem = selectedItems[safe: 0],
+               let secondItem = selectedItems[safe: 1] {
+              ZStack {
+                PlaylistFolderImage(item: firstItem)
+                  .rotationEffect(.degrees(5.0))
+                PlaylistFolderImage(item: secondItem).rotationEffect(.degrees(-5.0))
               }
+
+              Text(itemDescription)
+                .lineLimit(2)
+                .font(.body)
+                .foregroundColor(.white)
+                .textCase(.none)
+                .fixedSize(horizontal: false, vertical: true)
+            } else if let item = selectedItems.first {
+              PlaylistFolderImage(item: item)
+              Text(item.name ?? Strings.PlaylistFolders.playlistFolderMoveItemWithNoNameTitle)
+                .lineLimit(2)
+                .font(.body)
+                .foregroundColor(.white)
+                .textCase(.none)
             }
-            .padding(.top)
-          }()
+          }
+          .padding(.top)
         ) {}
-        .listRowInsets(.zero)
-        .listRowBackground(Color.clear)
+          .listRowInsets(.zero)
+          .listRowBackground(Color.clear)
 
         Section(
           header: Text(Strings.PlaylistFolders.playlistFolderMoveFolderCurrentSectionTitle)
@@ -171,19 +179,24 @@ struct PlaylistMoveFolderView: View {
             .foregroundColor(Color(.secondaryBraveLabel))
             .multilineTextAlignment(.leading)
         ) {
-
           Button(action: {
             selectedFolder = PlaylistManager.shared.currentFolder
           }) {
             PlaylistFolderView(
               isSourceFolder: true,
               folder: PlaylistManager.shared.currentFolder,
-              selectedFolder: $selectedFolder)
+              selectedFolder: $selectedFolder
+            )
           }
         }
         .listRowBackground(Color(.secondaryBraveGroupedBackground))
 
-        let sectionTitle = selectedItems.count == 1 ? Strings.PlaylistFolders.playlistFolderSelectASingleFolderTitle : String.localizedStringWithFormat(Strings.PlaylistFolders.playlistFolderSelectAFolderTitle, selectedItems.count)
+        let sectionTitle = selectedItems.count == 1
+          ? Strings.PlaylistFolders.playlistFolderSelectASingleFolderTitle
+          : String.localizedStringWithFormat(
+            Strings.PlaylistFolders.playlistFolderSelectAFolderTitle,
+            selectedItems.count
+          )
         Section(
           header: Text(sectionTitle)
             .font(.footnote)
@@ -191,7 +204,6 @@ struct PlaylistMoveFolderView: View {
             .foregroundColor(Color(.secondaryBraveLabel))
             .multilineTextAlignment(.leading)
         ) {
-
           // Show the "Saved" folder
           if PlaylistManager.shared.currentFolder?.uuid != savedFolder.first?.uuid {
             Button(action: {
@@ -200,7 +212,8 @@ struct PlaylistMoveFolderView: View {
               PlaylistFolderView(
                 isSourceFolder: false,
                 folder: savedFolder.first,
-                selectedFolder: $selectedFolder)
+                selectedFolder: $selectedFolder
+              )
             }
           }
 
@@ -214,7 +227,8 @@ struct PlaylistMoveFolderView: View {
               PlaylistFolderView(
                 isSourceFolder: false,
                 folder: folder,
-                selectedFolder: $selectedFolder)
+                selectedFolder: $selectedFolder
+              )
             }
           }
         }

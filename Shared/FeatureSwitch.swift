@@ -16,8 +16,13 @@ open class FeatureSwitch {
   let buildChannel: AppBuildChannel
   let nonChannelValue: Bool
   let percentage: Int
-  fileprivate let switchKey: String
-  init(named featureID: String, _ value: Bool = true, allowPercentage percentage: Int, buildChannel: AppBuildChannel = .release) {
+  private let switchKey: String
+  init(
+    named featureID: String,
+    _ value: Bool = true,
+    allowPercentage percentage: Int,
+    buildChannel: AppBuildChannel = .release
+  ) {
     self.featureID = featureID
     self.percentage = percentage
     self.buildChannel = buildChannel
@@ -47,7 +52,7 @@ open class FeatureSwitch {
   /// Is this user always a member of the test set, whatever the percentage probability?
   /// This _only_ tests the probabilities, not the other conditions.
   open func alwaysMembership(_ prefs: Prefs) -> Bool {
-    return lowerCaseS(prefs) == 99
+    lowerCaseS(prefs) == 99
   }
 
   /// Reset the random component of this switch (`lowerCaseS`). This is primarily useful for testing.
@@ -59,7 +64,7 @@ open class FeatureSwitch {
   // If the set of all possible values the switch can be in is `S` (integers between 0 and 99)
   // then the specific value is `s`.
   // We use this to compare with the probability of membership.
-  fileprivate func lowerCaseS(_ prefs: Prefs) -> Int {
+  private func lowerCaseS(_ prefs: Prefs) -> Int {
     // Use a branch of the prefs.
     let uuidKey = "\(self.switchKey).uuid"
 

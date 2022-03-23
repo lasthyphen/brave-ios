@@ -137,12 +137,12 @@ class WalletTableViewHeaderView: UITableViewHeaderFooterView {
   @available(iOS, unavailable)
   override var textLabel: UILabel? {
     get { nil }
-    set {}  // swiftlint:disable:this unused_setter_value
+    set {} // swiftlint:disable:this unused_setter_value
   }
 
   @available(iOS, unavailable)
   override var detailTextLabel: UILabel? {
     get { nil }
-    set {}  // swiftlint:disable:this unused_setter_value
+    set {} // swiftlint:disable:this unused_setter_value
   }
 }

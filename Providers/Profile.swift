@@ -35,11 +35,15 @@ class ProfileFileAccessor: FileAccessor {
     if let url = FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: sharedContainerIdentifier) {
       rootPath = url.path
     } else {
-      log.error("Unable to find the shared container. Defaulting profile location to ~/Library/Application Support/ instead.")
+      log
+        .error(
+          "Unable to find the shared container. Defaulting profile location to ~/Library/Application Support/ instead."
+        )
       rootPath =
-        (NSSearchPathForDirectoriesInDomains(
+        NSSearchPathForDirectoriesInDomains(
           .applicationSupportDirectory,
-          .userDomainMask, true)[0])
+          .userDomainMask, true
+        )[0]
     }
 
     super.init(rootPath: URL(fileURLWithPath: rootPath).appendingPathComponent(profileDirName).path)
@@ -69,7 +73,7 @@ protocol Profile: AnyObject {
   func localName() -> String
 }
 
-fileprivate let PrefKeyClientID = "PrefKeyClientID"
+private let PrefKeyClientID = "PrefKeyClientID"
 extension Profile {
   var clientID: String {
     let clientID: String
@@ -84,7 +88,6 @@ extension Profile {
 }
 
 open class BrowserProfile: Profile {
-
   fileprivate let name: String
   fileprivate let keychain: KeychainWrapper
   var isShutdown = false
@@ -108,18 +111,18 @@ open class BrowserProfile: Profile {
   }
 
   /**
-     * N.B., BrowserProfile is used from our extensions, often via a pattern like
-     *
-     *   BrowserProfile(…).foo.saveSomething(…)
-     *
-     * This can break if BrowserProfile's initializer does async work that
-     * subsequently — and asynchronously — expects the profile to stick around:
-     * see Bug 1218833. Be sure to only perform synchronous actions here.
-     *
-     * A SyncDelegate can be provided in this initializer, or once the profile is initialized.
-     * However, if we provide it here, it's assumed that we're initializing it from the application,
-     * and initialize the logins.db.
-     */
+   * N.B., BrowserProfile is used from our extensions, often via a pattern like
+   *
+   *   BrowserProfile(…).foo.saveSomething(…)
+   *
+   * This can break if BrowserProfile's initializer does async work that
+   * subsequently — and asynchronously — expects the profile to stick around:
+   * see Bug 1218833. Be sure to only perform synchronous actions here.
+   *
+   * A SyncDelegate can be provided in this initializer, or once the profile is initialized.
+   * However, if we provide it here, it's assumed that we're initializing it from the application,
+   * and initialize the logins.db.
+   */
   init(localName: String, clear: Bool = false) {
     log.debug("Initing profile \(localName) on thread \(Thread.current).")
     self.name = localName
@@ -142,7 +145,12 @@ open class BrowserProfile: Profile {
     let isNewProfile = !files.exists("")
 
     // Set up our database handles.
-    self.loginsDB = BrowserDB(filename: "logins.db", secretKey: BrowserProfile.loginsKey, schema: LoginsSchema(), files: files)
+    self.loginsDB = BrowserDB(
+      filename: "logins.db",
+      secretKey: BrowserProfile.loginsKey,
+      schema: LoginsSchema(),
+      files: files
+    )
 
     if isNewProfile {
       log.info("New profile. Removing old account metadata.")
@@ -174,26 +182,18 @@ open class BrowserProfile: Profile {
   }
 
   func localName() -> String {
-    return name
+    name
   }
 
-  lazy var searchEngines: SearchEngines = {
-    return SearchEngines(files: self.files)
-  }()
+  lazy var searchEngines: SearchEngines = SearchEngines(files: self.files)
 
   func makePrefs() -> Prefs {
-    return NSUserDefaultsPrefs(prefix: self.localName())
+    NSUserDefaultsPrefs(prefix: self.localName())
   }
 
-  lazy var prefs: Prefs = {
-    return self.makePrefs()
-  }()
+  lazy var prefs: Prefs = self.makePrefs()
 
-  lazy var certStore: CertStore = {
-    return CertStore()
-  }()
+  lazy var certStore: CertStore = CertStore()
 
-  lazy var logins: BrowserLogins = {
-    return SQLiteLogins(db: self.loginsDB)
-  }()
+  lazy var logins: BrowserLogins = SQLiteLogins(db: self.loginsDB)
 }

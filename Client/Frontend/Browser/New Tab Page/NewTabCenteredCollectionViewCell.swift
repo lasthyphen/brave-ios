@@ -27,10 +27,15 @@ class NewTabCenteredCollectionViewCell<View: UIView>: UICollectionViewCell, Coll
     fatalError()
   }
 
-  override func preferredLayoutAttributesFitting(_ layoutAttributes: UICollectionViewLayoutAttributes) -> UICollectionViewLayoutAttributes {
+  override func preferredLayoutAttributesFitting(_ layoutAttributes: UICollectionViewLayoutAttributes)
+  -> UICollectionViewLayoutAttributes {
     // swiftlint:disable:next force_cast
     let attributes = layoutAttributes.copy() as! UICollectionViewLayoutAttributes
-    attributes.size.height = systemLayoutSizeFitting(layoutAttributes.size, withHorizontalFittingPriority: .required, verticalFittingPriority: .fittingSizeLevel).height
+    attributes.size.height = systemLayoutSizeFitting(
+      layoutAttributes.size,
+      withHorizontalFittingPriority: .required,
+      verticalFittingPriority: .fittingSizeLevel
+    ).height
     return attributes
   }
 }

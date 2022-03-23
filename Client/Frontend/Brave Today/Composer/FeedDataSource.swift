@@ -32,17 +32,18 @@ class FeedDataSource {
     var cards: [FeedCard]? {
       switch self {
       case .success(let cards),
-        .loading(.success(let cards)):
+           .loading(.success(let cards)):
         return cards
       default:
         return nil
       }
     }
+
     /// The error if the state is `failure`
     var error: Error? {
       switch self {
       case .failure(let error),
-        .loading(.failure(let error)):
+           .loading(.failure(let error)):
         return error
       default:
         return nil
@@ -76,8 +77,8 @@ class FeedDataSource {
   init() {
     restoreCachedSources()
     if !AppConstants.buildChannel.isPublic,
-      let savedEnvironment = Preferences.BraveNews.debugEnvironment.value,
-      let environment = Environment(rawValue: savedEnvironment) {
+       let savedEnvironment = Preferences.BraveNews.debugEnvironment.value,
+       let environment = Environment(rawValue: savedEnvironment) {
       self.environment = environment
     }
   }
@@ -92,7 +93,8 @@ class FeedDataSource {
       DateFormatter().then {
         $0.dateFormat = "yyyy-MM-dd HH:mm:ss"
         $0.timeZone = TimeZone(secondsFromGMT: 0)
-      })
+      }
+    )
     return decoder
   }()
 
@@ -110,10 +112,13 @@ class FeedDataSource {
   /// - warning: Should only be changed in non-public releases
   var environment: Environment = .production {
     didSet {
-      if oldValue == environment { return }
+      if oldValue == environment {
+        return
+      }
       assert(
         !AppConstants.buildChannel.isPublic,
-        "Environment cannot be changed on non-public build channels")
+        "Environment cannot be changed on non-public build channels"
+      )
       Preferences.BraveNews.debugEnvironment.value = environment.rawValue
       clearCachedFiles()
     }
@@ -167,7 +172,7 @@ class FeedDataSource {
     // "en" is the default language and thus does not get the language code inserted into the
     // file name.
     if resource.isLocalized, let languageCode = Locale.preferredLanguages.first?.prefix(2),
-      languageCode != "en", Self.supportedLanguages.contains(String(languageCode)) {
+       languageCode != "en", Self.supportedLanguages.contains(String(languageCode)) {
       return "\(resource.name).\(languageCode).\(resource.type)"
     }
     return "\(resource.name).\(resource.type)"
@@ -183,8 +188,8 @@ class FeedDataSource {
     let filename = resourceFilename(for: resource)
     let cachedPath = fileManager.getOrCreateFolder(name: Self.cacheFolderName)?.appendingPathComponent(filename).path
     if let cachedPath = cachedPath,
-      let attributes = try? fileManager.attributesOfItem(atPath: cachedPath),
-      let date = attributes[.modificationDate] as? Date {
+       let attributes = try? fileManager.attributesOfItem(atPath: cachedPath),
+       let date = attributes[.modificationDate] as? Date {
       return Date().timeIntervalSince(date) > resource.cacheLifetime
     }
     return true
@@ -202,9 +207,9 @@ class FeedDataSource {
     let fileManager = FileManager.default
     let deferred = Deferred<Data?>(value: nil, defaultQueue: .main)
     let cachedPath = fileManager.getOrCreateFolder(name: Self.cacheFolderName)?.appendingPathComponent(name).path
-    if (loadExpiredData || !isResourceExpired(resource)),
-      let cachedPath = cachedPath,
-      fileManager.fileExists(atPath: cachedPath) {
+    if loadExpiredData || !isResourceExpired(resource),
+       let cachedPath = cachedPath,
+       fileManager.fileExists(atPath: cachedPath) {
       todayQueue.async {
         if let cachedContents = fileManager.contents(atPath: cachedPath) {
           deferred.fill(cachedContents)
@@ -233,7 +238,9 @@ class FeedDataSource {
     let filename = resourceFilename(for: resource)
     return cachedResource(resource)
       .bind({ [weak self] data -> Deferred<Result<Data, Error>> in
-        guard let self = self else { return .init() }
+        guard let self = self else {
+          return .init()
+        }
         if let data = data {
           return .init(value: .success(data), defaultQueue: .main)
         }
@@ -275,7 +282,9 @@ class FeedDataSource {
 
   private func restoreCachedSources() {
     cachedResource(.sources, loadExpiredData: true).uponQueue(todayQueue) { [weak self] data in
-      guard let self = self, let data = data else { return }
+      guard let self = self, let data = data else {
+        return
+      }
       do {
         let decodedResource = try self.decoder.decode([FailableDecodable<FeedItem.Source>].self, from: data)
         DispatchQueue.main.async {
@@ -345,7 +354,9 @@ class FeedDataSource {
               content = feedItems
             }
           }
-          guard let self = self else { return }
+          guard let self = self else {
+            return
+          }
           content = self.scored(rssItems: content)
           deferred.fill(.success(.init(source: source, items: content)))
         }
@@ -410,17 +421,21 @@ class FeedDataSource {
   func load(_ completion: (() -> Void)? = nil) {
     state = .loading(state)
     loadSources().both(loadFeed()).uponQueue(.main) { [weak self] results in
-      guard let self = self else { return }
+      guard let self = self else {
+        return
+      }
       switch results {
       case (.failure(let error), _),
-        (_, .failure(let error)):
+           (_, .failure(let error)):
         self.state = .failure(error)
         completion?()
       case (.success(let sources), .success(let items)):
         self.sources = sources
         self.items = items
         self.loadRSSFeeds().uponQueue(.main) { [weak self] results in
-          guard let self = self else { return }
+          guard let self = self else {
+            return
+          }
           for result in results {
             switch result {
             case .success(let feed):
@@ -465,7 +480,7 @@ class FeedDataSource {
   /// Get a map of customized sources IDs and their overridden enabled states
   var customizedSources: [String: Bool] {
     let all = FeedSourceOverride.all()
-    return all.reduce(into: [:]) { (result, source) in
+    return all.reduce(into: [:]) { result, source in
       result[source.publisherID] = source.enabled
     }
   }
@@ -562,15 +577,17 @@ class FeedDataSource {
     // Ensure main thread since we're querying from CoreData
     dispatchPrecondition(condition: .onQueue(.main))
     let lastVisitedDomains =
-      (try? History.suffix(200)
-        .lazy
-        .compactMap(\.url)
-        .compactMap { URL(string: $0)?.baseDomain }) ?? []
+      (
+        try? History.suffix(200)
+          .lazy
+          .compactMap(\.url)
+          .compactMap { URL(string: $0)?.baseDomain }
+      ) ?? []
     todayQueue.async {
       let items: [FeedItem] = feeds.compactMap { content in
         var score = content.baseScore
         if let feedBaseDomain = content.url?.baseDomain,
-          lastVisitedDomains.contains(feedBaseDomain) {
+           lastVisitedDomains.contains(feedBaseDomain) {
           score -= 5
         }
         guard let source = sources.first(where: { $0.id == content.publisherID }) else {
@@ -614,7 +631,8 @@ class FeedDataSource {
         FilteredFillStrategy(isIncluded: { $0.source.category == Self.topNewsCategory }),
         [
           .headline(paired: false)
-        ]),
+        ]
+      ),
       .braveAd,
       .repeating([
         .repeating([.headline(paired: false)], times: 2),
@@ -640,18 +658,21 @@ class FeedDataSource {
           RandomizedFillStrategy(isIncluded: { Date().timeIntervalSince($0.content.publishTime) < 48.hours }),
           [
             .headline(paired: false)
-          ]),
+          ]
+        ),
         .fillUsing(
           dealsCategoryFillStrategy,
           [
             .deals
-          ]),
+          ]
+        ),
         .fillUsing(
           RandomizedFillStrategy(isIncluded: { Date().timeIntervalSince($0.content.publishTime) < 48.hours }),
           [
             .headline(paired: true),
             .headline(paired: false),
-          ]),
+          ]
+        ),
       ]),
     ]
 
@@ -676,7 +697,9 @@ class FeedDataSource {
       case .braveAd:
         // If we fail to obtain inline content ads during a card gen it can be assumed that
         // all further calls will fail since cards are generated all at once
-        guard !contentAdsQueryFailed, let rewards = rewards else { return nil }
+        guard !contentAdsQueryFailed, let rewards = rewards else {
+          return nil
+        }
         let group = DispatchGroup()
         group.enter()
         var contentAd: InlineContentAd?
@@ -691,7 +714,8 @@ class FeedDataSource {
                 logger.debug("Inline content ads could not be filled; Skipping for the rest of this feed generation")
               }
               group.leave()
-            })
+            }
+          )
         }
         let result = group.wait(timeout: .now() + .seconds(1))
         if result == .success, let ad = contentAd {
@@ -699,7 +723,9 @@ class FeedDataSource {
         }
         return nil
       case .headline(let paired):
-        if articles.isEmpty { return nil }
+        if articles.isEmpty {
+          return nil
+        }
         let imageExists = { (item: FeedItem) -> Bool in
           item.content.imageURL != nil
         }
@@ -773,12 +799,12 @@ class FeedDataSource {
         }
       }
       if generatedCards.count < 10,
-        generatedCards.allSatisfy({
-          if case .ad = $0 {
-            return true
-          }
-          return false
-        }) {
+         generatedCards.allSatisfy({
+           if case .ad = $0 {
+             return true
+           }
+           return false
+         }) {
         // If there are less than 10 cards and they all are ads, show nothing
         generatedCards.removeAll()
       }
@@ -816,5 +842,4 @@ extension FeedDataSource {
     /// until there is no more content available
     indirect case repeating([FeedSequenceElement], times: Int = .max)
   }
-
 }

@@ -7,10 +7,9 @@ import Shared
 @testable import BraveShared
 
 class AppReviewTests: XCTestCase {
-
-  private var lastReviewDate: Date? { return Preferences.Review.lastReviewDate.value }
-  private var launchCount: Int { return Preferences.Review.launchCount.value }
-  private var threshold: Int { return Preferences.Review.threshold.value }
+  private var lastReviewDate: Date? { Preferences.Review.lastReviewDate.value }
+  private var launchCount: Int { Preferences.Review.launchCount.value }
+  private var threshold: Int { Preferences.Review.threshold.value }
 
   override func setUp() {
     // Put setup code here. This method is called before the invocation of each test method in the class.
@@ -40,7 +39,6 @@ class AppReviewTests: XCTestCase {
   }
 
   func testThresholdsNoDateInterval() {
-
     // First threshold
     for i in 2...AppReview.firstThreshold {
       simulateLaunch()
@@ -102,7 +100,6 @@ class AppReviewTests: XCTestCase {
     // Date and launch count far away in the future
     Preferences.Review.launchCount.value = AppReview.lastThreshold + 1000
     XCTAssert(AppReview.shouldRequestReview(date: dateFrom(string: "2022-01-01")))
-
   }
 
   private func simulateLaunch() {

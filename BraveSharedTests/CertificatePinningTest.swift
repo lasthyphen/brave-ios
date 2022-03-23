@@ -20,7 +20,6 @@ extension CertificatePinningTest {
 }
 
 class CertificatePinningTest: XCTestCase {
-
   private lazy var leaf = certificate(named: "leaf")
   private lazy var intermediate = certificate(named: "intermediate")
   private lazy var root = certificate(named: "root")
@@ -46,7 +45,6 @@ class CertificatePinningTest: XCTestCase {
       try evaluator.evaluate(trust, forHost: host)
       XCTFail("Validation succeeded but should have failed")
     } catch {
-
     }
   }
 
@@ -64,7 +62,6 @@ class CertificatePinningTest: XCTestCase {
       try evaluator.evaluate(trust, forHost: host)
       XCTFail("Validation succeeded but should have failed")
     } catch {
-
     }
   }
 
@@ -80,7 +77,6 @@ class CertificatePinningTest: XCTestCase {
       try evaluator.evaluate(trust, forHost: host)
       XCTFail("Validation succeeded but should have failed")
     } catch {
-
     }
   }
 
@@ -96,7 +92,6 @@ class CertificatePinningTest: XCTestCase {
       try evaluator.evaluate(trust, forHost: host)
       XCTFail("Validation succeeded but should have failed")
     } catch {
-
     }
   }
 
@@ -109,7 +104,10 @@ class CertificatePinningTest: XCTestCase {
 
     let host = "unit-test.brave.com"
     let trust = self.trust(for: [leaf])
-    let evaluator = PinningCertificateEvaluator(hosts: [host: leaf], options: [.default, .validateHost, .anchorSpecificTrustsOnly])
+    let evaluator = PinningCertificateEvaluator(
+      hosts: [host: leaf],
+      options: [.default, .validateHost, .anchorSpecificTrustsOnly]
+    )
 
     do {
       try evaluator.evaluate(trust, forHost: host)
@@ -125,7 +123,10 @@ class CertificatePinningTest: XCTestCase {
 
     let host = "badssl.com"
     let trust = self.trust(for: [root])
-    let evaluator = PinningCertificateEvaluator(hosts: [host: leaf], options: [.default, .validateHost, .anchorSpecificTrustsOnly])
+    let evaluator = PinningCertificateEvaluator(
+      hosts: [host: leaf],
+      options: [.default, .validateHost, .anchorSpecificTrustsOnly]
+    )
 
     do {
       try evaluator.evaluate(trust, forHost: host)
@@ -144,9 +145,8 @@ class CertificatePinningTest: XCTestCase {
       expectations.append(expectation)
 
       guard let hostUrl = URL(string: host),
-        let normalizedHost = hostUrl.normalizedHost()
+            let normalizedHost = hostUrl.normalizedHost()
       else {
-
         XCTFail("Invalid URL/Host for pinning: \(host)")
         expectation.fulfill()
         return
@@ -155,19 +155,20 @@ class CertificatePinningTest: XCTestCase {
       let certificateEvaluator = PinningCertificateEvaluator(hosts: [normalizedHost])
       let sessionManager = URLSession(configuration: .default, delegate: certificateEvaluator, delegateQueue: .main)
 
-      sessionManager.request(hostUrl, method: .put, parameters: ["unit-test": "unit-value"], encoding: .json) { response in
-        switch response {
-        case .success:
-          break
+      sessionManager
+        .request(hostUrl, method: .put, parameters: ["unit-test": "unit-value"], encoding: .json) { response in
+          switch response {
+          case .success:
+            break
 
-        case .failure(let error as NSError):
-          if error.code == NSURLErrorCancelled {
-            XCTFail("Invalid URL/Host for pinning: \(error) for host: \(host)")
+          case .failure(let error as NSError):
+            if error.code == NSURLErrorCancelled {
+              XCTFail("Invalid URL/Host for pinning: \(error) for host: \(host)")
+            }
           }
-        }
 
-        expectation.fulfill()
-      }.resume()
+          expectation.fulfill()
+        }.resume()
       sessionManager.finishTasksAndInvalidate()
     }
 
@@ -185,9 +186,8 @@ class CertificatePinningTest: XCTestCase {
       expectations.append(expectation)
 
       guard let hostUrl = URL(string: host),
-        let normalizedHost = hostUrl.normalizedHost()
+            let normalizedHost = hostUrl.normalizedHost()
       else {
-
         XCTFail("Invalid URL/Host for pinning: \(host)")
         expectation.fulfill()
         return

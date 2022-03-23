@@ -48,7 +48,9 @@ class BraveRewardsStatusView: UIView {
 
   private var visibleView: UIView?
   private func setVisibleView(_ view: UIView, animated: Bool) {
-    if view === visibleView { return }
+    if view === visibleView {
+      return
+    }
     if animated {
       let oldValue = visibleView
       visibleView = view
@@ -66,11 +68,13 @@ class BraveRewardsStatusView: UIView {
             withDuration: 0.1,
             animations: {
               self.visibleView?.isHidden = false
-            })
+            }
+          )
           UIView.animate(withDuration: 0.1, delay: 0.05) {
             self.visibleView?.alpha = 1.0
           }
-        })
+        }
+      )
     } else {
       visibleView?.isHidden = true
       visibleView = view

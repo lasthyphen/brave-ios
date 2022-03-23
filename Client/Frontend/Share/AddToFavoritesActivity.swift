@@ -13,11 +13,11 @@ class AddToFavoritesActivity: UIActivity {
   }
 
   override var activityTitle: String? {
-    return Strings.addToFavorites
+    Strings.addToFavorites
   }
 
   override var activityImage: UIImage? {
-    return #imageLiteral(resourceName: "add_to_favorites_share_action")
+    #imageLiteral(resourceName: "add_to_favorites_share_action")
   }
 
   override func perform() {
@@ -26,6 +26,6 @@ class AddToFavoritesActivity: UIActivity {
   }
 
   override func canPerform(withActivityItems activityItems: [Any]) -> Bool {
-    return true
+    true
   }
 }

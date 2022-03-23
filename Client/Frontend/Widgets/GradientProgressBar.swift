@@ -16,10 +16,9 @@
 import UIKit
 
 open class GradientProgressBar: UIProgressView {
-
   private struct DefaultValues {
     static let backgroundColor = UIColor.clear
-    static let animationDuration = 0.2  // CALayer default animation duration
+    static let animationDuration = 0.2 // CALayer default animation duration
   }
 
   var gradientColors: [CGColor] = []
@@ -98,7 +97,12 @@ open class GradientProgressBar: UIProgressView {
     // Apply "alphaMaskLayer" as a mask to the gradient layer in order to show only parts of the current "progress"
     gradientLayer.mask = alphaMaskLayer
 
-    gradientLayer.frame = CGRect(x: bounds.origin.x, y: bounds.origin.y, width: bounds.size.width * 2, height: bounds.size.height)
+    gradientLayer.frame = CGRect(
+      x: bounds.origin.x,
+      y: bounds.origin.y,
+      width: bounds.size.width * 2,
+      height: bounds.size.height
+    )
     gradientLayer.colors = gradientColors
     gradientLayer.locations = [0.0, 0.2, 0.4, 0.6, 0.8, 1.0, 1.0]
     gradientLayer.startPoint = .zero
@@ -131,12 +135,17 @@ open class GradientProgressBar: UIProgressView {
   func resetProgressBar() {
     // Call on super instead so no animation layers are created
     super.setProgress(0, animated: false)
-    isHidden = true  // The URLBar will unhide the view before starting the next animation.
+    isHidden = true // The URLBar will unhide the view before starting the next animation.
   }
 
   override open func layoutSubviews() {
     super.layoutSubviews()
-    self.gradientLayer.frame = CGRect(x: bounds.origin.x - 4, y: bounds.origin.y, width: bounds.size.width * 2, height: bounds.size.height)
+    self.gradientLayer.frame = CGRect(
+      x: bounds.origin.x - 4,
+      y: bounds.origin.y,
+      width: bounds.size.width * 2,
+      height: bounds.size.height
+    )
   }
 
   func animateGradient() {
@@ -165,7 +174,8 @@ open class GradientProgressBar: UIProgressView {
           deadline: DispatchTime.now() + DefaultValues.animationDuration,
           execute: {
             self.hideProgressBar()
-          })
+          }
+        )
       })
     }
     CATransaction.commit()
@@ -188,6 +198,6 @@ open class GradientProgressBar: UIProgressView {
 
 extension CGRect {
   func updateWidth(byPercentage percentage: CGFloat) -> CGRect {
-    return CGRect(x: origin.x, y: origin.y, width: size.width * percentage, height: size.height)
+    CGRect(x: origin.x, y: origin.y, width: size.width * percentage, height: size.height)
   }
 }

@@ -9,13 +9,12 @@ import Shared
 import BraveShared
 
 class BraveTalkRewardsOptInViewController: UIViewController, PopoverContentComponent {
-
   /// Gets called when a user taps on 'Enable Rewards' button.
   var rewardsEnabledHandler: (() -> Void)?
   var linkTapped: ((URLRequest) -> Void)?
 
   private var braveTalkView: View {
-    view as! View  // swiftlint:disable:this force_cast
+    view as! View // swiftlint:disable:this force_cast
   }
 
   override func loadView() {
@@ -27,7 +26,8 @@ class BraveTalkRewardsOptInViewController: UIViewController, PopoverContentCompo
 
     braveTalkView.enableRewardsButton.addTarget(
       self, action: #selector(enableRewardsAction),
-      for: .touchUpInside)
+      for: .touchUpInside
+    )
     braveTalkView.disclaimer.onLinkedTapped = { [unowned self] link in
       var request: URLRequest?
 
@@ -52,7 +52,6 @@ class BraveTalkRewardsOptInViewController: UIViewController, PopoverContentCompo
     dismiss(animated: true) {
       self.rewardsEnabledHandler?()
     }
-
   }
 
   override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
@@ -60,7 +59,6 @@ class BraveTalkRewardsOptInViewController: UIViewController, PopoverContentCompo
 
     if previousTraitCollection?.preferredContentSizeCategory
       != traitCollection.preferredContentSizeCategory {
-
       updatePreferredContentSize()
     }
   }

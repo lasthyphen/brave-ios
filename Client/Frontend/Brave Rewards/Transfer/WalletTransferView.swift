@@ -21,18 +21,21 @@ extension WalletTransferViewController {
       $0.spacing = 6
       $0.alignment = .leading
     }
+
     private let titleLabel = UILabel().then {
       $0.text = Strings.Rewards.walletTransferStepsTitle
       $0.font = .systemFont(ofSize: 17, weight: .semibold)
       $0.numberOfLines = 0
       $0.textColor = .braveLabel
     }
+
     private let bodyLabel = UILabel().then {
       $0.text = Strings.Rewards.walletTransferStepsBody
       $0.font = .systemFont(ofSize: 17)
       $0.numberOfLines = 0
       $0.textColor = .braveLabel
     }
+
     let learnMoreButton = UIButton(type: .system).then {
       $0.setTitle(Strings.learnMore, for: .normal)
       $0.setTitleColor(.braveBlurple, for: .normal)

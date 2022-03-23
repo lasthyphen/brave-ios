@@ -52,7 +52,8 @@ public enum KVOConstants: String {
 }
 
 public struct AppConstants {
-  public static let isRunningTest = NSClassFromString("XCTestCase") != nil || ProcessInfo.processInfo.arguments.contains(LaunchArguments.test)
+  public static let isRunningTest = NSClassFromString("XCTestCase") != nil || ProcessInfo.processInfo.arguments
+    .contains(LaunchArguments.test)
 
   /// Build Channel.
   public static let buildChannel: AppBuildChannel = {
@@ -85,9 +86,7 @@ public struct AppConstants {
     return scheme
   }()
 
-  public static let webServerPort: Int = {
-    AppConstants.buildChannel.isPublic ? 6571 : Int.random(in: 6572..<6600)
-  }()
+  public static let webServerPort: Int = AppConstants.buildChannel.isPublic ? 6571 : Int.random(in: 6572..<6600)
 
   public static let prefSendUsageData = "settings.sendUsageData"
 

@@ -38,7 +38,10 @@ public final class FeedSourceOverride: NSManagedObject, CRUD {
     deleteAll()
   }
 
-  class func getInternal(fromId id: String, context: NSManagedObjectContext = DataController.viewContext) -> FeedSourceOverride? {
+  class func getInternal(
+    fromId id: String,
+    context: NSManagedObjectContext = DataController.viewContext
+  ) -> FeedSourceOverride? {
     let predicate = NSPredicate(format: "\(#keyPath(FeedSourceOverride.publisherID)) == %@", id)
     return first(where: predicate, context: context)
   }

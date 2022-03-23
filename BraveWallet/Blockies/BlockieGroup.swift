@@ -44,7 +44,7 @@ struct BlockieGroup: View {
           d[HorizontalAlignment.center]
         }
     }
-    .padding(.leading, alignVisuallyCentered ? size * 0.3 : 0)  // Visually center the main blockie
+    .padding(.leading, alignVisuallyCentered ? size * 0.3 : 0) // Visually center the main blockie
   }
 }
 

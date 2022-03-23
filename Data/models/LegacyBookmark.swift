@@ -18,7 +18,6 @@ public typealias LegacyBookmark = Favorite
 
 /// Contains methods that rely on old pre-syncv2 Bookmark system.
 public struct LegacyBookmarksHelper {
-
   public static func getTopLevelLegacyBookmarks(
     _ context: NSManagedObjectContext? = nil
   ) -> [LegacyBookmark] {
@@ -68,7 +67,9 @@ extension Favorite {
   fileprivate static func restore_1_12_Bookmarks(completion: @escaping () -> Void) {
     let restorationCompleted = Preferences.Database.bookmark_v1_12_1RestorationCompleted
 
-    if restorationCompleted.value { return }
+    if restorationCompleted.value {
+      return
+    }
 
     guard let migrationContainer = DataController.shared.oldDocumentStore else {
       log.debug("No database found in old location, skipping bookmark restoration")
@@ -103,7 +104,6 @@ extension Favorite {
     var oldFavoritesData = [BookmarkRestorationData]()
 
     for restoredBookmark in bookmarksToRestore {
-
       var bookmarkType: BookmarkRestorationData.BookmarkType?
       if restoredBookmark.isFolder {
         bookmarkType = .folder
@@ -116,13 +116,16 @@ extension Favorite {
         bookmarkType = restoredBookmark.isFavorite ? .favorite(url: bUrl) : .bookmark(url: bUrl)
       }
 
-      guard let type = bookmarkType else { continue }
+      guard let type = bookmarkType else {
+        continue
+      }
       let bookmarkData = BookmarkRestorationData(
         bookmarkType: type, id: restoredBookmark.objectID,
         parentId: restoredBookmark.parentFolder?.objectID,
-        title: restoredBookmark.displayTitle ?? "")
+        title: restoredBookmark.displayTitle ?? ""
+      )
 
-      if case .favorite(_) = type {
+      if case .favorite = type {
         oldFavoritesData.append(bookmarkData)
       } else {
         oldBookmarksData.append(bookmarkData)
@@ -135,7 +138,8 @@ extension Favorite {
         saveLocation: nil,
         bookmarksToInsertAtGivenLevel: oldFavoritesData,
         allBookmarks: oldFavoritesData,
-        context: context)
+        context: context
+      )
 
       log.debug("Attempting to restore \(oldBookmarksData.count) bookmarks.")
       // Entry point is root level bookmarks only.
@@ -146,7 +150,8 @@ extension Favorite {
         saveLocation: nil,
         bookmarksToInsertAtGivenLevel: bookmarksAtRootLevel,
         allBookmarks: oldBookmarksData,
-        context: context)
+        context: context
+      )
 
       completion()
     }
@@ -167,11 +172,13 @@ extension Favorite {
         if saveLocation == nil {
           Favorite.addInternal(
             url: url, title: bookmark.title, isFavorite: true,
-            context: .existing(context))
+            context: .existing(context)
+          )
         } else {
           Favorite.addInternal(
             url: url, title: bookmark.title,
-            isFavorite: false, context: .existing(context))
+            isFavorite: false, context: .existing(context)
+          )
         }
 
       case .folder:
@@ -180,7 +187,8 @@ extension Favorite {
         self.reinsertBookmarks(
           saveLocation: nil,
           bookmarksToInsertAtGivenLevel: children, allBookmarks: allBookmarks,
-          context: context)
+          context: context
+        )
       }
     }
   }
@@ -205,8 +213,9 @@ extension Favorite {
     forFavorites: Bool,
     context: NSManagedObjectContext
   ) {
-
-    let predicate = forFavorites ? NSPredicate(format: "isFavorite == true") : allBookmarksOfAGivenLevelPredicate(parent: parentFolder)
+    let predicate = forFavorites
+      ? NSPredicate(format: "isFavorite == true")
+      : allBookmarksOfAGivenLevelPredicate(parent: parentFolder)
 
     let orderSort = NSSortDescriptor(key: #keyPath(Favorite.order), ascending: true)
     let folderSort = NSSortDescriptor(key: #keyPath(Favorite.isFolder), ascending: false)
@@ -215,7 +224,7 @@ extension Favorite {
     let sort = [orderSort, folderSort, createdSort]
 
     guard let allBookmarks = all(where: predicate, sortDescriptors: sort, context: context),
-      !allBookmarks.isEmpty
+          !allBookmarks.isEmpty
     else {
       return
     }
@@ -236,6 +245,7 @@ extension Favorite {
     // A bit hacky but you can't just pass 'nil' string to %@.
     let nilArgumentForPredicate = 0
     return NSPredicate(
-      format: "%K == %@ AND %K == NO", parentFolderKP, parent ?? nilArgumentForPredicate, isFavoriteKP)
+      format: "%K == %@ AND %K == NO", parentFolderKP, parent ?? nilArgumentForPredicate, isFavoriteKP
+    )
   }
 }

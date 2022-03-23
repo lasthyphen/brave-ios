@@ -11,7 +11,6 @@ import SnapKit
 ///   - Applying a larger hit area without adjusting the bounds
 ///   - Sizing correctly when adding setting `titleEdgeInsets` and `imageEdgeInsets`
 open class BraveButton: UIButton {
-
   // MARK: - Activity
 
   /// Where the loader should go when it begins animating
@@ -71,19 +70,22 @@ open class BraveButton: UIButton {
               withRelativeStartTime: 0, relativeDuration: 0.2,
               animations: {
                 animatingOutViews.forEach { $0.alpha = 0.0 }
-              })
+              }
+            )
             UIView.addKeyframe(
               withRelativeStartTime: 0.25, relativeDuration: 0.2,
               animations: {
                 animatingInViews.forEach { $0.alpha = 1.0 }
-              })
+              }
+            )
           },
           completion: { _ in
             if !self.isLoading {
               loaderView.stop()
               loaderView.removeFromSuperview()
             }
-          })
+          }
+        )
       case .right:
         UIView.animate(
           withDuration: 0.25,
@@ -102,7 +104,9 @@ open class BraveButton: UIButton {
 
   public override var isHighlighted: Bool {
     didSet {
-      if buttonType == .system { return }
+      if buttonType == .system {
+        return
+      }
       UIViewPropertyAnimator(duration: 0.3, dampingRatio: 1.0) {
         self.alpha = self.isHighlighted ? 0.6 : 1.0
       }
@@ -117,7 +121,8 @@ open class BraveButton: UIButton {
   override open func imageRect(forContentRect contentRect: CGRect) -> CGRect {
     var frame = super.imageRect(forContentRect: contentRect)
     if flipImageOrigin {
-      frame.origin.x = super.titleRect(forContentRect: contentRect).maxX - frame.width - imageEdgeInsets.right + imageEdgeInsets.left + titleEdgeInsets.right - titleEdgeInsets.left
+      frame.origin.x = super.titleRect(forContentRect: contentRect).maxX - frame.width - imageEdgeInsets
+        .right + imageEdgeInsets.left + titleEdgeInsets.right - titleEdgeInsets.left
     }
     return frame
   }
@@ -132,10 +137,13 @@ open class BraveButton: UIButton {
 
   override open var intrinsicContentSize: CGSize {
     var size = super.intrinsicContentSize
-    size.width += abs(imageEdgeInsets.left) + abs(imageEdgeInsets.right) + abs(titleEdgeInsets.left) + abs(titleEdgeInsets.right)
+    size
+      .width += abs(imageEdgeInsets.left) + abs(imageEdgeInsets.right) + abs(titleEdgeInsets.left) +
+      abs(titleEdgeInsets.right)
     size.height += max(
       abs(titleEdgeInsets.top) + abs(titleEdgeInsets.bottom),
-      abs(imageEdgeInsets.top) + abs(imageEdgeInsets.bottom))
+      abs(imageEdgeInsets.top) + abs(imageEdgeInsets.bottom)
+    )
     return size
   }
 

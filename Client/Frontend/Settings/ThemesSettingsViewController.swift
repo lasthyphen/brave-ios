@@ -9,7 +9,6 @@ import Shared
 import BraveRewards
 
 class ThemesSettingsViewController: UITableViewController {
-
   var themeApplied: (() -> Void)?
   var themeChanged: ((_ themeId: String?) -> Void)?
 
@@ -86,7 +85,6 @@ class ThemesSettingsViewController: UITableViewController {
     }
 
     tableView.reloadData()
-
   }
 
   private var customThemeIDs: [String] {
@@ -102,9 +100,13 @@ class ThemesSettingsViewController: UITableViewController {
         .appendingPathComponent(themeResource.saveTopFolderName)
         .appendingPathComponent(id)
         .appendingPathComponent(themeResource.resourceName)
-    else { return nil }
+    else {
+      return nil
+    }
 
-    guard let data = try? Data(contentsOf: metadata) else { return nil }
+    guard let data = try? Data(contentsOf: metadata) else {
+      return nil
+    }
     let json = try? JSONDecoder().decode(CustomTheme.self, from: data)
 
     return json?.themeName

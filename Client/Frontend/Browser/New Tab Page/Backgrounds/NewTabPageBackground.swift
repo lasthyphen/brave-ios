@@ -23,12 +23,14 @@ class NewTabPageBackground: PreferencesObserver {
       changed?()
     }
   }
+
   /// A unique wallpaper identifier
   private(set) var wallpaperId = UUID()
   /// The background/wallpaper image if available
   var backgroundImage: UIImage? {
     currentBackground?.wallpaper.image
   }
+
   /// The sponsors logo if available
   var sponsorLogoImage: UIImage? {
     if case .withBrandLogo(let logo) = currentBackground?.type {
@@ -36,6 +38,7 @@ class NewTabPageBackground: PreferencesObserver {
     }
     return nil
   }
+
   /// A block called when the current background image/sponsored logo changes
   /// while the New Tab Page is active
   var changed: (() -> Void)?
@@ -62,8 +65,11 @@ class NewTabPageBackground: PreferencesObserver {
     timer = Timer.scheduledTimer(
       withTimeInterval: 0.25, repeats: false,
       block: { [weak self] _ in
-        guard let self = self else { return }
+        guard let self = self else {
+          return
+        }
         self.currentBackground = self.dataSource.newBackground()
-      })
+      }
+    )
   }
 }

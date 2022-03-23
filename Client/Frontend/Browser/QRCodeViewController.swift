@@ -23,7 +23,8 @@ class QRCodeViewController: UIViewController {
   var qrCodeDelegate: QRCodeViewControllerDelegate?
 
   public static var hasCameraSupport: Bool {
-    !AVCaptureDevice.DiscoverySession(deviceTypes: [.builtInWideAngleCamera], mediaType: .video, position: .back).devices.isEmpty
+    !AVCaptureDevice.DiscoverySession(deviceTypes: [.builtInWideAngleCamera], mediaType: .video, position: .back)
+      .devices.isEmpty
   }
 
   public static var hasCameraPermissions: Bool {
@@ -38,9 +39,7 @@ class QRCodeViewController: UIViewController {
     return session
   }()
 
-  private lazy var captureDevice: AVCaptureDevice? = {
-    return AVCaptureDevice.default(for: AVMediaType.video)
-  }()
+  private lazy var captureDevice: AVCaptureDevice? = AVCaptureDevice.default(for: AVMediaType.video)
 
   private var videoPreviewLayer: AVCaptureVideoPreviewLayer?
   private let scanLine: UIImageView = UIImageView(image: #imageLiteral(resourceName: "qrcode-scanLine"))
@@ -53,20 +52,26 @@ class QRCodeViewController: UIViewController {
     label.numberOfLines = 0
     return label
   }()
+
   private var maskView: UIView = UIView()
   private var isAnimationing: Bool = false
   private var isLightOn: Bool = false
   private var shapeLayer: CAShapeLayer = CAShapeLayer()
 
   private var scanRange: CGRect {
-    let size = UIDevice.current.userInterfaceIdiom == .pad ? CGSize(width: view.frame.width / 2, height: view.frame.width / 2) : CGSize(width: view.frame.width / 3 * 2, height: view.frame.width / 3 * 2)
+    let size = UIDevice.current.userInterfaceIdiom == .pad
+      ? CGSize(
+        width: view.frame.width / 2,
+        height: view.frame.width / 2
+      )
+      : CGSize(width: view.frame.width / 3 * 2, height: view.frame.width / 3 * 2)
     var rect = CGRect(size: size)
     rect.center = self.view.bounds.center
     return rect
   }
 
   private var scanBorderHeight: CGFloat {
-    return UIDevice.current.userInterfaceIdiom == .pad ? view.frame.width / 2 : view.frame.width / 3 * 2
+    UIDevice.current.userInterfaceIdiom == .pad ? view.frame.width / 2 : view.frame.width / 3 * 2
   }
 
   override func viewDidLoad() {
@@ -79,7 +84,11 @@ class QRCodeViewController: UIViewController {
     if getAuthorizationStatus != .denied {
       setupCamera()
     } else {
-      let alert = UIAlertController(title: "", message: Strings.scanQRCodePermissionErrorMessage, preferredStyle: .alert)
+      let alert = UIAlertController(
+        title: "",
+        message: Strings.scanQRCodePermissionErrorMessage,
+        preferredStyle: .alert
+      )
       alert.addAction(UIAlertAction(title: Strings.scanQRCodeErrorOKButton, style: .default, handler: nil))
       self.present(alert, animated: true, completion: nil)
     }
@@ -129,30 +138,30 @@ class QRCodeViewController: UIViewController {
   }
 
   private func setupConstraints() {
-    maskView.snp.makeConstraints { (make) in
+    maskView.snp.makeConstraints { make in
       make.edges.equalTo(self.view)
     }
 
     if UIDevice.current.userInterfaceIdiom == .pad {
-      scanBorder.snp.makeConstraints { (make) in
+      scanBorder.snp.makeConstraints { make in
         make.center.equalTo(self.view)
         make.width.height.equalTo(view.frame.width / 2)
       }
     } else {
-      scanBorder.snp.makeConstraints { (make) in
+      scanBorder.snp.makeConstraints { make in
         make.center.equalTo(self.view)
         make.width.height.equalTo(view.frame.width / 3 * 2)
       }
     }
 
-    scanLine.snp.makeConstraints { (make) in
+    scanLine.snp.makeConstraints { make in
       make.left.equalTo(scanBorder.snp.left)
       make.top.equalTo(scanBorder.snp.top).offset(6)
       make.width.equalTo(scanBorder.snp.width)
       make.height.equalTo(6)
     }
 
-    instructionsLabel.snp.makeConstraints { (make) in
+    instructionsLabel.snp.makeConstraints { make in
       make.left.right.equalTo(self.view.safeAreaLayoutGuide)
       make.top.equalTo(scanBorder.snp.bottom).offset(15)
     }
@@ -165,10 +174,20 @@ class QRCodeViewController: UIViewController {
     }
 
     // Setup the NavigationItem
-    navigationItem.rightBarButtonItem = UIBarButtonItem(image: #imageLiteral(resourceName: "playlist_exit").template, style: .plain, target: self, action: #selector(goBack))
+    navigationItem.rightBarButtonItem = UIBarButtonItem(
+      image: #imageLiteral(resourceName: "playlist_exit").template,
+      style: .plain,
+      target: self,
+      action: #selector(goBack)
+    )
     navigationItem.rightBarButtonItem?.tintColor = .bravePrimary
 
-    navigationItem.leftBarButtonItem = UIBarButtonItem(image: #imageLiteral(resourceName: "qrcode-light").template, style: .plain, target: self, action: #selector(openLight))
+    navigationItem.leftBarButtonItem = UIBarButtonItem(
+      image: #imageLiteral(resourceName: "qrcode-light").template,
+      style: .plain,
+      target: self,
+      action: #selector(openLight)
+    )
     if captureDevice.hasTorch {
       navigationItem.leftBarButtonItem?.tintColor = .bravePrimary
     } else {
@@ -187,17 +206,18 @@ class QRCodeViewController: UIViewController {
     UIView.animate(
       withDuration: 2.4,
       animations: {
-        self.scanLine.snp.updateConstraints({ (make) in
+        self.scanLine.snp.updateConstraints({ make in
           make.top.equalTo(self.scanBorder.snp.top).offset(self.scanBorder.bounds.height - 6)
         })
         self.view.layoutIfNeeded()
       },
       completion: { _ in
-        self.scanLine.snp.updateConstraints({ (make) in
+        self.scanLine.snp.updateConstraints({ make in
           make.top.equalTo(self.scanBorder.snp.top).offset(6)
         })
         self.perform(#selector(self.startScanLineAnimation), with: nil, afterDelay: 0)
-      })
+      }
+    )
   }
 
   func stopScanLineAnimation() {
@@ -263,7 +283,6 @@ class QRCodeViewController: UIViewController {
     view.layer.addSublayer(videoPreviewLayer)
     self.videoPreviewLayer = videoPreviewLayer
     captureSession.startRunning()
-
   }
 
   override func willAnimateRotation(to toInterfaceOrientation: UIInterfaceOrientation, duration: TimeInterval) {
@@ -296,7 +315,11 @@ class QRCodeViewController: UIViewController {
 }
 
 extension QRCodeViewController: AVCaptureMetadataOutputObjectsDelegate {
-  func metadataOutput(_ output: AVCaptureMetadataOutput, didOutput metadataObjects: [AVMetadataObject], from connection: AVCaptureConnection) {
+  func metadataOutput(
+    _ output: AVCaptureMetadataOutput,
+    didOutput metadataObjects: [AVMetadataObject],
+    from connection: AVCaptureConnection
+  ) {
     if metadataObjects.isEmpty {
       captureSession.stopRunning()
       let alert = AlertController(title: "", message: Strings.scanQRCodeInvalidDataErrorMessage, preferredStyle: .alert)
@@ -305,7 +328,9 @@ extension QRCodeViewController: AVCaptureMetadataOutputObjectsDelegate {
           title: Strings.scanQRCodeErrorOKButton, style: .default,
           handler: { [weak self] _ in
             self?.captureSession.startRunning()
-          }), accessibilityIdentifier: "qrCodeAlert.okButton")
+          }
+        ), accessibilityIdentifier: "qrCodeAlert.okButton"
+      )
       present(alert, animated: true, completion: nil)
     } else {
       captureSession.stopRunning()
@@ -313,7 +338,8 @@ extension QRCodeViewController: AVCaptureMetadataOutputObjectsDelegate {
       dismiss(
         animated: true,
         completion: {
-          guard let metaData = metadataObjects.first as? AVMetadataMachineReadableCodeObject, let qrCodeDelegate = self.qrCodeDelegate, let text = metaData.stringValue else {
+          guard let metaData = metadataObjects.first as? AVMetadataMachineReadableCodeObject,
+                let qrCodeDelegate = self.qrCodeDelegate, let text = metaData.stringValue else {
             log.debug("Unable to scan QR code")
             return
           }
@@ -323,13 +349,14 @@ extension QRCodeViewController: AVCaptureMetadataOutputObjectsDelegate {
           } else {
             qrCodeDelegate.didScanQRCodeWithText(text)
           }
-        })
+        }
+      )
     }
   }
 }
 
 class QRCodeNavigationController: UINavigationController {
   override open var preferredStatusBarStyle: UIStatusBarStyle {
-    return .lightContent
+    .lightContent
   }
 }

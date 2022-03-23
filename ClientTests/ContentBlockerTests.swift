@@ -7,7 +7,6 @@ import WebKit
 @testable import Client
 
 class ContentBlockerTests: XCTestCase {
-
   var store: WKContentRuleListStore!
   var contentBlocker: BlocklistName!
   let contentBlockerName = "test-content-blocker"
@@ -39,7 +38,9 @@ class ContentBlockerTests: XCTestCase {
     var removedRuleLists: [XCTestExpectation] = []
 
     store.getAvailableContentRuleListIdentifiers { ids in
-      guard let ids = ids else { return }
+      guard let ids = ids else {
+        return
+      }
 
       ids.forEach { id in
         let idExpectation = self.expectation(description: "id: \(id)")
@@ -47,9 +48,10 @@ class ContentBlockerTests: XCTestCase {
         removedRuleLists.append(idExpectation)
 
         self.store.removeContentRuleList(forIdentifier: id) { error in
-          if error != nil { return }
+          if error != nil {
+            return
+          }
           idExpectation.fulfill()
-
         }
       }
 
@@ -63,8 +65,8 @@ class ContentBlockerTests: XCTestCase {
 
   func testCompilation() {
     let validRule = """
-      [{"trigger":{"url-filter":"-pubblicita300x275\\\\."},"action":{"type":"block"}}]
-      """
+    [{"trigger":{"url-filter":"-pubblicita300x275\\\\."},"action":{"type":"block"}}]
+    """
 
     compile(jsonString: validRule, expectSuccess: true)
   }
@@ -83,7 +85,8 @@ class ContentBlockerTests: XCTestCase {
 
     XCTAssertNil(
       ContentBlockerRegion.with(localeCode: "en"),
-      "Regional content blocker should be disabled for english locale")
+      "Regional content blocker should be disabled for english locale"
+    )
 
     let validLocale = "pl"
     let valid = ContentBlockerRegion.with(localeCode: validLocale)
@@ -91,7 +94,6 @@ class ContentBlockerTests: XCTestCase {
 
     let invalidLocale = "xx"
     XCTAssertNil(ContentBlockerRegion.with(localeCode: invalidLocale))
-
   }
 
   private func compile(jsonString json: String?, expectSuccess: Bool) {

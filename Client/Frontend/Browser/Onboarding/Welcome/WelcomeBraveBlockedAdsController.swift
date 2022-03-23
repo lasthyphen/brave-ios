@@ -31,17 +31,37 @@ class WelcomeBraveBlockedAdsController: UIViewController, PopoverContentComponen
     let uuid = UUID().uuidString.replacingOccurrences(of: "-", with: "")
 
     if trackerCount > 0 {
-      defaultText = trackerCount == 1 ? String(format: Strings.Onboarding.blockedAdsOnboardingPopoverSingleTrackerDescription, "[\(uuid)]", trackerCount, domain) : String(format: Strings.Onboarding.blockedAdsOnboardingPopoverMultipleTrackerDescription, "[\(uuid)]", trackerCount, domain)
+      defaultText = trackerCount == 1
+        ? String(
+          format: Strings.Onboarding.blockedAdsOnboardingPopoverSingleTrackerDescription,
+          "[\(uuid)]",
+          trackerCount,
+          domain
+        )
+        : String(
+          format: Strings.Onboarding.blockedAdsOnboardingPopoverMultipleTrackerDescription,
+          "[\(uuid)]",
+          trackerCount,
+          domain
+        )
     } else {
       defaultText = String(format: Strings.Onboarding.blockedAdsOnboardingPopoverDescriptionTwo, "[\(uuid)]", domain)
     }
 
-    if let attributedText = createBlockedDescription(trackerBlocked: trackerBlocked, uuid: uuid, defaultText: defaultText) {
+    if let attributedText = createBlockedDescription(
+      trackerBlocked: trackerBlocked,
+      uuid: uuid,
+      defaultText: defaultText
+    ) {
       label.attributedText = attributedText
     }
   }
 
-  private func createBlockedDescription(trackerBlocked: String, uuid: String, defaultText: String) -> NSAttributedString? {
+  private func createBlockedDescription(
+    trackerBlocked: String,
+    uuid: String,
+    defaultText: String
+  ) -> NSAttributedString? {
     let attributedText = NSMutableAttributedString()
 
     let defaultTextChunks = defaultText.separatedBy("[\(uuid)]")
@@ -56,7 +76,9 @@ class WelcomeBraveBlockedAdsController: UIViewController, PopoverContentComponen
         attributes: [
           .foregroundColor: UIColor.braveLabel,
           .font: UIFont.preferredFont(forTextStyle: .body),
-        ]))
+        ]
+      )
+    )
 
     attributedText.append(
       NSAttributedString(
@@ -64,7 +86,9 @@ class WelcomeBraveBlockedAdsController: UIViewController, PopoverContentComponen
         attributes: [
           .foregroundColor: UIColor.braveLabel,
           .font: UIFont.preferredFont(for: .body, weight: .bold),
-        ]))
+        ]
+      )
+    )
 
     attributedText.append(
       NSAttributedString(
@@ -72,7 +96,9 @@ class WelcomeBraveBlockedAdsController: UIViewController, PopoverContentComponen
         attributes: [
           .foregroundColor: UIColor.braveLabel,
           .font: UIFont.preferredFont(forTextStyle: .body),
-        ]))
+        ]
+      )
+    )
 
     return attributedText
   }

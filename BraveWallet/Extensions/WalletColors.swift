@@ -8,7 +8,6 @@ import UIKit
 import BraveUI
 
 extension UIColor {
-
   static var walletGreen: UIColor {
     UIColor(rgb: 0x2ac194)
   }

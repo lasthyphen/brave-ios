@@ -13,13 +13,12 @@ public struct MailToMetadata {
   public let headers: [String: String]
 }
 
-public extension URL {
-
+extension URL {
   /**
-     Extracts the metadata associated with a mailto: URL according to RFC 2368
-     https://tools.ietf.org/html/rfc2368
-     */
-  func mailToMetadata() -> MailToMetadata? {
+   Extracts the metadata associated with a mailto: URL according to RFC 2368
+   https://tools.ietf.org/html/rfc2368
+   */
+  public func mailToMetadata() -> MailToMetadata? {
     guard scheme == "mailto" else {
       return nil
     }

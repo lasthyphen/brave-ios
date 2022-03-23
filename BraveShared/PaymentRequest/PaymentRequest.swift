@@ -31,6 +31,7 @@ public struct PaymentRequest: Decodable {
         public let value: String
       }
     }
+
     public let skuTokens: [String]
     public let total: Item
     public let displayItems: [Item]
@@ -57,7 +58,9 @@ public struct PaymentRequest: Decodable {
   public let details: Details
 
   private enum PaymentKeys: String, CodingKey {
-    case name, methodData, details
+    case name
+    case methodData
+    case details
   }
 
   public init(from decoder: Decoder) throws {
@@ -66,8 +69,8 @@ public struct PaymentRequest: Decodable {
     let detailsString = try values.decode(String.self, forKey: .details)
 
     name = try values.decode(String.self, forKey: .name)
-    methodData = try JSONDecoder().decode([MethodData].self, from: methodDataString.data(using: String.Encoding.utf8) ?? Data())
+    methodData = try JSONDecoder()
+      .decode([MethodData].self, from: methodDataString.data(using: String.Encoding.utf8) ?? Data())
     details = try JSONDecoder().decode(Details.self, from: detailsString.data(using: String.Encoding.utf8) ?? Data())
-
   }
 }

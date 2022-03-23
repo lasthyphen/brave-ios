@@ -30,11 +30,15 @@ class BraveRewardsViewController: UIViewController, PopoverContentComponent {
     didSet {
       let isVerified = publisher?.status != .notVerified
       rewardsView.publisherView.learnMoreButton.isHidden = isVerified
-      rewardsView.publisherView.hostLabel.attributedText = publisher?.attributedDisplayName(fontSize: BraveRewardsPublisherView.UX.hostLabelFontSize)
-      rewardsView.publisherView.bodyLabel.text = isVerified ? Strings.Rewards.supportingPublisher : Strings.Rewards.unverifiedPublisher
+      rewardsView.publisherView.hostLabel.attributedText = publisher?
+        .attributedDisplayName(fontSize: BraveRewardsPublisherView.UX.hostLabelFontSize)
+      rewardsView.publisherView.bodyLabel.text = isVerified
+        ? Strings.Rewards.supportingPublisher
+        : Strings.Rewards.unverifiedPublisher
       if !isVerified {
         rewardsView.publisherView.faviconImageView.clearMonogramFavicon()
-        rewardsView.publisherView.faviconImageView.image = #imageLiteral(resourceName: "rewards-panel-unverified-pub").withRenderingMode(.alwaysOriginal)
+        rewardsView.publisherView.faviconImageView.image = #imageLiteral(resourceName: "rewards-panel-unverified-pub")
+          .withRenderingMode(.alwaysOriginal)
         rewardsView.publisherView.faviconImageView.contentMode = .center
       } else {
         if let url = tab.url {
@@ -60,7 +64,9 @@ class BraveRewardsViewController: UIViewController, PopoverContentComponent {
       .$value
       .receive(on: RunLoop.main)
       .sink(receiveValue: { [weak self] acknowledged in
-        guard let self = self else { return }
+        guard let self = self else {
+          return
+        }
         if !self.rewardsView.legacyWalletTransferStatusButton.isHidden && acknowledged {
           self.rewardsView.legacyWalletTransferStatusButton.isHidden = true
         }
@@ -73,7 +79,7 @@ class BraveRewardsViewController: UIViewController, PopoverContentComponent {
   }
 
   private var rewardsView: BraveRewardsView {
-    view as! BraveRewardsView  // swiftlint:disable:this force_cast
+    view as! BraveRewardsView // swiftlint:disable:this force_cast
   }
 
   override func loadView() {
@@ -98,9 +104,14 @@ class BraveRewardsViewController: UIViewController, PopoverContentComponent {
       }
       ledger.fetchPromotions(nil)
       ledger.listAutoContributePublishers { [weak self] list in
-        guard let self = self else { return }
+        guard let self = self else {
+          return
+        }
         self.supportedListCount = list.count
-        self.rewardsView.statusView.setVisibleStatus(status: list.isEmpty ? .rewardsOnNoCount : .rewardsOn, animated: false)
+        self.rewardsView.statusView.setVisibleStatus(
+          status: list.isEmpty ? .rewardsOnNoCount : .rewardsOn,
+          animated: false
+        )
         self.rewardsView.statusView.countView.countLabel.text = "\(list.count)"
       }
     }
@@ -108,7 +119,7 @@ class BraveRewardsViewController: UIViewController, PopoverContentComponent {
     rewardsView.legacyWalletTransferButton.isHidden = true
     rewardsView.legacyWalletTransferStatusButton.isHidden = true
     if let _ = Preferences.Rewards.transferDrainID.value,
-      let legacyWallet = legacyWallet {
+       let legacyWallet = legacyWallet {
       if !Preferences.Rewards.transferCompletionAcknowledged.value {
         legacyWallet.updateDrainStatus { status in
           self.drainStatus = status
@@ -124,7 +135,9 @@ class BraveRewardsViewController: UIViewController, PopoverContentComponent {
       if !Preferences.Rewards.dismissedLegacyWalletTransfer.value {
         if let legacyWallet = legacyWallet, !legacyWallet.isLedgerTransferExpired {
           legacyWallet.transferrableAmount({ [weak self] total in
-            guard let self = self else { return }
+            guard let self = self else {
+              return
+            }
             if total > 0 {
               self.rewardsView.legacyWalletTransferButton.isHidden = false
             }
@@ -146,14 +159,18 @@ class BraveRewardsViewController: UIViewController, PopoverContentComponent {
     rewardsView.rewardsToggle.isOn = rewards.isEnabled
 
     rewards.startLedgerService { [weak self] in
-      guard let self = self else { return }
+      guard let self = self else {
+        return
+      }
       if let ledger = self.rewards.ledger {
         let observer = LedgerObserver(ledger: ledger)
         ledger.add(observer)
         self.ledgerObserver = observer
 
         observer.fetchedPanelPublisher = { [weak self] publisher, tabId in
-          guard let self = self else { return }
+          guard let self = self else {
+            return
+          }
           if tabId == self.tab.rewardsId {
             self.publisher = publisher
           }
@@ -173,13 +190,33 @@ class BraveRewardsViewController: UIViewController, PopoverContentComponent {
       $0.height.equalTo(rewardsView)
     }
 
-    rewardsView.publisherView.learnMoreButton.addTarget(self, action: #selector(tappedUnverifiedPubLearnMore), for: .touchUpInside)
+    rewardsView.publisherView.learnMoreButton.addTarget(
+      self,
+      action: #selector(tappedUnverifiedPubLearnMore),
+      for: .touchUpInside
+    )
     rewardsView.subtitleLabel.text = rewards.isEnabled ? Strings.Rewards.enabledBody : Strings.Rewards.disabledBody
     rewardsView.rewardsToggle.addTarget(self, action: #selector(rewardsToggleValueChanged), for: .valueChanged)
-    rewardsView.legacyWalletTransferButton.addTarget(self, action: #selector(tappedRewardsTransfer), for: .touchUpInside)
-    rewardsView.legacyWalletTransferButton.dismissButton.addTarget(self, action: #selector(tappedDismissRewardsTransfer), for: .touchUpInside)
-    rewardsView.legacyWalletTransferStatusButton.addTarget(self, action: #selector(tappedRewardsStatusButton), for: .touchUpInside)
-    rewardsView.legacyWalletTransferStatusButton.dismissButton.addTarget(self, action: #selector(tappedDismissTransferStatus), for: .touchUpInside)
+    rewardsView.legacyWalletTransferButton.addTarget(
+      self,
+      action: #selector(tappedRewardsTransfer),
+      for: .touchUpInside
+    )
+    rewardsView.legacyWalletTransferButton.dismissButton.addTarget(
+      self,
+      action: #selector(tappedDismissRewardsTransfer),
+      for: .touchUpInside
+    )
+    rewardsView.legacyWalletTransferStatusButton.addTarget(
+      self,
+      action: #selector(tappedRewardsStatusButton),
+      for: .touchUpInside
+    )
+    rewardsView.legacyWalletTransferStatusButton.dismissButton.addTarget(
+      self,
+      action: #selector(tappedDismissTransferStatus),
+      for: .touchUpInside
+    )
 
     if !AppConstants.buildChannel.isPublic {
       let tapGesture = UITapGestureRecognizer(target: self, action: #selector(tappedHostLabel(_:)))
@@ -239,7 +276,8 @@ class BraveRewardsViewController: UIViewController, PopoverContentComponent {
       },
       completion: { _ in
         self.rewardsView.legacyWalletTransferStatusButton.alpha = 1.0
-      })
+      }
+    )
   }
 
   @objc private func tappedRewardsStatusButton() {
@@ -252,11 +290,17 @@ class BraveRewardsViewController: UIViewController, PopoverContentComponent {
   // MARK: - Debug Actions
 
   @objc private func tappedHostLabel(_ gesture: UITapGestureRecognizer) {
-    if gesture.state != .ended { return }
-    guard let publisher = publisher else { return }
+    if gesture.state != .ended {
+      return
+    }
+    guard let publisher = publisher else {
+      return
+    }
     rewards.ledger?.refreshPublisher(withId: publisher.id) { [weak self] status in
-      guard let self = self else { return }
-      let copy = publisher.copy() as! Ledger.PublisherInfo  // swiftlint:disable:this force_cast
+      guard let self = self else {
+        return
+      }
+      let copy = publisher.copy() as! Ledger.PublisherInfo // swiftlint:disable:this force_cast
       copy.status = status
       self.publisher = copy
 

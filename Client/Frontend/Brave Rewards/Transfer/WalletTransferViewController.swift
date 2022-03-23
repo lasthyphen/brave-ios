@@ -9,7 +9,6 @@ import Shared
 import BraveShared
 
 class WalletTransferViewController: UIViewController {
-
   let legacyWallet: BraveLedger
   var learnMoreHandler: (() -> Void)?
 
@@ -24,7 +23,7 @@ class WalletTransferViewController: UIViewController {
   }
 
   private var transferView: WalletTransferView {
-    view as! WalletTransferView  // swiftlint:disable:this force_cast
+    view as! WalletTransferView // swiftlint:disable:this force_cast
   }
 
   override func loadView() {
@@ -37,21 +36,35 @@ class WalletTransferViewController: UIViewController {
     super.viewDidLoad()
 
     title = Strings.Rewards.walletTransferTitle
-    navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(tappedDone))
+    navigationItem.rightBarButtonItem = UIBarButtonItem(
+      barButtonSystemItem: .done,
+      target: self,
+      action: #selector(tappedDone)
+    )
 
     transferView.cameraView.scanCallback = { [weak self] paymentId in
-      guard let self = self, !paymentId.isEmpty, !self.isTransferring else { return }
+      guard let self = self, !paymentId.isEmpty, !self.isTransferring else {
+        return
+      }
       self.isTransferring = true
       self.legacyWallet.linkBraveWallet(paymentId: paymentId) { [weak self] result, drainID in
-        guard let self = self else { return }
+        guard let self = self else {
+          return
+        }
         if result != .ledgerOk {
-          let alert = UIAlertController(title: Strings.Rewards.walletTransferFailureAlertTitle, message: "\(Strings.Rewards.walletTransferFailureAlertMessage) (\(result.rawValue))", preferredStyle: .alert)
+          let alert = UIAlertController(
+            title: Strings.Rewards.walletTransferFailureAlertTitle,
+            message: "\(Strings.Rewards.walletTransferFailureAlertMessage) (\(result.rawValue))",
+            preferredStyle: .alert
+          )
           alert.addAction(
             .init(
               title: Strings.OKString, style: .default,
               handler: { [unowned self] _ in
                 self.isTransferring = false
-              }))
+              }
+            )
+          )
           self.present(alert, animated: true)
           return
         }

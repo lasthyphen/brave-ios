@@ -41,6 +41,7 @@ class SyncAddDeviceViewController: SyncViewController {
     button.isHidden = true
     return button
   }()
+
   var controlContainerView: UIView!
   var containerView: UIView!
   var qrCodeView: SyncQRCodeView?
@@ -193,11 +194,11 @@ class SyncAddDeviceViewController: SyncViewController {
       $0.edges.equalToSuperview()
     }
 
-    doneButton.snp.makeConstraints { (make) in
+    doneButton.snp.makeConstraints { make in
       make.height.equalTo(40)
     }
 
-    enterWordsButton.snp.makeConstraints { (make) in
+    enterWordsButton.snp.makeConstraints { make in
       make.height.equalTo(20)
     }
 
@@ -244,7 +245,9 @@ class SyncAddDeviceViewController: SyncViewController {
   }
 
   private func lastSentenceRange(text: String) -> NSRange? {
-    guard let lastSentence = text.split(separator: "\n").last else { return nil }
+    guard let lastSentence = text.split(separator: "\n").last else {
+      return nil
+    }
     return (text as NSString).range(of: String(lastSentence))
   }
 

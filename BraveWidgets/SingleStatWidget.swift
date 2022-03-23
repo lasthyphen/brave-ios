@@ -11,9 +11,12 @@ import BraveShared
 import BraveUI
 
 struct SingleStatWidget: Widget {
-
   var body: some WidgetConfiguration {
-    IntentConfiguration(kind: "SingleStatWidget", intent: StatsConfigurationIntent.self, provider: StatProvider()) { entry in
+    IntentConfiguration(
+      kind: "SingleStatWidget",
+      intent: StatsConfigurationIntent.self,
+      provider: StatProvider()
+    ) { entry in
       StatView(entry: entry)
     }
     .supportedFamilies([.systemSmall])
@@ -34,14 +37,22 @@ private struct StatProvider: IntentTimelineProvider {
   func placeholder(in context: Context) -> Entry {
     StatEntry(date: Date(), statData: .init(name: Strings.shieldsAdAndTrackerStats, value: "100k"))
   }
+
   func getSnapshot(for configuration: Intent, in context: Context, completion: @escaping (Entry) -> Void) {
     let stat = configuration.statKind
-    let entry = StatEntry(date: Date(), statData: .init(name: stat.name, value: stat.displayString, color: stat.valueColor))
+    let entry = StatEntry(
+      date: Date(),
+      statData: .init(name: stat.name, value: stat.displayString, color: stat.valueColor)
+    )
     completion(entry)
   }
+
   func getTimeline(for configuration: Intent, in context: Context, completion: @escaping (Timeline<Entry>) -> Void) {
     let stat = configuration.statKind
-    let entry = StatEntry(date: Date(), statData: .init(name: stat.name, value: stat.displayString, color: stat.valueColor))
+    let entry = StatEntry(
+      date: Date(),
+      statData: .init(name: stat.name, value: stat.displayString, color: stat.valueColor)
+    )
     let timeline = Timeline(entries: [entry], policy: .never)
     completion(timeline)
   }
@@ -82,9 +93,15 @@ private struct StatView: View {
 #if DEBUG
 struct SingleStatWidget_Previews: PreviewProvider {
   static var previews: some View {
-    StatView(entry: StatEntry(date: Date(), statData: .init(name: "Ads & Trackers Blocked", value: "100k", color: UIColor.braveOrange)))
+    StatView(entry: StatEntry(
+      date: Date(),
+      statData: .init(name: "Ads & Trackers Blocked", value: "100k", color: UIColor.braveOrange)
+    ))
       .previewContext(WidgetPreviewContext(family: .systemSmall))
-    StatView(entry: StatEntry(date: Date(), statData: .init(name: "Placeholder Count", value: "100k", color: UIColor.braveOrange)))
+    StatView(entry: StatEntry(
+      date: Date(),
+      statData: .init(name: "Placeholder Count", value: "100k", color: UIColor.braveOrange)
+    ))
       .redacted(reason: .placeholder)
       .previewContext(WidgetPreviewContext(family: .systemSmall))
   }

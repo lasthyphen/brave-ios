@@ -64,9 +64,9 @@ class AsyncReducerTests: XCTestCase {
 
     delay(0.1) {
       do {
-        let _ = try reducer.append(6, 7, 8)
+        _ = try reducer.append(6, 7, 8)
         XCTFail("Can't append to a reducer that's already finished")
-      } catch let error {
+      } catch {
         XCTAssert(true, "Properly received error on finished reducer \(error)")
       }
       expectation.fulfill()
@@ -85,7 +85,7 @@ class AsyncReducerTests: XCTestCase {
 
       // Pretend that some new work arrived while we were handling this.
       if let nextUp = addDuring.popLast() {
-        let _ = try! reducer.append(nextUp)
+        _ = try! reducer.append(nextUp)
       }
 
       return deferMaybe(out)
@@ -93,7 +93,7 @@ class AsyncReducerTests: XCTestCase {
 
     // Start with 'foo'.
     reducer = AsyncReducer(initialValue: deferMaybe([:]), combine: combine)
-    let _ = try! reducer.append("foo")
+    _ = try! reducer.append("foo")
 
     // Wait for the result. We should have handled all three by the time this returns.
     let result = reducer.terminal.value
@@ -133,8 +133,8 @@ extension AsyncReducerTests {
 
   func append(_ reducer: AsyncReducer<Int, Int>, items: Int...) {
     do {
-      let _ = try reducer.append(items)
-    } catch let error {
+      _ = try reducer.append(items)
+    } catch {
       XCTFail("Append failed with \(error)")
     }
   }
@@ -145,15 +145,19 @@ class TestError: MaybeErrorType {
 }
 
 private let serialQueue = DispatchQueue(label: "com.mozilla.test.serial", attributes: [])
-private let concurrentQueue = DispatchQueue(label: "com.mozilla.test.concurrent", attributes: DispatchQueue.Attributes.concurrent)
+private let concurrentQueue = DispatchQueue(
+  label: "com.mozilla.test.concurrent",
+  attributes: DispatchQueue.Attributes.concurrent
+)
 
 func delay(_ delay: Double, closure: @escaping () -> Void) {
   concurrentQueue.asyncAfter(
-    deadline: DispatchTime.now() + Double(Int64(delay * Double(NSEC_PER_SEC))) / Double(NSEC_PER_SEC), execute: closure)
+    deadline: DispatchTime.now() + Double(Int64(delay * Double(NSEC_PER_SEC))) / Double(NSEC_PER_SEC), execute: closure
+  )
 }
 
 private func simpleAdder(_ a: Int, b: Int) -> Deferred<Maybe<Int>> {
-  return deferMaybe(a + b)
+  deferMaybe(a + b)
 }
 
 private func waitingFillingAdder(_ a: Int, b: Int) -> Deferred<Maybe<Int>> {

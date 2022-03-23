@@ -8,7 +8,6 @@ import Data
 import BraveShared
 
 class SyncDeviceTypeButton: UIControl {
-
   var imageView: UIImageView = UIImageView()
   var label: UILabel = UILabel()
   var type: DeviceType!
@@ -65,12 +64,12 @@ class SyncDeviceTypeButton: UIControl {
 
     self.type = type
 
-    imageView.snp.makeConstraints { (make) in
+    imageView.snp.makeConstraints { make in
       make.centerX.equalTo(self)
       make.centerY.equalTo(self).offset(-20)
     }
 
-    label.snp.makeConstraints { (make) in
+    label.snp.makeConstraints { make in
       make.top.equalTo(imageView.snp.bottom).offset(20)
       make.centerX.equalTo(self)
       make.width.equalTo(self)
@@ -84,6 +83,7 @@ class SyncDeviceTypeButton: UIControl {
     super.init(frame: frame)
   }
 
+  @available(*, unavailable)
   required init?(coder aDecoder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }
@@ -134,7 +134,10 @@ class SyncSelectDeviceTypeViewController: SyncViewController {
       UIView.spacer(.horizontal, amount: 24),
     ])
 
-    chooseDeviceStackView.setContentCompressionResistancePriority(UILayoutPriority.defaultHigh, for: NSLayoutConstraint.Axis.vertical)
+    chooseDeviceStackView.setContentCompressionResistancePriority(
+      UILayoutPriority.defaultHigh,
+      for: NSLayoutConstraint.Axis.vertical
+    )
 
     let devicesStackView = UIStackView()
     devicesStackView.axis = .vertical
@@ -168,11 +171,11 @@ class SyncSelectDeviceTypeViewController: SyncViewController {
     loadingView.addSubview(spinner)
     view.addSubview(loadingView)
 
-    spinner.snp.makeConstraints { (make) in
+    spinner.snp.makeConstraints { make in
       make.center.equalTo(spinner.superview!)
     }
 
-    loadingView.snp.makeConstraints { (make) in
+    loadingView.snp.makeConstraints { make in
       make.edges.equalTo(loadingView.superview!)
     }
   }

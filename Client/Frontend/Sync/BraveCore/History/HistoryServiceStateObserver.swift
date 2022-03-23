@@ -42,5 +42,4 @@ class HistoryServiceStateObserver: BraveServiceStateObserver, HistoryServiceObse
   func historyNodesDeleted(_ historyNodeList: [HistoryNode], isAllHistory: Bool) {
     listener(.historyDeleted(historyNodeList, isAllHistory: isAllHistory))
   }
-
 }

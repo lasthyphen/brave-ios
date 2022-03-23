@@ -20,14 +20,16 @@ private let log = Logger.browserLogger
 
 public class PlaylistMimeTypeDetector {
   private(set) var mimeType: String?
-  private(set) var fileExtension: String?  // When nil, assume `mpg` format.
+  private(set) var fileExtension: String? // When nil, assume `mpg` format.
 
   init(url: URL) {
     let possibleFileExtension = url.pathExtension.lowercased()
     if let supportedExtension = knownFileExtensions.first(where: { $0.lowercased() == possibleFileExtension }) {
       self.fileExtension = supportedExtension
       self.mimeType = mimeTypeMap.first(where: { $0.value == supportedExtension })?.key
-    } else if let fileExtension = PlaylistMimeTypeDetector.supportedAVAssetFileExtensions().first(where: { $0.lowercased() == possibleFileExtension }) {
+    }
+    else if let fileExtension = PlaylistMimeTypeDetector.supportedAVAssetFileExtensions()
+      .first(where: { $0.lowercased() == possibleFileExtension }) {
       self.fileExtension = fileExtension
       self.mimeType = PlaylistMimeTypeDetector.fileExtensionToMimeType(fileExtension)
     }
@@ -37,7 +39,9 @@ public class PlaylistMimeTypeDetector {
     if let fileExtension = mimeTypeMap[mimeType.lowercased()] {
       self.mimeType = mimeType
       self.fileExtension = fileExtension
-    } else if let mimeType = PlaylistMimeTypeDetector.supportedAVAssetMimeTypes().first(where: { $0.lowercased() == mimeType.lowercased() }) {
+    }
+    else if let mimeType = PlaylistMimeTypeDetector.supportedAVAssetMimeTypes()
+      .first(where: { $0.lowercased() == mimeType.lowercased() }) {
       self.mimeType = mimeType
       self.fileExtension = PlaylistMimeTypeDetector.mimeTypeToFileExtension(mimeType)
     }
@@ -66,13 +70,15 @@ public class PlaylistMimeTypeDetector {
       return
     }
 
-    if findHeader(offset: 0, data: data, header: [0x52, 0x49, 0x46, 0x46]) && findHeader(offset: 8, data: data, header: [0x57, 0x41, 0x56, 0x45]) {
+    if findHeader(offset: 0, data: data, header: [0x52, 0x49, 0x46, 0x46]) &&
+      findHeader(offset: 8, data: data, header: [0x57, 0x41, 0x56, 0x45]) {
       mimeType = "audio/x-wav"
       fileExtension = "wav"
       return
     }
 
-    if findHeader(offset: 0, data: data, header: [0xFF, 0xFB]) || findHeader(offset: 0, data: data, header: [0x49, 0x44, 0x33]) {
+    if findHeader(offset: 0, data: data, header: [0xFF, 0xFB]) ||
+      findHeader(offset: 0, data: data, header: [0x49, 0x44, 0x33]) {
       mimeType = "audio/mpeg"
       fileExtension = "mp4"
       return
@@ -84,7 +90,15 @@ public class PlaylistMimeTypeDetector {
       return
     }
 
-    if findHeader(offset: 4, data: data, header: [0x66, 0x74, 0x79, 0x70, 0x4D, 0x53, 0x4E, 0x56]) || findHeader(offset: 4, data: data, header: [0x66, 0x74, 0x79, 0x70, 0x69, 0x73, 0x6F, 0x6D]) || findHeader(offset: 4, data: data, header: [0x66, 0x74, 0x79, 0x70, 0x6D, 0x70, 0x34, 0x32]) || findHeader(offset: 0, data: data, header: [0x33, 0x67, 0x70, 0x35]) {
+    if findHeader(offset: 4, data: data, header: [0x66, 0x74, 0x79, 0x70, 0x4D, 0x53, 0x4E, 0x56]) || findHeader(
+      offset: 4,
+      data: data,
+      header: [0x66, 0x74, 0x79, 0x70, 0x69, 0x73, 0x6F, 0x6D]
+    ) || findHeader(offset: 4, data: data, header: [0x66, 0x74, 0x79, 0x70, 0x6D, 0x70, 0x34, 0x32]) || findHeader(
+      offset: 0,
+      data: data,
+      header: [0x33, 0x67, 0x70, 0x35]
+    ) {
       mimeType = "video/mp4"
       fileExtension = "mp4"
       return
@@ -102,7 +116,8 @@ public class PlaylistMimeTypeDetector {
       return
     }
 
-    if findHeader(offset: 0, data: data, header: [0x52, 0x49, 0x46, 0x46]) && findHeader(offset: 8, data: data, header: [0x41, 0x56, 0x49]) {
+    if findHeader(offset: 0, data: data, header: [0x52, 0x49, 0x46, 0x46]) &&
+      findHeader(offset: 8, data: data, header: [0x41, 0x56, 0x49]) {
       mimeType = "video/x-msvideo"
       fileExtension = "avi"
       return
@@ -121,13 +136,15 @@ public class PlaylistMimeTypeDetector {
       return
     }
 
-    if findHeader(offset: 0, data: data, header: [0x49, 0x44, 0x33]) || findHeader(offset: 0, data: data, header: [0xFF, 0xFB]) {
+    if findHeader(offset: 0, data: data, header: [0x49, 0x44, 0x33]) ||
+      findHeader(offset: 0, data: data, header: [0xFF, 0xFB]) {
       mimeType = "audio/mpeg"
       fileExtension = "mp3"
       return
     }
 
-    if findHeader(offset: 0, data: data, header: [0x4D, 0x34, 0x41, 0x20]) || findHeader(offset: 4, data: data, header: [0x66, 0x74, 0x79, 0x70, 0x4D, 0x34, 0x41]) {
+    if findHeader(offset: 0, data: data, header: [0x4D, 0x34, 0x41, 0x20]) ||
+      findHeader(offset: 4, data: data, header: [0x66, 0x74, 0x79, 0x70, 0x4D, 0x34, 0x41]) {
       mimeType = "audio/m4a"
       fileExtension = "m4a"
       return
@@ -145,7 +162,7 @@ public class PlaylistMimeTypeDetector {
       return
     }
 
-    mimeType = "application/x-mpegURL"  // application/vnd.apple.mpegurl
+    mimeType = "application/x-mpegURL" // application/vnd.apple.mpegurl
     fileExtension = nil
   }
 
@@ -162,7 +179,8 @@ public class PlaylistMimeTypeDetector {
     if #available(iOS 14.0, *) {
       return UTType(tag: fileExtension, tagClass: .filenameExtension, conformingTo: nil)?.preferredMIMEType
     } else {
-      if let tag = UTTypeCreatePreferredIdentifierForTag(kUTTagClassFilenameExtension, fileExtension as CFString, nil)?.takeRetainedValue() {
+      if let tag = UTTypeCreatePreferredIdentifierForTag(kUTTagClassFilenameExtension, fileExtension as CFString, nil)?
+        .takeRetainedValue() {
         return UTTypeCopyPreferredTagWithClass(tag, kUTTagClassMIMEType)?.takeRetainedValue() as String?
       }
       return nil
@@ -174,7 +192,8 @@ public class PlaylistMimeTypeDetector {
     if #available(iOS 14.0, *) {
       return UTType(tag: mimeType, tagClass: .mimeType, conformingTo: nil)?.preferredFilenameExtension
     } else {
-      if let tag = UTTypeCreatePreferredIdentifierForTag(kUTTagClassMIMEType, mimeType as CFString, nil)?.takeRetainedValue() {
+      if let tag = UTTypeCreatePreferredIdentifierForTag(kUTTagClassMIMEType, mimeType as CFString, nil)?
+        .takeRetainedValue() {
         return UTTypeCopyPreferredTagWithClass(tag, kUTTagClassFilenameExtension)?.takeRetainedValue() as String?
       }
       return nil
@@ -188,7 +207,11 @@ public class PlaylistMimeTypeDetector {
       return types.compactMap({ UTType($0.rawValue)?.preferredFilenameExtension }).filter({ !$0.isEmpty })
     } else {
       let types = AVURLAsset.audiovisualTypes()
-      return types.compactMap({ UTTypeCopyPreferredTagWithClass($0 as CFString, kUTTagClassFilenameExtension)?.takeRetainedValue() as String? }).filter({ !$0.isEmpty })
+      return types
+        .compactMap({
+          UTTypeCopyPreferredTagWithClass($0 as CFString, kUTTagClassFilenameExtension)?.takeRetainedValue() as String?
+        })
+        .filter({ !$0.isEmpty })
     }
   }
 
@@ -199,7 +222,10 @@ public class PlaylistMimeTypeDetector {
       return types.compactMap({ UTType($0.rawValue)?.preferredMIMEType }).filter({ !$0.isEmpty })
     } else {
       let types = AVURLAsset.audiovisualTypes()
-      return types.compactMap({ UTTypeCopyPreferredTagWithClass($0 as CFString, kUTTagClassMIMEType)?.takeRetainedValue() as String? }).filter({ !$0.isEmpty })
+      return types
+        .compactMap({
+          UTTypeCopyPreferredTagWithClass($0 as CFString, kUTTagClassMIMEType)?.takeRetainedValue() as String? })
+        .filter({ !$0.isEmpty })
     }
   }
 
@@ -209,8 +235,8 @@ public class PlaylistMimeTypeDetector {
     "mp4",
     "m4v",
     "m4a",
-    "m4b",  // DRM protected
-    "m4p",  // DRM protected
+    "m4b", // DRM protected
+    "m4p", // DRM protected
     "3gp",
     "3gpp",
     "sdv",
@@ -258,16 +284,16 @@ public class PlaylistMimeTypeDetector {
     "audio/mpeg3": "mp3",
     "audio/mp3": "mp3",
     "audio/x-caf": "caf",
-    "audio/mpeg": "mp3",  // mpg3
+    "audio/mpeg": "mp3", // mpg3
     "audio/x-mpeg3": "mp3",
     "audio/wav": "wav",
     "audio/flac": "flac",
     "audio/x-flac": "flac",
     "audio/mp4": "mp4",
-    "audio/x-mpg": "mp3",  // maybe mpg3
+    "audio/x-mpg": "mp3", // maybe mpg3
     "audio/scpls": "pls",
     "audio/x-aiff": "aiff",
-    "audio/usac": "eac3",  // Extended AC3
+    "audio/usac": "eac3", // Extended AC3
     "audio/x-mpeg": "mp3",
     "audio/wave": "wav",
     "audio/x-m4r": "m4r",
@@ -276,12 +302,12 @@ public class PlaylistMimeTypeDetector {
     "audio/aiff": "aiff",
     "audio/3gpp2": "3gp2",
     "audio/aac": "aac",
-    "audio/mpg": "mp3",  // mpg3
-    "audio/mpegurl": "mpg",  // actually .m3u8, .m3u HLS stream
+    "audio/mpg": "mp3", // mpg3
+    "audio/mpegurl": "mpg", // actually .m3u8, .m3u HLS stream
     "audio/x-m4b": "m4b",
     "audio/x-m4p": "m4p",
     "audio/x-scpls": "pls",
-    "audio/x-mpegurl": "mpg",  // actually .m3u8, .m3u HLS stream
+    "audio/x-mpegurl": "mpg", // actually .m3u8, .m3u HLS stream
     "audio/x-aac": "aac",
     "audio/3gpp": "3gp",
     "audio/basic": "au",
@@ -300,11 +326,11 @@ public class PlaylistMimeTypeDetector {
     "video/avi": "avi",
     "video/x-m4v": "m4v",
     "video/mp2t": "ts",
-    "application/vnd.apple.mpegurl": "mpg",  // actually .m3u8, .m3u HLS stream
+    "application/vnd.apple.mpegurl": "mpg", // actually .m3u8, .m3u HLS stream
     "video/3gpp": "3gp",
-    "text/vtt": "vtt",  // Subtitles format
+    "text/vtt": "vtt", // Subtitles format
     "application/mp4": "mp4",
-    "application/x-mpegurl": "mpg",  // actually .m3u8, .m3u HLS stream
+    "application/x-mpegurl": "mpg", // actually .m3u8, .m3u HLS stream
     "video/webm": "webm",
     "application/ogg": "ogg",
     "video/msvideo": "avi",
@@ -341,7 +367,8 @@ class PlaylistWebLoader: UIView {
   }
 
   private let playlistDetectorScript: WKUserScript? = {
-    guard let path = Bundle.main.path(forResource: "PlaylistDetector", ofType: "js"), let source = try? String(contentsOfFile: path) else {
+    guard let path = Bundle.main.path(forResource: "PlaylistDetector", ofType: "js"),
+          let source = try? String(contentsOfFile: path) else {
       log.error("Failed to load PlaylistDetector.js")
       return nil
     }
@@ -372,7 +399,12 @@ class PlaylistWebLoader: UIView {
     replacements.forEach({
       alteredSource = alteredSource.replacingOccurrences(of: $0.key, with: $0.value, options: .literal)
     })
-    return WKUserScript.create(source: alteredSource, injectionTime: .atDocumentStart, forMainFrameOnly: false, in: .page)
+    return WKUserScript.create(
+      source: alteredSource,
+      injectionTime: .atDocumentStart,
+      forMainFrameOnly: false,
+      in: .page
+    )
   }()
 
   private weak var certStore: CertStore?
@@ -403,14 +435,21 @@ class PlaylistWebLoader: UIView {
 
       browserController.tab(tab, didCreateWebView: webView)
       KVOs.forEach { webView.removeObserver(browserController, forKeyPath: $0.rawValue) }
-      webView.scrollView.removeObserver(browserController.scrollController, forKeyPath: KVOConstants.contentSize.rawValue)
+      webView.scrollView.removeObserver(
+        browserController.scrollController,
+        forKeyPath: KVOConstants.contentSize.rawValue
+      )
     }
 
     // When creating a tab, TabManager automatically adds a uiDelegate
     // This webView is invisible and we don't want any UI being handled.
     webView.uiDelegate = nil
     webView.navigationDelegate = self
-    tab.addContentScript(PlaylistWebLoaderContentHelper(self), name: PlaylistWebLoaderContentHelper.name(), contentWorld: .page)
+    tab.addContentScript(
+      PlaylistWebLoaderContentHelper(self),
+      name: PlaylistWebLoaderContentHelper.name(),
+      contentWorld: .page
+    )
 
     if let script = playlistDetectorScript {
       // Do NOT inject the PlaylistHelper script!
@@ -425,6 +464,7 @@ class PlaylistWebLoader: UIView {
     }
   }
 
+  @available(*, unavailable)
   required init?(coder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }
@@ -434,13 +474,17 @@ class PlaylistWebLoader: UIView {
   }
 
   func load(url: URL) {
-    guard let webView = tab.webView else { return }
+    guard let webView = tab.webView else {
+      return
+    }
     webView.frame = self.window?.bounds ?? .zero
     webView.load(URLRequest(url: url, cachePolicy: .reloadIgnoringCacheData, timeoutInterval: 60.0))
   }
 
   func stop() {
-    guard let webView = tab.webView else { return }
+    guard let webView = tab.webView else {
+      return
+    }
     webView.stopLoading()
     DispatchQueue.main.async {
       self.handler(nil)
@@ -459,14 +503,18 @@ class PlaylistWebLoader: UIView {
     }
 
     static func name() -> String {
-      return "PlaylistWebLoader"
+      "PlaylistWebLoader"
     }
 
     func scriptMessageHandlerName() -> String? {
-      return "playlistCacheLoader_\(UserScriptManager.messageHandlerTokenString)"
+      "playlistCacheLoader_\(UserScriptManager.messageHandlerTokenString)"
     }
 
-    func userContentController(_ userContentController: WKUserContentController, didReceiveScriptMessage message: WKScriptMessage, replyHandler: (Any?, String?) -> Void) {
+    func userContentController(
+      _ userContentController: WKUserContentController,
+      didReceiveScriptMessage message: WKScriptMessage,
+      replyHandler: (Any?, String?) -> Void
+    ) {
       defer { replyHandler(nil, nil) }
       if let info = PageInfo.from(message: message) {
         isPageLoaded = info.pageLoad
@@ -474,7 +522,9 @@ class PlaylistWebLoader: UIView {
         if isPageLoaded {
           timeout?.cancel()
           timeout = DispatchWorkItem(block: { [weak self] in
-            guard let self = self else { return }
+            guard let self = self else {
+              return
+            }
             self.webLoader?.handler(nil)
             self.webLoader?.tab.webView?.loadHTMLString("<html><body>PlayList</body></html>", baseURL: nil)
           })
@@ -487,7 +537,7 @@ class PlaylistWebLoader: UIView {
       }
 
       guard let item = PlaylistInfo.from(message: message),
-        item.detected
+            item.detected
       else {
         timeout?.cancel()
         timeout = nil
@@ -497,7 +547,8 @@ class PlaylistWebLoader: UIView {
       }
 
       // For now, we ignore base64 video mime-types loaded via the `data:` scheme.
-      if item.duration <= 0.0 && !item.detected || item.src.isEmpty || item.src.hasPrefix("data:") || item.src.hasPrefix("blob:") {
+      if item.duration <= 0.0 && !item.detected || item.src.isEmpty || item.src.hasPrefix("data:") || item.src
+        .hasPrefix("blob:") {
         timeout?.cancel()
         timeout = nil
         webLoader?.handler(nil)
@@ -588,7 +639,11 @@ extension PlaylistWebLoader: WKNavigationDelegate {
     self.handler(nil)
   }
 
-  func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
+  func webView(
+    _ webView: WKWebView,
+    decidePolicyFor navigationAction: WKNavigationAction,
+    decisionHandler: @escaping (WKNavigationActionPolicy) -> Void
+  ) {
     guard let url = navigationAction.request.url else {
       decisionHandler(.cancel)
       return
@@ -608,7 +663,7 @@ extension PlaylistWebLoader: WKNavigationDelegate {
 
     // Universal links do not work if the request originates from the app, manual handling is required.
     if let mainDocURL = navigationAction.request.mainDocumentURL,
-      let universalLink = UniversalLinkManager.universalLinkType(for: mainDocURL, checkPath: true) {
+       let universalLink = UniversalLinkManager.universalLinkType(for: mainDocURL, checkPath: true) {
       switch universalLink {
       case .buyVPN:
         decisionHandler(.cancel)
@@ -618,7 +673,8 @@ extension PlaylistWebLoader: WKNavigationDelegate {
 
     // First special case are some schemes that are about Calling. We prompt the user to confirm this action. This
     // gives us the exact same behaviour as Safari.
-    if url.scheme == "tel" || url.scheme == "facetime" || url.scheme == "facetime-audio" || url.scheme == "mailto" || isAppleMapsURL(url) || isStoreURL(url) {
+    if url.scheme == "tel" || url.scheme == "facetime" || url.scheme == "facetime-audio" || url
+      .scheme == "mailto" || isAppleMapsURL(url) || isStoreURL(url) {
       decisionHandler(.cancel)
       return
     }
@@ -644,8 +700,8 @@ extension PlaylistWebLoader: WKNavigationDelegate {
         // do nothing, use Apple's https solution.
       } else {
         if Preferences.Shields.httpsEverywhere.value,
-          url.scheme == "http",
-          let urlHost = url.normalizedHost() {
+           url.scheme == "http",
+           let urlHost = url.normalizedHost() {
           HttpsEverywhereStats.shared.shouldUpgrade(url) { shouldupgrade in
             DispatchQueue.main.async {
               if shouldupgrade {
@@ -657,10 +713,9 @@ extension PlaylistWebLoader: WKNavigationDelegate {
       }
 
       if let mainDocumentURL = navigationAction.request.mainDocumentURL,
-        mainDocumentURL.schemelessAbsoluteString == url.schemelessAbsoluteString,
-        !(InternalURL(url)?.isSessionRestore ?? false),
-        navigationAction.sourceFrame.isMainFrame || navigationAction.targetFrame?.isMainFrame == true {
-
+         mainDocumentURL.schemelessAbsoluteString == url.schemelessAbsoluteString,
+         !(InternalURL(url)?.isSessionRestore ?? false),
+         navigationAction.sourceFrame.isMainFrame || navigationAction.targetFrame?.isMainFrame == true {
         // Identify specific block lists that need to be applied to the requesting domain
         let domainForShields = Domain.getOrCreate(forUrl: mainDocumentURL, persistent: false)
 
@@ -672,13 +727,16 @@ extension PlaylistWebLoader: WKNavigationDelegate {
         let controller = webView.configuration.userContentController
 
         // Grab all lists that have valid rules and add/remove them as necessary
-        on.compactMap { $0.rule }.forEach(controller.add)
-        off.compactMap { $0.rule }.forEach(controller.remove)
+        on.compactMap(\.rule).forEach(controller.add)
+        off.compactMap(\.rule).forEach(controller.remove)
 
         tab.userScriptManager?.isFingerprintingProtectionEnabled =
           domainForShields.isShieldExpected(.FpProtection, considerAllShieldsOption: true)
 
-        webView.configuration.preferences.javaScriptEnabled = !domainForShields.isShieldExpected(.NoScript, considerAllShieldsOption: true)
+        webView.configuration.preferences.javaScriptEnabled = !domainForShields.isShieldExpected(
+          .NoScript,
+          considerAllShieldsOption: true
+        )
       }
 
       // Cookie Blocking code below
@@ -699,13 +757,17 @@ extension PlaylistWebLoader: WKNavigationDelegate {
     decisionHandler(.cancel)
   }
 
-  func webView(_ webView: WKWebView, decidePolicyFor navigationResponse: WKNavigationResponse, decisionHandler: @escaping (WKNavigationResponsePolicy) -> Void) {
+  func webView(
+    _ webView: WKWebView,
+    decidePolicyFor navigationResponse: WKNavigationResponse,
+    decisionHandler: @escaping (WKNavigationResponsePolicy) -> Void
+  ) {
     let response = navigationResponse.response
     let responseURL = response.url
 
     if let responseURL = responseURL,
-      let internalURL = InternalURL(responseURL),
-      internalURL.isSessionRestore {
+       let internalURL = InternalURL(responseURL),
+       internalURL.isSessionRestore {
       tab.shouldClassifyLoadsForAds = false
     }
 
@@ -725,7 +787,13 @@ extension PlaylistWebLoader: WKNavigationDelegate {
     // TODO: REFACTOR to support Multiple Windows Better
     if let browserController = webView.currentScene?.browserViewController {
       // Check if this response should be handed off to Passbook.
-      if OpenPassBookHelper(request: request, response: response, canShowInWebView: false, forceDownload: false, browserViewController: browserController) != nil {
+      if OpenPassBookHelper(
+        request: request,
+        response: response,
+        canShowInWebView: false,
+        forceDownload: false,
+        browserViewController: browserController
+      ) != nil {
         decisionHandler(.cancel)
         return
       }
@@ -745,23 +813,34 @@ extension PlaylistWebLoader: WKNavigationDelegate {
     decisionHandler(.allow)
   }
 
-  func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, preferences: WKWebpagePreferences, decisionHandler: @escaping (WKNavigationActionPolicy, WKWebpagePreferences) -> Void) {
-
+  func webView(
+    _ webView: WKWebView,
+    decidePolicyFor navigationAction: WKNavigationAction,
+    preferences: WKWebpagePreferences,
+    decisionHandler: @escaping (WKNavigationActionPolicy, WKWebpagePreferences) -> Void
+  ) {
     self.webView(webView, decidePolicyFor: navigationAction) {
       decisionHandler($0, preferences)
     }
   }
 
-  func webView(_ webView: WKWebView, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
+  func webView(
+    _ webView: WKWebView,
+    didReceive challenge: URLAuthenticationChallenge,
+    completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void
+  ) {
     let origin = "\(challenge.protectionSpace.host):\(challenge.protectionSpace.port)"
     if challenge.protectionSpace.authenticationMethod == NSURLAuthenticationMethodServerTrust,
-      let trust = challenge.protectionSpace.serverTrust,
-      let cert = SecTrustGetCertificateAtIndex(trust, 0), certStore?.containsCertificate(cert, forOrigin: origin) == true {
+       let trust = challenge.protectionSpace.serverTrust,
+       let cert = SecTrustGetCertificateAtIndex(trust, 0),
+       certStore?.containsCertificate(cert, forOrigin: origin) == true {
       completionHandler(.useCredential, URLCredential(trust: trust))
       return
     }
 
-    guard challenge.protectionSpace.authenticationMethod == NSURLAuthenticationMethodHTTPBasic || challenge.protectionSpace.authenticationMethod == NSURLAuthenticationMethodHTTPDigest || challenge.protectionSpace.authenticationMethod == NSURLAuthenticationMethodNTLM else {
+    guard challenge.protectionSpace.authenticationMethod == NSURLAuthenticationMethodHTTPBasic || challenge
+      .protectionSpace.authenticationMethod == NSURLAuthenticationMethodHTTPDigest || challenge.protectionSpace
+      .authenticationMethod == NSURLAuthenticationMethodNTLM else {
       completionHandler(.performDefaultHandling, nil)
       return
     }

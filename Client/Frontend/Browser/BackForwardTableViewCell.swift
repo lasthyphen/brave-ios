@@ -7,7 +7,6 @@ import Storage
 import Shared
 
 class BackForwardTableViewCell: UITableViewCell {
-
   private struct BackForwardViewCellUX {
     static let faviconWidth = 29
     static let faviconPadding: CGFloat = 20
@@ -48,6 +47,7 @@ class BackForwardTableViewCell: UITableViewCell {
       setNeedsUpdateConstraints()
     }
   }
+
   var connectingBackwards = true {
     didSet {
       setNeedsUpdateConstraints()
@@ -124,6 +124,7 @@ class BackForwardTableViewCell: UITableViewCell {
     }
   }
 
+  @available(*, unavailable)
   required init(coder aDecoder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }

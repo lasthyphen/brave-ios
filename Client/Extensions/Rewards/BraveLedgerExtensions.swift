@@ -11,7 +11,6 @@ import BraveShared
 private let log = Logger.braveCoreLogger
 
 extension BraveLedger {
-
   public var isLedgerTransferExpired: Bool {
     if Locale.current.regionCode != "JP" {
       return false
@@ -39,7 +38,7 @@ extension BraveLedger {
       let filter = Ledger.ActivityInfoFilter().then {
         $0.id = ""
         $0.excluded = .filterAllExceptExcluded
-        $0.percent = 1  // exclude 0% sites.
+        $0.percent = 1 // exclude 0% sites.
         $0.orderBy = [sort]
         $0.nonVerified = allowUnverifiedPublishers
         $0.reconcileStamp = autoContributeProperties?.reconcileStamp ?? 0
@@ -57,8 +56,8 @@ extension BraveLedger {
       return
     }
     if !AppConstants.buildChannel.isPublic,
-      let overrideValue = Preferences.Rewards.drainStatusOverride.value,
-      let status = Ledger.DrainStatus(rawValue: overrideValue) {
+       let overrideValue = Preferences.Rewards.drainStatusOverride.value,
+       let status = Ledger.DrainStatus(rawValue: overrideValue) {
       Preferences.Rewards.lastTransferStatus.value = status.rawValue
       completion(status)
       return
@@ -83,8 +82,10 @@ extension BraveLedger {
   ///
   /// Use this is in UI instead of `createWallet` directly unless required
   public func createWalletAndFetchDetails(_ completion: @escaping (Bool) -> Void) {
-    createWallet { [weak self] (error) in
-      guard let self = self else { return }
+    createWallet { [weak self] error in
+      guard let self = self else {
+        return
+      }
 
       if let _ = error {
         completion(false)
@@ -117,7 +118,8 @@ extension BraveLedger {
         queue: .main,
         execute: {
           completion(success)
-        })
+        }
+      )
     }
   }
 
@@ -131,8 +133,10 @@ extension BraveLedger {
 
   public func setupDeviceCheckEnrollment(_ client: DeviceCheckClient, completion: @escaping () -> Void) {
     // Enroll in DeviceCheck
-    client.generateToken { [weak self] (token, error) in
-      guard let self = self else { return }
+    client.generateToken { [weak self] token, error in
+      guard let self = self else {
+        return
+      }
       if let error = error {
         log.error("Failed to generate DeviceCheck token: \(error)")
         completion()
@@ -145,7 +149,9 @@ extension BraveLedger {
           completion()
           return
         }
-        guard let registration = registration else { return }
+        guard let registration = registration else {
+          return
+        }
         client.registerDevice(enrollment: registration) { error in
           if let error = error {
             log.error("Failed to register device with mobile attestation server: \(error)")
@@ -177,7 +183,7 @@ extension BraveLedger {
       }
     }
     group.notify(queue: .main) {
-      deviceCheck.generateAttestation(paymentId: paymentId) { (attestation, error) in
+      deviceCheck.generateAttestation(paymentId: paymentId) { attestation, error in
         guard let attestation = attestation else {
           completion(false)
           return

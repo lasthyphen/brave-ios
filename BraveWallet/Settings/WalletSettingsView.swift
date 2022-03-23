@@ -93,7 +93,8 @@ public struct WalletSettingsView: View {
               Text(Strings.Wallet.settingsResetTransactionAlertButtonTitle),
               action: {
                 settingsStore.resetTransaction()
-              }),
+              }
+            ),
             secondaryButton: .cancel(Text(Strings.cancelButtonTitle))
           )
         }
@@ -108,7 +109,8 @@ public struct WalletSettingsView: View {
               Text(Strings.Wallet.settingsResetWalletAlertButtonTitle),
               action: {
                 settingsStore.reset()
-              }),
+              }
+            ),
             secondaryButton: .cancel(Text(Strings.no))
           )
         }

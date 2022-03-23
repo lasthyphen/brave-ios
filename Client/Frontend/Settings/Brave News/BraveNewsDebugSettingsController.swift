@@ -29,6 +29,7 @@ extension FeedDataSource {
       return "Error: \(error.localizedDescription)"
     }
   }
+
   fileprivate func detailRows(for state: State) -> [Row] {
     switch state {
     case .initial:
@@ -80,13 +81,17 @@ class BraveNewsDebugSettingsController: TableViewController {
           Row(
             text: "Environment", detailText: feedDataSource.environment.name,
             selection: { [unowned self] in
-              let picker = TodayEnvironmentPicker(selectedEnvironment: feedDataSource.environment) { [unowned self] newEnvironment in
+              let picker = TodayEnvironmentPicker(
+                selectedEnvironment: feedDataSource
+                  .environment
+              ) { [unowned self] newEnvironment in
                 feedDataSource.environment = newEnvironment
                 self.reloadData()
                 self.navigationController?.popViewController(animated: true)
               }
               navigationController?.pushViewController(picker, animated: true)
-            }, accessory: .disclosureIndicator)
+            }, accessory: .disclosureIndicator
+          )
         ],
         footer: .title("Changing the environment will purge all cached resources immediately.")
       ),
@@ -104,7 +109,8 @@ class BraveNewsDebugSettingsController: TableViewController {
               for category in categories where !category.isEmpty {
                 self.feedDataSource.toggleCategory(category, enabled: false)
               }
-            }, cellClass: ButtonCell.self)
+            }, cellClass: ButtonCell.self
+          )
         ]
       ),
     ]
@@ -136,7 +142,11 @@ private class TodayEnvironmentPicker: TableViewController {
     super.viewDidLoad()
 
     title = "Environment"
-    navigationItem.leftBarButtonItem = .init(barButtonSystemItem: .cancel, target: self, action: #selector(cancelPicker))
+    navigationItem.leftBarButtonItem = .init(
+      barButtonSystemItem: .cancel,
+      target: self,
+      action: #selector(cancelPicker)
+    )
 
     dataSource.sections = [
       .init(
@@ -145,8 +155,10 @@ private class TodayEnvironmentPicker: TableViewController {
             text: environment.name,
             selection: { [unowned self] in
               self.environmentUpdated(environment)
-            }, accessory: environment == selectedEnvironment ? .checkmark : .none)
-        })
+            }, accessory: environment == selectedEnvironment ? .checkmark : .none
+          )
+        }
+      )
     ]
   }
 

@@ -8,7 +8,6 @@ import BraveUI
 import Shared
 
 class WalletTransferExpiredViewController: UIViewController, PopoverContentComponent {
-
   private let gradientBackgroundView = GradientView(
     colors: [
       .init(rgb: 0xA1A8F2),
@@ -35,7 +34,8 @@ class WalletTransferExpiredViewController: UIViewController, PopoverContentCompo
       string.addAttributes(
         [
           .font: UIFont.systemFont(ofSize: 16.0, weight: .medium)
-        ], range: .init(location: 0, length: string.string.count))
+        ], range: .init(location: 0, length: string.string.count)
+      )
       return string.withLineSpacing(3)
     }()
   }

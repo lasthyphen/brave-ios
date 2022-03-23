@@ -8,7 +8,8 @@ public struct BraveUX {
   public static let braveOffersURL = URL(string: "https://offers.brave.com/")!
   public static let bravePlaylistOnboardingURL = URL(string: "https://brave.com/playlist")!
   public static let braveRewardsLearnMoreURL = URL(string: "https://brave.com/rewards-ios/")!
-  public static let braveRewardsUnverifiedPublisherLearnMoreURL = URL(string: "https://brave.com/faq-rewards/#unclaimed-funds")!
+  public static let braveRewardsUnverifiedPublisherLearnMoreURL =
+    URL(string: "https://brave.com/faq-rewards/#unclaimed-funds")!
   public static let braveNewsPartnersURL = URL(string: "https://brave.com/brave-news/")!
   public static let braveTermsOfUseURL = URL(string: "https://www.brave.com/terms_of_use")!
   public static let batTermsOfUseURL = URL(string: "https://basicattentiontoken.org/user-terms-of-service/")!

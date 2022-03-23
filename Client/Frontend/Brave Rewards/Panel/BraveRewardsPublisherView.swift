@@ -8,7 +8,6 @@ import BraveUI
 import Shared
 
 class BraveRewardsPublisherView: UIStackView {
-
   struct UX {
     static let hostLabelFontSize: CGFloat = 19.0
   }
@@ -60,12 +59,14 @@ class BraveRewardsPublisherView: UIStackView {
         UIStackView(arrangedSubviews: [faviconImageView, hostLabel]).then {
           $0.spacing = 8
           $0.alignment = .center
-        }),
+        }
+      ),
       .view(
         UIStackView(arrangedSubviews: [bodyLabel]).then {
           $0.isLayoutMarginsRelativeArrangement = true
           $0.layoutMargins = UIEdgeInsets(top: 0, left: 20, bottom: 0, right: 20)
-        }),
+        }
+      ),
       .customSpace(4),
       .view(learnMoreButton)
     )

@@ -8,7 +8,6 @@ import SwiftUI
 
 /// A UIView whos layer is a gradient layer
 public class GradientView: UIView {
-
   public convenience init() {
     self.init(colors: [], positions: [], startPoint: .zero, endPoint: CGPoint(x: 0, y: 1))
   }
@@ -24,11 +23,11 @@ public class GradientView: UIView {
 
   /// The gradient layer which you may modify
   public var gradientLayer: CAGradientLayer {
-    return layer as! CAGradientLayer  // swiftlint:disable:this force_cast
+    layer as! CAGradientLayer // swiftlint:disable:this force_cast
   }
 
   public override class var layerClass: AnyClass {
-    return CAGradientLayer.self
+    CAGradientLayer.self
   }
 
   @available(*, unavailable)

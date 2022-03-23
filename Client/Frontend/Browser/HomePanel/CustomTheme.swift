@@ -7,7 +7,10 @@ import Foundation
 /// A set of attributes that are used to customized the Brave app.
 struct CustomTheme: Codable, NTPThemeable {
   private enum CodingKeys: String, CodingKey {
-    case wallpapers, logo, topSites, themeName
+    case wallpapers
+    case logo
+    case topSites
+    case themeName
   }
 
   /// Name of the custom theme.
@@ -23,7 +26,10 @@ struct CustomTheme: Codable, NTPThemeable {
 
   struct TopSite: Codable {
     private enum CodingKeys: String, CodingKey {
-      case name, destinationUrl, iconUrl, backgroundColor
+      case name
+      case destinationUrl
+      case iconUrl
+      case backgroundColor
     }
 
     let name: String

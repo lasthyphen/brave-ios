@@ -11,6 +11,7 @@ class FeedCardFooterButton: UIControl {
     $0.font = .systemFont(ofSize: 14, weight: .semibold)
     $0.isAccessibilityElement = false
   }
+
   private let disclosureIcon = UIImageView(image: UIImage(imageLiteralResourceName: "disclosure-arrow").template).then {
     $0.tintColor = .white
     $0.setContentHuggingPriority(.required, for: .horizontal)

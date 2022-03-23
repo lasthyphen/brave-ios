@@ -10,15 +10,21 @@ private let log = Logger.browserLogger
 
 class LocalRequestHelper: TabContentScript {
   func scriptMessageHandlerName() -> String? {
-    return "localRequestHelper"
+    "localRequestHelper"
   }
 
-  func userContentController(_ userContentController: WKUserContentController, didReceiveScriptMessage message: WKScriptMessage, replyHandler: (Any?, String?) -> Void) {
+  func userContentController(
+    _ userContentController: WKUserContentController,
+    didReceiveScriptMessage message: WKScriptMessage,
+    replyHandler: (Any?, String?) -> Void
+  ) {
     defer { replyHandler(nil, nil) }
     guard let requestUrl = message.frameInfo.request.url,
-      let internalUrl = InternalURL(requestUrl),
-      let params = message.body as? [String: String]
-    else { return }
+          let internalUrl = InternalURL(requestUrl),
+          let params = message.body as? [String: String]
+    else {
+      return
+    }
 
     if UserScriptManager.isMessageHandlerTokenMissing(in: params) {
       log.debug("Missing required security token.")
@@ -38,6 +44,6 @@ class LocalRequestHelper: TabContentScript {
   }
 
   class func name() -> String {
-    return "LocalRequestHelper"
+    "LocalRequestHelper"
   }
 }

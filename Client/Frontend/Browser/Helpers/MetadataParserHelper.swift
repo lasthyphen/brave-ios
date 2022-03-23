@@ -16,7 +16,8 @@ class MetadataParserHelper: TabEventHandler {
   init() {
     self.tabObservers = registerFor(
       .didChangeURL,
-      queue: .main)
+      queue: .main
+    )
   }
 
   deinit {
@@ -27,14 +28,18 @@ class MetadataParserHelper: TabEventHandler {
     // Get the metadata out of the page-metadata-parser, and into a type safe struct as soon
     // as possible.
     guard let webView = tab.webView,
-      let url = webView.url, url.isWebPage(includeDataURIs: false), !InternalURL.isValid(url: url)
+          let url = webView.url, url.isWebPage(includeDataURIs: false), !InternalURL.isValid(url: url)
     else {
       // TabEvent.post(.pageMetadataNotAvailable, for: tab)
       tab.pageMetadata = nil
       return
     }
 
-    webView.evaluateSafeJavaScript(functionName: "__firefox__.metadata && __firefox__.metadata.getMetadata()", contentWorld: .defaultClient, asFunction: false) { (result, error) in
+    webView.evaluateSafeJavaScript(
+      functionName: "__firefox__.metadata && __firefox__.metadata.getMetadata()",
+      contentWorld: .defaultClient,
+      asFunction: false
+    ) { result, error in
       guard error == nil else {
         // TabEvent.post(.pageMetadataNotAvailable, for: tab)
         tab.pageMetadata = nil
@@ -42,7 +47,7 @@ class MetadataParserHelper: TabEventHandler {
       }
 
       guard let dict = result as? [String: Any],
-        let data = try? JSONSerialization.data(withJSONObject: dict, options: [])
+            let data = try? JSONSerialization.data(withJSONObject: dict, options: [])
       else {
         log.debug("Page contains no metadata!")
         //                TabEvent.post(.pageMetadataNotAvailable, for: tab)
@@ -72,7 +77,8 @@ class MediaImageLoader: TabEventHandler {
     self.prefs = prefs
     self.tabObservers = registerFor(
       .didLoadPageMetadata,
-      queue: .main)
+      queue: .main
+    )
   }
 
   deinit {
@@ -93,5 +99,4 @@ class MediaImageLoader: TabEventHandler {
 
     WebImageCacheManager.shared.load(from: url)
   }
-
 }

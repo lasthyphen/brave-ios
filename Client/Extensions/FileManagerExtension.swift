@@ -12,6 +12,7 @@ extension FileManager {
     case cookie = "/Cookies"
     case webSiteData = "/WebKit/WebsiteData"
   }
+
   public typealias FolderLockObj = (folder: Folder, lock: Bool)
 
   /// URL where files downloaded by user are stored.
@@ -27,12 +28,20 @@ extension FileManager {
 
   // Lock a folder using FolderLockObj provided.
   @discardableResult public func setFolderAccess(_ lockObjects: [FolderLockObj]) -> Bool {
-    guard let baseDir = baseDirectory() else { return false }
+    guard let baseDir = baseDirectory() else {
+      return false
+    }
     for lockObj in lockObjects {
       do {
-        try self.setAttributes([.posixPermissions: (lockObj.lock ? 0 : 0o755)], ofItemAtPath: baseDir + lockObj.folder.rawValue)
+        try self.setAttributes(
+          [.posixPermissions: lockObj.lock ? 0 : 0o755],
+          ofItemAtPath: baseDir + lockObj.folder.rawValue
+        )
       } catch {
-        log.error("Failed to \(lockObj.lock ? "Lock" : "Unlock") item at path \(lockObj.folder.rawValue) with error: \n\(error)")
+        log
+          .error(
+            "Failed to \(lockObj.lock ? "Lock" : "Unlock") item at path \(lockObj.folder.rawValue) with error: \n\(error)"
+          )
         return false
       }
     }
@@ -41,7 +50,9 @@ extension FileManager {
 
   // Check the locked status of a folder. Returns true for locked.
   public func checkLockedStatus(folder: Folder) -> Bool {
-    guard let baseDir = baseDirectory() else { return false }
+    guard let baseDir = baseDirectory() else {
+      return false
+    }
     do {
       if let lockValue = try self.attributesOfItem(atPath: baseDir + folder.rawValue)[.posixPermissions] as? NSNumber {
         return lockValue == 0o755
@@ -56,8 +67,9 @@ extension FileManager {
     _ data: Data, fileName: String, folderName: String,
     location: SearchPathDirectory = .applicationSupportDirectory
   ) -> Bool {
-
-    guard let folderUrl = getOrCreateFolder(name: folderName, location: location) else { return false }
+    guard let folderUrl = getOrCreateFolder(name: folderName, location: location) else {
+      return false
+    }
 
     do {
       let fileUrl = folderUrl.appendingPathComponent(fileName)
@@ -77,11 +89,15 @@ extension FileManager {
     name: String, excludeFromBackups: Bool = true,
     location: SearchPathDirectory = .applicationSupportDirectory
   ) -> URL? {
-    guard let documentsDir = location.url else { return nil }
+    guard let documentsDir = location.url else {
+      return nil
+    }
 
     var folderDir = documentsDir.appendingPathComponent(name)
 
-    if fileExists(atPath: folderDir.path) { return folderDir }
+    if fileExists(atPath: folderDir.path) {
+      return folderDir
+    }
 
     do {
       try createDirectory(at: folderDir, withIntermediateDirectories: true, attributes: nil)
@@ -100,7 +116,9 @@ extension FileManager {
   }
 
   func removeFolder(withName name: String, location: SearchPathDirectory) {
-    guard let locationUrl = location.url else { return }
+    guard let locationUrl = location.url else {
+      return
+    }
     let fileUrl = locationUrl.appendingPathComponent(name)
 
     if !fileExists(atPath: fileUrl.path) {
@@ -120,7 +138,7 @@ extension FileManager {
     destinationName: String, destinationLocation: SearchPathDirectory
   ) {
     guard let sourceLocation = sourceLocation.url,
-      let destinationLocation = destinationLocation.url
+          let destinationLocation = destinationLocation.url
     else {
       return
     }
@@ -141,27 +159,26 @@ extension FileManager {
   }
 
   private func baseDirectory() -> String? {
-    return NSSearchPathForDirectoriesInDomains(.libraryDirectory, .userDomainMask, true).first
+    NSSearchPathForDirectoriesInDomains(.libraryDirectory, .userDomainMask, true).first
   }
 }
 
 extension FileManager.SearchPathDirectory {
-
   /// Returns first url in user domain mask of given search path directory
   var url: URL? {
-    return FileManager.default.urls(for: self, in: .userDomainMask).first
+    FileManager.default.urls(for: self, in: .userDomainMask).first
   }
 }
 
 extension FileManager {
-
   /// Navigates to download Folder inside the application's folder
   func openBraveDownloadsFolder(_ completion: @escaping (Bool) -> Void) {
     do {
       guard
         var downloadsPathComponents = URLComponents(
           url: try FileManager.default.downloadsPath(),
-          resolvingAgainstBaseURL: false)
+          resolvingAgainstBaseURL: false
+        )
       else {
         completion(false)
         return

@@ -50,7 +50,8 @@ private struct ShortcutProvider: IntentTimelineProvider {
   func placeholder(in context: Context) -> ShortcutEntry {
     .init(
       date: Date(),
-      shortcutSlots: context.isPreview ? [] : [.playlist, .newPrivateTab, .bookmarks])
+      shortcutSlots: context.isPreview ? [] : [.playlist, .newPrivateTab, .bookmarks]
+    )
   }
 
   func getTimeline(
@@ -101,15 +102,16 @@ private struct ShortcutLink<Content: View>: View {
             Color(UIColor.braveBackground)
               .clipShape(ContainerRelativeShape())
           )
-        })
+        }
+      )
     } else {
       EmptyView()
     }
   }
 }
 
-private extension WidgetShortcut {
-  var displayString: String {
+extension WidgetShortcut {
+  fileprivate var displayString: String {
     switch self {
     case .unknown:
       assertionFailure()
@@ -135,7 +137,7 @@ private extension WidgetShortcut {
     }
   }
 
-  var image: Image {
+  fileprivate var image: Image {
     switch self {
     case .unknown:
       assertionFailure()
@@ -181,7 +183,7 @@ private struct ShortcutsView: View {
       // TODO: Would be nice to export handling this url to `BraveShared`.
       // Now it's hardcoded here and in `NavigationRouter`.
       if let url = URL(string: "brave://shortcut?path=0"),
-        let image = UIImage(named: "brave-logo-no-bg-small") {
+         let image = UIImage(named: "brave-logo-no-bg-small") {
         Link(
           destination: url,
           label: {
@@ -193,7 +195,8 @@ private struct ShortcutsView: View {
                 Color(UIColor.braveBackground)
                   .clipShape(ContainerRelativeShape())
               )
-          })
+          }
+        )
       }
       HStack(spacing: 8) {
         ForEach(slots, id: \.self) { shortcut in
@@ -202,7 +205,8 @@ private struct ShortcutsView: View {
             text: shortcut.displayString,
             image: {
               shortcut.image
-            })
+            }
+          )
         }
       }
       .frame(maxHeight: .infinity)

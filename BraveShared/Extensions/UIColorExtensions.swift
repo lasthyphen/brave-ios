@@ -6,7 +6,6 @@ import Foundation
 import UIKit
 
 extension UIColor {
-
   public func toHexString() -> String {
     var r: CGFloat = 0
     var g: CGFloat = 0
@@ -15,7 +14,7 @@ extension UIColor {
 
     getRed(&r, green: &g, blue: &b, alpha: &a)
 
-    let rgb: Int = (Int)(r * 255) << 16 | (Int)(g * 255) << 8 | (Int)(b * 255) << 0
+    let rgb: Int = Int(r * 255) << 16 | Int(g * 255) << 8 | Int(b * 255) << 0
 
     return String(format: "%06x", rgb)
   }
@@ -42,6 +41,7 @@ extension UIColor {
       hue: h,
       saturation: max(s - desaturation, 0.0),
       brightness: b,
-      alpha: a)
+      alpha: a
+    )
   }
 }

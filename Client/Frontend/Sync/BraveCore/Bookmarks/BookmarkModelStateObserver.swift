@@ -41,7 +41,11 @@ class BookmarkModelStateObserver: BraveServiceStateObserver, BookmarkModelObserv
     self.listener(.childrenChanged(bookmarkNode))
   }
 
-  func bookmarkNode(_ bookmarkNode: BookmarkNode, movedFromParent oldParent: BookmarkNode, toParent newParent: BookmarkNode) {
+  func bookmarkNode(
+    _ bookmarkNode: BookmarkNode,
+    movedFromParent oldParent: BookmarkNode,
+    toParent newParent: BookmarkNode
+  ) {
     self.listener(.nodeMoved(bookmarkNode, oldParent, newParent))
   }
 

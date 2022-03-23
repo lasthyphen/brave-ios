@@ -19,10 +19,12 @@ public class FixedHeightHostingPanModalController<Content: View>: UIViewControll
     hostingController = .init(rootView: rootView)
     super.init(nibName: nil, bundle: nil)
   }
+
   @available(*, unavailable)
   public required init(coder: NSCoder) {
     fatalError()
   }
+
   public override func viewDidLoad() {
     super.viewDidLoad()
     // In order to have a fixed size SwiftUI pan modal, we have to add the SwiftUI
@@ -37,18 +39,27 @@ public class FixedHeightHostingPanModalController<Content: View>: UIViewControll
     hostingController.view.snp.makeConstraints {
       $0.top.leading.trailing.equalToSuperview()
     }
-    NotificationCenter.default.addObserver(self, selector: #selector(sizeCategoryChanged), name: UIContentSizeCategory.didChangeNotification, object: nil)
+    NotificationCenter.default.addObserver(
+      self,
+      selector: #selector(sizeCategoryChanged),
+      name: UIContentSizeCategory.didChangeNotification,
+      object: nil
+    )
   }
+
   public override func viewWillAppear(_ animated: Bool) {
     super.viewWillAppear(animated)
     panModalSetNeedsLayoutUpdate()
   }
+
   @objc private func sizeCategoryChanged() {
     panModalSetNeedsLayoutUpdate()
   }
+
   public var panScrollable: UIScrollView? {
     nil
   }
+
   private func hostingControllerIntrinsicHeight(for containerSize: CGSize) -> CGFloat {
     hostingController.view.systemLayoutSizeFitting(
       containerSize,
@@ -56,12 +67,15 @@ public class FixedHeightHostingPanModalController<Content: View>: UIViewControll
       verticalFittingPriority: .fittingSizeLevel
     ).height
   }
+
   public var shortFormHeight: PanModalHeight {
-    return .contentHeight(hostingControllerIntrinsicHeight(for: view.bounds.size))
+    .contentHeight(hostingControllerIntrinsicHeight(for: view.bounds.size))
   }
+
   public var longFormHeight: PanModalHeight {
-    return .contentHeight(hostingControllerIntrinsicHeight(for: view.bounds.size))
+    .contentHeight(hostingControllerIntrinsicHeight(for: view.bounds.size))
   }
+
   public override var preferredContentSize: CGSize {
     get {
       let containerSize = CGSize(width: min(375, view.bounds.width), height: view.bounds.height)

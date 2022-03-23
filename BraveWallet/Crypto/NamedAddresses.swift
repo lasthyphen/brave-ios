@@ -22,6 +22,7 @@ enum NamedAddresses {
     names.merge(Self.defaultNamedAddresses, uniquingKeysWith: { key, _ in key })
     return names[address.lowercased()] ?? address.truncatedAddress
   }
+
   /// The address for the 0x exchange proxy used for swapping currency
   static let swapExchangeProxyAddress = "0xdef1c0ded9bec7f1a1670819833240f027b25eff"
 

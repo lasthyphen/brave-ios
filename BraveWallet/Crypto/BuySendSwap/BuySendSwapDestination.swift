@@ -11,7 +11,9 @@ import BraveCore
 /// Used to determine where a user is navigated to when they tap on a buy, send or swap button
 struct BuySendSwapDestination: Identifiable, Equatable, Hashable {
   enum Kind: String, Identifiable, CaseIterable {
-    case buy, send, swap
+    case buy
+    case send
+    case swap
 
     var id: String {
       rawValue

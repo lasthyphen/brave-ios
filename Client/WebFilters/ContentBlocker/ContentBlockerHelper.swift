@@ -11,7 +11,7 @@ private let log = Logger.browserLogger
 
 enum BlockerStatus: String {
   case Disabled
-  case NoBlockedURLs  // When TP is enabled but nothing is being blocked
+  case NoBlockedURLs // When TP is enabled but nothing is being blocked
   case Whitelisted
   case Blocking
 }
@@ -29,7 +29,11 @@ struct ContentBlockingConfig {
 }
 
 struct NoImageModeDefaults {
-  static let script = "[{'trigger':{'url-filter':'.*','resource-type':['image']},'action':{'type':'block'}}]".replacingOccurrences(of: "'", with: "\"")
+  static let script = "[{'trigger':{'url-filter':'.*','resource-type':['image']},'action':{'type':'block'}}]"
+    .replacingOccurrences(
+      of: "'",
+      with: "\""
+    )
   static let scriptName = "images"
 }
 
@@ -41,30 +45,33 @@ enum BlockingStrength: String {
 }
 
 class ContentBlockerHelper {
-
   static let ruleStore: WKContentRuleListStore = WKContentRuleListStore.default()
   weak var tab: Tab?
 
   static func compileBundledLists() async {
-    return await BlocklistName.compileBundledRules(ruleStore: ruleStore)
+    await BlocklistName.compileBundledRules(ruleStore: ruleStore)
   }
 
   var isUserEnabled: Bool? {
     didSet {
       setupTabTrackingProtection()
-      guard let tab = tab else { return }
+      guard let tab = tab else {
+        return
+      }
       TabEvent.post(.didChangeContentBlocking, for: tab)
       tab.reload()
     }
   }
 
   var isEnabled: Bool {
-    return isUserEnabled ?? (tab != nil)
+    isUserEnabled ?? (tab != nil)
   }
 
   var stats: TPPageStats = TPPageStats() {
     didSet {
-      guard let tab = self.tab else { return }
+      guard let tab = self.tab else {
+        return
+      }
       if stats.total <= 1 {
         TabEvent.post(.didChangeContentBlocking, for: tab)
       }
@@ -82,7 +89,12 @@ class ContentBlockerHelper {
   init(tab: Tab) {
     self.tab = tab
 
-    NotificationCenter.default.addObserver(self, selector: #selector(setupTabTrackingProtection), name: .contentBlockerTabSetupRequired, object: nil)
+    NotificationCenter.default.addObserver(
+      self,
+      selector: #selector(setupTabTrackingProtection),
+      name: .contentBlockerTabSetupRequired,
+      object: nil
+    )
   }
 
   class func prefsChanged() {
@@ -121,7 +133,9 @@ class ContentBlockerHelper {
   }
 
   private func removeTrackingProtection() {
-    guard let tab = tab else { return }
+    guard let tab = tab else {
+      return
+    }
     tab.webView?.configuration.userContentController.removeAllContentRuleLists()
 
     if let rule = ContentBlockerHelper.blockImagesRule, tab.noImageMode {
@@ -134,7 +148,9 @@ class ContentBlockerHelper {
   }
 
   func noImageMode(enabled: Bool) {
-    guard let rule = ContentBlockerHelper.blockImagesRule else { return }
+    guard let rule = ContentBlockerHelper.blockImagesRule else {
+      return
+    }
 
     if enabled {
       addToTab(contentRuleList: rule)
@@ -143,17 +159,19 @@ class ContentBlockerHelper {
     }
 
     // Async required here to ensure remove() call is processed.
-    DispatchQueue.main.async() {
-      self.tab?.webView?.evaluateSafeJavaScript(functionName: "window.__firefox__.NoImageMode.setEnabled", args: [enabled], contentWorld: .defaultClient)
+    DispatchQueue.main.async {
+      self.tab?.webView?.evaluateSafeJavaScript(
+        functionName: "window.__firefox__.NoImageMode.setEnabled",
+        args: [enabled],
+        contentWorld: .defaultClient
+      )
     }
   }
-
 }
 
 // MARK: Static methods to check if Tracking Protection is enabled in the user's prefs
 
 extension ContentBlockerHelper {
-
   static func setTrackingProtectionMode(_ enabled: Bool, for prefs: Prefs, with tabManager: TabManager) {
     guard let selectedTab = tabManager.selectedTab else {
       return
@@ -173,7 +191,7 @@ extension ContentBlockerHelper {
   }
 
   static func isTrackingProtectionActive(tabManager: TabManager) -> Bool {
-    return tabManager.selectedTab != nil
+    tabManager.selectedTab != nil
   }
 
   static func toggleTrackingProtectionMode(for prefs: Prefs, tabManager: TabManager) {

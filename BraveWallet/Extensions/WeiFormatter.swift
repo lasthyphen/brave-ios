@@ -69,13 +69,13 @@ struct WeiFormatter {
   ///                 ERC20 tokens will have 18 decimals by default
   func decimalString(for value: String, radix: Radix = .decimal, decimals: Int) -> String? {
     guard !value.isEmpty, Self.isStringValid(value, radix: radix),
-      let bv = BDouble(value, radix: radix.rawValue)
+          let bv = BDouble(value, radix: radix.rawValue)
     else {
       return nil
     }
     var decimal = bv / (BDouble(10) ** decimals)
     if case .gasFee(let limit, let limitRadix) = decimalFormatStyle,
-      let gasLimit = BDouble(limit, radix: limitRadix.rawValue) {
+       let gasLimit = BDouble(limit, radix: limitRadix.rawValue) {
       decimal *= gasLimit
     }
     return decimal.decimalExpansion(
@@ -124,7 +124,7 @@ struct WeiFormatter {
     radix: Radix
   ) -> String? {
     guard isStringValid(weiString, radix: radix),
-      let value = BDouble(weiString, radix: radix.rawValue)
+          let value = BDouble(weiString, radix: radix.rawValue)
     else {
       return nil
     }
@@ -142,7 +142,7 @@ struct WeiFormatter {
     outputRadix: Radix
   ) -> String? {
     guard isStringValid(gweiString, radix: radix),
-      let gwei = BDouble(gweiString, radix: radix.rawValue)
+          let gwei = BDouble(gweiString, radix: radix.rawValue)
     else {
       return nil
     }

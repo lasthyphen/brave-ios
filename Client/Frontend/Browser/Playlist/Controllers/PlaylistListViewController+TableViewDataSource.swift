@@ -63,7 +63,10 @@ extension PlaylistListViewController: UITableViewDataSource {
   }
 
   func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-    guard let cell = tableView.dequeueReusableCell(withIdentifier: Constants.playListCellIdentifier, for: indexPath) as? PlaylistCell else {
+    guard let cell = tableView.dequeueReusableCell(
+      withIdentifier: Constants.playListCellIdentifier,
+      for: indexPath
+    ) as? PlaylistCell else {
       return UITableViewCell()
     }
 
@@ -72,7 +75,7 @@ extension PlaylistListViewController: UITableViewDataSource {
 
   func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
     guard let cell = cell as? PlaylistCell,
-      let item = PlaylistManager.shared.itemAtIndex(indexPath.row)
+          let item = PlaylistManager.shared.itemAtIndex(indexPath.row)
     else {
       return
     }
@@ -98,13 +101,16 @@ extension PlaylistListViewController: UITableViewDataSource {
       indexPath: indexPath,
       cell: cell,
       state: cacheState,
-      percentComplete: nil)
+      percentComplete: nil
+    )
 
     // Load the HLS/Media thumbnail. If it fails, fall-back to favIcon
     if let assetUrl = URL(string: item.src), let favIconUrl = URL(string: item.pageSrc) {
       cell.thumbnailActivityIndicator.startAnimating()
       cell.thumbnailGenerator.loadThumbnail(assetUrl: assetUrl, favIconUrl: favIconUrl) { [weak cell] image in
-        guard let cell = cell else { return }
+        guard let cell = cell else {
+          return
+        }
 
         cell.thumbnailView.image = image ?? FaviconFetcher.defaultFaviconImage
         cell.thumbnailView.backgroundColor = .black
@@ -115,6 +121,6 @@ extension PlaylistListViewController: UITableViewDataSource {
   }
 
   func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
-    return UIView()
+    UIView()
   }
 }

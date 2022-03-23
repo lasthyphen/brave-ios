@@ -26,7 +26,8 @@ struct BiometricsPromptView: UIViewControllerRepresentable {
               isPresented = false
             }
           }
-        }))
+        })
+      )
       uiViewController.present(controller, animated: true)
     } else {
       if uiViewController.presentedViewController != nil {

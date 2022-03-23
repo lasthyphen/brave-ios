@@ -6,9 +6,7 @@ import XCTest
 import Shared
 
 class BytesTests: XCTestCase {
-
   func testGenerateRandomBytes() {
-
     let rollCount = 200
     let bytesLength: UInt = 256
 

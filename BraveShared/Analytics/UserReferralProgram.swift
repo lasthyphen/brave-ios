@@ -9,7 +9,6 @@ import WebKit
 private let log = Logger.browserLogger
 
 public class UserReferralProgram {
-
   /// Domains must match server HTTP header ones _exactly_
   private static let urpCookieOnlyDomains = ["coinbase.com"]
   public static let shared = UserReferralProgram()
@@ -40,14 +39,17 @@ public class UserReferralProgram {
 
     guard
       let apiKey = Bundle.main.getPlistString(
-        for: UserReferralProgram.apiKeyPlistKey)?
+        for: UserReferralProgram.apiKeyPlistKey
+      )?
         .trimmingCharacters(in: .whitespacesAndNewlines)
     else {
       log.error("Urp init error, failed to get values from Brave.plist.")
       return nil
     }
 
-    guard let urpService = UrpService(host: host, apiKey: apiKey) else { return nil }
+    guard let urpService = UrpService(host: host, apiKey: apiKey) else {
+      return nil
+    }
 
     UrpLog.log("URP init, host: \(host)")
 
@@ -59,7 +61,9 @@ public class UserReferralProgram {
     UrpLog.log("first run referral lookup")
 
     let referralBlock: (ReferralData?, UrpError?) -> Void = { [weak self] referral, error in
-      guard let self = self else { return }
+      guard let self = self else {
+        return
+      }
 
       if error == BraveShared.UrpError.endpointError {
         UrpLog.log("URP look up had endpoint error, will retry on next launch.")
@@ -67,7 +71,9 @@ public class UserReferralProgram {
         self.referralLookupRetry.timer = nil
 
         // Hit max retry attempts.
-        if self.referralLookupRetry.currentCount > self.referralLookupRetry.retryLimit { return }
+        if self.referralLookupRetry.currentCount > self.referralLookupRetry.retryLimit {
+          return
+        }
 
         self.referralLookupRetry.currentCount += 1
         self.referralLookupRetry.timer =
@@ -75,7 +81,7 @@ public class UserReferralProgram {
             withTimeInterval: self.referralLookupRetry.retryTimeInterval,
             repeats: true
           ) { [weak self] _ in
-            self?.referralLookup() { refCode, offerUrl in
+            self?.referralLookup { refCode, offerUrl in
               completion(refCode, offerUrl)
             }
           }
@@ -188,7 +194,8 @@ public class UserReferralProgram {
         Preferences.URP.nextCheckDate.value = nil
         Preferences.URP.retryCountdown.value = nil
       } else {
-        UrpLog.log("Network error or isFinalized returned false, decrementing retry counter and trying again next time.")
+        UrpLog
+          .log("Network error or isFinalized returned false, decrementing retry counter and trying again next time.")
         // Decrement counter, next retry happens on next day
         Preferences.URP.retryCountdown.value = counter - 1
         Preferences.URP.nextCheckDate.value = checkDate + 1.days
@@ -199,7 +206,7 @@ public class UserReferralProgram {
   /// Returns referral code and sets expiration day for its deletion from DAU pings(if needed).
   public class func getReferralCode() -> String? {
     if let referralCodeDeleteDate = Preferences.URP.referralCodeDeleteDate.value,
-      Date().timeIntervalSince1970 >= referralCodeDeleteDate {
+       Date().timeIntervalSince1970 >= referralCodeDeleteDate {
       Preferences.URP.referralCode.value = nil
       Preferences.URP.referralCodeDeleteDate.value = nil
       UrpLog.log("Enough time has passed, removing referral code data")

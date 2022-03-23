@@ -30,18 +30,18 @@ public protocol BrowserifyExposable {
   static func generateFunction(name: String, arguments: String) -> String
 }
 
-public extension BrowserifyExposable {
-  func addExposedFunctions(to context: JSContext) {
+extension BrowserifyExposable {
+  public func addExposedFunctions(to context: JSContext) {
     exposedFunctions.forEach {
       context.evaluateScript("\($0.name) = \($0.body)")
     }
   }
 
-  static func generateFunction(name: String, arguments: String = "") -> String {
-    return """
-      function(\(arguments)) {
-      return module.exports.\(name)(\(arguments))
-      }
-      """
+  public static func generateFunction(name: String, arguments: String = "") -> String {
+    """
+    function(\(arguments)) {
+    return module.exports.\(name)(\(arguments))
+    }
+    """
   }
 }

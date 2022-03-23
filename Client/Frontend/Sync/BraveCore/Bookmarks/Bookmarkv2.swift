@@ -12,7 +12,6 @@ import Shared
 // A Lightweight wrapper around BraveCore bookmarks
 // with the same layout/interface as `Bookmark (from CoreData)`
 class Bookmarkv2: WebsitePresentable {
-
   // MARK: Lifecycle
 
   init(_ bookmarkNode: BookmarkNode) {
@@ -26,11 +25,11 @@ class Bookmarkv2: WebsitePresentable {
   public var bookmarkFavIconObserver: BookmarkModelListener?
 
   public var isFolder: Bool {
-    return bookmarkNode.isFolder == true
+    bookmarkNode.isFolder == true
   }
 
   public var title: String? {
-    return bookmarkNode.titleUrlNodeTitle
+    bookmarkNode.titleUrlNodeTitle
   }
 
   public var url: String? {
@@ -58,15 +57,15 @@ class Bookmarkv2: WebsitePresentable {
   }
 
   public var children: [Bookmarkv2]? {
-    return bookmarkNode.children.map({ Bookmarkv2($0) })
+    bookmarkNode.children.map({ Bookmarkv2($0) })
   }
 
   public var canBeDeleted: Bool {
-    return bookmarkNode.isPermanentNode == false
+    bookmarkNode.isPermanentNode == false
   }
 
   public var objectID: Int {
-    return Int(bookmarkNode.nodeId)
+    Int(bookmarkNode.nodeId)
   }
 
   public func update(customTitle: String?, url: URL?) {
@@ -75,7 +74,7 @@ class Bookmarkv2: WebsitePresentable {
   }
 
   public func existsInPersistentStore() -> Bool {
-    return bookmarkNode.isValid && bookmarkNode.parent != nil
+    bookmarkNode.isValid && bookmarkNode.parent != nil
   }
 }
 

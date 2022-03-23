@@ -121,13 +121,15 @@ private struct AccountDetailsHeaderView: View {
   var address: String
 
   private var qrCodeImage: UIImage? {
-    guard let addressData = address.data(using: .utf8) else { return nil }
+    guard let addressData = address.data(using: .utf8) else {
+      return nil
+    }
     let context = CIContext()
     let filter = CIFilter.qrCodeGenerator()
     filter.message = addressData
     filter.correctionLevel = "H"
     if let image = filter.outputImage,
-      let cgImage = context.createCGImage(image, from: image.extent) {
+       let cgImage = context.createCGImage(image, from: image.extent) {
       return UIImage(cgImage: cgImage)
     }
     return nil
@@ -174,7 +176,7 @@ struct AccountDetailsViewController_Previews: PreviewProvider {
       account: KeyringStore.previewStoreWithWalletCreated.keyring.accountInfos.first!,
       editMode: false
     )
-    .previewColorSchemes()
+      .previewColorSchemes()
   }
 }
 #endif

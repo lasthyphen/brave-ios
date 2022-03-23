@@ -47,6 +47,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
     return BraveCoreMain(userAgent: UserAgent.mobile, additionalSwitches: switches)
   }()
+
   var migration: Migration?
 
   private weak var application: UIApplication?
@@ -67,7 +68,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
   private var sceneInfo: SceneInfoModel?
 
   @discardableResult
-  func application(_ application: UIApplication, willFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+  func application(
+    _ application: UIApplication,
+    willFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
+  ) -> Bool {
     // Hold references to willFinishLaunching parameters for delayed app launch
     self.application = application
     self.launchOptions = launchOptions
@@ -125,7 +129,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
   }
 
   @discardableResult
-  fileprivate func startApplication(_ application: UIApplication, withLaunchOptions launchOptions: [AnyHashable: Any]?) -> Bool {
+  fileprivate func startApplication(
+    _ application: UIApplication,
+    withLaunchOptions launchOptions: [AnyHashable: Any]?
+  ) -> Bool {
     log.info("startApplication begin")
 
     // Set the Safari UA for browsing.
@@ -153,9 +160,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         return try DiskImageStore(
           files: profile.files,
           namespace: "TabManagerScreenshots",
-          quality: UIConstants.screenshotQuality)
+          quality: UIConstants.screenshotQuality
+        )
       } catch {
-        log.error("Failed to create an image store for files: \(profile.files) and namespace: \"TabManagerScreenshots\": \(error.localizedDescription)")
+        log
+          .error(
+            "Failed to create an image store for files: \(profile.files) and namespace: \"TabManagerScreenshots\": \(error.localizedDescription)"
+          )
         assertionFailure()
       }
       return nil
@@ -165,7 +176,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     sceneInfo = SceneInfoModel(
       profile: profile,
       diskImageStore: diskImageStore,
-      migration: migration)
+      migration: migration
+    )
 
     // Perform migrations
     let profilePrefix = profile.prefs.getBranchPrefix()
@@ -175,8 +187,16 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     setUpWebServer(profile)
 
     // Temporary fix for Bug 1390871 - NSInvalidArgumentException: -[WKContentView menuHelperFindInPage]: unrecognized selector
-    if let clazz = NSClassFromString("WKCont" + "ent" + "View"), let swizzledMethod = class_getInstanceMethod(TabWebViewMenuHelper.self, #selector(TabWebViewMenuHelper.swizzledMenuHelperFindInPage)) {
-      class_addMethod(clazz, MenuHelper.selectorFindInPage, method_getImplementation(swizzledMethod), method_getTypeEncoding(swizzledMethod))
+    if let clazz = NSClassFromString("WKCont" + "ent" + "View"), let swizzledMethod = class_getInstanceMethod(
+      TabWebViewMenuHelper.self,
+      #selector(TabWebViewMenuHelper.swizzledMenuHelperFindInPage)
+    ) {
+      class_addMethod(
+        clazz,
+        MenuHelper.selectorFindInPage,
+        method_getImplementation(swizzledMethod),
+        method_getTypeEncoding(swizzledMethod)
+      )
     }
 
     #if !NO_BRAVE_NEWS
@@ -188,7 +208,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
 
     if !Preferences.BraveNews.languageChecked.value,
-      let languageCode = Locale.preferredLanguages.first?.prefix(2) {
+       let languageCode = Locale.preferredLanguages.first?.prefix(2) {
       Preferences.BraveNews.languageChecked.value = true
       // Base opt-in visibility on whether or not the user's language is supported in BT
       Preferences.BraveNews.isShowingOptIn.value = FeedDataSource.supportedLanguages.contains(String(languageCode))
@@ -204,7 +224,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     return true
   }
 
-  func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+  func application(
+    _ application: UIApplication,
+    didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
+  ) -> Bool {
     // IAPs can trigger on the app as soon as it launches,
     // for example when a previous transaction was not finished and is in pending state.
     SKPaymentQueue.default().add(iapObserver)
@@ -213,7 +236,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var shouldPerformAdditionalDelegateHandling = true
 
     AdblockRustEngine.setDomainResolver { urlCString, start, end in
-      guard let urlCString = urlCString else { return }
+      guard let urlCString = urlCString else {
+        return
+      }
       let urlString = String(cString: urlCString)
       let parsableURLString: String = {
         // Apple's URL implementation requires a URL be prefixed with a scheme to be
@@ -226,8 +251,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
       }()
 
       guard let url = URL(string: parsableURLString),
-        let baseDomain = url.baseDomain,
-        let range = urlString.range(of: baseDomain)
+            let baseDomain = url.baseDomain,
+            let range = urlString.range(of: baseDomain)
       else {
         log.error("Failed to resolve domain ")
         return
@@ -254,7 +279,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     // If a shortcut was launched, display its information and take the appropriate action
     if let shortcutItem = launchOptions?[UIApplication.LaunchOptionsKey.shortcutItem] as? UIApplicationShortcutItem {
-
       QuickActions.sharedInstance.launchedShortcutItem = shortcutItem
       // This will block "performActionForShortcutItem:completionHandler" from being called.
       shouldPerformAdditionalDelegateHandling = false
@@ -343,26 +367,34 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
       localizedTitle: Strings.quickActionNewTab,
       localizedSubtitle: nil,
       icon: UIApplicationShortcutIcon(templateImageName: "quick_action_new_tab"),
-      userInfo: [:])
+      userInfo: [:]
+    )
 
     let privateTabItem = UIMutableApplicationShortcutItem(
       type: "\(Bundle.main.bundleIdentifier ?? "").NewPrivateTab",
       localizedTitle: Strings.quickActionNewPrivateTab,
       localizedSubtitle: nil,
       icon: UIApplicationShortcutIcon(templateImageName: "quick_action_new_private_tab"),
-      userInfo: [:])
+      userInfo: [:]
+    )
 
     let scanQRCodeItem = UIMutableApplicationShortcutItem(
       type: "\(Bundle.main.bundleIdentifier ?? "").ScanQRCode",
       localizedTitle: Strings.scanQRCodeViewTitle,
       localizedSubtitle: nil,
       icon: UIApplicationShortcutIcon(templateImageName: "recent-search-qrcode"),
-      userInfo: [:])
+      userInfo: [:]
+    )
 
-    application.shortcutItems = Preferences.Privacy.privateBrowsingOnly.value ? [privateTabItem, scanQRCodeItem] : [newTabItem, privateTabItem, scanQRCodeItem]
+    application.shortcutItems = Preferences.Privacy.privateBrowsingOnly.value
+      ? [privateTabItem, scanQRCodeItem]
+      : [newTabItem, privateTabItem, scanQRCodeItem]
   }
 
-  func application(_ application: UIApplication, supportedInterfaceOrientationsFor window: UIWindow?) -> UIInterfaceOrientationMask {
+  func application(
+    _ application: UIApplication,
+    supportedInterfaceOrientationsFor window: UIWindow?
+  ) -> UIInterfaceOrientationMask {
     if let presentedViewController = window?.rootViewController?.presentedViewController {
       return presentedViewController.supportedInterfaceOrientations
     } else {
@@ -402,7 +434,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
   func setUpWebServer(_ profile: Profile) {
     let server = WebServer.sharedInstance
-    guard !server.server.isRunning else { return }
+    guard !server.server.isRunning else {
+      return
+    }
 
     let responders: [(String, InternalSchemeResponse)] =
       [
@@ -411,12 +445,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         (SessionRestoreHandler.path, SessionRestoreHandler()),
         (ErrorPageHandler.path, ErrorPageHandler()),
       ]
-    responders.forEach { (path, responder) in
+    responders.forEach { path, responder in
       InternalSchemeHandler.responders[path] = responder
     }
 
-    ReaderModeHandlers.register(server, profile: profile)  // TODO: PORT TO InternalSchemeHandler
-    BookmarksInterstitialPageHandler.register(server)  // TODO: PORT TO InternalSchemeHandler
+    ReaderModeHandlers.register(server, profile: profile) // TODO: PORT TO InternalSchemeHandler
+    BookmarksInterstitialPageHandler.register(server) // TODO: PORT TO InternalSchemeHandler
 
     // Bug 1223009 was an issue whereby CGDWebserver crashed when moving to a background task
     // catching and handling the error seemed to fix things, but we're not sure why.
@@ -459,12 +493,16 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
   }
 
   func sceneInfo(for sceneSession: UISceneSession) -> SceneInfoModel? {
-    return sceneInfo
+    sceneInfo
   }
 }
 
 extension AppDelegate: MFMailComposeViewControllerDelegate {
-  func mailComposeController(_ controller: MFMailComposeViewController, didFinishWith result: MFMailComposeResult, error: Error?) {
+  func mailComposeController(
+    _ controller: MFMailComposeViewController,
+    didFinishWith result: MFMailComposeResult,
+    error: Error?
+  ) {
     // Dismiss the view controller and start the app up
     controller.dismiss(animated: true, completion: nil)
     startApplication(application!, withLaunchOptions: self.launchOptions)
@@ -474,10 +512,14 @@ extension AppDelegate: MFMailComposeViewControllerDelegate {
 extension AppDelegate {
   // MARK: UISceneSession Lifecycle
 
-  func application(_ application: UIApplication, configurationForConnecting connectingSceneSession: UISceneSession, options: UIScene.ConnectionOptions) -> UISceneConfiguration {
+  func application(
+    _ application: UIApplication,
+    configurationForConnecting connectingSceneSession: UISceneSession,
+    options: UIScene.ConnectionOptions
+  ) -> UISceneConfiguration {
     // Called when a new scene session is being created.
     // Use this method to select a configuration to create the new scene with.
-    return UISceneConfiguration(
+    UISceneConfiguration(
       name: connectingSceneSession.configuration.name,
       sessionRole: connectingSceneSession.role
     ).then {

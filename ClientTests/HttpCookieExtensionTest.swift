@@ -7,7 +7,6 @@ import XCTest
 import WebKit
 
 class HttpCookieExtensionTest: XCTestCase {
-
   func testSaveAndLoadCookie() {
     // Set some cookies here
     let expectation = XCTestExpectation(description: "Cookie is loaded from file")
@@ -35,7 +34,8 @@ class HttpCookieExtensionTest: XCTestCase {
                   }
                 })
               })
-            })
+            }
+          )
         })
       }
     } else {

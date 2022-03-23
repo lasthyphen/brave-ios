@@ -30,7 +30,11 @@ class WKWebViewExtensionsTest: XCTestCase {
     XCTAssertNil(js.error)
     XCTAssertEqual(js.javascript, "demo_function('&lt;script&gt;alert(1);&lt;/script&gt;')")
 
-    js = webView.generateJSFunctionString(functionName: "demo_function", args: ["<script>alert(1);</script>"], escapeArgs: false)
+    js = webView.generateJSFunctionString(
+      functionName: "demo_function",
+      args: ["<script>alert(1);</script>"],
+      escapeArgs: false
+    )
     XCTAssertNil(js.error)
     XCTAssertEqual(js.javascript, "demo_function(<script>alert(1);</script>)")
   }

@@ -6,7 +6,6 @@ import UIKit
 import BraveShared
 
 open class ActionButton: BraveButton {
-
   override public init(frame: CGRect) {
     super.init(frame: frame)
 

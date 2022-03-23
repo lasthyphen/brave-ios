@@ -6,7 +6,6 @@ import XCTest
 @testable import BraveShared
 
 class DateTimeExtensionTests: XCTestCase {
-
   func testHoursMinutesDays() {
     XCTAssertEqual(1.minutes, 60)
     XCTAssertEqual(12.minutes, 720)

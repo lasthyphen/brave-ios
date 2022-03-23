@@ -15,18 +15,22 @@ class NoImageModeHelper: TabContentScript {
   }
 
   static func name() -> String {
-    return "NoImageMode"
+    "NoImageMode"
   }
 
   func scriptMessageHandlerName() -> String? {
-    return "NoImageMode"
+    "NoImageMode"
   }
 
-  func userContentController(_ userContentController: WKUserContentController, didReceiveScriptMessage message: WKScriptMessage, replyHandler: (Any?, String?) -> Void) {
+  func userContentController(
+    _ userContentController: WKUserContentController,
+    didReceiveScriptMessage message: WKScriptMessage,
+    replyHandler: (Any?, String?) -> Void
+  ) {
     // Do nothing.
   }
 
   static var isActivated: Bool {
-    return Preferences.Shields.blockImages.value
+    Preferences.Shields.blockImages.value
   }
 }

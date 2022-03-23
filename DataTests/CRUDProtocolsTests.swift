@@ -13,7 +13,7 @@ class CRUDProtocolsTests: CoreDataTestCase {
   let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: String(describing: CRUDClass.self))
 
   private func entity(for context: NSManagedObjectContext) -> NSEntityDescription {
-    return NSEntityDescription.entity(forEntityName: String(describing: CRUDClass.self), in: context)!
+    NSEntityDescription.entity(forEntityName: String(describing: CRUDClass.self), in: context)!
   }
 
   let initialObjectsCount = 5
@@ -40,7 +40,7 @@ class CRUDProtocolsTests: CoreDataTestCase {
   }
 
   private var notMatchingPredicate: NSPredicate {
-    return NSPredicate(format: "title = %@", "999")
+    NSPredicate(format: "title = %@", "999")
   }
 
   // MARK: - Readable

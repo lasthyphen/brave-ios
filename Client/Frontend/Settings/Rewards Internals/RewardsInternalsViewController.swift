@@ -25,7 +25,6 @@ private class WarningCell: MultilineSubtitleCell {
 
 /// A place where all rewards debugging information will live.
 class RewardsInternalsViewController: TableViewController {
-
   private let ledger: BraveLedger
   private var internalsInfo: Ledger.RewardsInternalsInfo?
 
@@ -70,7 +69,11 @@ class RewardsInternalsViewController: TableViewController {
 
     title = Strings.RewardsInternals.title
 
-    navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .action, target: self, action: #selector(tappedShare)).then {
+    navigationItem.rightBarButtonItem = UIBarButtonItem(
+      barButtonSystemItem: .action,
+      target: self,
+      action: #selector(tappedShare)
+    ).then {
       $0.accessibilityLabel = Strings.RewardsInternals.shareInternalsTitle
     }
 
@@ -78,13 +81,18 @@ class RewardsInternalsViewController: TableViewController {
   }
 
   @objc private func tappedShare() {
-    let controller = RewardsInternalsShareController(ledger: self.ledger, initiallySelectedSharables: RewardsInternalsSharable.default)
+    let controller = RewardsInternalsShareController(
+      ledger: self.ledger,
+      initiallySelectedSharables: RewardsInternalsSharable.default
+    )
     let container = UINavigationController(rootViewController: controller)
     present(container, animated: true)
   }
 
   func reloadSections() {
-    guard let info = internalsInfo else { return }
+    guard let info = internalsInfo else {
+      return
+    }
 
     let dateFormatter = DateFormatter().then {
       $0.dateStyle = .short
@@ -93,29 +101,51 @@ class RewardsInternalsViewController: TableViewController {
     var sections: [Static.Section] = [
       .init(
         rows: [
-          Row(text: Strings.RewardsInternals.sharingWarningTitle, detailText: Strings.RewardsInternals.sharingWarningMessage, cellClass: WarningCell.self)
+          Row(
+            text: Strings.RewardsInternals.sharingWarningTitle,
+            detailText: Strings.RewardsInternals.sharingWarningMessage,
+            cellClass: WarningCell.self
+          )
         ]
       ),
       .init(
         header: .title(Strings.RewardsInternals.walletInfoHeader),
         rows: [
-          Row(text: Strings.RewardsInternals.keyInfoSeed, detailText: "\(info.isKeyInfoSeedValid ? Strings.RewardsInternals.valid : Strings.RewardsInternals.invalid)"),
+          Row(
+            text: Strings.RewardsInternals.keyInfoSeed,
+            detailText: "\(info.isKeyInfoSeedValid ? Strings.RewardsInternals.valid : Strings.RewardsInternals.invalid)"
+          ),
           Row(
             text: Strings.RewardsInternals.walletPaymentID, detailText: info.paymentId,
             selection: { [unowned self] in
-              if let index = self.dataSource.sections[safe: 1]?.rows.firstIndex(where: { $0.cellClass == PaymentIDCell.self }),
+              if let index = self.dataSource.sections[safe: 1]?.rows
+                .firstIndex(where: { $0.cellClass == PaymentIDCell.self }),
                 let cell = self.tableView.cellForRow(at: IndexPath(item: index, section: 1)) as? PaymentIDCell {
                 cell.showMenu()
               }
-            }, cellClass: PaymentIDCell.self),
-          Row(text: Strings.RewardsInternals.walletCreationDate, detailText: dateFormatter.string(from: Date(timeIntervalSince1970: TimeInterval(info.bootStamp)))),
+            }, cellClass: PaymentIDCell.self
+          ),
+          Row(
+            text: Strings.RewardsInternals.walletCreationDate,
+            detailText: dateFormatter.string(from: Date(timeIntervalSince1970: TimeInterval(info.bootStamp)))
+          ),
         ]
       ),
       .init(
         header: .title(Strings.RewardsInternals.deviceInfoHeader),
         rows: [
-          Row(text: Strings.RewardsInternals.status, detailText: DCDevice.current.isSupported ? Strings.RewardsInternals.supported : Strings.RewardsInternals.notSupported),
-          Row(text: Strings.RewardsInternals.enrollmentState, detailText: DeviceCheckClient.isDeviceEnrolled() ? Strings.RewardsInternals.enrolled : Strings.RewardsInternals.notEnrolled),
+          Row(
+            text: Strings.RewardsInternals.status,
+            detailText: DCDevice.current.isSupported
+              ? Strings.RewardsInternals.supported
+              : Strings.RewardsInternals.notSupported
+          ),
+          Row(
+            text: Strings.RewardsInternals.enrollmentState,
+            detailText: DeviceCheckClient.isDeviceEnrolled()
+              ? Strings.RewardsInternals.enrolled
+              : Strings.RewardsInternals.notEnrolled
+          ),
         ]
       ),
     ]
@@ -126,17 +156,31 @@ class RewardsInternalsViewController: TableViewController {
         .init(
           header: .title(Strings.RewardsInternals.legacyWalletInfoHeader),
           rows: [
-            Row(text: Strings.RewardsInternals.keyInfoSeed, detailText: "\(internals.isKeyInfoSeedValid ? Strings.RewardsInternals.valid : Strings.RewardsInternals.invalid)"),
+            Row(
+              text: Strings.RewardsInternals.keyInfoSeed,
+              detailText: "\(internals.isKeyInfoSeedValid
+                ? Strings.RewardsInternals.valid
+                : Strings.RewardsInternals.invalid)"
+            ),
             Row(
               text: Strings.RewardsInternals.walletPaymentID, detailText: internals.paymentId,
               selection: { [unowned self] in
-                if let index = self.dataSource.sections[safe: legacyWalletSection]?.rows.firstIndex(where: { $0.cellClass == PaymentIDCell.self }),
-                  let cell = self.tableView.cellForRow(at: IndexPath(item: index, section: legacyWalletSection)) as? PaymentIDCell {
+                if let index = self.dataSource.sections[safe: legacyWalletSection]?.rows
+                  .firstIndex(where: { $0.cellClass == PaymentIDCell.self }),
+                  let cell = self.tableView
+                    .cellForRow(at: IndexPath(item: index, section: legacyWalletSection)) as? PaymentIDCell {
                   cell.showMenu()
                 }
-              }, cellClass: PaymentIDCell.self),
-            Row(text: Strings.RewardsInternals.walletCreationDate, detailText: dateFormatter.string(from: Date(timeIntervalSince1970: TimeInterval(internals.bootStamp)))),
-            Row(text: Strings.RewardsInternals.legacyWalletHasTransferrableBalance, detailText: hasTransferrableBalance ? Strings.yes : Strings.no),
+              }, cellClass: PaymentIDCell.self
+            ),
+            Row(
+              text: Strings.RewardsInternals.walletCreationDate,
+              detailText: dateFormatter.string(from: Date(timeIntervalSince1970: TimeInterval(internals.bootStamp)))
+            ),
+            Row(
+              text: Strings.RewardsInternals.legacyWalletHasTransferrableBalance,
+              detailText: hasTransferrableBalance ? Strings.yes : Strings.no
+            ),
           ]
         )
       )
@@ -149,7 +193,11 @@ class RewardsInternalsViewController: TableViewController {
 /// A file generator that creates a JSON file containing basic information such as wallet info, device info
 /// and balance info
 struct RewardsInternalsBasicInfoGenerator: RewardsInternalsFileGenerator {
-  func generateFiles(at path: String, using builder: RewardsInternalsSharableBuilder, completion: @escaping (Error?) -> Void) {
+  func generateFiles(
+    at path: String,
+    using builder: RewardsInternalsSharableBuilder,
+    completion: @escaping (Error?) -> Void
+  ) {
     // Only 1 file to make here
     var internals: Ledger.RewardsInternalsInfo?
     builder.ledger.rewardsInternalInfo { info in
@@ -164,7 +212,8 @@ struct RewardsInternalsBasicInfoGenerator: RewardsInternalsFileGenerator {
       "Wallet Info": [
         "Key Info Seed": "\(info.isKeyInfoSeedValid ? "Valid" : "Invalid")",
         "Wallet Payment ID": info.paymentId,
-        "Wallet Creation Date": builder.dateFormatter.string(from: Date(timeIntervalSince1970: TimeInterval(info.bootStamp))),
+        "Wallet Creation Date": builder.dateFormatter
+          .string(from: Date(timeIntervalSince1970: TimeInterval(info.bootStamp))),
       ],
       "Device Info": [
         "DeviceCheck Status": DCDevice.current.isSupported ? "Supported" : "Not supported",

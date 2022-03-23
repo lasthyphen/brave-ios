@@ -88,7 +88,7 @@ class TabLocationView: UIView {
 
   var readerModeState: ReaderModeState {
     get {
-      return readerModeButton.readerModeState
+      readerModeButton.readerModeState
     }
     set(newReaderModeState) {
       if newReaderModeState != self.readerModeButton.readerModeState {
@@ -100,7 +100,10 @@ class TabLocationView: UIView {
           if !readerModeButton.isHidden {
             // Delay the Reader Mode accessibility announcement briefly to prevent interruptions.
             DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(2)) {
-              UIAccessibility.post(notification: .announcement, argument: Strings.readerModeAvailableVoiceOverAnnouncement)
+              UIAccessibility.post(
+                notification: .announcement,
+                argument: Strings.readerModeAvailableVoiceOverAnnouncement
+              )
             }
           }
         }
@@ -108,13 +111,17 @@ class TabLocationView: UIView {
           withDuration: 0.1,
           animations: { () -> Void in
             self.readerModeButton.alpha = newReaderModeState == .unavailable ? 0 : 1
-          })
+          }
+        )
       }
     }
   }
 
   lazy var placeholder: NSAttributedString = {
-    return NSAttributedString(string: Strings.tabToolbarSearchAddressPlaceholderText, attributes: [NSAttributedString.Key.foregroundColor: UIColor.secondaryBraveLabel])
+    NSAttributedString(
+      string: Strings.tabToolbarSearchAddressPlaceholderText,
+      attributes: [NSAttributedString.Key.foregroundColor: UIColor.secondaryBraveLabel]
+    )
   }()
 
   lazy var urlTextField: UITextField = {
@@ -151,14 +158,19 @@ class TabLocationView: UIView {
   fileprivate lazy var readerModeButton: ReaderModeButton = {
     let readerModeButton = ReaderModeButton(frame: .zero)
     readerModeButton.addTarget(self, action: #selector(tapReaderModeButton), for: .touchUpInside)
-    readerModeButton.addGestureRecognizer(UILongPressGestureRecognizer(target: self, action: #selector(longPressReaderModeButton)))
+    readerModeButton
+      .addGestureRecognizer(UILongPressGestureRecognizer(target: self, action: #selector(longPressReaderModeButton)))
     readerModeButton.isAccessibilityElement = true
     readerModeButton.isHidden = true
     readerModeButton.imageView?.contentMode = .scaleAspectFit
     readerModeButton.contentHorizontalAlignment = .center
     readerModeButton.accessibilityLabel = Strings.tabToolbarReaderViewButtonAccessibilityLabel
     readerModeButton.accessibilityIdentifier = "TabLocationView.readerModeButton"
-    readerModeButton.accessibilityCustomActions = [UIAccessibilityCustomAction(name: Strings.tabToolbarReaderViewButtonTitle, target: self, selector: #selector(readerModeCustomAction))]
+    readerModeButton.accessibilityCustomActions = [UIAccessibilityCustomAction(
+      name: Strings.tabToolbarReaderViewButtonTitle,
+      target: self,
+      selector: #selector(readerModeCustomAction)
+    )]
     readerModeButton.unselectedTintColor = .braveLabel
     readerModeButton.selectedTintColor = .braveOrange
     return readerModeButton
@@ -179,7 +191,10 @@ class TabLocationView: UIView {
     $0.accessibilityLabel = Strings.tabToolbarReloadButtonAccessibilityLabel
     $0.setImage(#imageLiteral(resourceName: "nav-refresh").template, for: .normal)
     $0.tintColor = .braveLabel
-    let longPressGestureStopReloadButton = UILongPressGestureRecognizer(target: self, action: #selector(didLongPressStopReload(_:)))
+    let longPressGestureStopReloadButton = UILongPressGestureRecognizer(
+      target: self,
+      action: #selector(didLongPressStopReload(_:))
+    )
     $0.addGestureRecognizer(longPressGestureStopReloadButton)
     $0.addTarget(self, action: #selector(didClickStopReload), for: .touchUpInside)
   }
@@ -197,7 +212,10 @@ class TabLocationView: UIView {
   lazy var rewardsButton: RewardsButton = {
     let button = RewardsButton()
     button.addTarget(self, action: #selector(didClickBraveRewardsButton), for: .touchUpInside)
-    let longPressGestureRewardsButton = UILongPressGestureRecognizer(target: self, action: #selector(didLongPressRewardsButton(_:)))
+    let longPressGestureRewardsButton = UILongPressGestureRecognizer(
+      target: self,
+      action: #selector(didLongPressRewardsButton(_:))
+    )
     button.addGestureRecognizer(longPressGestureRewardsButton)
     return button
   }()
@@ -265,13 +283,15 @@ class TabLocationView: UIView {
     self.addInteraction(dragInteraction)
   }
 
+  @available(*, unavailable)
   required init(coder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }
 
   override var accessibilityElements: [Any]? {
     get {
-      return [lockImageView, urlTextField, readerModeButton, playlistButton, reloadButton, shieldsButton].filter { !$0.isHidden }
+      [lockImageView, urlTextField, readerModeButton, playlistButton, reloadButton, shieldsButton]
+        .filter { !$0.isHidden }
     }
     set {
       super.accessibilityElements = newValue
@@ -317,7 +337,7 @@ class TabLocationView: UIView {
   }
 
   @objc func readerModeCustomAction() -> Bool {
-    return delegate?.tabLocationViewDidLongPressReaderMode(self) ?? false
+    delegate?.tabLocationViewDidLongPressReaderMode(self) ?? false
   }
 
   @objc func didClickBraveShieldsButton() {
@@ -343,14 +363,20 @@ class TabLocationView: UIView {
 // MARK: - UIGestureRecognizerDelegate
 
 extension TabLocationView: UIGestureRecognizerDelegate {
-  func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
+  func gestureRecognizer(
+    _ gestureRecognizer: UIGestureRecognizer,
+    shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer
+  ) -> Bool {
     // When long pressing a button make sure the textfield's long press gesture is not triggered
-    return !(otherGestureRecognizer.view is UIButton)
+    !(otherGestureRecognizer.view is UIButton)
   }
 
-  func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldBeRequiredToFailBy otherGestureRecognizer: UIGestureRecognizer) -> Bool {
+  func gestureRecognizer(
+    _ gestureRecognizer: UIGestureRecognizer,
+    shouldBeRequiredToFailBy otherGestureRecognizer: UIGestureRecognizer
+  ) -> Bool {
     // If the longPressRecognizer is active, fail the tap recognizer to avoid conflicts.
-    return gestureRecognizer == longPressRecognizer && otherGestureRecognizer == tapRecognizer
+    gestureRecognizer == longPressRecognizer && otherGestureRecognizer == tapRecognizer
   }
 
   func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldReceive touch: UITouch) -> Bool {
@@ -367,7 +393,7 @@ extension TabLocationView: UIDragInteractionDelegate {
   func dragInteraction(_ interaction: UIDragInteraction, itemsForBeginning session: UIDragSession) -> [UIDragItem] {
     // Ensure we actually have a URL in the location bar and that the URL is not local.
     guard let url = self.url, !InternalURL.isValid(url: url), let itemProvider = NSItemProvider(contentsOf: url),
-      !reloadButton.isHighlighted
+          !reloadButton.isHighlighted
     else {
       return []
     }
@@ -398,7 +424,7 @@ class DisplayTextField: UITextField {
 
   override var accessibilityCustomActions: [UIAccessibilityCustomAction]? {
     get {
-      return accessibilityActionsSource?.accessibilityCustomActionsForView(self)
+      accessibilityActionsSource?.accessibilityCustomActionsForView(self)
     }
     set {
       super.accessibilityCustomActions = newValue
@@ -406,7 +432,7 @@ class DisplayTextField: UITextField {
   }
 
   override var canBecomeFirstResponder: Bool {
-    return false
+    false
   }
 
   // This override is done in case the eTLD+1 string overflows the width of textField.
@@ -426,7 +452,6 @@ class DisplayTextField: UITextField {
 }
 
 private class CustomSeparatorView: UIView {
-
   private let innerView: UIView
   init(lineSize: CGSize, cornerRadius: CGFloat = 0) {
     innerView = UIView(frame: .init(origin: .zero, size: lineSize))
@@ -444,13 +469,14 @@ private class CustomSeparatorView: UIView {
 
   override var backgroundColor: UIColor? {
     get {
-      return innerView.backgroundColor
+      innerView.backgroundColor
     }
     set {
       innerView.backgroundColor = newValue
     }
   }
 
+  @available(*, unavailable)
   required init?(coder aDecoder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }

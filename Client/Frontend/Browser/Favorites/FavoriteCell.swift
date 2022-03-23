@@ -44,7 +44,8 @@ class FavoriteCell: UICollectionViewCell, CollectionViewReusable {
         withDuration: 0.25, delay: 0, options: [.beginFromCurrentState],
         animations: {
           self.imageView.alpha = self.isHighlighted ? 0.7 : 1.0
-        })
+        }
+      )
     }
   }
 
@@ -86,6 +87,7 @@ class FavoriteCell: UICollectionViewCell, CollectionViewReusable {
     NotificationCenter.default.removeObserver(self, name: .thumbnailEditOff, object: nil)
   }
 
+  @available(*, unavailable)
   required init?(coder aDecoder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }
@@ -95,9 +97,10 @@ class FavoriteCell: UICollectionViewCell, CollectionViewReusable {
     backgroundColor = .clear
   }
 
-  override func preferredLayoutAttributesFitting(_ layoutAttributes: UICollectionViewLayoutAttributes) -> UICollectionViewLayoutAttributes {
+  override func preferredLayoutAttributesFitting(_ layoutAttributes: UICollectionViewLayoutAttributes)
+  -> UICollectionViewLayoutAttributes {
     // Size of cells are determined outside of cell
-    return layoutAttributes
+    layoutAttributes
   }
 
   static func height(forWidth width: CGFloat) -> CGFloat {

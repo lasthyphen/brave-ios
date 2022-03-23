@@ -11,15 +11,18 @@ import BraveCore
 // MARK: - Onboarding
 
 extension BrowserViewController {
-
   func presentOnboardingIntro() {
-    if Preferences.DebugFlag.skipOnboardingIntro == true { return }
+    if Preferences.DebugFlag.skipOnboardingIntro == true {
+      return
+    }
 
     presentOnboardingWelcomeScreen(on: self)
   }
 
   func presentOnboardingWelcomeScreen(on parentController: UIViewController) {
-    if Preferences.DebugFlag.skipOnboardingIntro == true { return }
+    if Preferences.DebugFlag.skipOnboardingIntro == true {
+      return
+    }
 
     // 1. Existing user.
     // 2. User already completed onboarding.
@@ -30,13 +33,16 @@ extension BrowserViewController {
     // 1. User is brand new
     // 2. User hasn't completed onboarding
     if Preferences.General.basicOnboardingCompleted.value != OnboardingState.completed.rawValue,
-      Preferences.General.isNewRetentionUser.value == true {
+       Preferences.General.isNewRetentionUser.value == true {
       let onboardingController = WelcomeViewController(
         profile: profile,
-        rewards: rewards)
+        rewards: rewards
+      )
       onboardingController.modalPresentationStyle = .fullScreen
       onboardingController.onAdsWebsiteSelected = { [weak self] url in
-        guard let self = self else { return }
+        guard let self = self else {
+          return
+        }
 
         if let url = url {
           self.topToolbar.leaveOverlayMode()
@@ -45,7 +51,8 @@ extension BrowserViewController {
           let tab = self.tabManager.addTab(
             PrivilegedRequest(url: url) as URLRequest,
             afterTab: self.tabManager.selectedTab,
-            isPrivate: PrivateBrowsingManager.shared.isPrivateBrowsing)
+            isPrivate: PrivateBrowsingManager.shared.isPrivateBrowsing
+          )
           self.tabManager.selectTab(tab)
         } else {
           self.addNTPTutorialPage()
@@ -56,7 +63,9 @@ extension BrowserViewController {
         }
       }
       onboardingController.onSkipSelected = { [weak self] in
-        guard let self = self else { return }
+        guard let self = self else {
+          return
+        }
         self.addNTPTutorialPage()
       }
 
@@ -70,16 +79,17 @@ extension BrowserViewController {
       tabManager.addTab(
         PrivilegedRequest(url: url) as URLRequest,
         afterTab: self.tabManager.selectedTab,
-        isPrivate: PrivateBrowsingManager.shared.isPrivateBrowsing)
+        isPrivate: PrivateBrowsingManager.shared.isPrivateBrowsing
+      )
     }
   }
 
   func showNTPOnboarding() {
     if Preferences.General.isNewRetentionUser.value == true,
-      Preferences.DebugFlag.skipNTPCallouts != true,
-      !topToolbar.inOverlayMode,
-      topToolbar.currentURL == nil,
-      !Preferences.FullScreenCallout.ntpCalloutCompleted.value {
+       Preferences.DebugFlag.skipNTPCallouts != true,
+       !topToolbar.inOverlayMode,
+       topToolbar.currentURL == nil,
+       !Preferences.FullScreenCallout.ntpCalloutCompleted.value {
       presentNTPStatsOnboarding()
     }
   }
@@ -92,7 +102,7 @@ extension BrowserViewController {
 
     // We can only show this onboarding on the NTP
     guard let ntpController = tabManager.selectedTab?.newTabPageViewController,
-      let statsFrame = ntpController.ntpStatsOnboardingFrame
+          let statsFrame = ntpController.ntpStatsOnboardingFrame
     else {
       return
     }
@@ -124,16 +134,21 @@ extension BrowserViewController {
     popover.arrowDistance = 10.0
     popover.present(from: borderView, on: self) { [weak popover, weak self] in
       guard let popover = popover,
-        let self = self
-      else { return }
-
-      // Mask the shadow
-      let maskFrame = self.view.convert(frame, to: popover.backgroundOverlayView)
-      guard !maskFrame.isNull && !maskFrame.isInfinite && !maskFrame.isEmpty && !popover.backgroundOverlayView.bounds.isNull && !popover.backgroundOverlayView.bounds.isInfinite && !popover.backgroundOverlayView.bounds.isEmpty else {
+            let self = self
+      else {
         return
       }
 
-      guard maskFrame.origin.x.isFinite && maskFrame.origin.y.isFinite && maskFrame.size.width.isFinite && maskFrame.size.height.isFinite && maskFrame.size.width > 0 && maskFrame.size.height > 0 else {
+      // Mask the shadow
+      let maskFrame = self.view.convert(frame, to: popover.backgroundOverlayView)
+      guard !maskFrame.isNull && !maskFrame.isInfinite && !maskFrame.isEmpty && !popover.backgroundOverlayView.bounds
+        .isNull && !popover.backgroundOverlayView.bounds.isInfinite && !popover.backgroundOverlayView.bounds.isEmpty
+      else {
+        return
+      }
+
+      guard maskFrame.origin.x.isFinite && maskFrame.origin.y.isFinite && maskFrame.size.width.isFinite && maskFrame
+        .size.height.isFinite && maskFrame.size.width > 0 && maskFrame.size.height > 0 else {
         return
       }
 
@@ -158,7 +173,8 @@ extension BrowserViewController {
           path.addRoundedRect(
             in: maskFrame,
             cornerWidth: 12.0,
-            cornerHeight: 12.0)
+            cornerHeight: 12.0
+          )
           return path
         }()
       }
@@ -166,11 +182,14 @@ extension BrowserViewController {
   }
 
   func presentNTPMenuOnboarding() {
-    guard let menuButton = UIDevice.isIpad ? topToolbar.menuButton : toolbar?.menuButton else { return }
+    guard let menuButton = UIDevice.isIpad ? topToolbar.menuButton : toolbar?.menuButton else {
+      return
+    }
     let controller = WelcomeNTPOnboardingController()
     controller.setText(
       title: Strings.Onboarding.ntpOnboardingPopoverDoneTitle,
-      details: Strings.Onboarding.ntpOnboardingPopoverDoneDescription)
+      details: Strings.Onboarding.ntpOnboardingPopoverDoneDescription
+    )
 
     let popover = PopoverController(contentController: controller)
     popover.arrowDistance = 7.0
@@ -179,7 +198,8 @@ extension BrowserViewController {
     if let icon = menuButton.imageView?.image {
       let maskedView = controller.maskedPointerView(
         icon: icon,
-        tint: menuButton.imageView?.tintColor)
+        tint: menuButton.imageView?.tintColor
+      )
       popover.view.insertSubview(maskedView, aboveSubview: popover.backgroundOverlayView)
       maskedView.frame = CGRect(width: 45.0, height: 45.0)
       maskedView.center = view.convert(menuButton.center, from: menuButton.superview)
@@ -213,12 +233,15 @@ extension BrowserViewController {
       icon: topToolbar.locationView.shieldsButton.imageView?.image,
       from: topToolbar.locationView.shieldsButton,
       on: popover,
-      browser: self)
+      browser: self
+    )
     popover.popoverDidDismiss = { [weak self] _ in
       pulseAnimation.removeFromSuperview()
 
       DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-        guard let self = self else { return }
+        guard let self = self else {
+          return
+        }
 
         if self.shouldShowPlaylistOnboardingThisSession {
           self.showPlaylistOnboarding(tab: self.tabManager.selectedTab)

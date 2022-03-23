@@ -9,7 +9,6 @@ import SnapKit
 /// On iPhones it presents as a bottom drawer style.
 /// On iPads it presents as a popup at center of the screen.
 class BottomSheetViewController: UIViewController {
-
   private struct UX {
     static let handleWidth: CGFloat = 35
     static let handleHeight: CGFloat = 5
@@ -34,6 +33,7 @@ class BottomSheetViewController: UIViewController {
     $0.backgroundColor = .black
     $0.alpha = 0
   }
+
   private let handleView = UIView().then {
     $0.backgroundColor = .black
     $0.alpha = 0.25
@@ -54,7 +54,9 @@ class BottomSheetViewController: UIViewController {
       let maxY = view.frame.maxY
 
       func update() {
-        if maxY <= 0 { return }
+        if maxY <= 0 {
+          return
+        }
         // Update dark blur, the more of content view go away the less dark it is.
         backgroundOverlayView.alpha = (maxY - yPosition) / maxY
 
@@ -63,7 +65,9 @@ class BottomSheetViewController: UIViewController {
         view.layoutIfNeeded()
       }
 
-      if oldValue == yPosition { return }
+      if oldValue == yPosition {
+        return
+      }
 
       // All vertical position manipulation on iPads happens programatically,
       // no need to check for Y position limits.
@@ -77,7 +81,7 @@ class BottomSheetViewController: UIViewController {
       // Only move the view if dragged below initial level.
       if yPosition <= initialY {
         yPosition = initialY
-      } else if yPosition > maxY {  // Dragged all way down, remove the view.
+      } else if yPosition > maxY { // Dragged all way down, remove the view.
         yPosition = maxY
       }
 
@@ -157,7 +161,9 @@ class BottomSheetViewController: UIViewController {
     handleView.isHidden = showAsPopup
 
     // Don't remake constraints if not needed.
-    if yPosition == initialDrawerYPosition { return }
+    if yPosition == initialDrawerYPosition {
+      return
+    }
 
     contentView.snp.remakeConstraints {
       if showAsPopup || isLandscapePhone {
@@ -206,17 +212,22 @@ class BottomSheetViewController: UIViewController {
 
   @objc private func handlePanGesture(_ pan: UIPanGestureRecognizer) {
     // The view shouldn't be draggable on iPads
-    if showAsPopup { return }
+    if showAsPopup {
+      return
+    }
 
     let translation = pan.translation(in: contentView)
     yPosition += translation.y
     pan.setTranslation(CGPoint.zero, in: contentView)
 
-    if pan.state != .ended { return }
+    if pan.state != .ended {
+      return
+    }
 
     let projectedVelocity = project(
       initialVelocity: pan.velocity(in: contentView).y,
-      decelerationRate: UIScrollView.DecelerationRate.normal.rawValue)
+      decelerationRate: UIScrollView.DecelerationRate.normal.rawValue
+    )
 
     let nextYPosition: CGFloat
 
@@ -235,7 +246,6 @@ class BottomSheetViewController: UIViewController {
       withDuration: animationDuration,
       animations: {
         self.yPosition = nextYPosition
-
       }
     ) { _ in
       if nextYPosition > 0 {
@@ -270,6 +280,6 @@ class BottomSheetViewController: UIViewController {
 
   // Distance travelled after decelerating to zero velocity at a constant rate (credit: a WWDC video)
   private func project(initialVelocity: CGFloat, decelerationRate: CGFloat) -> CGFloat {
-    return (initialVelocity / 1000.0) * decelerationRate / (1.0 - decelerationRate)
+    (initialVelocity / 1000.0) * decelerationRate / (1.0 - decelerationRate)
   }
 }

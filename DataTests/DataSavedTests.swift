@@ -8,7 +8,6 @@ import CoreData
 @testable import Data
 
 class DataSavedTests: CoreDataTestCase {
-
   func testInsertWebsite() {
     let savedUrl = URL(string: "https://brave.com")!
     let amount = "1.25"
@@ -54,7 +53,8 @@ class DataSavedTests: CoreDataTestCase {
     backgroundSaveAndWaitForExpectation {
       DataSaved.insert(
         savedUrl: savedUrl.absoluteString,
-        amount: amount)
+        amount: amount
+      )
     }
 
     let predicate = NSPredicate(format: "\(#keyPath(DataSaved.savedUrl)) == %@", savedUrl.absoluteString)

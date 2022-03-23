@@ -34,6 +34,7 @@ class AssetDetailStore: ObservableObject {
       }
     }
   }
+
   @Published private(set) var isLoadingAccountBalances: Bool = false
   @Published private(set) var accounts: [AccountAssetViewModel] = []
   @Published private(set) var transactions: [BraveWallet.TransactionInfo] = []
@@ -97,11 +98,13 @@ class AssetDetailStore: ObservableObject {
         toAssets: ["usd", "btc"],
         timeframe: timeframe
       ) { [weak self] success, prices in
-        guard let self = self else { return }
+        guard let self = self else {
+          return
+        }
         self.isLoadingPrice = false
         self.isInitialState = false
         if let assetPrice = prices.first(where: { $0.toAsset == "usd" }),
-          let value = Double(assetPrice.price) {
+           let value = Double(assetPrice.price) {
           self.assetPriceValue = value
           self.price = Self.priceFormatter.string(from: NSNumber(value: value)) ?? ""
           if let deltaValue = Double(assetPrice.assetTimeframeChange) {
@@ -109,7 +112,8 @@ class AssetDetailStore: ObservableObject {
             self.priceDelta = self.percentFormatter.string(from: NSNumber(value: deltaValue / 100.0)) ?? ""
           }
           for index in 0..<self.accounts.count {
-            self.accounts[index].fiatBalance = Self.priceFormatter.string(from: NSNumber(value: self.accounts[index].decimalBalance * self.assetPriceValue)) ?? ""
+            self.accounts[index].fiatBalance = Self.priceFormatter
+              .string(from: NSNumber(value: self.accounts[index].decimalBalance * self.assetPriceValue)) ?? ""
           }
         }
         if let assetPrice = prices.first(where: { $0.toAsset == "btc" }) {
@@ -121,7 +125,9 @@ class AssetDetailStore: ObservableObject {
         vsAsset: "usd",
         timeframe: timeframe
       ) { [weak self] success, history in
-        guard let self = self else { return }
+        guard let self = self else {
+          return
+        }
         self.isLoadingChart = false
         self.priceHistory = history
       }
@@ -141,7 +147,8 @@ class AssetDetailStore: ObservableObject {
           if let index = accounts.firstIndex(where: { $0.account.address == account.address }) {
             accounts[index].decimalBalance = value ?? 0.0
             accounts[index].balance = String(format: "%.4f", value ?? 0.0)
-            accounts[index].fiatBalance = Self.priceFormatter.string(from: NSNumber(value: self.accounts[index].decimalBalance * assetPriceValue)) ?? ""
+            accounts[index].fiatBalance = Self.priceFormatter
+              .string(from: NSNumber(value: self.accounts[index].decimalBalance * assetPriceValue)) ?? ""
           }
         }
       }
@@ -153,7 +160,9 @@ class AssetDetailStore: ObservableObject {
 
   func fetchTransactions() {
     rpcService.network { [weak self] network in
-      guard let self = self else { return }
+      guard let self = self else {
+        return
+      }
       self.keyringService.defaultKeyringInfo { keyring in
         var allTransactions: [BraveWallet.TransactionInfo] = []
         let group = DispatchGroup()
@@ -167,18 +176,18 @@ class AssetDetailStore: ObservableObject {
         group.notify(queue: .main) {
           self.transactions =
             allTransactions
-            .filter { tx in
-              switch tx.txType {
-              case .erc20Approve, .erc20Transfer:
-                let toAddress = tx.txDataUnion.ethTxData1559?.baseData.to
-                return toAddress == self.token.contractAddress
-              case .ethSend, .other, .erc721TransferFrom, .erc721SafeTransferFrom:
-                return network.symbol.caseInsensitiveCompare(self.token.symbol) == .orderedSame
-              @unknown default:
-                return false
+              .filter { tx in
+                switch tx.txType {
+                case .erc20Approve, .erc20Transfer:
+                  let toAddress = tx.txDataUnion.ethTxData1559?.baseData.to
+                  return toAddress == self.token.contractAddress
+                case .ethSend, .other, .erc721TransferFrom, .erc721SafeTransferFrom:
+                  return network.symbol.caseInsensitiveCompare(self.token.symbol) == .orderedSame
+                @unknown default:
+                  return false
+                }
               }
-            }
-            .sorted(by: { $0.createdTime > $1.createdTime })
+              .sorted(by: { $0.createdTime > $1.createdTime })
         }
       }
     }
@@ -230,8 +239,10 @@ extension AssetDetailStore: BraveWalletJsonRpcServiceObserver {
       self.fetchTransactions()
     }
   }
+
   func onAddEthereumChainRequestCompleted(_ chainId: String, error: String) {
   }
+
   func onIsEip1559Changed(_ chainId: String, isEip1559: Bool) {
   }
 }
@@ -239,8 +250,10 @@ extension AssetDetailStore: BraveWalletJsonRpcServiceObserver {
 extension AssetDetailStore: BraveWalletTxServiceObserver {
   func onNewUnapprovedTx(_ txInfo: BraveWallet.TransactionInfo) {
   }
+
   func onUnapprovedTxUpdated(_ txInfo: BraveWallet.TransactionInfo) {
   }
+
   func onTransactionStatusChanged(_ txInfo: BraveWallet.TransactionInfo) {
     fetchTransactions()
   }

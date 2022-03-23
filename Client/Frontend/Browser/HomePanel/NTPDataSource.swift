@@ -8,7 +8,6 @@ import BraveShared
 import BraveCore
 
 class NTPDataSource {
-
   var initializeFavorites: ((_ sites: [CustomTheme.TopSite]?) -> Void)?
 
   /// Custom homepage spec requirement:
@@ -59,7 +58,9 @@ class NTPDataSource {
 
   private lazy var standardBackgrounds: [NTPWallpaper] = {
     let backgroundFilePath = "ntp-data"
-    guard let backgroundData = self.loadData(file: backgroundFilePath) else { return [] }
+    guard let backgroundData = self.loadData(file: backgroundFilePath) else {
+      return []
+    }
 
     do {
       return try JSONDecoder().decode([NTPWallpaper].self, from: backgroundData)
@@ -118,38 +119,42 @@ class NTPDataSource {
   }
 
   func newBackground() -> (NTPWallpaper, BackgroundType)? {
-    if !Preferences.NewTabPage.backgroundImages.value { return nil }
+    if !Preferences.NewTabPage.backgroundImages.value {
+      return nil
+    }
 
     // Identifying the background array to use
     let (backgroundSet, backgroundType, strategy) = {
       () -> ([NTPWallpaper], BackgroundType, ImageRotationStrategy) in
 
-      if let theme = customTheme,
-        let refCode = theme.refCode,
-        Preferences.NewTabPage.selectedCustomTheme.value != nil {
-        return (theme.wallpapers, .withQRCode(refCode), .randomOrderAvoidDuplicates)
-      }
+        if let theme = customTheme,
+           let refCode = theme.refCode,
+           Preferences.NewTabPage.selectedCustomTheme.value != nil {
+          return (theme.wallpapers, .withQRCode(refCode), .randomOrderAvoidDuplicates)
+        }
 
-      if let sponsor = sponsor {
-        let attemptSponsored =
-          Preferences.NewTabPage.backgroundSponsoredImages.value
-          && backgroundRotationCounter == NTPDataSource.sponsorshipShowValue
-          && !PrivateBrowsingManager.shared.isPrivateBrowsing
+        if let sponsor = sponsor {
+          let attemptSponsored =
+            Preferences.NewTabPage.backgroundSponsoredImages.value
+              && backgroundRotationCounter == NTPDataSource.sponsorshipShowValue
+              && !PrivateBrowsingManager.shared.isPrivateBrowsing
 
-        if attemptSponsored {
-          // Force a max, and wrap back down if it is hit.
-          sponsoredBackgroundRotationCampaignIndex %= sponsor.campaigns.count
+          if attemptSponsored {
+            // Force a max, and wrap back down if it is hit.
+            sponsoredBackgroundRotationCampaignIndex %= sponsor.campaigns.count
 
-          if let campaign = sponsor.campaigns[safe: sponsoredBackgroundRotationCampaignIndex] {
-            return (campaign.wallpapers, .withBrandLogo(campaign.logo), .sponsoredRotation)
+            if let campaign = sponsor.campaigns[safe: sponsoredBackgroundRotationCampaignIndex] {
+              return (campaign.wallpapers, .withBrandLogo(campaign.logo), .sponsoredRotation)
+            }
           }
         }
-      }
 
-      return (standardBackgrounds, .regular, .randomOrderAvoidDuplicates)
+        return (standardBackgrounds, .regular, .randomOrderAvoidDuplicates)
     }()
 
-    if backgroundSet.isEmpty { return nil }
+    if backgroundSet.isEmpty {
+      return nil
+    }
 
     // Choosing the actual index / item to use
     let backgroundIndex = { () -> Int in
@@ -202,7 +207,9 @@ class NTPDataSource {
     // Increment regardless, this is a counter, not an index, so smallest should be `1`
     backgroundRotationCounter += 1
 
-    guard let bgWithIndex = backgroundSet[safe: backgroundIndex] else { return nil }
+    guard let bgWithIndex = backgroundSet[safe: backgroundIndex] else {
+      return nil
+    }
     return (bgWithIndex, backgroundType)
   }
 

@@ -6,7 +6,6 @@
 import Foundation
 import XCTest
 import Storage
-
 @testable import Client
 
 class BenchmarkTierTests: XCTestCase {
@@ -43,42 +42,50 @@ class BenchmarkTierTests: XCTestCase {
     case 0..<Tier.specialTier.rawValue:
       XCTAssertTrue(
         existingNextTier == .newbieExclusiveTier,
-        "Next Tier for # of ads: \(numberOfTrackerAds)")
+        "Next Tier for # of ads: \(numberOfTrackerAds)"
+      )
 
     case Tier.specialTier.rawValue..<Tier.newbieExclusiveTier.rawValue:
       XCTAssertTrue(
         existingNextTier == .casualExclusiveTier,
-        "Next Tier for # of ads: \(numberOfTrackerAds)")
+        "Next Tier for # of ads: \(numberOfTrackerAds)"
+      )
 
     case Tier.newbieExclusiveTier.rawValue..<Tier.casualExclusiveTier.rawValue:
       XCTAssertTrue(
         existingNextTier == .regularExclusiveTier,
-        "Next Tier for # of ads: \(numberOfTrackerAds)")
+        "Next Tier for # of ads: \(numberOfTrackerAds)"
+      )
 
     case Tier.casualExclusiveTier.rawValue..<Tier.regularExclusiveTier.rawValue:
       XCTAssertTrue(
         existingNextTier == .expertExclusiveTier,
-        "Next Tier for # of ads: \(numberOfTrackerAds)")
+        "Next Tier for # of ads: \(numberOfTrackerAds)"
+      )
 
     case Tier.regularExclusiveTier.rawValue..<Tier.expertExclusiveTier.rawValue:
       XCTAssertTrue(
         existingNextTier == .professionalTier,
-        "Next Tier for # of ads: \(numberOfTrackerAds)")
+        "Next Tier for # of ads: \(numberOfTrackerAds)"
+      )
 
     case Tier.expertExclusiveTier.rawValue..<Tier.professionalTier.rawValue:
       XCTAssertTrue(
         existingNextTier == .primeTier,
-        "Next Tier for # of ads: \(numberOfTrackerAds)")
+        "Next Tier for # of ads: \(numberOfTrackerAds)"
+      )
 
     case Tier.professionalTier.rawValue..<Tier.primeTier.rawValue:
       XCTAssertTrue(
         existingNextTier == .grandTier,
-        "Next Tier for # of ads: \(numberOfTrackerAds)")
+        "Next Tier for # of ads: \(numberOfTrackerAds)"
+      )
 
     case Tier.primeTier.rawValue..<Tier.grandTier.rawValue:
       XCTAssertTrue(
         existingNextTier == .legendaryTier,
-        "Next Tier for # of ads: \(numberOfTrackerAds)")
+        "Next Tier for # of ads: \(numberOfTrackerAds)"
+      )
 
     default:
       XCTAssertNil(existingNextTier)

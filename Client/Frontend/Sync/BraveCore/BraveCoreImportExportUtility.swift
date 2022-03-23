@@ -12,7 +12,6 @@ import Data
 private let log = Logger.browserLogger
 
 class BraveCoreImportExportUtility {
-
   // Import an array of bookmarks into BraveCore
   func importBookmarks(from array: [BraveImportedBookmark], _ completion: @escaping (_ success: Bool) -> Void) {
     precondition(state == .none, "Bookmarks Import - Error Importing while an Import/Export operation is in progress")
@@ -20,7 +19,9 @@ class BraveCoreImportExportUtility {
     state = .importing
     self.queue.async {
       self.importer.import(from: array, topLevelFolderName: Strings.Sync.importFolderName) { state in
-        guard state != .started else { return }
+        guard state != .started else {
+          return
+        }
 
         self.state = .none
         DispatchQueue.main.async {
@@ -44,29 +45,39 @@ class BraveCoreImportExportUtility {
 
     state = .importing
     self.queue.async {
-      self.importer.import(fromFile: path, topLevelFolderName: Strings.Sync.importFolderName, automaticImport: true) { [weak self] state, bookmarks in
-        guard let self = self, state != .started else { return }
-
-        do {
-          try self.rethrow(state)
-          self.state = .none
-          log.info("Bookmarks Import - Completed Import Successfully")
-          DispatchQueue.main.async {
-            completion(true)
+      self.importer
+        .import(
+          fromFile: path,
+          topLevelFolderName: Strings.Sync.importFolderName,
+          automaticImport: true
+        ) { [weak self] state, bookmarks in
+          guard let self = self, state != .started else {
+            return
           }
-        } catch {
-          self.state = .none
-          log.error(error)
-          DispatchQueue.main.async {
-            completion(false)
+
+          do {
+            try self.rethrow(state)
+            self.state = .none
+            log.info("Bookmarks Import - Completed Import Successfully")
+            DispatchQueue.main.async {
+              completion(true)
+            }
+          } catch {
+            self.state = .none
+            log.error(error)
+            DispatchQueue.main.async {
+              completion(false)
+            }
           }
         }
-      }
     }
   }
 
   // Import bookmarks from a file into an array
-  func importBookmarks(from path: URL, _ completion: @escaping (_ success: Bool, _ bookmarks: [BraveImportedBookmark]) -> Void) {
+  func importBookmarks(
+    from path: URL,
+    _ completion: @escaping (_ success: Bool, _ bookmarks: [BraveImportedBookmark]) -> Void
+  ) {
     precondition(state == .none, "Bookmarks Import - Error Importing while an Import/Export operation is in progress")
 
     guard let path = nativeURLPathFromURL(path) else {
@@ -79,24 +90,31 @@ class BraveCoreImportExportUtility {
 
     state = .importing
     self.queue.async {
-      self.importer.import(fromFile: path, topLevelFolderName: Strings.Sync.importFolderName, automaticImport: false) { [weak self] state, bookmarks in
-        guard let self = self, state != .started else { return }
-
-        do {
-          try self.rethrow(state)
-          self.state = .none
-          log.info("Bookmarks Import - Completed Import Successfully")
-          DispatchQueue.main.async {
-            completion(true, bookmarks ?? [])
+      self.importer
+        .import(
+          fromFile: path,
+          topLevelFolderName: Strings.Sync.importFolderName,
+          automaticImport: false
+        ) { [weak self] state, bookmarks in
+          guard let self = self, state != .started else {
+            return
           }
-        } catch {
-          self.state = .none
-          log.error(error)
-          DispatchQueue.main.async {
-            completion(false, [])
+
+          do {
+            try self.rethrow(state)
+            self.state = .none
+            log.info("Bookmarks Import - Completed Import Successfully")
+            DispatchQueue.main.async {
+              completion(true, bookmarks ?? [])
+            }
+          } catch {
+            self.state = .none
+            log.error(error)
+            DispatchQueue.main.async {
+              completion(false, [])
+            }
           }
         }
-      }
     }
   }
 
@@ -115,7 +133,9 @@ class BraveCoreImportExportUtility {
     self.state = .exporting
     self.queue.async {
       self.exporter.export(toFile: path) { [weak self] state in
-        guard let self = self, state != .started else { return }
+        guard let self = self, state != .started else {
+          return
+        }
 
         do {
           try self.rethrow(state)
@@ -151,7 +171,9 @@ class BraveCoreImportExportUtility {
     let bookmarks = bookmarks.map({ $0.toChromiumExportedBookmark() })
     self.queue.async {
       self.exporter.export(toFile: path, bookmarks: bookmarks) { [weak self] state in
-        guard let self = self, state != .started else { return }
+        guard let self = self, state != .started else {
+          return
+        }
 
         do {
           try self.rethrow(state)
@@ -189,8 +211,10 @@ class BraveCoreImportExportUtility {
 // MARK: - Parsing
 extension BraveCoreImportExportUtility {
   func nativeURLPathFromURL(_ url: URL) -> String? {
-    return url.withUnsafeFileSystemRepresentation { bytes -> String? in
-      guard let bytes = bytes else { return nil }
+    url.withUnsafeFileSystemRepresentation { bytes -> String? in
+      guard let bytes = bytes else {
+        return nil
+      }
       return String(cString: bytes)
     }
   }
@@ -210,7 +234,7 @@ private enum ParsingError: String, Error {
 extension LegacyBookmark {
   fileprivate func toChromiumExportedBookmark() -> BookmarkNode {
     // Tail recursion to map children..
-    return BookmarkNode(
+    BookmarkNode(
       title: self.isFolder ? self.customTitle ?? "(No Title)" : self.title ?? "(No Title)",
       id: Int64(self.order),
       guid: UUID().uuidString.lowercased(),

@@ -19,7 +19,7 @@ extension CGRect {
 
 extension Data {
   public var isGIF: Bool {
-    return [0x47, 0x49, 0x46].elementsEqual(prefix(3))
+    [0x47, 0x49, 0x46].elementsEqual(prefix(3))
   }
 }
 
@@ -64,7 +64,7 @@ extension UIImage {
 
   /// Return a UIImage which will always render as a template
   public var template: UIImage {
-    return withRenderingMode(.alwaysTemplate)
+    withRenderingMode(.alwaysTemplate)
   }
 
   public func scale(toSize size: CGSize) -> UIImage {
@@ -93,7 +93,12 @@ extension UIImage {
     return newImage
   }
 
-  public func textToImage(drawText text: String, textFont: UIFont? = nil, textColor: UIColor? = nil, atPoint point: CGPoint) -> UIImage? {
+  public func textToImage(
+    drawText text: String,
+    textFont: UIFont? = nil,
+    textColor: UIColor? = nil,
+    atPoint point: CGPoint
+  ) -> UIImage? {
     let paragraphStyle = NSMutableParagraphStyle()
     paragraphStyle.alignment = .center
 

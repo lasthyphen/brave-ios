@@ -10,7 +10,7 @@ import BraveUI
 
 class StatsSectionProvider: NSObject, NTPSectionProvider {
   func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-    return 1
+    1
   }
 
   func registerCells(to collectionView: UICollectionView) {
@@ -18,17 +18,25 @@ class StatsSectionProvider: NSObject, NTPSectionProvider {
   }
 
   func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-    return collectionView.dequeueReusableCell(for: indexPath) as NewTabCollectionViewCell<BraveShieldStatsView>
+    collectionView.dequeueReusableCell(for: indexPath) as NewTabCollectionViewCell<BraveShieldStatsView>
   }
 
-  func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+  func collectionView(
+    _ collectionView: UICollectionView,
+    layout collectionViewLayout: UICollectionViewLayout,
+    sizeForItemAt indexPath: IndexPath
+  ) -> CGSize {
     var size = fittingSizeForCollectionView(collectionView, section: indexPath.section)
     size.height = 110
     return size
   }
 
-  func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
-    return UIEdgeInsets(top: 0, left: 20, bottom: 0, right: 20)
+  func collectionView(
+    _ collectionView: UICollectionView,
+    layout collectionViewLayout: UICollectionViewLayout,
+    insetForSectionAt section: Int
+  ) -> UIEdgeInsets {
+    UIEdgeInsets(top: 0, left: 20, bottom: 0, right: 20)
   }
 }
 
@@ -55,7 +63,7 @@ class BraveShieldStatsView: UIView {
   }()
 
   private lazy var stats: [StatView] = {
-    return [self.adsStatView, self.dataSavedStatView, self.timeStatView]
+    [self.adsStatView, self.dataSavedStatView, self.timeStatView]
   }()
 
   override init(frame: CGRect) {
@@ -67,9 +75,15 @@ class BraveShieldStatsView: UIView {
 
     update()
 
-    NotificationCenter.default.addObserver(self, selector: #selector(update), name: NSNotification.Name(rawValue: BraveGlobalShieldStats.didUpdateNotification), object: nil)
+    NotificationCenter.default.addObserver(
+      self,
+      selector: #selector(update),
+      name: NSNotification.Name(rawValue: BraveGlobalShieldStats.didUpdateNotification),
+      object: nil
+    )
   }
 
+  @available(*, unavailable)
   required init?(coder aDecoder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }
@@ -91,7 +105,8 @@ class BraveShieldStatsView: UIView {
   }
 
   @objc private func update() {
-    adsStatView.stat = (BraveGlobalShieldStats.shared.adblock + BraveGlobalShieldStats.shared.trackingProtection).kFormattedNumber
+    adsStatView.stat = (BraveGlobalShieldStats.shared.adblock + BraveGlobalShieldStats.shared.trackingProtection)
+      .kFormattedNumber
     dataSavedStatView.stat = BraveGlobalShieldStats.shared.dataSaved
     timeStatView.stat = BraveGlobalShieldStats.shared.timeSaved
   }
@@ -140,19 +155,28 @@ private class StatView: UIView {
     addSubview(statLabel)
     addSubview(titleLabel)
 
-    statLabel.snp.makeConstraints({ (make) -> Void in
+    statLabel.snp.makeConstraints({ make -> Void in
       make.left.equalTo(0)
       make.right.equalTo(0)
-      make.centerY.equalTo(self).offset(-(statLabel.sizeThatFits(CGSize(width: CGFloat.greatestFiniteMagnitude, height: CGFloat.greatestFiniteMagnitude)).height) - 10)
+      make.centerY.equalTo(self)
+        .offset(
+          -(
+            statLabel
+              .sizeThatFits(CGSize(width: CGFloat.greatestFiniteMagnitude, height: CGFloat.greatestFiniteMagnitude))
+              .height
+          ) -
+            10
+        )
     })
 
-    titleLabel.snp.makeConstraints({ (make) -> Void in
+    titleLabel.snp.makeConstraints({ make -> Void in
       make.left.equalTo(0)
       make.right.equalTo(0)
       make.top.equalTo(statLabel.snp.bottom).offset(5)
     })
   }
 
+  @available(*, unavailable)
   required init?(coder aDecoder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }

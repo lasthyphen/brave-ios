@@ -12,4 +12,9 @@ if AppConstants.isRunningTest {
   appDelegate = AppDelegate.self
 }
 
-_ = UIApplicationMain(CommandLine.argc, CommandLine.unsafeArgv, NSStringFromClass(UIApplication.self), NSStringFromClass(appDelegate))
+_ = UIApplicationMain(
+  CommandLine.argc,
+  CommandLine.unsafeArgv,
+  NSStringFromClass(UIApplication.self),
+  NSStringFromClass(appDelegate)
+)

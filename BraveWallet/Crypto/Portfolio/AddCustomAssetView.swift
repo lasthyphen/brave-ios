@@ -128,7 +128,8 @@ struct AddCustomAssetView: View {
       decimals: Int32(decimalsInput) ?? 18,
       visible: true,
       tokenId: "",
-      coingeckoId: "")
+      coingeckoId: ""
+    )
     userAssetStore.addUserAsset(token: token) { [self] success in
       if success {
         presentationMode.dismiss()
@@ -147,7 +148,9 @@ struct AddCustomAssetView_Previews: PreviewProvider {
         walletService: MockBraveWalletService(),
         blockchainRegistry: MockBlockchainRegistry(),
         rpcService: MockJsonRpcService(),
-        assetRatioService: MockAssetRatioService()))
+        assetRatioService: MockAssetRatioService()
+      )
+    )
   }
 }
 #endif

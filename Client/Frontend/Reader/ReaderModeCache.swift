@@ -42,7 +42,7 @@ class MemoryReaderModeCache: ReaderModeCache {
   }
 
   class var sharedInstance: ReaderModeCache {
-    return MemoryReaderModeCacheSharedInstance
+    MemoryReaderModeCacheSharedInstance
   }
 
   func put(_ url: URL, _ readabilityResult: ReadabilityResult) throws {
@@ -51,7 +51,11 @@ class MemoryReaderModeCache: ReaderModeCache {
 
   func get(_ url: URL) throws -> ReadabilityResult {
     guard let resultWrapper = cache.object(forKey: url as AnyObject) as? ReadabilityResultWrapper else {
-      throw NSError(domain: ReaderModeCacheErrorDomain, code: ReaderModeCacheErrorCode.noPathsFound.rawValue, userInfo: nil)
+      throw NSError(
+        domain: ReaderModeCacheErrorDomain,
+        code: ReaderModeCacheErrorCode.noPathsFound.rawValue,
+        userInfo: nil
+      )
     }
     return resultWrapper.result
   }
@@ -61,7 +65,7 @@ class MemoryReaderModeCache: ReaderModeCache {
   }
 
   func contains(_ url: URL) -> Bool {
-    return cache.object(forKey: url as AnyObject) != nil
+    cache.object(forKey: url as AnyObject) != nil
   }
 }
 
@@ -73,18 +77,25 @@ class MemoryReaderModeCache: ReaderModeCache {
 /// and improve at a later time.
 class DiskReaderModeCache: ReaderModeCache {
   class var sharedInstance: ReaderModeCache {
-    return DiskReaderModeCacheSharedInstance
+    DiskReaderModeCacheSharedInstance
   }
 
   func put(_ url: URL, _ readabilityResult: ReadabilityResult) throws {
     guard let (cacheDirectoryPath, contentFilePath) = cachePathsForURL(url) else {
-      throw NSError(domain: ReaderModeCacheErrorDomain, code: ReaderModeCacheErrorCode.noPathsFound.rawValue, userInfo: nil)
+      throw NSError(
+        domain: ReaderModeCacheErrorDomain,
+        code: ReaderModeCacheErrorCode.noPathsFound.rawValue,
+        userInfo: nil
+      )
     }
 
-    try FileManager.default.createDirectory(atPath: cacheDirectoryPath, withIntermediateDirectories: true, attributes: nil)
+    try FileManager.default.createDirectory(
+      atPath: cacheDirectoryPath,
+      withIntermediateDirectories: true,
+      attributes: nil
+    )
     let string: String = readabilityResult.encode()
     try string.write(toFile: contentFilePath, atomically: true, encoding: .utf8)
-    return
   }
 
   func get(_ url: URL) throws -> ReadabilityResult {
@@ -95,11 +106,17 @@ class DiskReaderModeCache: ReaderModeCache {
       }
     }
 
-    throw NSError(domain: ReaderModeCacheErrorDomain, code: ReaderModeCacheErrorCode.noPathsFound.rawValue, userInfo: nil)
+    throw NSError(
+      domain: ReaderModeCacheErrorDomain,
+      code: ReaderModeCacheErrorCode.noPathsFound.rawValue,
+      userInfo: nil
+    )
   }
 
   func delete(_ url: URL, error: NSErrorPointer) {
-    guard let (cacheDirectoryPath, _) = cachePathsForURL(url) else { return }
+    guard let (cacheDirectoryPath, _) = cachePathsForURL(url) else {
+      return
+    }
 
     if FileManager.default.fileExists(atPath: cacheDirectoryPath) {
       do {
@@ -129,13 +146,21 @@ class DiskReaderModeCache: ReaderModeCache {
   }
 
   fileprivate func hashedPathForURL(_ url: URL) -> String? {
-    guard let hash = hashForURL(url) else { return nil }
+    guard let hash = hashForURL(url) else {
+      return nil
+    }
 
-    return NSString.path(withComponents: [hash.substring(with: NSRange(location: 0, length: 2)), hash.substring(with: NSRange(location: 2, length: 2)), hash.substring(from: 4)]) as String
+    return NSString.path(withComponents: [
+      hash.substring(with: NSRange(location: 0, length: 2)),
+      hash.substring(with: NSRange(location: 2, length: 2)),
+      hash.substring(from: 4)
+    ]) as String
   }
 
   fileprivate func hashForURL(_ url: URL) -> NSString? {
-    guard let data = url.absoluteString.data(using: .utf8) else { return nil }
+    guard let data = url.absoluteString.data(using: .utf8) else {
+      return nil
+    }
 
     return data.sha1.hexEncodedString as NSString?
   }

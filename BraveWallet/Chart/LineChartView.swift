@@ -41,7 +41,7 @@ struct LineChartView<DataType: DataPoint, FillStyle: View>: View {
     self.data = data
     self.numberOfColumns = numberOfColumns
     let (min, max) = { () -> (CGFloat, CGFloat) in
-      let filledData = data.map({ $0.value })
+      let filledData = data.map(\.value)
       let min = filledData.min() ?? 0.0
       let max = filledData.max() ?? CGFloat.greatestFiniteMagnitude
       if min == max {
@@ -123,7 +123,7 @@ struct LineChartView<DataType: DataPoint, FillStyle: View>: View {
     let stride = width / CGFloat(numberOfColumns - 1)
     let index = Int(round(offset / stride))
     guard index >= 0 && index < data.count,
-      let calculatedPoint = point(for: index, in: size)
+          let calculatedPoint = point(for: index, in: size)
     else {
       return nil
     }
@@ -140,7 +140,7 @@ struct LineChartView<DataType: DataPoint, FillStyle: View>: View {
     let size: CGFloat = 14.0
     return GeometryReader { proxy in
       if numberOfColumns != points.count,
-        let scaledPoint = point(for: points.endIndex - 1, in: proxy.size) {
+         let scaledPoint = point(for: points.endIndex - 1, in: proxy.size) {
         Circle()
           .frame(width: size, height: size)
           .background(
@@ -206,14 +206,14 @@ struct LineChartView<DataType: DataPoint, FillStyle: View>: View {
         .mask(
           LineChartShape(points: points)
             .padding(.vertical, 14)
-            .drawingGroup()  // Drawing group clips anything above it, so we need additional padding
+            .drawingGroup() // Drawing group clips anything above it, so we need additional padding
             .overlay(
               finalDotView
-                .padding(.vertical, 14)  // But drag calculations need to use the correct coordinates without padding)
+                .padding(.vertical, 14) // But drag calculations need to use the correct coordinates without padding)
             )
         )
         .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(.vertical, -14)  // But drag calculations need to use the correct coordinates without padding
+        .padding(.vertical, -14) // But drag calculations need to use the correct coordinates without padding
         .overlay(
           Group {
             if let dragContext = dragContext {
@@ -244,7 +244,8 @@ struct LineChartView<DataType: DataPoint, FillStyle: View>: View {
                     selectedDataPoint = nil
                   })
               )
-          })
+          }
+        )
     }
     .padding(.bottom, 16)
     .padding(.top, 4)
@@ -303,7 +304,7 @@ private struct LineChartDescriptor: AXChartDescriptorRepresentable {
 
   func makeChartDescriptor() -> AXChartDescriptor {
     let (min, max) = { () -> (CGFloat, CGFloat) in
-      let filledData = values.map({ $0.value })
+      let filledData = values.map(\.value)
       let min = filledData.min() ?? 0.0
       let max = filledData.max() ?? CGFloat.greatestFiniteMagnitude
       if min == max {
@@ -390,11 +391,11 @@ private struct LineChartAnimatableData: VectorArithmetic {
   }
 
   var magnitudeSquared: Double {
-    return points.reduce(0, { $0 + $1.magnitudeSquared })
+    points.reduce(0, { $0 + $1.magnitudeSquared })
   }
 
   static var zero: LineChartAnimatableData {
-    return .init(points: [])
+    .init(points: [])
   }
 }
 

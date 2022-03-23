@@ -37,7 +37,7 @@ struct AssetDetailHeaderView: View {
       Color(
         assetDetailStore.priceIsDown ? .walletRed : .walletGreen
       )
-      .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+        .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
     )
   }
 
@@ -99,15 +99,17 @@ struct AssetDetailHeaderView: View {
           String.localizedStringWithFormat(
             Strings.Wallet.assetDetailSubtitle,
             assetDetailStore.token.name,
-            assetDetailStore.token.symbol)
+            assetDetailStore.token.symbol
+          )
         )
-        .font(.footnote)
-        .foregroundColor(Color(.secondaryBraveLabel))
+          .font(.footnote)
+          .foregroundColor(Color(.secondaryBraveLabel))
         VStack(alignment: .leading) {
           HStack {
             Group {
               if let selectedCandle = selectedCandle,
-                let formattedString = AssetDetailStore.priceFormatter.string(from: NSNumber(value: selectedCandle.value)) {
+                 let formattedString = AssetDetailStore.priceFormatter
+                   .string(from: NSNumber(value: selectedCandle.value)) {
                 Text(formattedString)
               } else {
                 Text(assetDetailStore.price)
@@ -132,7 +134,8 @@ struct AssetDetailHeaderView: View {
           title: String.localizedStringWithFormat(
             Strings.Wallet.assetDetailSubtitle,
             assetDetailStore.token.name,
-            assetDetailStore.token.symbol),
+            assetDetailStore.token.symbol
+          ),
           dataPoints: data
         )
         .disabled(data.isEmpty)
@@ -196,9 +199,9 @@ struct CurrencyDetailHeaderView_Previews: PreviewProvider {
       networkStore: .previewStore,
       buySendSwapDestination: .constant(nil)
     )
-    .padding(.vertical)
-    .previewLayout(.sizeThatFits)
-    .previewSizeCategories()
+      .padding(.vertical)
+      .previewLayout(.sizeThatFits)
+      .previewSizeCategories()
     //    .previewColorSchemes()
   }
 }

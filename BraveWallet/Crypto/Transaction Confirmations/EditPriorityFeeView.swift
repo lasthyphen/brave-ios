@@ -27,7 +27,10 @@ struct EditPriorityFeeView: View {
   @Environment(\.presentationMode) @Binding private var presentationMode
 
   private enum GasFeeKind: Hashable {
-    case low, optimal, high, custom
+    case low
+    case optimal
+    case high
+    case custom
   }
 
   @State private var gasFeeKind: GasFeeKind = .optimal
@@ -58,9 +61,13 @@ struct EditPriorityFeeView: View {
     // Comparing from high to low as sometimes avg/slow fees are the same
     if selectedMaxPrice == gasEstimation.fastMaxFeePerGas && selectedMaxTip == gasEstimation.fastMaxPriorityFeePerGas {
       gasFeeKind = .high
-    } else if selectedMaxPrice == gasEstimation.avgMaxFeePerGas && selectedMaxTip == gasEstimation.avgMaxPriorityFeePerGas {
+    }
+    else if selectedMaxPrice == gasEstimation.avgMaxFeePerGas && selectedMaxTip == gasEstimation
+      .avgMaxPriorityFeePerGas {
       gasFeeKind = .optimal
-    } else if selectedMaxPrice == gasEstimation.slowMaxFeePerGas && selectedMaxTip == gasEstimation.slowMaxPriorityFeePerGas {
+    }
+    else if selectedMaxPrice == gasEstimation.slowMaxFeePerGas && selectedMaxTip == gasEstimation
+      .slowMaxPriorityFeePerGas {
       gasFeeKind = .low
     } else {
       gasFeeKind = .custom
@@ -85,8 +92,8 @@ struct EditPriorityFeeView: View {
     case .custom:
       // Gas limit is already in Gwei, so doesn't need additional conversion other than to hex
       guard let limit = BDouble(gasLimit)?.rounded().asString(radix: 16),
-        let gasFee = WeiFormatter.gweiToWei(maximumGasPrice, radix: .decimal, outputRadix: .hex),
-        let gasTip = WeiFormatter.gweiToWei(maximumTipPrice, radix: .decimal, outputRadix: .hex)
+            let gasFee = WeiFormatter.gweiToWei(maximumGasPrice, radix: .decimal, outputRadix: .hex),
+            let gasTip = WeiFormatter.gweiToWei(maximumTipPrice, radix: .decimal, outputRadix: .hex)
       else {
         // Show error?
         return
@@ -135,9 +142,9 @@ struct EditPriorityFeeView: View {
     if case .custom = gasFeeKind {
       // Validate data
       guard let gasLimitValue = BDouble(gasLimit), gasLimitValue > 0,
-        let basePrice = BDouble(baseInGwei),
-        let maxTipValue = BDouble(maximumTipPrice), maxTipValue > 0,
-        let maxFeeValue = BDouble(maximumGasPrice), maxFeeValue > basePrice
+            let basePrice = BDouble(baseInGwei),
+            let maxTipValue = BDouble(maximumTipPrice), maxTipValue > 0,
+            let maxFeeValue = BDouble(maximumGasPrice), maxFeeValue > basePrice
       else {
         return true
       }
@@ -155,7 +162,7 @@ struct EditPriorityFeeView: View {
     } set: { value in
       maximumTipPrice = value
       if let base = BDouble(baseInGwei),
-        let tip = BDouble(value) {
+         let tip = BDouble(value) {
         maximumGasPrice = (floor(base) + tip).decimalExpansion(precisionAfterDecimalPoint: 2)
       }
     }

@@ -11,7 +11,6 @@ import BraveShared
 private let log = Logger.browserLogger
 
 final class WebImageCache: ImageCacheProtocol {
-
   private let webImageManager: SDWebImageManager
 
   private let isPrivate: Bool
@@ -61,7 +60,12 @@ final class WebImageCache: ImageCacheProtocol {
 
     webImageOptions.append(.scaleDownLargeImages)
 
-    let imageOperation = webImageManager.loadImage(with: url, options: SDWebImageOptions(webImageOptions), context: webImageContext, progress: progressBlock) { image, data, error, webImageCacheType, _, imageURL in
+    let imageOperation = webImageManager.loadImage(
+      with: url,
+      options: SDWebImageOptions(webImageOptions),
+      context: webImageContext,
+      progress: progressBlock
+    ) { image, data, error, webImageCacheType, _, imageURL in
       let key = self.webImageManager.cacheKey(for: url)
       if let image = image {
         let maxSize = CGFloat(FaviconMO.maxSize)
@@ -88,7 +92,7 @@ final class WebImageCache: ImageCacheProtocol {
   }
 
   func isCached(_ url: URL) -> Bool {
-    return webImageManager.cacheKey(for: url) != nil
+    webImageManager.cacheKey(for: url) != nil
   }
 
   func remove(fromCache url: URL) {
@@ -105,13 +109,11 @@ final class WebImageCache: ImageCacheProtocol {
       webImageManager.imageCache.clear(with: .disk)
     }
   }
-
 }
 
 extension WebImageCache {
-
   private var webImageOptions: [SDWebImageOptions] {
-    return [.retryFailed, .continueInBackground]
+    [.retryFailed, .continueInBackground]
   }
 
   private var webImageContext: [SDWebImageContextOption: Any] {
@@ -140,5 +142,4 @@ extension WebImageCache {
       return ImageCacheType.none
     }
   }
-
 }

@@ -9,7 +9,6 @@ protocol BookmarkDetailsViewDelegate: AnyObject {
 }
 
 class AddEditHeaderView: UIView {
-
   struct UX {
     static let defaultSpacing: CGFloat = 8
     static let faviconSize: CGFloat = 64

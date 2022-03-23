@@ -2,11 +2,12 @@
 
 import Foundation
 
-public extension JSONSerialization {
-
-  class func jsObject(withNative native: Any?, escaped: Bool = false) -> String? {
-
-    guard let native = native, let data = try? JSONSerialization.data(withJSONObject: native, options: JSONSerialization.WritingOptions(rawValue: 0)) else {
+extension JSONSerialization {
+  public class func jsObject(withNative native: Any?, escaped: Bool = false) -> String? {
+    guard let native = native, let data = try? JSONSerialization.data(
+      withJSONObject: native,
+      options: JSONSerialization.WritingOptions(rawValue: 0)
+    ) else {
       return nil
     }
 

@@ -13,7 +13,6 @@ import BraveCore
 private let log = Logger.browserLogger
 
 class LoginListViewController: LoginAuthViewController {
-
   // MARK: UX
 
   struct UX {
@@ -60,14 +59,18 @@ class LoginListViewController: LoginAuthViewController {
     // Adding the Password store observer in constructor to watch credentials changes
     passwordStoreListener = passwordAPI.add(
       PasswordStoreStateObserver { [weak self] _ in
-        guard let self = self, !self.isCredentialsBeingSearched else { return }
+        guard let self = self, !self.isCredentialsBeingSearched else {
+          return
+        }
 
         DispatchQueue.main.async {
           self.fetchLoginInfo()
         }
-      })
+      }
+    )
   }
 
+  @available(*, unavailable)
   required init?(coder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }
@@ -87,7 +90,12 @@ class LoginListViewController: LoginAuthViewController {
     // Insert Done button if being presented outside of the Settings Navigation stack
     if navigationController?.viewControllers.first === self {
       navigationItem.leftBarButtonItem =
-        UIBarButtonItem(title: Strings.settingsSearchDoneButton, style: .done, target: self, action: #selector(dismissAnimated))
+        UIBarButtonItem(
+          title: Strings.settingsSearchDoneButton,
+          style: .done,
+          target: self,
+          action: #selector(dismissAnimated)
+        )
     }
 
     navigationItem.do {
@@ -99,7 +107,8 @@ class LoginListViewController: LoginAuthViewController {
     definesPresentationContext = true
 
     tableView.tableFooterView = SettingsTableSectionHeaderFooterView(
-      frame: CGRect(width: tableView.bounds.width, height: UX.headerHeight))
+      frame: CGRect(width: tableView.bounds.width, height: UX.headerHeight)
+    )
   }
 
   override func viewWillAppear(_ animated: Bool) {
@@ -182,7 +191,6 @@ class LoginListViewController: LoginAuthViewController {
 // MARK: TableViewDataSource - TableViewDelegate
 
 extension LoginListViewController {
-
   override func numberOfSections(in tableView: UITableView) -> Int {
     tableView.backgroundView = credentialList.isEmpty ? emptyLoginView : nil
 
@@ -240,7 +248,8 @@ extension LoginListViewController {
 
         $0.setLines(
           loginInfo.displayURLString,
-          detailText: loginInfo.usernameValue)
+          detailText: loginInfo.usernameValue
+        )
         $0.imageView?.contentMode = .scaleAspectFit
         $0.imageView?.image = FaviconFetcher.defaultFaviconImage
         $0.imageView?.layer.borderColor = BraveUX.faviconBorderColor.cgColor
@@ -257,7 +266,8 @@ extension LoginListViewController {
             domain: domain,
             fallbackMonogramCharacter: signOnRealmURL.baseDomain?.first,
             shouldClearMonogramFavIcon: false,
-            cachedOnly: true)
+            cachedOnly: true
+          )
         } else {
           cell.imageView?.clearMonogramFavicon()
           cell.imageView?.image = FaviconFetcher.defaultFaviconImage
@@ -280,7 +290,8 @@ extension LoginListViewController {
       let loginDetailsViewController = LoginInfoViewController(
         passwordAPI: passwordAPI,
         credentials: credentials,
-        windowProtection: windowProtection)
+        windowProtection: windowProtection
+      )
       loginDetailsViewController.settingsDelegate = settingsDelegate
       navigationController?.pushViewController(loginDetailsViewController, animated: true)
 
@@ -298,7 +309,8 @@ extension LoginListViewController {
   }
 
   // Determine whether to show delete button in edit mode
-  override func tableView(_ tableView: UITableView, editingStyleForRowAt indexPath: IndexPath) -> UITableViewCell.EditingStyle {
+  override func tableView(_ tableView: UITableView, editingStyleForRowAt indexPath: IndexPath) -> UITableViewCell
+  .EditingStyle {
     guard indexPath.section == Section.savedLogins.rawValue else {
       return .none
     }
@@ -308,36 +320,47 @@ extension LoginListViewController {
 
   // Determine whether to indent while in edit mode for deletion
   override func tableView(_ tableView: UITableView, shouldIndentWhileEditingRowAt indexPath: IndexPath) -> Bool {
-    return indexPath.section == Section.savedLogins.rawValue
+    indexPath.section == Section.savedLogins.rawValue
   }
 
-  override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
+  override func tableView(
+    _ tableView: UITableView,
+    commit editingStyle: UITableViewCell.EditingStyle,
+    forRowAt indexPath: IndexPath
+  ) {
     if editingStyle == .delete {
-      guard let credential = credentialList[safe: indexPath.row] else { return }
+      guard let credential = credentialList[safe: indexPath.row] else {
+        return
+      }
 
       showDeleteLoginWarning(with: credential)
     }
   }
 
   override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
-    return indexPath.section == Section.savedLogins.rawValue
+    indexPath.section == Section.savedLogins.rawValue
   }
 
   private func showDeleteLoginWarning(with credential: PasswordForm) {
     let alert = UIAlertController(
       title: Strings.deleteLoginAlertTitle,
       message: Strings.Login.loginEntryDeleteAlertMessage,
-      preferredStyle: .alert)
+      preferredStyle: .alert
+    )
 
     alert.addAction(
       UIAlertAction(
         title: Strings.deleteLoginButtonTitle, style: .destructive,
         handler: { [weak self] _ in
-          guard let self = self else { return }
+          guard let self = self else {
+            return
+          }
 
           self.passwordAPI.removeLogin(credential)
           self.fetchLoginInfo()
-        }))
+        }
+      )
+    )
 
     alert.addAction(UIAlertAction(title: Strings.cancelButtonTitle, style: .cancel, handler: nil))
     present(alert, animated: true, completion: nil)
@@ -347,7 +370,6 @@ extension LoginListViewController {
 // MARK: - Actions
 
 extension LoginListViewController {
-
   @objc func didToggleSaveLogins(_ toggle: UISwitch) {
     Preferences.General.saveLogins.value = toggle.isOn
   }
@@ -360,9 +382,10 @@ extension LoginListViewController {
 // MARK: UISearchResultUpdating
 
 extension LoginListViewController: UISearchResultsUpdating {
-
   func updateSearchResults(for searchController: UISearchController) {
-    guard let query = searchController.searchBar.text else { return }
+    guard let query = searchController.searchBar.text else {
+      return
+    }
 
     if searchLoginTimer != nil {
       searchLoginTimer?.invalidate()
@@ -370,7 +393,13 @@ extension LoginListViewController: UISearchResultsUpdating {
     }
 
     searchLoginTimer =
-      Timer.scheduledTimer(timeInterval: 0.1, target: self, selector: #selector(fetchSearchResults(timer:)), userInfo: query, repeats: false)
+      Timer.scheduledTimer(
+        timeInterval: 0.1,
+        target: self,
+        selector: #selector(fetchSearchResults(timer:)),
+        userInfo: query,
+        repeats: false
+      )
   }
 
   @objc private func fetchSearchResults(timer: Timer) {
@@ -385,7 +414,6 @@ extension LoginListViewController: UISearchResultsUpdating {
 // MARK: UISearchControllerDelegate
 
 extension LoginListViewController: UISearchControllerDelegate {
-
   func willPresentSearchController(_ searchController: UISearchController) {
     isCredentialsBeingSearched = true
 

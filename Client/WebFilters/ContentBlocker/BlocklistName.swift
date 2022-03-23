@@ -10,7 +10,6 @@ import BraveShared
 private let log = Logger.browserLogger
 
 class BlocklistName: CustomStringConvertible, ContentBlocker {
-
   static let ad = BlocklistName(filename: "block-ads")
   static let tracker = BlocklistName(filename: "block-trackers")
   static let https = BlocklistName(filename: "upgrade-http")
@@ -36,7 +35,7 @@ class BlocklistName: CustomStringConvertible, ContentBlocker {
   }
 
   var description: String {
-    return "<\(type(of: self)): \(self.filename)>"
+    "<\(type(of: self)): \(self.filename)>"
   }
 
   private static let blocklistFileVersionMap: [BlocklistName: Preferences.Option<String?>] = [
@@ -45,15 +44,20 @@ class BlocklistName: CustomStringConvertible, ContentBlocker {
   ]
 
   lazy var fileVersionPref: Preferences.Option<String?>? = {
-    return BlocklistName.blocklistFileVersionMap[self]
+    BlocklistName.blocklistFileVersionMap[self]
   }()
 
   lazy var fileVersion: String? = {
-    guard let _ = BlocklistName.blocklistFileVersionMap[self] else { return nil }
+    guard let _ = BlocklistName.blocklistFileVersionMap[self] else {
+      return nil
+    }
     return Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String
   }()
 
-  static func blocklists(forDomain domain: Domain, locale: String? = Locale.current.languageCode) -> (on: Set<BlocklistName>, off: Set<BlocklistName>) {
+  static func blocklists(
+    forDomain domain: Domain,
+    locale: String? = Locale.current.languageCode
+  ) -> (on: Set<BlocklistName>, off: Set<BlocklistName>) {
     let regionalBlocker = ContentBlockerRegion.with(localeCode: locale)
 
     if domain.shield_allOff == 1 {
@@ -77,7 +81,7 @@ class BlocklistName: CustomStringConvertible, ContentBlocker {
 
     // For lists not implemented, always return exclude from `onList` to prevent accidental execution
 
-    // TODO #159: Setup image shield
+    // TODO: #159: Setup image shield
 
     var offList = allLists.subtracting(onList)
     // Make sure to consider the regional list since the user may disable it globally
@@ -104,7 +108,6 @@ class BlocklistName: CustomStringConvertible, ContentBlocker {
     data: Data?,
     ruleStore: WKContentRuleListStore = ContentBlockerHelper.ruleStore
   ) async {
-
     guard let data = data, let dataString = String(data: data, encoding: .utf8) else {
       log.error("Could not read data for content blocker compilation.")
       return
@@ -116,7 +119,7 @@ class BlocklistName: CustomStringConvertible, ContentBlocker {
       assert(rule != nil)
       self.rule = rule
     } catch {
-      // TODO #382: Potential telemetry location
+      // TODO: #382: Potential telemetry location
       log.error("Content blocker '\(self.filename)' errored: \(error.localizedDescription)")
     }
   }

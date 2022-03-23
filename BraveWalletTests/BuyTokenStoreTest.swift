@@ -4,7 +4,6 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import Foundation
-
 import XCTest
 import Combine
 import BraveCore
@@ -24,7 +23,9 @@ class BuyTokenStoreTests: XCTestCase {
       rpcService: MockJsonRpcService(),
       prefilledToken: .previewToken
     )
-    XCTAssertEqual(store.selectedBuyToken?.symbol.lowercased(), BraveWallet.BlockchainToken.previewToken.symbol.lowercased())
+    XCTAssertEqual(
+      store.selectedBuyToken?.symbol.lowercased(),
+      BraveWallet.BlockchainToken.previewToken.symbol.lowercased()
+    )
   }
-
 }

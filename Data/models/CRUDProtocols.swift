@@ -19,14 +19,23 @@ protocol Deletable where Self: NSManagedObject {
 
 protocol Readable where Self: NSManagedObject {
   static func count(predicate: NSPredicate?, context: NSManagedObjectContext) -> Int?
-  static func first(where predicate: NSPredicate?, sortDescriptors: [NSSortDescriptor]?, context: NSManagedObjectContext) -> Self?
-  static func all(where predicate: NSPredicate?, sortDescriptors: [NSSortDescriptor]?, fetchLimit: Int, fetchBatchSize: Int, context: NSManagedObjectContext) -> [Self]?
+  static func first(
+    where predicate: NSPredicate?,
+    sortDescriptors: [NSSortDescriptor]?,
+    context: NSManagedObjectContext
+  ) -> Self?
+  static func all(
+    where predicate: NSPredicate?,
+    sortDescriptors: [NSSortDescriptor]?,
+    fetchLimit: Int,
+    fetchBatchSize: Int,
+    context: NSManagedObjectContext
+  ) -> [Self]?
 }
 
 // MARK: - Implementations
 extension Deletable {
   func delete(context: WriteContext = .new(inMemory: false)) {
-
     DataController.perform(context: context) { context in
       let objectOnContext = context.object(with: self.objectID)
       context.delete(objectOnContext)
@@ -38,9 +47,10 @@ extension Deletable {
     context: WriteContext = .new(inMemory: false),
     includesPropertyValues: Bool = true
   ) {
-
     DataController.perform(context: context) { context in
-      guard let request = getFetchRequest() as? NSFetchRequest<NSFetchRequestResult> else { return }
+      guard let request = getFetchRequest() as? NSFetchRequest<NSFetchRequestResult> else {
+        return
+      }
       request.predicate = predicate
       request.includesPropertyValues = includesPropertyValues
 
@@ -49,7 +59,7 @@ extension Deletable {
         // Have to delete objects one by one.
         var isInMemoryContext: Bool = false
         if let currentCoordinator = context.persistentStoreCoordinator,
-          let inMemoryCoordinator = DataController.viewContextInMemory.persistentStoreCoordinator {
+           let inMemoryCoordinator = DataController.viewContextInMemory.persistentStoreCoordinator {
           isInMemoryContext = currentCoordinator == inMemoryCoordinator
         }
         if AppConstants.isRunningTest || isInMemoryContext {
@@ -65,11 +75,18 @@ extension Deletable {
           // Batch delete writes directly to the persistent store.
           // Therefore contexts and in-memory objects must be updated manually.
 
-          guard let batchDeleteResult = try context.persistentStoreCoordinator?.execute(deleteRequest, with: context) as? NSBatchDeleteResult else { return }
+          guard let batchDeleteResult = try context.persistentStoreCoordinator?.execute(
+            deleteRequest,
+            with: context
+          ) as? NSBatchDeleteResult else {
+            return
+          }
 
           guard batchDeleteResult.resultType == .resultTypeObjectIDs,
-            let objectIDArray = batchDeleteResult.result as? [NSManagedObjectID]
-          else { return }
+                let objectIDArray = batchDeleteResult.result as? [NSManagedObjectID]
+          else {
+            return
+          }
 
           let changes = [NSDeletedObjectsKey: objectIDArray]
 
@@ -108,7 +125,7 @@ extension Readable {
     where predicate: NSPredicate? = nil, sortDescriptors: [NSSortDescriptor]? = nil,
     context: NSManagedObjectContext = DataController.viewContext
   ) -> Self? {
-    return all(where: predicate, sortDescriptors: sortDescriptors, fetchLimit: 1, context: context)?.first
+    all(where: predicate, sortDescriptors: sortDescriptors, fetchLimit: 1, context: context)?.first
   }
 
   static func all(
@@ -154,4 +171,5 @@ extension Fetchable {
     return NSFetchRequest<Self>(entityName: selfName)
   }
 }
+
 extension NSManagedObject: Fetchable {}

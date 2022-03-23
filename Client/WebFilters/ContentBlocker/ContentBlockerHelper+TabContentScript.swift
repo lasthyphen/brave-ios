@@ -11,11 +11,11 @@ private let log = Logger.braveCoreLogger
 
 extension ContentBlockerHelper: TabContentScript {
   class func name() -> String {
-    return "TrackingProtectionStats"
+    "TrackingProtectionStats"
   }
 
   func scriptMessageHandlerName() -> String? {
-    return "trackingProtectionStats"
+    "trackingProtectionStats"
   }
 
   func clearPageStats() {
@@ -23,7 +23,11 @@ extension ContentBlockerHelper: TabContentScript {
     blockedRequests.removeAll()
   }
 
-  func userContentController(_ userContentController: WKUserContentController, didReceiveScriptMessage message: WKScriptMessage, replyHandler: (Any?, String?) -> Void) {
+  func userContentController(
+    _ userContentController: WKUserContentController,
+    didReceiveScriptMessage message: WKScriptMessage,
+    replyHandler: (Any?, String?) -> Void
+  ) {
     defer { replyHandler(nil, nil) }
     guard let body = message.body as? [String: AnyObject] else {
       return
@@ -35,9 +39,9 @@ extension ContentBlockerHelper: TabContentScript {
     }
 
     guard isEnabled,
-      let data = body["data"] as? [String: String],
-      let urlString = data["url"],
-      let mainDocumentUrl = tab?.webView?.url
+          let data = body["data"] as? [String: String],
+          let urlString = data["url"],
+          let mainDocumentUrl = tab?.webView?.url
     else {
       return
     }
@@ -48,7 +52,9 @@ extension ContentBlockerHelper: TabContentScript {
       return
     }
 
-    guard let url = URL(string: urlString) else { return }
+    guard let url = URL(string: urlString) else {
+      return
+    }
 
     let resourceType = TPStatsResourceType(rawValue: data["resourceType"] ?? "")
 

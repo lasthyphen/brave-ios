@@ -8,7 +8,6 @@ import BraveShared
 import BraveCore
 
 class NTPNotificationViewController: TranslucentBottomSheet {
-
   private let state: BrandedImageCalloutState
 
   var learnMoreHandler: (() -> Void)?
@@ -20,7 +19,9 @@ class NTPNotificationViewController: TranslucentBottomSheet {
     self.rewards = rewards
     super.init()
 
-    if state == .dontShow { return nil }
+    if state == .dontShow {
+      return nil
+    }
   }
 
   private var mainView: UIStackView?
@@ -56,7 +57,9 @@ class NTPNotificationViewController: TranslucentBottomSheet {
   }
 
   private func updateMainViewConstraints() {
-    guard let mainView = mainView else { return }
+    guard let mainView = mainView else {
+      return
+    }
 
     mainView.snp.remakeConstraints {
       $0.leading.trailing.bottom.top.equalTo(view.safeAreaLayoutGuide).inset(16)

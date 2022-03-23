@@ -27,7 +27,8 @@ public class WebcompatReporter {
   public static func reportIssue(on url: URL) -> Deferred<Bool> {
     let deferred = Deferred<Bool>(value: nil, defaultQueue: .main)
     let baseURL = AppConstants.buildChannel == .debug ? BaseURL.staging : BaseURL.prod
-    let apiKey = (Bundle.main.infoDictionary?[apiKeyPlistKey] as? String)?.trimmingCharacters(in: .whitespacesAndNewlines)
+    let apiKey = (Bundle.main.infoDictionary?[apiKeyPlistKey] as? String)?
+      .trimmingCharacters(in: .whitespacesAndNewlines)
 
     var components = URLComponents()
     components.scheme = "https"
@@ -35,8 +36,8 @@ public class WebcompatReporter {
     components.path = "/\(version)/webcompat"
 
     guard let baseDomain = url.baseDomain,
-      let key = apiKey,
-      let endpoint = components.url
+          let key = apiKey,
+          let endpoint = components.url
     else {
       log.error("Failed to setup webcompat request")
       deferred.fill(false)

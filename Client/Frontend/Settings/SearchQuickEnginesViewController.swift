@@ -11,13 +11,13 @@ private let log = Logger.browserLogger
 // MARK: - SearchQuickEnginesViewController
 
 class SearchQuickEnginesViewController: UITableViewController {
-
   // MARK: UX
 
   struct UX {
     static let iconSize = CGSize(
       width: OpenSearchEngine.preferredIconSize,
-      height: OpenSearchEngine.preferredIconSize)
+      height: OpenSearchEngine.preferredIconSize
+    )
 
     static let headerHeight: CGFloat = 44
   }
@@ -39,6 +39,7 @@ class SearchQuickEnginesViewController: UITableViewController {
     super.init(nibName: nil, bundle: nil)
   }
 
+  @available(*, unavailable)
   required init?(coder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }
@@ -59,7 +60,8 @@ class SearchQuickEnginesViewController: UITableViewController {
       #endif
     }
 
-    let footer = SettingsTableSectionHeaderFooterView(frame: CGRect(width: tableView.bounds.width, height: UX.headerHeight))
+    let footer =
+      SettingsTableSectionHeaderFooterView(frame: CGRect(width: tableView.bounds.width, height: UX.headerHeight))
     tableView.tableFooterView = footer
   }
 
@@ -72,7 +74,7 @@ class SearchQuickEnginesViewController: UITableViewController {
   // MARK: TableViewDataSource - TableViewDelegate
 
   override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-    return searchEngines.orderedEngines.count - 1
+    searchEngines.orderedEngines.count - 1
   }
 
   override func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
@@ -97,7 +99,10 @@ class SearchQuickEnginesViewController: UITableViewController {
       }
     }
 
-    let searchEngineCell = tableView.dequeueReusableCell(withIdentifier: Constants.quickSearchEngineRowIdentifier, for: indexPath).then {
+    let searchEngineCell = tableView.dequeueReusableCell(
+      withIdentifier: Constants.quickSearchEngineRowIdentifier,
+      for: indexPath
+    ).then {
       $0.showsReorderControl = true
       $0.editingAccessoryView = toggle
       $0.selectionStyle = .none
@@ -115,11 +120,11 @@ class SearchQuickEnginesViewController: UITableViewController {
   }
 
   override func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-    return UX.headerHeight
+    UX.headerHeight
   }
 
   override func tableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool {
-    return true
+    true
   }
 
   override func tableView(_ tableView: UITableView, moveRowAt indexPath: IndexPath, to newIndexPath: IndexPath) {
@@ -132,19 +137,19 @@ class SearchQuickEnginesViewController: UITableViewController {
     tableView.reloadData()
   }
 
-  override func tableView(_ tableView: UITableView, editingStyleForRowAt indexPath: IndexPath) -> UITableViewCell.EditingStyle {
-    return .none
+  override func tableView(_ tableView: UITableView, editingStyleForRowAt indexPath: IndexPath) -> UITableViewCell
+  .EditingStyle {
+    .none
   }
 
   override func tableView(_ tableView: UITableView, shouldIndentWhileEditingRowAt indexPath: IndexPath) -> Bool {
-    return false
+    false
   }
 }
 
 // MARK: - Actions
 
 extension SearchQuickEnginesViewController {
-
   @objc func didToggleEngine(_ toggle: UISwitch) {
     let engine = searchEngines.orderedEngines[toggle.tag]
 

@@ -6,8 +6,8 @@ import Foundation
 
 extension UIView {
   /**
-     * Takes a screenshot of the view with the given size.
-     */
+   * Takes a screenshot of the view with the given size.
+   */
   func screenshot(_ size: CGSize, offset: CGPoint? = nil, quality: CGFloat = 1) -> UIImage? {
     assert(0...1 ~= quality)
 
@@ -22,9 +22,9 @@ extension UIView {
   }
 
   /**
-     * Takes a screenshot of the view with the given aspect ratio.
-     * An aspect ratio of 0 means capture the entire view.
-     */
+   * Takes a screenshot of the view with the given aspect ratio.
+   * An aspect ratio of 0 means capture the entire view.
+   */
   func screenshot(_ aspectRatio: CGFloat = 0, offset: CGPoint? = nil, quality: CGFloat = 1) -> UIImage? {
     assert(aspectRatio >= 0)
 
@@ -54,8 +54,8 @@ extension UIView {
   }
 
   /**
-     * rounds the requested corners of a view with the provided radius
-     */
+   * rounds the requested corners of a view with the provided radius
+   */
   func addRoundedCorners(_ cornersToRound: UIRectCorner, cornerRadius: CGSize, color: UIColor) {
     let rect = bounds
     let maskPath = UIBezierPath(roundedRect: rect, byRoundingCorners: cornersToRound, cornerRadii: cornerRadius)
@@ -75,8 +75,8 @@ extension UIView {
   }
 
   /**
-     This allows us to find the view in a current view hierarchy that is currently the first responder
-     */
+   This allows us to find the view in a current view hierarchy that is currently the first responder
+   */
   static func findSubViewWithFirstResponder(_ view: UIView) -> UIView? {
     let subviews = view.subviews
 
@@ -88,7 +88,9 @@ extension UIView {
       return firstResponderSubview
     }
 
-    guard let firstSubview = subviews.first(where: { !($0 is UIRefreshControl) }) else { return nil }
+    guard let firstSubview = subviews.first(where: { !($0 is UIRefreshControl) }) else {
+      return nil
+    }
 
     return findSubViewWithFirstResponder(firstSubview)
   }

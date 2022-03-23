@@ -22,7 +22,12 @@ struct AddAccountView: View {
   private func addAccount() {
     if privateKey.isEmpty {
       // Add normal account
-      let accountName = name.isEmpty ? String.localizedStringWithFormat(Strings.Wallet.defaultAccountName, keyringStore.keyring.accountInfos.filter(\.isPrimary).count + 1) : name
+      let accountName = name.isEmpty
+        ? String.localizedStringWithFormat(
+          Strings.Wallet.defaultAccountName,
+          keyringStore.keyring.accountInfos.filter(\.isPrimary).count + 1
+        )
+        : name
       keyringStore.addPrimaryAccount(accountName) { success in
         if success {
           presentationMode.dismiss()
@@ -36,7 +41,12 @@ struct AddAccountView: View {
           failedToImport = true
         }
       }
-      let accountName = name.isEmpty ? String.localizedStringWithFormat(Strings.Wallet.defaultSecondaryAccountName, keyringStore.keyring.accountInfos.filter(\.isImported).count + 1) : name
+      let accountName = name.isEmpty
+        ? String.localizedStringWithFormat(
+          Strings.Wallet.defaultSecondaryAccountName,
+          keyringStore.keyring.accountInfos.filter(\.isImported).count + 1
+        )
+        : name
       if isJSONImported {
         keyringStore.addSecondaryAccount(accountName, json: privateKey, password: originPassword, completion: handler)
       } else {
@@ -68,7 +78,9 @@ struct AddAccountView: View {
     .listStyle(InsetGroupedListStyle())
     .sheet(isPresented: $isPresentingImport) {
       DocumentOpenerView(allowedContentTypes: [.text, .json]) { urls in
-        guard let fileURL = urls.first else { return }
+        guard let fileURL = urls.first else {
+          return
+        }
         self.isLoadingFile = true
         DispatchQueue.global(qos: .userInitiated).async {
           do {
@@ -120,14 +132,14 @@ struct AddAccountView: View {
           .font(.subheadline.weight(.semibold))
           .foregroundColor(Color(.bravePrimary))
       )
-      .osAvailabilityModifiers { content in
-        if #available(iOS 15.0, *) {
-          content  // Padding already applied
-        } else {
-          content
-            .padding(.top)
+        .osAvailabilityModifiers { content in
+          if #available(iOS 15.0, *) {
+            content // Padding already applied
+          } else {
+            content
+              .padding(.top)
+          }
         }
-      }
     ) {
       TextField(Strings.Wallet.accountDetailsNamePlaceholder, text: $name)
         .listRowBackground(Color(.secondaryBraveGroupedBackground))
@@ -162,7 +174,7 @@ struct AddAccountView: View {
         .background(
           Text(Strings.Wallet.importAccountPlaceholder)
             .padding(.vertical, 8)
-            .padding(.horizontal, 4)  // To match the TextEditor's editing insets
+            .padding(.horizontal, 4) // To match the TextEditor's editing insets
             .frame(maxWidth: .infinity, alignment: .leading)
             .foregroundColor(Color(.placeholderText))
             .opacity(privateKey.isEmpty ? 1 : 0)

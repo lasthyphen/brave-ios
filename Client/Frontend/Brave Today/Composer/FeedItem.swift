@@ -16,7 +16,6 @@ struct FeedItem: Equatable, Comparable {
 }
 
 extension FeedItem {
-
   struct Source: Equatable, Decodable {
     var id: String
     var isDefault: Bool
@@ -41,9 +40,11 @@ extension FeedItem {
     init(rawValue: String) {
       self.rawValue = rawValue
     }
+
     init(from decoder: Decoder) throws {
       rawValue = try decoder.singleValueContainer().decode(String.self)
     }
+
     static let article = FeedContentType(rawValue: "article")
     static let deals = FeedContentType(rawValue: "product")
     static let sponsor = FeedContentType(rawValue: "brave_offers")

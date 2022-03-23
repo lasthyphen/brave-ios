@@ -11,6 +11,7 @@ extension BraveWallet.AccountInfo: Identifiable {
   public var id: String {
     address
   }
+
   public var isPrimary: Bool {
     !isImported
   }
@@ -24,72 +25,77 @@ extension BraveWallet.TransactionInfo {
   var isSwap: Bool {
     ethTxToAddress.caseInsensitiveCompare(NamedAddresses.swapExchangeProxyAddress) == .orderedSame
   }
+
   var isEIP1559Transaction: Bool {
-    guard let ethTxData1559 = txDataUnion.ethTxData1559 else { return false }
+    guard let ethTxData1559 = txDataUnion.ethTxData1559 else {
+      return false
+    }
     return !ethTxData1559.maxPriorityFeePerGas.isEmpty && !ethTxData1559.maxFeePerGas.isEmpty
   }
+
   var ethTxToAddress: String {
     // Eth transaction are all coming as `ethTxData1559`
     // Comment below out for future proper eth transaction separation (EIP1559 and non-EIP1559)
-    /*if isEIP1559Transaction {
-      return txDataUnion.ethTxData1559?.baseData.to ?? ""
-    } else {
-      return txDataUnion.ethTxData?.to ?? ""
-    }*/
+    /* if isEIP1559Transaction {
+       return txDataUnion.ethTxData1559?.baseData.to ?? ""
+     } else {
+       return txDataUnion.ethTxData?.to ?? ""
+     } */
     txDataUnion.ethTxData1559?.baseData.to ?? ""
   }
+
   var ethTxValue: String {
     // Eth transaction are all coming as `ethTxData1559`
     // Comment below out for future proper eth transaction separation (EIP1559 and non-EIP1559)
-    /*if isEIP1559Transaction {
-      return txDataUnion.ethTxData1559?.baseData.value ?? ""
-    } else {
-      return txDataUnion.ethTxData?.value ?? ""
-    }*/
+    /* if isEIP1559Transaction {
+       return txDataUnion.ethTxData1559?.baseData.value ?? ""
+     } else {
+       return txDataUnion.ethTxData?.value ?? ""
+     } */
     txDataUnion.ethTxData1559?.baseData.value ?? ""
   }
 
   var ethTxGasLimit: String {
     // Eth transaction are all coming as `ethTxData1559`
     // Comment below out for future proper eth transaction separation (EIP1559 and non-EIP1559)
-    /*if isEIP1559Transaction {
-      return txDataUnion.ethTxData1559?.baseData.gasLimit ?? ""
-    } else {
-      return txDataUnion.ethTxData?.gasLimit ?? ""
-    }*/
+    /* if isEIP1559Transaction {
+       return txDataUnion.ethTxData1559?.baseData.gasLimit ?? ""
+     } else {
+       return txDataUnion.ethTxData?.gasLimit ?? ""
+     } */
     txDataUnion.ethTxData1559?.baseData.gasLimit ?? ""
   }
 
   var ethTxGasPrice: String {
     // Eth transaction are all coming as `ethTxData1559`
     // Comment below out for future proper eth transaction separation (EIP1559 and non-EIP1559)
-    /*if isEIP1559Transaction {
-      return txDataUnion.ethTxData1559?.baseData.gasPrice ?? ""
-    } else {
-      return txDataUnion.ethTxData?.gasPrice ?? ""
-    }*/
+    /* if isEIP1559Transaction {
+       return txDataUnion.ethTxData1559?.baseData.gasPrice ?? ""
+     } else {
+       return txDataUnion.ethTxData?.gasPrice ?? ""
+     } */
     txDataUnion.ethTxData1559?.baseData.gasPrice ?? ""
   }
 
   var ethTxData: [NSNumber] {
     // Eth transaction are all coming as `ethTxData1559`
     // Comment below out for future proper eth transaction separation (EIP1559 and non-EIP1559)
-    /*if isEIP1559Transaction {
-      return txDataUnion.ethTxData1559?.baseData.data ?? .init()
-    } else {
-      return txDataUnion.ethTxData?.data ?? .init()
-    }*/
+    /* if isEIP1559Transaction {
+       return txDataUnion.ethTxData1559?.baseData.data ?? .init()
+     } else {
+       return txDataUnion.ethTxData?.data ?? .init()
+     } */
     txDataUnion.ethTxData1559?.baseData.data ?? .init()
   }
 
   var ethTxNonce: String {
     // Eth transaction are all coming as `ethTxData1559`
     // Comment below out for future proper eth transaction separation (EIP1559 and non-EIP1559)
-    /*if isEIP1559Transaction {
-      return txDataUnion.ethTxData1559?.baseData.nonce ?? .init()
-    } else {
-      return txDataUnion.ethTxData?.nonce ?? .init()
-    }*/
+    /* if isEIP1559Transaction {
+       return txDataUnion.ethTxData1559?.baseData.nonce ?? .init()
+     } else {
+       return txDataUnion.ethTxData?.nonce ?? .init()
+     } */
     txDataUnion.ethTxData1559?.baseData.nonce ?? ""
   }
 }
@@ -136,7 +142,7 @@ extension BraveWallet.BlockchainToken: Identifiable {
     // ETH special swap address
     // Only checking token.symbol with selected network.symbol is sufficient
     // since there is no swap support for custom networks.
-    return symbol == network.symbol ? BraveWallet.ethSwapAddress : contractAddress
+    symbol == network.symbol ? BraveWallet.ethSwapAddress : contractAddress
   }
 }
 

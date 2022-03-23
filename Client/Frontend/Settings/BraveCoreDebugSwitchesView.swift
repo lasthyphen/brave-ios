@@ -151,7 +151,8 @@ struct BraveCoreDebugSwitchesView: View {
     private var binding: Binding<Bool> {
       .init(
         get: {
-          activeSwitches.value.contains(coreSwitch.rawValue) && !switchValues.value[coreSwitch.rawValue, default: ""].isEmpty
+          activeSwitches.value.contains(coreSwitch.rawValue) && !switchValues.value[coreSwitch.rawValue, default: ""]
+            .isEmpty
         },
         set: { isOn in
           if isOn {
@@ -218,7 +219,10 @@ struct BraveCoreDebugSwitchesView: View {
           SwitchContainer(.componentUpdater)
         }
         NavigationLink {
-          BasicStringInputView(coreSwitch: .vModule, hint: "Should match the format:\n\n{folder-expression}={level}\n\nDefaults to */brave/*=5")
+          BasicStringInputView(
+            coreSwitch: .vModule,
+            hint: "Should match the format:\n\n{folder-expression}={level}\n\nDefaults to */brave/*=5"
+          )
         } label: {
           SwitchContainer(.vModule)
         }

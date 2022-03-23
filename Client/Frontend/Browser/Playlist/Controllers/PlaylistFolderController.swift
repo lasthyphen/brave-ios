@@ -32,6 +32,7 @@ class PlaylistFolderController: UIViewController {
     title = Strings.PlayList.playListSectionTitle
   }
 
+  @available(*, unavailable)
   required init?(coder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }
@@ -49,10 +50,19 @@ class PlaylistFolderController: UIViewController {
 
     toolbarItems = [
       UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil),
-      UIBarButtonItem(title: Strings.PlaylistFolders.playlistNewFolderButtonTitle, style: .plain, target: self, action: #selector(onNewFolder(_:))),
+      UIBarButtonItem(
+        title: Strings.PlaylistFolders.playlistNewFolderButtonTitle,
+        style: .plain,
+        target: self,
+        action: #selector(onNewFolder(_:))
+      ),
     ]
 
-    navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(onDonePressed(_:)))
+    navigationItem.rightBarButtonItem = UIBarButtonItem(
+      barButtonSystemItem: .done,
+      target: self,
+      action: #selector(onDonePressed(_:))
+    )
 
     view.addSubview(tableView)
     tableView.snp.makeConstraints {
@@ -100,7 +110,7 @@ class PlaylistFolderController: UIViewController {
 
 extension PlaylistFolderController: UITableViewDataSource {
   func numberOfSections(in tableView: UITableView) -> Int {
-    return Section.allCases.count
+    Section.allCases.count
   }
 
   func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -123,7 +133,6 @@ extension PlaylistFolderController: UITableViewDataSource {
   }
 
   func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
-
     guard let section = Section(rawValue: indexPath.section) else {
       return
     }
@@ -136,7 +145,9 @@ extension PlaylistFolderController: UITableViewDataSource {
 
       cell.imageView?.image = folderIcon
       cell.textLabel?.text = Strings.PlaylistFolders.playlistSavedFolderTitle
-      cell.detailTextLabel?.text = "\(itemCount == 1 ? Strings.PlaylistFolders.playlistFolderSubtitleItemSingleCount : String.localizedStringWithFormat(Strings.PlaylistFolders.playlistFolderSubtitleItemCount, itemCount))"
+      cell.detailTextLabel?.text = "\(itemCount == 1
+        ? Strings.PlaylistFolders.playlistFolderSubtitleItemSingleCount
+        : String.localizedStringWithFormat(Strings.PlaylistFolders.playlistFolderSubtitleItemCount, itemCount))"
       cell.detailTextLabel?.textColor = .secondaryBraveLabel
       cell.accessoryType = .disclosureIndicator
       cell.selectionStyle = .none
@@ -149,7 +160,9 @@ extension PlaylistFolderController: UITableViewDataSource {
 
       cell.imageView?.image = folderIcon
       cell.textLabel?.text = folder.title
-      cell.detailTextLabel?.text = "\(itemCount == 1 ? Strings.PlaylistFolders.playlistFolderSubtitleItemSingleCount : String.localizedStringWithFormat(Strings.PlaylistFolders.playlistFolderSubtitleItemCount, itemCount))"
+      cell.detailTextLabel?.text = "\(itemCount == 1
+        ? Strings.PlaylistFolders.playlistFolderSubtitleItemSingleCount
+        : String.localizedStringWithFormat(Strings.PlaylistFolders.playlistFolderSubtitleItemCount, itemCount))"
       cell.detailTextLabel?.textColor = .secondaryBraveLabel
       cell.accessoryType = .disclosureIndicator
       cell.selectionStyle = .none
@@ -158,7 +171,6 @@ extension PlaylistFolderController: UITableViewDataSource {
 }
 
 extension PlaylistFolderController: UITableViewDelegate {
-
   private func deleteFolder(folder: PlaylistFolder) {
     PlaylistManager.shared.delete(folder: folder)
 
@@ -185,21 +197,29 @@ extension PlaylistFolderController: UITableViewDelegate {
     }
 
     editView.onEditFolder = { [weak self] folderTitle in
-      guard let self = self else { return }
+      guard let self = self else {
+        return
+      }
       PlaylistFolder.updateFolder(folderID: folderID) { result in
         switch result {
         case .failure(let error):
           log.error("Error Saving Folder Title: \(error)")
 
           DispatchQueue.main.async {
-            let alert = UIAlertController(title: Strings.genericErrorTitle, message: Strings.PlaylistFolders.playlistFolderErrorSavingMessage, preferredStyle: .alert)
+            let alert = UIAlertController(
+              title: Strings.genericErrorTitle,
+              message: Strings.PlaylistFolders.playlistFolderErrorSavingMessage,
+              preferredStyle: .alert
+            )
 
             alert.addAction(
               UIAlertAction(
                 title: Strings.OBErrorOkay, style: .default,
                 handler: { _ in
                   self.presentedViewController?.dismiss(animated: true, completion: nil)
-                }))
+                }
+              )
+            )
             self.present(alert, animated: true, completion: nil)
           }
 
@@ -213,7 +233,10 @@ extension PlaylistFolderController: UITableViewDelegate {
       }
     }
 
-    let hostingController = UIHostingController(rootView: editView.environment(\.managedObjectContext, DataController.swiftUIContext)).then {
+    let hostingController = UIHostingController(
+      rootView: editView
+        .environment(\.managedObjectContext, DataController.swiftUIContext)
+    ).then {
       $0.modalPresentationStyle = .formSheet
     }
 
@@ -228,7 +251,9 @@ extension PlaylistFolderController: UITableViewDelegate {
     }
 
     playlistFolder.onCreateFolder = { [weak self] folderTitle, selectedItems in
-      guard let self = self else { return }
+      guard let self = self else {
+        return
+      }
       self.presentedViewController?.dismiss(animated: true, completion: nil)
 
       let folderTitle = folderTitle.isEmpty ? Strings.PlaylistFolders.playlistUntitledFolderTitle : folderTitle
@@ -248,7 +273,10 @@ extension PlaylistFolderController: UITableViewDelegate {
       }
     }
 
-    let hostingController = UIHostingController(rootView: playlistFolder.environment(\.managedObjectContext, DataController.swiftUIContext)).then {
+    let hostingController = UIHostingController(
+      rootView: playlistFolder
+        .environment(\.managedObjectContext, DataController.swiftUIContext)
+    ).then {
       $0.modalPresentationStyle = .formSheet
       $0.modalTransitionStyle = UIDevice.isIpad ? .crossDissolve : .coverVertical
     }
@@ -273,8 +301,10 @@ extension PlaylistFolderController: UITableViewDelegate {
     }
   }
 
-  func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
-
+  func tableView(
+    _ tableView: UITableView,
+    trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath
+  ) -> UISwipeActionsConfiguration? {
     guard let section = Section(rawValue: indexPath.section) else {
       return nil
     }
@@ -285,8 +315,10 @@ extension PlaylistFolderController: UITableViewDelegate {
 
     let editAction = UIContextualAction(
       style: .normal, title: nil,
-      handler: { [weak self] (action, view, completionHandler) in
-        guard let self = self else { return }
+      handler: { [weak self] action, view, completionHandler in
+        guard let self = self else {
+          return
+        }
 
         switch section {
         case .savedItems:
@@ -294,7 +326,7 @@ extension PlaylistFolderController: UITableViewDelegate {
 
         case .folders:
           guard let folder = self.othersFRC.fetchedObjects?[safe: indexPath.row],
-            let folderUUID = folder.uuid
+                let folderUUID = folder.uuid
           else {
             completionHandler(false)
             return
@@ -303,12 +335,15 @@ extension PlaylistFolderController: UITableViewDelegate {
         }
 
         completionHandler(true)
-      })
+      }
+    )
 
     let deleteAction = UIContextualAction(
       style: .normal, title: nil,
-      handler: { [weak self] (action, view, completionHandler) in
-        guard let self = self else { return }
+      handler: { [weak self] action, view, completionHandler in
+        guard let self = self else {
+          return
+        }
 
         switch section {
         case .savedItems:
@@ -323,7 +358,8 @@ extension PlaylistFolderController: UITableViewDelegate {
         }
 
         completionHandler(true)
-      })
+      }
+    )
 
     editAction.image = UIImage(systemName: "pencil")
     editAction.backgroundColor = .braveBlurple
@@ -334,22 +370,25 @@ extension PlaylistFolderController: UITableViewDelegate {
     return UISwipeActionsConfiguration(actions: [deleteAction, editAction])
   }
 
-  func tableView(_ tableView: UITableView, contextMenuConfigurationForRowAt indexPath: IndexPath, point: CGPoint) -> UIContextMenuConfiguration? {
-
+  func tableView(
+    _ tableView: UITableView,
+    contextMenuConfigurationForRowAt indexPath: IndexPath,
+    point: CGPoint
+  ) -> UIContextMenuConfiguration? {
     guard let section = Section(rawValue: indexPath.section),
-      section == .folders
+          section == .folders
     else {
       return nil
     }
 
     guard let folder = othersFRC.fetchedObjects?[safe: indexPath.row],
-      let folderUUID = folder.uuid
+          let folderUUID = folder.uuid
     else {
       return nil
     }
 
     let actionProvider: UIContextMenuActionProvider = { [weak self] _ in
-      return UIMenu(children: [
+      UIMenu(children: [
         UIAction(
           title: Strings.PlaylistFolders.playlistFolderEditMenuTitle, image: UIImage(systemName: "pencil"),
           handler: { _ in
@@ -358,16 +397,20 @@ extension PlaylistFolderController: UITableViewDelegate {
             }
 
             self.onEditFolder(folderUUID: folderUUID)
-          }),
-
+          }
+        ),
+        
         UIAction(
           title: Strings.delete, image: UIImage(systemName: "trash"), attributes: .destructive,
           handler: { _ in
-            guard let self = self else { return }
+            guard let self = self else {
+              return
+            }
             self.othersFRC.fetchedObjects?.first(where: { $0.uuid == folderUUID })?.do {
               self.deleteFolder(folder: $0)
             }
-          }),
+          }
+        ),
       ])
     }
 
@@ -378,21 +421,24 @@ extension PlaylistFolderController: UITableViewDelegate {
     return UIContextMenuConfiguration(identifier: identifier, previewProvider: nil, actionProvider: actionProvider)
   }
 
-  func tableView(_ tableView: UITableView, previewForHighlightingContextMenuWithConfiguration configuration: UIContextMenuConfiguration) -> UITargetedPreview? {
+  func tableView(
+    _ tableView: UITableView,
+    previewForHighlightingContextMenuWithConfiguration configuration: UIContextMenuConfiguration
+  ) -> UITargetedPreview? {
     guard let identifier = configuration.identifier as? NSDictionary else {
       return nil
     }
 
     guard let folderUUID = identifier["folderUUID"] as? String,
-      let row = identifier["row"] as? Int,
-      row < othersFRC.fetchedObjects?.count ?? -1
+          let row = identifier["row"] as? Int,
+          row < othersFRC.fetchedObjects?.count ?? -1
     else {
       return nil
     }
 
     guard let folder = othersFRC.fetchedObjects?[safe: row],
-      folderUUID == folder.uuid,
-      let cell = tableView.cellForRow(at: IndexPath(row: row, section: Section.folders.rawValue))
+          folderUUID == folder.uuid,
+          let cell = tableView.cellForRow(at: IndexPath(row: row, section: Section.folders.rawValue))
     else {
       return nil
     }
@@ -401,21 +447,32 @@ extension PlaylistFolderController: UITableViewDelegate {
     parameters.visiblePath = UIBezierPath(
       roundedRect: cell.contentView.frame.with {
         $0.size.width = cell.bounds.width
-      }, cornerRadius: 12.0)
+      }, cornerRadius: 12.0
+    )
     parameters.backgroundColor = .tertiaryBraveBackground
 
     return UITargetedPreview(view: cell, parameters: parameters)
   }
 
-  func tableView(_ tableView: UITableView, previewForDismissingContextMenuWithConfiguration configuration: UIContextMenuConfiguration) -> UITargetedPreview? {
+  func tableView(
+    _ tableView: UITableView,
+    previewForDismissingContextMenuWithConfiguration configuration: UIContextMenuConfiguration
+  ) -> UITargetedPreview? {
     self.tableView(tableView, previewForHighlightingContextMenuWithConfiguration: configuration)
   }
 }
 
 extension PlaylistFolderController: NSFetchedResultsControllerDelegate {
-  func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
-
-    if parent != nil, tableView.hasActiveDrag || tableView.hasActiveDrop { return }
+  func controller(
+    _ controller: NSFetchedResultsController<NSFetchRequestResult>,
+    didChange anObject: Any,
+    at indexPath: IndexPath?,
+    for type: NSFetchedResultsChangeType,
+    newIndexPath: IndexPath?
+  ) {
+    if parent != nil, tableView.hasActiveDrag || tableView.hasActiveDrop {
+      return
+    }
 
     var indexPath = indexPath
     var newIndexPath = newIndexPath
@@ -425,18 +482,26 @@ extension PlaylistFolderController: NSFetchedResultsControllerDelegate {
 
     switch type {
     case .insert:
-      guard let newIndexPath = newIndexPath else { break }
+      guard let newIndexPath = newIndexPath else {
+        break
+      }
       tableView.insertRows(at: [newIndexPath], with: .fade)
     case .delete:
-      guard let indexPath = indexPath else { break }
+      guard let indexPath = indexPath else {
+        break
+      }
       tableView.deleteRows(at: [indexPath], with: .fade)
     case .update:
-      guard let indexPath = indexPath else { break }
+      guard let indexPath = indexPath else {
+        break
+      }
       tableView.reloadRows(at: [indexPath], with: .fade)
     case .move:
       guard let indexPath = indexPath,
-        let newIndexPath = newIndexPath
-      else { break }
+            let newIndexPath = newIndexPath
+      else {
+        break
+      }
       tableView.deleteRows(at: [indexPath], with: .fade)
       tableView.insertRows(at: [newIndexPath], with: .fade)
     default:
@@ -445,12 +510,16 @@ extension PlaylistFolderController: NSFetchedResultsControllerDelegate {
   }
 
   func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
-    if parent != nil, tableView.hasActiveDrag || tableView.hasActiveDrop { return }
+    if parent != nil, tableView.hasActiveDrag || tableView.hasActiveDrop {
+      return
+    }
     tableView.endUpdates()
   }
 
   func controllerWillChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
-    if parent != nil, tableView.hasActiveDrag || tableView.hasActiveDrop { return }
+    if parent != nil, tableView.hasActiveDrag || tableView.hasActiveDrop {
+      return
+    }
     tableView.beginUpdates()
   }
 }
@@ -474,7 +543,6 @@ extension PlaylistFolderController: UITableViewDragDelegate, UITableViewDropDele
   }
 
   func tableView(_ tableView: UITableView, moveRowAt sourceIndexPath: IndexPath, to destinationIndexPath: IndexPath) {
-
     if sourceIndexPath.section != destinationIndexPath.section {
       return
     }
@@ -485,7 +553,9 @@ extension PlaylistFolderController: UITableViewDragDelegate, UITableViewDropDele
     destinationIndexPath.section = 0
 
     reorderItems(from: sourceIndexPath, to: destinationIndexPath) { [weak self] in
-      guard let self = self else { return }
+      guard let self = self else {
+        return
+      }
 
       do {
         try self.othersFRC.performFetch()
@@ -495,8 +565,11 @@ extension PlaylistFolderController: UITableViewDragDelegate, UITableViewDropDele
     }
   }
 
-  func tableView(_ tableView: UITableView, itemsForBeginning session: UIDragSession, at indexPath: IndexPath) -> [UIDragItem] {
-
+  func tableView(
+    _ tableView: UITableView,
+    itemsForBeginning session: UIDragSession,
+    at indexPath: IndexPath
+  ) -> [UIDragItem] {
     if indexPath.section != Section.folders.rawValue {
       return []
     }
@@ -507,10 +580,15 @@ extension PlaylistFolderController: UITableViewDragDelegate, UITableViewDropDele
     return [dragItem]
   }
 
-  func tableView(_ tableView: UITableView, dropSessionDidUpdate session: UIDropSession, withDestinationIndexPath destinationIndexPath: IndexPath?) -> UITableViewDropProposal {
-
+  func tableView(
+    _ tableView: UITableView,
+    dropSessionDidUpdate session: UIDropSession,
+    withDestinationIndexPath destinationIndexPath: IndexPath?
+  ) -> UITableViewDropProposal {
     var dropProposal = UITableViewDropProposal(operation: .cancel)
-    guard session.items.count == 1 else { return dropProposal }
+    guard session.items.count == 1 else {
+      return dropProposal
+    }
 
     if destinationIndexPath?.section != Section.folders.rawValue {
       return dropProposal
@@ -537,43 +615,60 @@ extension PlaylistFolderController: UITableViewDragDelegate, UITableViewDropDele
     }
 
     guard let section = Section(rawValue: destinationIndexPath.section),
-      section == .folders
+          section == .folders
     else {
       return
     }
 
     if coordinator.proposal.operation == .move {
-      guard let item = coordinator.items.first else { return }
+      guard let item = coordinator.items.first else {
+        return
+      }
       _ = coordinator.drop(item.dragItem, toRowAt: destinationIndexPath)
       tableView.moveRow(at: sourceIndexPath, to: destinationIndexPath)
     }
   }
 
-  func tableView(_ tableView: UITableView, dragPreviewParametersForRowAt indexPath: IndexPath) -> UIDragPreviewParameters? {
-    guard let cell = tableView.cellForRow(at: indexPath) else { return nil }
+  func tableView(
+    _ tableView: UITableView,
+    dragPreviewParametersForRowAt indexPath: IndexPath
+  ) -> UIDragPreviewParameters? {
+    guard let cell = tableView.cellForRow(at: indexPath) else {
+      return nil
+    }
 
     let preview = UIDragPreviewParameters()
     preview.visiblePath = UIBezierPath(
       roundedRect: cell.contentView.frame.with {
         $0.size.width = cell.bounds.width
-      }, cornerRadius: 12.0)
+      }, cornerRadius: 12.0
+    )
     preview.backgroundColor = .tertiaryBraveBackground
     return preview
   }
 
-  func tableView(_ tableView: UITableView, dropPreviewParametersForRowAt indexPath: IndexPath) -> UIDragPreviewParameters? {
-    guard let cell = tableView.cellForRow(at: indexPath) else { return nil }
+  func tableView(
+    _ tableView: UITableView,
+    dropPreviewParametersForRowAt indexPath: IndexPath
+  ) -> UIDragPreviewParameters? {
+    guard let cell = tableView.cellForRow(at: indexPath) else {
+      return nil
+    }
 
     let preview = UIDragPreviewParameters()
     preview.visiblePath = UIBezierPath(
       roundedRect: cell.contentView.frame.with {
         $0.size.width = cell.bounds.width
-      }, cornerRadius: 12.0)
+      }, cornerRadius: 12.0
+    )
     preview.backgroundColor = .tertiaryBraveBackground
     return preview
   }
 
-  func tableView(_ tableView: UITableView, dragSessionIsRestrictedToDraggingApplication session: UIDragSession) -> Bool {
+  func tableView(
+    _ tableView: UITableView,
+    dragSessionIsRestrictedToDraggingApplication session: UIDragSession
+  ) -> Bool {
     true
   }
 
@@ -592,7 +687,9 @@ extension PlaylistFolderController: UITableViewDragDelegate, UITableViewDropDele
         }
       }
 
-      guard let self = self else { return }
+      guard let self = self else {
+        return
+      }
 
       let src = self.othersFRC.object(at: sourceIndexPath)
       objects.remove(at: sourceIndexPath.row)

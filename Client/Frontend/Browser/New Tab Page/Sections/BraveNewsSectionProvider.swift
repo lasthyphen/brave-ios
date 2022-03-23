@@ -99,7 +99,11 @@ class BraveNewsSectionProvider: NSObject, NTPObservableSectionProvider {
     }
   }
 
-  func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+  func collectionView(
+    _ collectionView: UICollectionView,
+    layout collectionViewLayout: UICollectionViewLayout,
+    sizeForItemAt indexPath: IndexPath
+  ) -> CGSize {
     var size = fittingSizeForCollectionView(collectionView, section: indexPath.section)
     switch dataSource.state {
     case .failure, .initial, .loading:
@@ -114,12 +118,20 @@ class BraveNewsSectionProvider: NSObject, NTPObservableSectionProvider {
     return size
   }
 
-  func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
-    return UIEdgeInsets(top: 0, left: 16, bottom: 16, right: 16)
+  func collectionView(
+    _ collectionView: UICollectionView,
+    layout collectionViewLayout: UICollectionViewLayout,
+    insetForSectionAt section: Int
+  ) -> UIEdgeInsets {
+    UIEdgeInsets(top: 0, left: 16, bottom: 16, right: 16)
   }
 
-  func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
-    return 20
+  func collectionView(
+    _ collectionView: UICollectionView,
+    layout collectionViewLayout: UICollectionViewLayout,
+    minimumLineSpacingForSectionAt section: Int
+  ) -> CGFloat {
+    20
   }
 
   private var iabTrackedCellContexts: [IndexPath: ViewportTrackedCardContext] = [:]
@@ -153,32 +165,41 @@ class BraveNewsSectionProvider: NSObject, NTPObservableSectionProvider {
       }
       return false
     }
-    if iabTrackedCellContexts.isEmpty { return }
+    if iabTrackedCellContexts.isEmpty {
+      return
+    }
     for (indexPath, context) in iabTrackedCellContexts {
       if cellAtIndexPathIsMostlyVisible(indexPath, context: context),
-        context.runningTimer == nil {
+         context.runningTimer == nil {
         context.runningTimer = Timer.scheduledTimer(
           withTimeInterval: 1.0, repeats: false,
           block: { [weak self] timer in
-            guard let self = self else { return }
+            guard let self = self else {
+              return
+            }
             if let context = self.iabTrackedCellContexts[indexPath],
-              context.runningTimer == timer,
-              cellAtIndexPathIsMostlyVisible(indexPath, context: context) {
+               context.runningTimer == timer,
+               cellAtIndexPathIsMostlyVisible(indexPath, context: context) {
               // Still at least 50% visible
               context.action()
             }
-          })
+          }
+        )
       }
     }
   }
 
-  func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
+  func collectionView(
+    _ collectionView: UICollectionView,
+    willDisplay cell: UICollectionViewCell,
+    forItemAt indexPath: IndexPath
+  ) {
     if indexPath.item == 0, let cell = cell as? FeedCardCell<BraveNewsOptInView> {
       cell.content.graphicAnimationView.play()
     }
     if let card = dataSource.state.cards?[safe: indexPath.item] {
       if case .partner(let item) = card,
-        let creativeInstanceID = item.content.creativeInstanceID {
+         let creativeInstanceID = item.content.creativeInstanceID {
         iabTrackedCellContexts[indexPath] = .init(collectionView: collectionView) { [weak self] in
           self?.rewards.ads.reportPromotedContentAdEvent(
             item.content.urlHash,
@@ -199,7 +220,11 @@ class BraveNewsSectionProvider: NSObject, NTPObservableSectionProvider {
     }
   }
 
-  func collectionView(_ collectionView: UICollectionView, didEndDisplaying cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
+  func collectionView(
+    _ collectionView: UICollectionView,
+    didEndDisplaying cell: UICollectionViewCell,
+    forItemAt indexPath: IndexPath
+  ) {
     iabTrackedCellContexts[indexPath] = nil
     if indexPath.item == 0, let cell = cell as? FeedCardCell<BraveNewsOptInView> {
       cell.content.graphicAnimationView.stop()
@@ -265,7 +290,7 @@ class BraveNewsSectionProvider: NSObject, NTPObservableSectionProvider {
       let cell = collectionView.dequeueReusableCell(for: indexPath) as FeedCardCell<DealsFeedGroupView>
       cell.content.titleLabel.text = title
       cell.content.titleLabel.isHidden = title.isEmpty
-      zip(cell.content.feedViews, items.indices).forEach { (view, index) in
+      zip(cell.content.feedViews, items.indices).forEach { view, index in
         let item = items[index]
         view.setupWithItem(
           item,
@@ -308,8 +333,16 @@ class BraveNewsSectionProvider: NSObject, NTPObservableSectionProvider {
       let cell = collectionView.dequeueReusableCell(for: indexPath) as FeedCardCell<SmallHeadlinePairCardView>
       cell.content.smallHeadelineCardViews.left.feedView.setupWithItem(pair.first)
       cell.content.smallHeadelineCardViews.right.feedView.setupWithItem(pair.second)
-      cell.content.actionHandler = handler(from: { $0 == 0 ? pair.first : pair.second }, card: card, indexPath: indexPath)
-      cell.content.contextMenu = contextMenu(from: { $0 == 0 ? pair.first : pair.second }, card: card, indexPath: indexPath)
+      cell.content.actionHandler = handler(
+        from: { $0 == 0 ? pair.first : pair.second },
+        card: card,
+        indexPath: indexPath
+      )
+      cell.content.contextMenu = contextMenu(
+        from: { $0 == 0 ? pair.first : pair.second },
+        card: card,
+        indexPath: indexPath
+      )
       return cell
     case .group(let items, let title, let direction, _):
       let groupView: FeedGroupView
@@ -330,7 +363,7 @@ class BraveNewsSectionProvider: NSObject, NTPObservableSectionProvider {
       groupView.titleLabel.text = title
       groupView.titleLabel.isHidden = title.isEmpty
 
-      zip(groupView.feedViews, items.indices).forEach { (view, index) in
+      zip(groupView.feedViews, items.indices).forEach { view, index in
         let item = items[index]
         view.setupWithItem(item)
       }
@@ -340,7 +373,7 @@ class BraveNewsSectionProvider: NSObject, NTPObservableSectionProvider {
     case .numbered(let items, let title):
       let cell = collectionView.dequeueReusableCell(for: indexPath) as FeedCardCell<NumberedFeedGroupView>
       cell.content.titleLabel.text = title
-      zip(cell.content.feedViews, items.indices).forEach { (view, index) in
+      zip(cell.content.feedViews, items.indices).forEach { view, index in
         let item = items[index]
         view.setupWithItem(item)
       }
@@ -350,14 +383,18 @@ class BraveNewsSectionProvider: NSObject, NTPObservableSectionProvider {
     }
   }
 
-  private func handler(from feedList: @escaping (Int) -> FeedItem, card: FeedCard, indexPath: IndexPath) -> (Int, FeedItemAction) -> Void {
-    return { [weak self] index, action in
+  private func handler(
+    from feedList: @escaping (Int) -> FeedItem,
+    card: FeedCard,
+    indexPath: IndexPath
+  ) -> (Int, FeedItemAction) -> Void {
+    { [weak self] index, action in
       self?.actionHandler(.itemAction(action, context: .init(item: feedList(index), card: card, indexPath: indexPath)))
     }
   }
 
   private func handler(for item: FeedItem, card: FeedCard, indexPath: IndexPath) -> (Int, FeedItemAction) -> Void {
-    return handler(from: { _ in item }, card: card, indexPath: indexPath)
+    handler(from: { _ in item }, card: card, indexPath: indexPath)
   }
 
   private func inlineContentAdContextMenu(_ ad: InlineContentAd) -> FeedItemMenu {
@@ -375,16 +412,24 @@ class BraveNewsSectionProvider: NSObject, NTPObservableSectionProvider {
     }
     return .init { index -> UIMenu? in
       func mapDeferredHandler(_ handler: @escaping MenuActionHandler) -> UIActionHandler {
-        return UIAction.deferredActionHandler { _ in
+        UIAction.deferredActionHandler { _ in
           handler(ad)
         }
       }
       var openInNewTab: UIAction {
-        .init(title: Strings.openNewTabButtonTitle, image: UIImage(named: "brave.plus"), handler: mapDeferredHandler(openInNewTabHandler))
+        .init(
+          title: Strings.openNewTabButtonTitle,
+          image: UIImage(named: "brave.plus"),
+          handler: mapDeferredHandler(openInNewTabHandler)
+        )
       }
 
       var openInNewPrivateTab: UIAction {
-        .init(title: Strings.openNewPrivateTabButtonTitle, image: UIImage(named: "brave.shades"), handler: mapDeferredHandler(openInNewPrivateTabHandler))
+        .init(
+          title: Strings.openNewPrivateTabButtonTitle,
+          image: UIImage(named: "brave.shades"),
+          handler: mapDeferredHandler(openInNewPrivateTabHandler)
+        )
       }
       let openActions: [UIAction] = [
         openInNewTab,
@@ -399,7 +444,11 @@ class BraveNewsSectionProvider: NSObject, NTPObservableSectionProvider {
     }
   }
 
-  private func contextMenu(from feedList: @escaping (Int) -> FeedItem, card: FeedCard, indexPath: IndexPath) -> FeedItemMenu {
+  private func contextMenu(
+    from feedList: @escaping (Int) -> FeedItem,
+    card: FeedCard,
+    indexPath: IndexPath
+  ) -> FeedItemMenu {
     typealias MenuActionHandler = (_ context: FeedItemActionContext) -> Void
 
     func itemActionHandler(_ action: FeedItemAction, _ context: FeedItemActionContext) {
@@ -417,30 +466,49 @@ class BraveNewsSectionProvider: NSObject, NTPObservableSectionProvider {
     }
 
     return .init { [weak self] index -> UIMenu? in
-      guard let self = self else { return nil }
+      guard let self = self else {
+        return nil
+      }
       let item = feedList(index)
       let context = FeedItemActionContext(item: item, card: card, indexPath: indexPath)
 
       func mapDeferredHandler(_ handler: @escaping MenuActionHandler) -> UIActionHandler {
-        return UIAction.deferredActionHandler { _ in
+        UIAction.deferredActionHandler { _ in
           handler(context)
         }
       }
 
       var openInNewTab: UIAction {
-        .init(title: Strings.openNewTabButtonTitle, image: UIImage(named: "brave.plus"), handler: mapDeferredHandler(openInNewTabHandler))
+        .init(
+          title: Strings.openNewTabButtonTitle,
+          image: UIImage(named: "brave.plus"),
+          handler: mapDeferredHandler(openInNewTabHandler)
+        )
       }
 
       var openInNewPrivateTab: UIAction {
-        .init(title: Strings.openNewPrivateTabButtonTitle, image: UIImage(named: "brave.shades"), handler: mapDeferredHandler(openInNewPrivateTabHandler))
+        .init(
+          title: Strings.openNewPrivateTabButtonTitle,
+          image: UIImage(named: "brave.shades"),
+          handler: mapDeferredHandler(openInNewPrivateTabHandler)
+        )
       }
 
       var disableSource: UIAction {
-        .init(title: String(format: Strings.BraveNews.disablePublisherContent, item.source.name), image: UIImage(named: "disable.feed.source"), attributes: .destructive, handler: mapDeferredHandler(toggleSourceHandler))
+        .init(
+          title: String(format: Strings.BraveNews.disablePublisherContent, item.source.name),
+          image: UIImage(named: "disable.feed.source"),
+          attributes: .destructive,
+          handler: mapDeferredHandler(toggleSourceHandler)
+        )
       }
 
       var enableSource: UIAction {
-        .init(title: String(format: Strings.BraveNews.enablePublisherContent, item.source.name), image: UIImage(named: "enable.feed.source"), handler: mapDeferredHandler(toggleSourceHandler))
+        .init(
+          title: String(format: Strings.BraveNews.enablePublisherContent, item.source.name),
+          image: UIImage(named: "enable.feed.source"),
+          handler: mapDeferredHandler(toggleSourceHandler)
+        )
       }
 
       let openActions: [UIAction] = [
@@ -465,7 +533,7 @@ class BraveNewsSectionProvider: NSObject, NTPObservableSectionProvider {
   }
 
   private func contextMenu(for item: FeedItem, card: FeedCard, indexPath: IndexPath) -> FeedItemMenu {
-    return contextMenu(from: { _ in item }, card: card, indexPath: indexPath)
+    contextMenu(from: { _ in item }, card: card, indexPath: indexPath)
   }
 }
 
@@ -482,7 +550,7 @@ extension FeedItemView {
       thumbnailImageView.isHidden = false
       thumbnailImageView.sd_setImage(
         with: feedItem.content.imageURL, placeholderImage: nil, options: .avoidAutoSetImage,
-        completed: { (image, _, cacheType, _) in
+        completed: { image, _, cacheType, _ in
           if cacheType == .none {
             UIView.transition(
               with: self.thumbnailImageView,
@@ -495,7 +563,8 @@ extension FeedItemView {
           } else {
             self.thumbnailImageView.image = image
           }
-        })
+        }
+      )
     }
 
     brandContainerView.textLabel.text = nil
@@ -510,7 +579,7 @@ extension FeedItemView {
     titleLabel.text = ad.title
     thumbnailImageView.sd_setImage(
       with: ad.imageURL.asURL, placeholderImage: nil, options: .avoidAutoSetImage,
-      completed: { (image, _, cacheType, _) in
+      completed: { image, _, cacheType, _ in
         if cacheType == .none {
           UIView.transition(
             with: self.thumbnailImageView,
@@ -523,7 +592,8 @@ extension FeedItemView {
         } else {
           self.thumbnailImageView.image = image
         }
-      })
+      }
+    )
     brandContainerView.textLabel.text = ad.message
     callToActionButton.setTitle(ad.ctaText, for: .normal)
   }

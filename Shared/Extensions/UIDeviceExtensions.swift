@@ -4,14 +4,15 @@
 
 import UIKit
 
-public extension UIDevice {
-
-  var modelName: String {
+extension UIDevice {
+  public var modelName: String {
     var systemInfo = utsname()
     uname(&systemInfo)
     let machineMirror = Mirror(reflecting: systemInfo.machine)
     let identifier = machineMirror.children.reduce("") { identifier, element in
-      guard let value = element.value as? Int8, value != 0 else { return identifier }
+      guard let value = element.value as? Int8, value != 0 else {
+        return identifier
+      }
       return identifier + String(UnicodeScalar(UInt8(value)))
     }
 
@@ -55,28 +56,27 @@ public extension UIDevice {
     }
   }
 
-  static var iPhone4s: Bool {
-    return UIScreen.main.nativeBounds.height == 960
+  public static var iPhone4s: Bool {
+    UIScreen.main.nativeBounds.height == 960
   }
 
-  static var iPhoneX: Bool {
-    return UIScreen.main.nativeBounds.height == 2436
+  public static var iPhoneX: Bool {
+    UIScreen.main.nativeBounds.height == 2436
   }
 
-  static var isIpad: Bool {
-    return UIDevice.current.userInterfaceIdiom == .pad
+  public static var isIpad: Bool {
+    UIDevice.current.userInterfaceIdiom == .pad
   }
 
-  static var isPhone: Bool {
-    return UIDevice.current.userInterfaceIdiom == .phone
+  public static var isPhone: Bool {
+    UIDevice.current.userInterfaceIdiom == .phone
   }
 
   // Dev note: UIApplication.shared cannot be used in application extensions.
-  func forcePortraitIfIphone(for application: UIApplication) {
+  public func forcePortraitIfIphone(for application: UIApplication) {
     if userInterfaceIdiom != .pad && application.statusBarOrientation.isLandscape {
       let value = UIInterfaceOrientation.portrait.rawValue
       UIDevice.current.setValue(value, forKey: "orientation")
     }
   }
-
 }

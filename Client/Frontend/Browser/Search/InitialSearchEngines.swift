@@ -10,7 +10,14 @@ import Foundation
 class InitialSearchEngines {
   /// Type of search engine available to the user.
   enum SearchEngineID: String {
-    case google, braveSearch, bing, duckduckgo, yandex, qwant, startpage, ecosia
+    case google
+    case braveSearch
+    case bing
+    case duckduckgo
+    case yandex
+    case qwant
+    case startpage
+    case ecosia
 
     /// Open Search Reference  for default search Engines
     var openSearchReference: String {
@@ -54,7 +61,7 @@ class InitialSearchEngines {
     /// This is used to determine If a seach engine is added already
     /// Added to espeically to prevent Default Search engines using Open Search Auto-Add
     var reference: String? {
-      return id.openSearchReference
+      id.openSearchReference
     }
 
     // Only `id` mattera when comparing search engines.
@@ -104,7 +111,9 @@ class InitialSearchEngines {
   /// If the engine does not exist in `engines` list, it is added to it.
   private(set) var priorityEngine: SearchEngineID? {
     didSet {
-      guard let engine = priorityEngine else { return }
+      guard let engine = priorityEngine else {
+        return
+      }
       if !engines.contains(.init(id: engine)) {
         // As a fallback we add the missing engine
         engines.append(.init(id: engine))
@@ -141,7 +150,9 @@ class InitialSearchEngines {
   // MARK: - Locale overrides
 
   private func regionOverrides() {
-    guard let region = locale.regionCode else { return }
+    guard let region = locale.regionCode else {
+      return
+    }
 
     if Self.yandexDefaultRegions.contains(region) {
       defaultSearchEngine = .yandex
@@ -165,8 +176,8 @@ class InitialSearchEngines {
   private func sortEngines() {
     engines =
       engines
-      .sorted { e, _ in e.id == defaultSearchEngine }
-      .sorted { e, _ in e.id == priorityEngine }
+        .sorted { e, _ in e.id == defaultSearchEngine }
+        .sorted { e, _ in e.id == priorityEngine }
   }
 
   private func replaceOrInsert(engineId: SearchEngineID, customId: String?) {

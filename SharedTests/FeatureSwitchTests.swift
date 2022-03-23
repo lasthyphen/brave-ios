@@ -9,7 +9,11 @@ class FeatureSwitchTests: XCTestCase {
   let buildChannel = AppConstants.buildChannel
 
   func testPersistent() {
-    let featureSwitch = FeatureSwitch(named: "test-persistent-over-restarts", allowPercentage: 50, buildChannel: buildChannel)
+    let featureSwitch = FeatureSwitch(
+      named: "test-persistent-over-restarts",
+      allowPercentage: 50,
+      buildChannel: buildChannel
+    )
     let prefs = MockProfilePrefs()
     var membership = featureSwitch.isMember(prefs)
     var changed = 0
@@ -53,9 +57,9 @@ class FeatureSwitchTests: XCTestCase {
     let prefs = MockProfilePrefs()
     let featureSwitch = FeatureSwitch(named: "test-user-enabled", allowPercentage: 0, buildChannel: buildChannel)
     XCTAssertFalse(featureSwitch.isMember(prefs), "The feature should be disabled")
-    featureSwitch.setMembership(true, for: prefs)  // enable the feature
+    featureSwitch.setMembership(true, for: prefs) // enable the feature
     XCTAssertTrue(featureSwitch.isMember(prefs), "The feature should be enabled")
-    featureSwitch.setMembership(false, for: prefs)  // disable the feature
+    featureSwitch.setMembership(false, for: prefs) // disable the feature
     XCTAssertFalse(featureSwitch.isMember(prefs), "The feature should be disabled again")
   }
 
@@ -63,7 +67,7 @@ class FeatureSwitchTests: XCTestCase {
     let prefs = MockProfilePrefs()
     let featureSwitch = FeatureSwitch(named: "test-user-disabled", allowPercentage: 100, buildChannel: buildChannel)
     XCTAssertTrue(featureSwitch.isMember(prefs), "The feature should be enabled")
-    featureSwitch.setMembership(false, for: prefs)  // disable the feature
+    featureSwitch.setMembership(false, for: prefs) // disable the feature
     XCTAssertFalse(featureSwitch.isMember(prefs), "The feature should be disabled again")
   }
 }
@@ -82,7 +86,11 @@ extension FeatureSwitchTests {
   }
 
   func test50Percent() {
-    let featureSwitch = FeatureSwitch(named: "test-half-the-population", allowPercentage: 50, buildChannel: buildChannel)
+    let featureSwitch = FeatureSwitch(
+      named: "test-half-the-population",
+      allowPercentage: 50,
+      buildChannel: buildChannel
+    )
     testApprox(featureSwitch, expected: 50)
   }
 
@@ -103,7 +111,12 @@ extension FeatureSwitchTests {
 
   func testAppConstantsWin() {
     // simulate in release channel, but switched off in AppConstants.
-    let featureFlaggedOff = FeatureSwitch(named: "test-release-flagged-off", false, allowPercentage: 100, buildChannel: buildChannel)
+    let featureFlaggedOff = FeatureSwitch(
+      named: "test-release-flagged-off",
+      false,
+      allowPercentage: 100,
+      buildChannel: buildChannel
+    )
     testExactly(featureFlaggedOff, expected: 0)
 
     // simulate in non-release channel, but switched on in AppConstants.
@@ -116,8 +129,8 @@ extension FeatureSwitchTests {
   }
 }
 
-private extension FeatureSwitchTests {
-  func sampleN(_ featureSwitch: FeatureSwitch, testCount: Int = 1000) -> Int {
+extension FeatureSwitchTests {
+  private func sampleN(_ featureSwitch: FeatureSwitch, testCount: Int = 1000) -> Int {
     var count = 0
     for _ in 0..<testCount {
       let prefs = MockProfilePrefs()
@@ -128,21 +141,22 @@ private extension FeatureSwitchTests {
     return count
   }
 
-  func testExactly(_ featureSwitch: FeatureSwitch, expected: Int) {
+  private func testExactly(_ featureSwitch: FeatureSwitch, expected: Int) {
     let testCount = 1000
     let count = sampleN(featureSwitch, testCount: testCount)
     let normalizedExpectedCount = (testCount * expected) / 100
     XCTAssertEqual(count, normalizedExpectedCount)
   }
 
-  func testApprox(_ featureSwitch: FeatureSwitch, expected: Int, epsilon: Int = 2) {
+  private func testApprox(_ featureSwitch: FeatureSwitch, expected: Int, epsilon: Int = 2) {
     let testCount = 10000
     let count = sampleN(featureSwitch, testCount: testCount)
     let acceptableRange = Range(
       uncheckedBounds: (
         lower: testCount * (expected - epsilon) / 100,
         upper: testCount * (expected + epsilon) / 100
-      ))
+      )
+    )
 
     XCTAssertTrue(acceptableRange.contains(count), "\(count) in \(acceptableRange)?")
   }

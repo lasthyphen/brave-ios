@@ -63,6 +63,7 @@ extension BraveWallet.TransactionInfo {
       confirmedTime: Date(timeIntervalSince1970: 1636402508)
     )
   }
+
   static var previewConfirmedSwap: BraveWallet.TransactionInfo {
     BraveWallet.TransactionInfo(
       id: "2531db97-6d1d-4906-a1b2-f829c41f489e",
@@ -96,6 +97,7 @@ extension BraveWallet.TransactionInfo {
       confirmedTime: Date(timeIntervalSince1970: 1636402508)
     )
   }
+
   static var previewConfirmedERC20Approve: BraveWallet.TransactionInfo {
     BraveWallet.TransactionInfo(
       id: "19819c05-612a-47c5-84b0-e95045d15b37",
@@ -109,7 +111,9 @@ extension BraveWallet.TransactionInfo {
             gasLimit: "0x520ca",
             to: "0x1f9840a85d5af5bf1d1762f925bdaddc4201f984",
             value: "0x0",
-            data: _transactionBase64ToData("CV6nswAAAAAAAAAAAAAAAOWSQnoK7Okt4+3uHxjgFXwFhhVk//////////////////////////////////////////8=")
+            data: _transactionBase64ToData(
+              "CV6nswAAAAAAAAAAAAAAAOWSQnoK7Okt4+3uHxjgFXwFhhVk//////////////////////////////////////////8="
+            )
           ),
           chainId: "0x3",
           maxPriorityFeePerGas: "0x77359400",
@@ -120,14 +124,20 @@ extension BraveWallet.TransactionInfo {
       txStatus: .confirmed,
       txType: .erc20Approve,
       txParams: ["address", "uint256"],
-      txArgs: ["0xe592427a0aece92de3edee1f18e0157c05861564Z", "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"],
+      txArgs: [
+        "0xe592427a0aece92de3edee1f18e0157c05861564Z",
+        "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
+      ],
       createdTime: Date(timeIntervalSince1970: 1636399671),
       submittedTime: Date(timeIntervalSince1970: 1636399673),
       confirmedTime: Date(timeIntervalSince1970: 1636402508)
     )
   }
+
   static private func _transactionBase64ToData(_ base64String: String) -> [NSNumber] {
-    guard let data = Data(base64Encoded: base64String) else { return [] }
+    guard let data = Data(base64Encoded: base64String) else {
+      return []
+    }
     return Array(data).map(NSNumber.init(value:))
   }
 }

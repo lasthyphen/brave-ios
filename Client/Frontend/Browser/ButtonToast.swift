@@ -25,13 +25,27 @@ class ButtonToast: Toast {
     }
   }
 
-  init(labelText: String, descriptionText: String? = nil, imageName: String? = nil, buttonText: String? = nil, backgroundColor: UIColor = SimpleToastUX.toastDefaultColor, textAlignment: NSTextAlignment = .left, completion: ((_ buttonPressed: Bool) -> Void)? = nil) {
+  init(
+    labelText: String,
+    descriptionText: String? = nil,
+    imageName: String? = nil,
+    buttonText: String? = nil,
+    backgroundColor: UIColor = SimpleToastUX.toastDefaultColor,
+    textAlignment: NSTextAlignment = .left,
+    completion: ((_ buttonPressed: Bool) -> Void)? = nil
+  ) {
     super.init(frame: .zero)
 
     self.completionHandler = completion
 
     self.clipsToBounds = true
-    self.addSubview(createView(labelText, descriptionText: descriptionText, imageName: imageName, buttonText: buttonText, textAlignment: textAlignment))
+    self.addSubview(createView(
+      labelText,
+      descriptionText: descriptionText,
+      imageName: imageName,
+      buttonText: buttonText,
+      textAlignment: textAlignment
+    ))
 
     self.toastView.backgroundColor = backgroundColor
 
@@ -45,11 +59,18 @@ class ButtonToast: Toast {
     }
   }
 
+  @available(*, unavailable)
   required init?(coder aDecoder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }
 
-  fileprivate func createView(_ labelText: String, descriptionText: String?, imageName: String?, buttonText: String?, textAlignment: NSTextAlignment) -> UIView {
+  fileprivate func createView(
+    _ labelText: String,
+    descriptionText: String?,
+    imageName: String?,
+    buttonText: String?,
+    textAlignment: NSTextAlignment
+  ) -> UIView {
     let horizontalStackView = UIStackView()
     horizontalStackView.axis = .horizontal
     horizontalStackView.alignment = .center
@@ -77,7 +98,7 @@ class ButtonToast: Toast {
     var descriptionLabel: UILabel?
     if let descriptionText = descriptionText {
       label.lineBreakMode = .byClipping
-      label.numberOfLines = 1  // if showing a description we cant wrap to the second line
+      label.numberOfLines = 1 // if showing a description we cant wrap to the second line
       label.adjustsFontSizeToFitWidth = true
 
       descriptionLabel = UILabel()
@@ -106,7 +127,7 @@ class ButtonToast: Toast {
       button.titleLabel?.minimumScaleFactor = 0.1
       button.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(buttonPressed)))
 
-      button.snp.makeConstraints { (make) in
+      button.snp.makeConstraints { make in
         make.width.equalTo(button.titleLabel!.intrinsicContentSize.width + 2 * ButtonToastUX.toastButtonPadding)
       }
 
@@ -139,7 +160,12 @@ class ButtonToast: Toast {
     dismiss(true)
   }
 
-  override func showToast(viewController: UIViewController? = nil, delay: DispatchTimeInterval = SimpleToastUX.toastDelayBefore, duration: DispatchTimeInterval? = SimpleToastUX.toastDismissAfter, makeConstraints: @escaping (SnapKit.ConstraintMaker) -> Swift.Void) {
+  override func showToast(
+    viewController: UIViewController? = nil,
+    delay: DispatchTimeInterval = SimpleToastUX.toastDelayBefore,
+    duration: DispatchTimeInterval? = SimpleToastUX.toastDismissAfter,
+    makeConstraints: @escaping (SnapKit.ConstraintMaker) -> Swift.Void
+  ) {
     super.showToast(viewController: viewController, delay: delay, duration: duration, makeConstraints: makeConstraints)
   }
 }

@@ -3,7 +3,6 @@
 import BraveCore
 
 class SyncQRCodeView: UIImageView {
-
   private let barcodeSize: CGFloat = 200.0
 
   convenience init(syncApi: BraveSyncAPI) {
@@ -20,6 +19,7 @@ class SyncQRCodeView: UIImageView {
     super.init(frame: frame)
   }
 
+  @available(*, unavailable)
   required init?(coder aDecoder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }

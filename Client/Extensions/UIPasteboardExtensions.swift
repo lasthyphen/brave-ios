@@ -19,13 +19,15 @@ extension UIPasteboard {
     ]
   }
 
-  fileprivate func imageTypeKey(_ isGIF: Bool) -> String {
-    return (isGIF ? kUTTypeGIF : kUTTypePNG) as String
+  private func imageTypeKey(_ isGIF: Bool) -> String {
+    (isGIF ? kUTTypeGIF : kUTTypePNG) as String
   }
 
   private var syncURL: URL? {
-    return UIPasteboard.general.string.flatMap {
-      guard let url = URL(string: $0), url.isWebPage() else { return nil }
+    UIPasteboard.general.string.flatMap {
+      guard let url = URL(string: $0), url.isWebPage() else {
+        return nil
+      }
       return url
     }
   }
@@ -34,8 +36,8 @@ extension UIPasteboard {
   /// When iCloud pasteboards are enabled, the usually fast, synchronous calls
   /// become slow and synchronous causing very slow start up times.
   func asyncString() -> Deferred<Maybe<String?>> {
-    return fetchAsync() {
-      return UIPasteboard.general.string
+    fetchAsync {
+      UIPasteboard.general.string
     }
   }
 
@@ -44,8 +46,8 @@ extension UIPasteboard {
   /// we already use; but use optionals instead of errorTypes, because not having a URL
   /// on the clipboard isn't an error.
   func asyncURL() -> Deferred<Maybe<URL?>> {
-    return fetchAsync() {
-      return self.syncURL
+    fetchAsync {
+      self.syncURL
     }
   }
 
@@ -61,9 +63,10 @@ extension UIPasteboard {
 
   /// Clears clipboard after certain amount of seconds and returns its timer.
   @discardableResult func clear(after seconds: TimeInterval = 0) -> Timer {
-    return Timer.scheduledTimer(
+    Timer.scheduledTimer(
       timeInterval: seconds, target: self, selector: #selector(clearPasteboard),
-      userInfo: nil, repeats: false)
+      userInfo: nil, repeats: false
+    )
   }
 
   @objc func clearPasteboard() {

@@ -210,14 +210,17 @@ private struct RestoreWalletView: View {
     .onChange(of: password, perform: handlePasswordChanged)
     .onChange(of: repeatedPassword, perform: handleRepeatedPasswordChanged)
     .background(
-      BiometricsPromptView(isPresented: $keyringStore.isRestoreFromUnlockBiometricsPromptVisible) { enabled, navController in
+      BiometricsPromptView(
+        isPresented: $keyringStore
+          .isRestoreFromUnlockBiometricsPromptVisible
+      ) { enabled, navController in
         defer {
           keyringStore.isRestoreFromUnlockBiometricsPromptVisible = false
           keyringStore.markOnboardingCompleted()
         }
         // Store password in keychain
         if enabled, case let status = KeyringStore.storePasswordInKeychain(password),
-          status != errSecSuccess {
+           status != errSecSuccess {
           let isPublic = AppConstants.buildChannel.isPublic
           let alert = UIAlertController(
             title: Strings.Wallet.biometricsSetupErrorTitle,
@@ -230,7 +233,8 @@ private struct RestoreWalletView: View {
           // an option to enable in `UnlockWalletView`
         }
         return false
-      })
+      }
+    )
   }
 }
 

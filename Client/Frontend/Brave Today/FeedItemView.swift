@@ -25,6 +25,7 @@ class FeedItemView: UIView {
     }
     isAccessibilityElement = true
   }
+
   /// The feed thumbnail image view. By default thumbnails aspect scale to
   /// fill the available space
   lazy var thumbnailImageView = UIImageView().then {
@@ -32,25 +33,30 @@ class FeedItemView: UIView {
     $0.backgroundColor = UIColor(white: 1.0, alpha: 0.1)
     $0.clipsToBounds = true
   }
+
   /// The feed title label
   var titleLabel = UILabel().then {
     $0.textColor = .white
     $0.setContentCompressionResistancePriority(.required, for: .vertical)
   }
+
   /// An optional description label
   lazy var descriptionLabel = UILabel().then {
     $0.textColor = UIColor.white.withAlphaComponent(0.5)
   }
+
   /// The date of when the article was posted
   lazy var dateLabel = UILabel().then {
     $0.textColor = UIColor.white.withAlphaComponent(0.5)
   }
+
   /// The branding information (if applicable)
   lazy var brandContainerView = BrandContainerView()
   /// An optional promoted button for sponsored/partnered cards
   lazy var promotedButton = PromotedButton().then {
     $0.setContentHuggingPriority(.required, for: .horizontal)
   }
+
   lazy var callToActionButton = CallToActionButton().then {
     $0.setContentHuggingPriority(.required, for: .horizontal)
     $0.setContentCompressionResistancePriority(.required, for: .horizontal)
@@ -71,7 +77,10 @@ class FeedItemView: UIView {
       thumbnailImageView.snp.remakeConstraints { maker in
         switch imageLayout {
         case .aspectRatio(let ratio):
-          precondition(!ratio.isZero, "Invalid aspect ratio of 0 for component: \(component) in feed item layout: \(layout)")
+          precondition(
+            !ratio.isZero,
+            "Invalid aspect ratio of 0 for component: \(component) in feed item layout: \(layout)"
+          )
           maker.height.equalTo(thumbnailImageView.snp.width).multipliedBy(1.0 / ratio)
         case .fixedSize(let size):
           maker.size.equalTo(size)
@@ -151,7 +160,6 @@ class FeedItemView: UIView {
 }
 
 extension FeedItemView {
-
   class CallToActionButton: BraveButton {
     override init(frame: CGRect) {
       super.init(frame: frame)
@@ -175,12 +183,12 @@ extension FeedItemView {
   }
 
   class PromotedButton: UIControl {
-
     private let image = UIImageView(image: UIImage(imageLiteralResourceName: "graph-up").template).then {
       $0.setContentHuggingPriority(.required, for: .horizontal)
       $0.setContentCompressionResistancePriority(.required, for: .horizontal)
       $0.tintColor = UIColor(white: 1.0, alpha: 0.8)
     }
+
     private let label = UILabel().then {
       $0.text = Strings.BraveNews.promoted
       $0.numberOfLines = 1
@@ -216,7 +224,9 @@ extension FeedItemView {
 
     override var accessibilityLabel: String? {
       get { label.text }
-      set { assertionFailure("Accessibility label is inherited from a subview: \(String(describing: newValue)) ignored") }
+      set {
+        assertionFailure("Accessibility label is inherited from a subview: \(String(describing: newValue)) ignored")
+      }
     }
 
     @available(*, unavailable)
@@ -256,10 +266,12 @@ extension FeedItemView {
       var alignment: UIStackView.Alignment = .fill
       var children: [Component]
     }
+
     enum ImageLayout {
       case fixedSize(CGSize)
       case aspectRatio(CGFloat)
     }
+
     struct LabelConfiguration {
       var numberOfLines: Int
       var font: UIFont
@@ -275,6 +287,7 @@ extension FeedItemView {
       static let date = LabelConfiguration(numberOfLines: 1, font: .systemFont(ofSize: 11.0, weight: .semibold))
       static let brand = LabelConfiguration(numberOfLines: 0, font: .systemFont(ofSize: 13.0, weight: .semibold))
     }
+
     /// The components that represent the appropriate UI in a feed item view
     /// or container to hold said UI
     enum Component {
@@ -285,10 +298,14 @@ extension FeedItemView {
       case title(_ labelConfiguration: LabelConfiguration)
       case date(_ labelConfiguration: LabelConfiguration = .date)
       case description(_ labelConfiguration: LabelConfiguration = .description)
-      case brand(viewingMode: BrandContainerView.ViewingMode = .automatic, labelConfiguration: LabelConfiguration = .brand)
+      case brand(
+        viewingMode: BrandContainerView.ViewingMode = .automatic,
+        labelConfiguration: LabelConfiguration = .brand
+      )
       case promotedButton
       case callToActionButton
     }
+
     /// The root stack for a given layout
     var root: Stack
 
@@ -297,7 +314,7 @@ extension FeedItemView {
       func _height(for component: Component) -> CGFloat {
         switch component {
         case .stack(let stack):
-          return stack.children.reduce(0.0, { return $0 + _height(for: $1) }) + stack.padding.top + stack.padding.bottom
+          return stack.children.reduce(0.0, { $0 + _height(for: $1) }) + stack.padding.top + stack.padding.bottom
         case .customSpace(let space):
           return space
         case .flexibleSpace(let minHeight):
@@ -310,13 +327,21 @@ extension FeedItemView {
             return width / ratio
           }
         case .title(let configuration), .date(let configuration), .description(let configuration):
-          return configuration.font.pointSize * (configuration.numberOfLines == 0 ? 3 : CGFloat(configuration.numberOfLines))
+          return configuration.font.pointSize * (
+            configuration.numberOfLines == 0
+              ? 3
+              : CGFloat(configuration.numberOfLines)
+          )
         case .brand(let viewingMode, let configuration):
           switch viewingMode {
           case .automatic, .alwaysLogo:
             return 20.0
           case .alwaysText:
-            return configuration.font.pointSize * (configuration.numberOfLines == 0 ? 1 : CGFloat(configuration.numberOfLines))
+            return configuration.font.pointSize * (
+              configuration.numberOfLines == 0
+                ? 1
+                : CGFloat(configuration.numberOfLines)
+            )
           }
         case .promotedButton:
           return 22.0
@@ -572,12 +597,14 @@ extension FeedItemView {
       /// Always shows the brand as text even if a logo is available
       case alwaysText
     }
+
     /// The current viewing mode for this brand container
     var viewingMode: ViewingMode = .automatic {
       didSet {
         updateVisibleViewForViewingMode()
       }
     }
+
     /// An image view for setting the brands logo
     private(set) var logoImageView = UIImageView().then {
       $0.contentMode = .scaleAspectFit
@@ -587,15 +614,19 @@ extension FeedItemView {
         $0.height.equalTo(20)
       }
     }
+
     /// A label view for setting the brands name in plain text
     private(set) var textLabel = UILabel().then {
       $0.textColor = UIColor(white: 1.0, alpha: 0.7)
       $0.numberOfLines = 0
     }
+
     /// The currently visible view in the container based on `viewingMode`.
     private var visibleView: UIView? {
       didSet {
-        if oldValue === visibleView { return }
+        if oldValue === visibleView {
+          return
+        }
         oldValue?.removeFromSuperview()
         if let view = visibleView {
           addSubview(view)
@@ -615,7 +646,9 @@ extension FeedItemView {
       updateVisibleViewForViewingMode()
 
       imageObservervation = logoImageView.observe(\.image, options: [.new]) { [weak self] _, _ in
-        guard let self = self else { return }
+        guard let self = self else {
+          return
+        }
         if self.viewingMode == .automatic {
           self.updateAutomaticVisibleView()
         }
@@ -645,6 +678,5 @@ extension FeedItemView {
         visibleView = logoImageView
       }
     }
-
   }
 }

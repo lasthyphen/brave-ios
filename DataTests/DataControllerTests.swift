@@ -10,7 +10,7 @@ class DataControllerTests: CoreDataTestCase {
   let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: String(describing: "Bookmark"))
 
   private func entity(for context: NSManagedObjectContext) -> NSEntityDescription {
-    return NSEntityDescription.entity(forEntityName: String(describing: "Bookmark"), in: context)!
+    NSEntityDescription.entity(forEntityName: String(describing: "Bookmark"), in: context)!
   }
 
   func testStoreIsEmpty() {
@@ -87,5 +87,4 @@ class DataControllerTests: CoreDataTestCase {
 
     XCTAssertEqual(try! DataController.viewContext.count(for: fetchRequest), 0)
   }
-
 }

@@ -14,7 +14,7 @@ private let log = Logger.browserLogger
 class ScreenshotHelper {
   var viewIsVisible = false
 
-  fileprivate weak var tabManager: TabManager?
+  private weak var tabManager: TabManager?
 
   init(tabManager: TabManager) {
     self.tabManager = tabManager

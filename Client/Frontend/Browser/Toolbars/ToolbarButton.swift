@@ -27,6 +27,7 @@ class ToolbarButton: UIButton {
     fatalError("init(coder:) has not been implemented")
   }
 
+  @available(*, unavailable)
   required init?(coder aDecoder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }
@@ -49,7 +50,11 @@ class ToolbarButton: UIButton {
     }
   }
 
-  override func contextMenuInteraction(_ interaction: UIContextMenuInteraction, willDisplayMenuFor configuration: UIContextMenuConfiguration, animator: UIContextMenuInteractionAnimating?) {
+  override func contextMenuInteraction(
+    _ interaction: UIContextMenuInteraction,
+    willDisplayMenuFor configuration: UIContextMenuConfiguration,
+    animator: UIContextMenuInteractionAnimating?
+  ) {
     UIImpactFeedbackGenerator(style: .medium).bzzt()
   }
 }

@@ -30,7 +30,7 @@ class HeadlineCardView: FeedCardBackgroundButton, FeedCardContent {
         self?.actionHandler?(0, .opened())
       },
       menu: { [weak self] in
-        return self?.contextMenu?.menu?(0)
+        self?.contextMenu?.menu?(0)
       }
     )
     addInteraction(UIContextMenuInteraction(delegate: contextMenuDelegate))
@@ -50,7 +50,6 @@ class HeadlineCardView: FeedCardBackgroundButton, FeedCardContent {
 }
 
 class SmallHeadlineCardView: HeadlineCardView {
-
   required init() {
     super.init()
 
@@ -72,7 +71,10 @@ class SmallHeadlinePairCardView: UIView, FeedCardContent {
     $0.spacing = 20
   }
 
-  let smallHeadelineCardViews: (left: SmallHeadlineCardView, right: SmallHeadlineCardView) = (SmallHeadlineCardView(), SmallHeadlineCardView())
+  let smallHeadelineCardViews: (left: SmallHeadlineCardView, right: SmallHeadlineCardView) = (
+    SmallHeadlineCardView(),
+    SmallHeadlineCardView()
+  )
 
   required init() {
     super.init(frame: .zero)
@@ -88,10 +90,10 @@ class SmallHeadlinePairCardView: UIView, FeedCardContent {
       self?.actionHandler?(1, action)
     }
     smallHeadelineCardViews.left.contextMenu = FeedItemMenu({ [weak self] _ -> UIMenu? in
-      return self?.contextMenu?.menu?(0)
+      self?.contextMenu?.menu?(0)
     })
     smallHeadelineCardViews.right.contextMenu = FeedItemMenu({ [weak self] _ -> UIMenu? in
-      return self?.contextMenu?.menu?(1)
+      self?.contextMenu?.menu?(1)
     })
 
     stackView.snp.makeConstraints {

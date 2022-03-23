@@ -37,13 +37,13 @@ class PlaylistCarplayManager: NSObject {
       // IE: Will we show it on each window OR just the one browser controller.
       // After all, we can't play media simultaneously.
       if let selectedTab = browserController?.tabManager.selectedTab,
-        let playlistItem = selectedTab.playlistItem,
-        PlaylistManager.shared.index(of: playlistItem.pageSrc) == nil {
-
+         let playlistItem = selectedTab.playlistItem,
+         PlaylistManager.shared.index(of: playlistItem.pageSrc) == nil {
         browserController?.updatePlaylistURLBar(
           tab: selectedTab,
           state: .newItem,
-          item: playlistItem)
+          item: playlistItem
+        )
       }
     }
   }
@@ -80,10 +80,10 @@ class PlaylistCarplayManager: NSObject {
     if currentWindow == nil {
       currentWindow =
         UIApplication.shared.connectedScenes
-        .filter({ $0.activationState == .foregroundActive })
-        .compactMap({ $0 as? UIWindowScene })
-        .first?.windows
-        .filter({ $0.isKeyWindow }).first
+          .filter({ $0.activationState == .foregroundActive })
+          .compactMap({ $0 as? UIWindowScene })
+          .first?.windows
+          .filter(\.isKeyWindow).first
     }
 
     // If there is no media player, create one,
@@ -91,19 +91,24 @@ class PlaylistCarplayManager: NSObject {
     let mediaPlayer = self.mediaPlayer ?? MediaPlayer()
     let mediaStreamer = PlaylistMediaStreamer(
       playerView: currentWindow ?? UIView(),
-      certStore: browserController?.profile.certStore)
+      certStore: browserController?.profile.certStore
+    )
 
     // Construct the CarPlay UI
     let carPlayController = PlaylistCarplayController(
       mediaStreamer: mediaStreamer,
       player: mediaPlayer,
-      interfaceController: carplayInterface)
+      interfaceController: carplayInterface
+    )
     self.mediaPlayer = mediaPlayer
     return carPlayController
   }
 
-  func getPlaylistController(tab: Tab?, initialItem: PlaylistInfo?, initialItemPlaybackOffset: Double) -> PlaylistViewController {
-
+  func getPlaylistController(
+    tab: Tab?,
+    initialItem: PlaylistInfo?,
+    initialItemPlaybackOffset: Double
+  ) -> PlaylistViewController {
     // If background playback is enabled, tabs will continue to play media
     // Even if another controller is presented and even when PIP is enabled in playlist.
     // Therefore we need to stop the page/tab from playing when using playlist.
@@ -117,12 +122,13 @@ class PlaylistCarplayManager: NSObject {
 
     let playlistController =
       self.playlistController
-      ?? PlaylistViewController(
-        openInNewTab: browserController?.openURLInNewTab,
-        profile: browserController?.profile,
-        mediaPlayer: mediaPlayer,
-        initialItem: initialItem,
-        initialItemPlaybackOffset: initialItemPlaybackOffset)
+        ?? PlaylistViewController(
+          openInNewTab: browserController?.openURLInNewTab,
+          profile: browserController?.profile,
+          mediaPlayer: mediaPlayer,
+          initialItem: initialItem,
+          initialItemPlaybackOffset: initialItemPlaybackOffset
+        )
     self.mediaPlayer = mediaPlayer
     return playlistController
   }
@@ -133,22 +139,26 @@ class PlaylistCarplayManager: NSObject {
     }
 
     if let tab = tab,
-      let item = tab.playlistItem,
-      let webView = tab.webView,
-      let tag = tab.playlistItem?.tagId {
+       let item = tab.playlistItem,
+       let webView = tab.webView,
+       let tag = tab.playlistItem?.tagId {
       PlaylistHelper.getCurrentTime(webView: webView, nodeTag: tag) { [unowned self] currentTime in
         completion(
           self.getPlaylistController(
             tab: tab,
             initialItem: item,
-            initialItemPlaybackOffset: currentTime))
+            initialItemPlaybackOffset: currentTime
+          )
+        )
       }
     } else {
       return completion(
         getPlaylistController(
           tab: tab,
           initialItem: nil,
-          initialItemPlaybackOffset: 0.0))
+          initialItemPlaybackOffset: 0.0
+        )
+      )
     }
   }
 

@@ -76,7 +76,8 @@ class BraveNewsOptInView: UIView, FeedCardContent {
           $0.textColor = .white
           $0.font = .systemFont(ofSize: 18, weight: .semibold)
           $0.numberOfLines = 0
-        }),
+        }
+      ),
       .view(
         UILabel().then {
           $0.text = Strings.BraveNews.introCardBody
@@ -84,7 +85,8 @@ class BraveNewsOptInView: UIView, FeedCardContent {
           $0.textColor = .white
           $0.font = .systemFont(ofSize: 14)
           $0.numberOfLines = 0
-        }),
+        }
+      ),
       .view(
         UIStackView().then {
           $0.spacing = 4
@@ -99,9 +101,11 @@ class BraveNewsOptInView: UIView, FeedCardContent {
                 $0.textColor = .white
                 $0.font = .systemFont(ofSize: 13)
                 $0.numberOfLines = 0
-              })
+              }
+            )
           )
-        }),
+        }
+      ),
       .customSpace(24),
       .view(turnOnBraveNewsButton),
       .view(learnMoreButton)
@@ -142,6 +146,7 @@ class BraveNewsOptInView: UIView, FeedCardContent {
       assertionFailure("Unused for welcome card")
     }
   }
+
   var contextMenu: FeedItemMenu? {
     didSet {
       assertionFailure("Unused for welcome card")
@@ -155,11 +160,13 @@ private class MaskedNewLabel: UIView {
     // New has a white background always behind it, so only light
     $0.overrideUserInterfaceStyle = .light
   }
+
   private let label = UILabel().then {
     $0.text = Strings.BraveNews.introCardNew.uppercased()
     $0.textColor = .black
     $0.font = .systemFont(ofSize: 12, weight: .bold)
   }
+
   override init(frame: CGRect) {
     super.init(frame: frame)
 
@@ -179,16 +186,19 @@ private class MaskedNewLabel: UIView {
     isAccessibilityElement = true
     accessibilityTraits = [.staticText]
   }
+
   override func layoutSubviews() {
     super.layoutSubviews()
     label.frame = gradientView.bounds
   }
+
   @available(*, unavailable)
   required init(coder: NSCoder) {
     fatalError()
   }
+
   override var accessibilityLabel: String? {
     get { label.accessibilityLabel }
-    set {}  // swiftlint:disable:this unused_setter_value
+    set {} // swiftlint:disable:this unused_setter_value
   }
 }

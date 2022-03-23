@@ -20,7 +20,6 @@ class RoundInterfaceView: UIView {
 }
 
 class SyncViewController: UIViewController {
-
   override func viewDidLoad() {
     super.viewDidLoad()
 

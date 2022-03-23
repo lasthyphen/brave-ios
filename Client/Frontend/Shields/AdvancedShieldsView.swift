@@ -16,6 +16,7 @@ class AdvancedShieldsView: UIStackView {
   let globalControlsTitleView = HeaderTitleView().then {
     $0.titleLabel.text = Strings.Shields.globalControls.uppercased()
   }
+
   let globalControlsButton = ChangeGlobalDefaultsView()
 
   override init(frame: CGRect) {
@@ -47,9 +48,7 @@ class AdvancedShieldsView: UIStackView {
 }
 
 extension AdvancedShieldsView {
-
   class HeaderTitleView: UIView {
-
     let titleLabel = UILabel().then {
       $0.font = .systemFont(ofSize: 13.0)
       $0.numberOfLines = 0
@@ -74,7 +73,6 @@ extension AdvancedShieldsView {
 
   /// A container displaying a toggle for the user
   class ToggleView: UIView {
-
     let titleLabel: UILabel = {
       let l = UILabel()
       l.font = .systemFont(ofSize: 15.0)
@@ -86,6 +84,7 @@ extension AdvancedShieldsView {
     let toggleSwitch = UISwitch().then {
       $0.onTintColor = UIColor.braveOrange
     }
+
     var valueToggled: ((Bool) -> Void)?
 
     init(title: String) {
@@ -132,12 +131,12 @@ extension AdvancedShieldsView {
 
     override var accessibilityLabel: String? {
       get { titleLabel.accessibilityLabel }
-      set { assertionFailure() }  // swiftlint:disable:this unused_setter_value
+      set { assertionFailure() } // swiftlint:disable:this unused_setter_value
     }
 
     override var accessibilityValue: String? {
       get { toggleSwitch.accessibilityValue }
-      set { assertionFailure() }  // swiftlint:disable:this unused_setter_value
+      set { assertionFailure() } // swiftlint:disable:this unused_setter_value
     }
 
     @objc private func switchValueChanged() {
@@ -163,22 +162,24 @@ extension AdvancedShieldsView {
 }
 
 final class ChangeGlobalDefaultsView: UIControl {
-
   private let highlightedBackgroundView = UIView().then {
     $0.isUserInteractionEnabled = false
     $0.alpha = 0.0
     $0.backgroundColor = UIColor.bravePrimary.withAlphaComponent(0.1)
   }
+
   private let imageView = UIImageView(image: UIImage(imageLiteralResourceName: "internet-block").template).then {
     $0.setContentHuggingPriority(.required, for: .horizontal)
     $0.tintColor = .braveLabel
   }
+
   private let textLabel = UILabel().then {
     $0.setContentHuggingPriority(.defaultLow, for: .horizontal)
     $0.font = .systemFont(ofSize: 15.0)
     $0.textColor = .braveLabel
     $0.text = Strings.Shields.globalChangeButton
   }
+
   private let chevron = UIImageView(image: UIImage(imageLiteralResourceName: "chevron").template).then {
     $0.setContentHuggingPriority(.required, for: .horizontal)
     $0.tintColor = .secondaryBraveLabel
@@ -190,7 +191,8 @@ final class ChangeGlobalDefaultsView: UIControl {
         withDuration: 0.15, delay: 0, options: [.beginFromCurrentState],
         animations: {
           self.highlightedBackgroundView.alpha = self.isHighlighted ? 1.0 : 0.0
-        }, completion: nil)
+        }, completion: nil
+      )
     }
   }
 

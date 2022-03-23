@@ -5,7 +5,6 @@
 @testable import Client
 import Foundation
 import Shared
-
 import XCTest
 
 class PrefsTests: XCTestCase {

@@ -22,6 +22,7 @@ extension Ledger.PromotionStatus {
     }
   }
 }
+
 extension Ledger.PromotionType {
   fileprivate var displayText: String {
     switch self {
@@ -49,7 +50,11 @@ class RewardsInternalsPromotionListController: TableViewController {
   override func viewDidLoad() {
     title = Strings.RewardsInternals.promotionsTitle
 
-    navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .action, target: self, action: #selector(tappedShare)).then {
+    navigationItem.rightBarButtonItem = UIBarButtonItem(
+      barButtonSystemItem: .action,
+      target: self,
+      action: #selector(tappedShare)
+    ).then {
       $0.accessibilityLabel = Strings.RewardsInternals.shareInternalsTitle
     }
 
@@ -73,15 +78,24 @@ class RewardsInternalsPromotionListController: TableViewController {
     dataSource.sections = promotions.map { promo in
       var rows = [
         Row(text: Strings.RewardsInternals.status, detailText: promo.status.displayText),
-        Row(text: Strings.RewardsInternals.amount, detailText: "\(batFormatter.string(from: NSNumber(value: promo.approximateValue)) ?? "0.0") \(Strings.BAT)"),
+        Row(
+          text: Strings.RewardsInternals.amount,
+          detailText: "\(batFormatter.string(from: NSNumber(value: promo.approximateValue)) ?? "0.0") \(Strings.BAT)"
+        ),
         Row(text: Strings.RewardsInternals.type, detailText: promo.type.displayText),
-        Row(text: Strings.RewardsInternals.expiresAt, detailText: dateFormatter.string(from: Date(timeIntervalSince1970: TimeInterval(promo.expiresAt)))),
+        Row(
+          text: Strings.RewardsInternals.expiresAt,
+          detailText: dateFormatter.string(from: Date(timeIntervalSince1970: TimeInterval(promo.expiresAt)))
+        ),
         Row(text: Strings.RewardsInternals.legacyPromotion, detailText: promo.legacyClaimed ? Strings.yes : Strings.no),
         Row(text: Strings.RewardsInternals.version, detailText: "\(promo.version)"),
       ]
       if promo.status == .finished {
         rows.append(contentsOf: [
-          Row(text: Strings.RewardsInternals.claimedAt, detailText: dateFormatter.string(from: Date(timeIntervalSince1970: TimeInterval(promo.claimedAt)))),
+          Row(
+            text: Strings.RewardsInternals.claimedAt,
+            detailText: dateFormatter.string(from: Date(timeIntervalSince1970: TimeInterval(promo.claimedAt)))
+          ),
           Row(text: Strings.RewardsInternals.claimID, detailText: promo.claimId, cellClass: SubtitleCell.self),
         ])
       }
@@ -103,7 +117,11 @@ class RewardsInternalsPromotionListController: TableViewController {
 /// A file generator that creates JSON files containing all of the promotions that the user has claimed
 /// or has pending to claim
 struct RewardsInternalsPromotionsGenerator: RewardsInternalsFileGenerator {
-  func generateFiles(at path: String, using builder: RewardsInternalsSharableBuilder, completion: @escaping (Error?) -> Void) {
+  func generateFiles(
+    at path: String,
+    using builder: RewardsInternalsSharableBuilder,
+    completion: @escaping (Error?) -> Void
+  ) {
     let ledger = builder.ledger
     ledger.updatePendingAndFinishedPromotions {
       let promotions = ledger.finishedPromotions + ledger.pendingPromotions
@@ -113,12 +131,14 @@ struct RewardsInternalsPromotionsGenerator: RewardsInternalsFileGenerator {
           "Status": promo.status.displayText,
           "Amount": promo.approximateValue,
           "Type": promo.type.displayText,
-          "Expires at": builder.dateAndTimeFormatter.string(from: Date(timeIntervalSince1970: TimeInterval(promo.expiresAt))),
+          "Expires at": builder.dateAndTimeFormatter
+            .string(from: Date(timeIntervalSince1970: TimeInterval(promo.expiresAt))),
           "Legacy promotion": promo.legacyClaimed ? "Yes" : "No",
           "Version": promo.version,
         ]
         if promo.status == .finished {
-          data["Claimed at"] = builder.dateAndTimeFormatter.string(from: Date(timeIntervalSince1970: TimeInterval(promo.claimedAt)))
+          data["Claimed at"] = builder.dateAndTimeFormatter
+            .string(from: Date(timeIntervalSince1970: TimeInterval(promo.claimedAt)))
           data["Claim ID"] = promo.claimId
         }
         return data

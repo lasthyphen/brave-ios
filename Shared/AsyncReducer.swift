@@ -6,8 +6,11 @@ import Foundation
 
 public let DefaultDispatchQueue = DispatchQueue.global(qos: DispatchQoS.default.qosClass)
 
-public func asyncReducer<T, U>(_ initialValue: T, combine: @escaping (T, U) -> Deferred<Maybe<T>>) -> AsyncReducer<T, U> {
-  return AsyncReducer(initialValue: initialValue, combine: combine)
+public func asyncReducer<T, U>(
+  _ initialValue: T,
+  combine: @escaping (T, U) -> Deferred<Maybe<T>>
+) -> AsyncReducer<T, U> {
+  AsyncReducer(initialValue: initialValue, combine: combine)
 }
 
 /**
@@ -27,7 +30,7 @@ public func asyncReducer<T, U>(_ initialValue: T, combine: @escaping (T, U) -> D
 open class AsyncReducer<T, U> {
   // T is the accumulator. U is the input value. The returned T is the new accumulated value.
   public typealias Combine = (T, U) -> Deferred<Maybe<T>>
-  fileprivate let lock = NSRecursiveLock()
+  private let lock = NSRecursiveLock()
 
   private let dispatchQueue: DispatchQueue
   private let combine: Combine
@@ -40,9 +43,9 @@ open class AsyncReducer<T, U> {
   private var isStarted: Bool = false
 
   /**
-     * Has this task queue finished?
-     * Once the task queue has finished, it cannot have more tasks appended.
-     */
+   * Has this task queue finished?
+   * Once the task queue has finished, it cannot have more tasks appended.
+   */
   open var isFilled: Bool {
     lock.lock()
     defer { lock.unlock() }
@@ -53,7 +56,11 @@ open class AsyncReducer<T, U> {
     self.init(initialValue: deferMaybe(initialValue), queue: queue, combine: combine)
   }
 
-  public init(initialValue: Deferred<Maybe<T>>, queue: DispatchQueue = DefaultDispatchQueue, combine: @escaping Combine) {
+  public init(
+    initialValue: Deferred<Maybe<T>>,
+    queue: DispatchQueue = DefaultDispatchQueue,
+    combine: @escaping Combine
+  ) {
     self.dispatchQueue = queue
     self.combine = combine
     self.initialValueDeferred = initialValue
@@ -61,7 +68,7 @@ open class AsyncReducer<T, U> {
 
   // This is always protected by a lock, so we don't need to
   // take another one.
-  fileprivate func ensureStarted() {
+  private func ensureStarted() {
     if self.isStarted {
       return
     }
@@ -73,7 +80,7 @@ open class AsyncReducer<T, U> {
     func nextItem() -> U? {
       // Because popFirst is only available on array slices.
       // removeFirst is fine for range-replaceable collections.
-      return queuedItems.isEmpty ? nil : queuedItems.removeFirst()
+      queuedItems.isEmpty ? nil : queuedItems.removeFirst()
     }
 
     func continueMaybe(_ res: Maybe<T>) {
@@ -94,7 +101,7 @@ open class AsyncReducer<T, U> {
       }
 
       let combineItem = deferDispatchAsync(dispatchQueue) {
-        return self.combine(accumulator, item)
+        self.combine(accumulator, item)
       }
 
       queueNext(combineItem)
@@ -105,19 +112,19 @@ open class AsyncReducer<T, U> {
   }
 
   /**
-     * Append one or more tasks onto the end of the queue.
-     *
-     * @throws AlreadyFilled if the queue has finished already.
-     */
+   * Append one or more tasks onto the end of the queue.
+   *
+   * @throws AlreadyFilled if the queue has finished already.
+   */
   open func append(_ items: U...) throws -> Deferred<Maybe<T>> {
-    return try append(items)
+    try append(items)
   }
 
   /**
-     * Append a list of tasks onto the end of the queue.
-     *
-     * @throws AlreadyFilled if the queue has already finished.
-     */
+   * Append a list of tasks onto the end of the queue.
+   *
+   * @throws AlreadyFilled if the queue has already finished.
+   */
   open func append(_ items: [U]) throws -> Deferred<Maybe<T>> {
     lock.lock()
     defer { lock.unlock() }

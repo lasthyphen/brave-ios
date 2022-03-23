@@ -18,7 +18,10 @@ struct AssetSearchView: View {
   
   var body: some View {
     NavigationView {
-      TokenList(tokens: allTokens.filter({ $0.isErc20 || $0.symbol == cryptoStore.networkStore.selectedChain.symbol })) { token in
+      TokenList(
+        tokens: allTokens
+          .filter({ $0.isErc20 || $0.symbol == cryptoStore.networkStore.selectedChain.symbol })
+      ) { token in
         NavigationLink(
           destination: AssetDetailView(
             assetDetailStore: cryptoStore.assetDetailStore(for: token),
@@ -48,7 +51,8 @@ struct AssetSearchView: View {
     .navigationViewStyle(StackNavigationViewStyle())
     .onAppear {
       cryptoStore.blockchainRegistry.allTokens(cryptoStore.networkStore.selectedChainId) { tokens in
-        self.allTokens = ([cryptoStore.networkStore.selectedChain.nativeToken] + tokens).sorted(by: { $0.symbol < $1.symbol })
+        self.allTokens = ([cryptoStore.networkStore.selectedChain.nativeToken] + tokens)
+          .sorted(by: { $0.symbol < $1.symbol })
       }
     }
   }

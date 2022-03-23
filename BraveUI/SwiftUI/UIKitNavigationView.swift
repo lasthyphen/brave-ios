@@ -34,6 +34,7 @@ public struct UIKitNavigationView<Content: View>: View {
         )
       )
     }
+
     func updateUIViewController(_ uiViewController: UINavigationController, context: Context) {
     }
   }

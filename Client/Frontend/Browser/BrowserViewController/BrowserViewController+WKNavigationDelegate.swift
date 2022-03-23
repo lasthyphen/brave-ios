@@ -31,13 +31,15 @@ extension WKNavigationAction {
 extension URL {
   /// Obtain a schemeless absolute string
   fileprivate var schemelessAbsoluteString: String {
-    guard let scheme = self.scheme else { return absoluteString }
+    guard let scheme = self.scheme else {
+      return absoluteString
+    }
     return absoluteString.replacingOccurrences(of: "\(scheme)://", with: "")
   }
 }
 
 extension BrowserViewController {
-  fileprivate func handleExternalURL(_ url: URL, openedURLCompletionHandler: ((Bool) -> Void)? = nil) {
+  private func handleExternalURL(_ url: URL, openedURLCompletionHandler: ((Bool) -> Void)? = nil) {
     self.view.endEditing(true)
     let popup = AlertPopupView(
       imageView: nil,
@@ -47,12 +49,13 @@ extension BrowserViewController {
       titleSize: 21
     )
     popup.addButton(title: Strings.openExternalAppURLDontAllow, fontSize: 16) { () -> PopupViewDismissType in
-      return .flyDown
+      .flyDown
     }
-    popup.addButton(title: Strings.openExternalAppURLAllow, type: .primary, fontSize: 16) { () -> PopupViewDismissType in
-      UIApplication.shared.open(url, options: [:], completionHandler: openedURLCompletionHandler)
-      return .flyDown
-    }
+    popup
+      .addButton(title: Strings.openExternalAppURLAllow, type: .primary, fontSize: 16) { () -> PopupViewDismissType in
+        UIApplication.shared.open(url, options: [:], completionHandler: openedURLCompletionHandler)
+        return .flyDown
+      }
     popup.showWithType(showType: .flyUp)
   }
 }
@@ -108,10 +111,15 @@ extension BrowserViewController: WKNavigationDelegate {
   // method.
 
   fileprivate func isUpholdOAuthAuthorization(_ url: URL) -> Bool {
-    return url.scheme == "rewards" && url.host == "uphold"
+    url.scheme == "rewards" && url.host == "uphold"
   }
 
-  func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, preferences: WKWebpagePreferences, decisionHandler: @escaping (WKNavigationActionPolicy, WKWebpagePreferences) -> Void) {
+  func webView(
+    _ webView: WKWebView,
+    decidePolicyFor navigationAction: WKNavigationAction,
+    preferences: WKWebpagePreferences,
+    decisionHandler: @escaping (WKNavigationActionPolicy, WKWebpagePreferences) -> Void
+  ) {
     guard let url = navigationAction.request.url else {
       decisionHandler(.cancel, preferences)
       return
@@ -142,7 +150,7 @@ extension BrowserViewController: WKNavigationDelegate {
 
     // Universal links do not work if the request originates from the app, manual handling is required.
     if let mainDocURL = navigationAction.request.mainDocumentURL,
-      let universalLink = UniversalLinkManager.universalLinkType(for: mainDocURL, checkPath: true) {
+       let universalLink = UniversalLinkManager.universalLinkType(for: mainDocURL, checkPath: true) {
       switch universalLink {
       case .buyVPN:
         presentCorrespondingVPNViewController()
@@ -191,7 +199,7 @@ extension BrowserViewController: WKNavigationDelegate {
     // Brave Search logic.
 
     if navigationAction.targetFrame?.isMainFrame == true,
-      BraveSearchManager.isValidURL(url) {
+       BraveSearchManager.isValidURL(url) {
       // We fetch cookies to determine if backup search was enabled on the website.
       let profile = self.profile
       webView.configuration.websiteDataStore.httpCookieStore.getAllCookies { cookies in
@@ -234,8 +242,8 @@ extension BrowserViewController: WKNavigationDelegate {
         // do nothing, use Apple's https solution.
       } else {
         if Preferences.Shields.httpsEverywhere.value,
-          url.scheme == "http",
-          let urlHost = url.normalizedHost() {
+           url.scheme == "http",
+           let urlHost = url.normalizedHost() {
           HttpsEverywhereStats.shared.shouldUpgrade(url) { shouldupgrade in
             DispatchQueue.main.async {
               if shouldupgrade {
@@ -256,17 +264,17 @@ extension BrowserViewController: WKNavigationDelegate {
       // No adblocking logic is be used on session restore urls. It uses javascript to retrieve the
       // request then the page is reloaded with a proper url and adblocking rules are applied.
       if let mainDocumentURL = navigationAction.request.mainDocumentURL,
-        mainDocumentURL.schemelessAbsoluteString == url.schemelessAbsoluteString,
-        !(InternalURL(url)?.isSessionRestore ?? false),
-        navigationAction.sourceFrame.isMainFrame || navigationAction.targetFrame?.isMainFrame == true {
+         mainDocumentURL.schemelessAbsoluteString == url.schemelessAbsoluteString,
+         !(InternalURL(url)?.isSessionRestore ?? false),
+         navigationAction.sourceFrame.isMainFrame || navigationAction.targetFrame?.isMainFrame == true {
         // Identify specific block lists that need to be applied to the requesting domain
         let domainForShields = Domain.getOrCreate(forUrl: mainDocumentURL, persistent: !isPrivateBrowsing)
         let (on, off) = BlocklistName.blocklists(forDomain: domainForShields)
         let controller = webView.configuration.userContentController
 
         // Grab all lists that have valid rules and add/remove them as necessary
-        on.compactMap { $0.rule }.forEach(controller.add)
-        off.compactMap { $0.rule }.forEach(controller.remove)
+        on.compactMap(\.rule).forEach(controller.add)
+        off.compactMap(\.rule).forEach(controller.remove)
 
         if let tab = tabManager[webView] {
           tab.userScriptManager?.isFingerprintingProtectionEnabled =
@@ -311,7 +319,11 @@ extension BrowserViewController: WKNavigationDelegate {
         // Do not show error message for JS navigated links or redirect
         // as it's not the result of a user action.
         if !didOpenURL, navigationAction.navigationType == .linkActivated {
-          let alert = UIAlertController(title: Strings.unableToOpenURLErrorTitle, message: Strings.unableToOpenURLError, preferredStyle: .alert)
+          let alert = UIAlertController(
+            title: Strings.unableToOpenURLErrorTitle,
+            message: Strings.unableToOpenURLError,
+            preferredStyle: .alert
+          )
           alert.addAction(UIAlertAction(title: Strings.OKString, style: .default, handler: nil))
           self.present(alert, animated: true, completion: nil)
         }
@@ -320,13 +332,17 @@ extension BrowserViewController: WKNavigationDelegate {
     decisionHandler(.cancel, preferences)
   }
 
-  func webView(_ webView: WKWebView, decidePolicyFor navigationResponse: WKNavigationResponse, decisionHandler: @escaping (WKNavigationResponsePolicy) -> Void) {
+  func webView(
+    _ webView: WKWebView,
+    decidePolicyFor navigationResponse: WKNavigationResponse,
+    decisionHandler: @escaping (WKNavigationResponsePolicy) -> Void
+  ) {
     let response = navigationResponse.response
     let responseURL = response.url
 
     if let tab = tabManager[webView],
-      let responseURL = responseURL,
-      InternalURL(responseURL)?.isSessionRestore == true {
+       let responseURL = responseURL,
+       InternalURL(responseURL)?.isSessionRestore == true {
       tab.shouldClassifyLoadsForAds = false
     }
 
@@ -351,7 +367,13 @@ extension BrowserViewController: WKNavigationDelegate {
     }
 
     // Check if this response should be handed off to Passbook.
-    if let passbookHelper = OpenPassBookHelper(request: request, response: response, canShowInWebView: canShowInWebView, forceDownload: forceDownload, browserViewController: self) {
+    if let passbookHelper = OpenPassBookHelper(
+      request: request,
+      response: response,
+      canShowInWebView: canShowInWebView,
+      forceDownload: forceDownload,
+      browserViewController: self
+    ) {
       // Open our helper and cancel this response from the webview.
       passbookHelper.open()
       decisionHandler(.cancel)
@@ -360,7 +382,14 @@ extension BrowserViewController: WKNavigationDelegate {
 
     // Check if this response should be downloaded.
     let cookieStore = webView.configuration.websiteDataStore.httpCookieStore
-    if let downloadHelper = DownloadHelper(request: request, response: response, cookieStore: cookieStore, canShowInWebView: canShowInWebView, forceDownload: forceDownload, browserViewController: self) {
+    if let downloadHelper = DownloadHelper(
+      request: request,
+      response: response,
+      cookieStore: cookieStore,
+      canShowInWebView: canShowInWebView,
+      forceDownload: forceDownload,
+      browserViewController: self
+    ) {
       // Clear the pending download web view so that subsequent navigations from the same
       // web view don't invoke another download.
       pendingDownloadWebView = nil
@@ -388,19 +417,25 @@ extension BrowserViewController: WKNavigationDelegate {
     decisionHandler(.allow)
   }
 
-  func webView(_ webView: WKWebView, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
-
+  func webView(
+    _ webView: WKWebView,
+    didReceive challenge: URLAuthenticationChallenge,
+    completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void
+  ) {
     // If this is a certificate challenge, see if the certificate has previously been
     // accepted by the user.
     let origin = "\(challenge.protectionSpace.host):\(challenge.protectionSpace.port)"
     if challenge.protectionSpace.authenticationMethod == NSURLAuthenticationMethodServerTrust,
-      let trust = challenge.protectionSpace.serverTrust,
-      let cert = SecTrustGetCertificateAtIndex(trust, 0), profile.certStore.containsCertificate(cert, forOrigin: origin) {
+       let trust = challenge.protectionSpace.serverTrust,
+       let cert = SecTrustGetCertificateAtIndex(trust, 0),
+       profile.certStore.containsCertificate(cert, forOrigin: origin) {
       completionHandler(.useCredential, URLCredential(trust: trust))
       return
     }
 
-    guard challenge.protectionSpace.authenticationMethod == NSURLAuthenticationMethodHTTPBasic || challenge.protectionSpace.authenticationMethod == NSURLAuthenticationMethodHTTPDigest || challenge.protectionSpace.authenticationMethod == NSURLAuthenticationMethodNTLM,
+    guard challenge.protectionSpace.authenticationMethod == NSURLAuthenticationMethodHTTPBasic || challenge
+      .protectionSpace.authenticationMethod == NSURLAuthenticationMethodHTTPDigest || challenge.protectionSpace
+      .authenticationMethod == NSURLAuthenticationMethodNTLM,
       let tab = tabManager[webView]
     else {
       completionHandler(.performDefaultHandling, nil)
@@ -408,7 +443,8 @@ extension BrowserViewController: WKNavigationDelegate {
     }
 
     // If this is a request to our local web server, use our private credentials.
-    if challenge.protectionSpace.host == "localhost" && challenge.protectionSpace.port == Int(WebServer.sharedInstance.server.port) {
+    if challenge.protectionSpace.host == "localhost" && challenge.protectionSpace
+      .port == Int(WebServer.sharedInstance.server.port) {
       completionHandler(.useCredential, WebServer.sharedInstance.credentials)
       return
     }
@@ -427,7 +463,9 @@ extension BrowserViewController: WKNavigationDelegate {
   }
 
   func webView(_ webView: WKWebView, didCommit navigation: WKNavigation!) {
-    guard let tab = tabManager[webView] else { return }
+    guard let tab = tabManager[webView] else {
+      return
+    }
 
     tab.url = webView.url
     self.scrollController.resetZoomState()
@@ -441,7 +479,6 @@ extension BrowserViewController: WKNavigationDelegate {
 
   func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
     if let tab = tabManager[webView] {
-
       // Second attempt to inject results to the BraveSearch.
       // This will be called if we got fallback results faster than
       // the page navigation.
@@ -488,16 +525,21 @@ extension BrowserViewController: WKNavigationDelegate {
       // or any sort of internal-url, then we run cosmetic filters on it.
       // If ad-block shields are enabled for this URL
       if let url = webView.url,
-        !InternalURL.isValid(url: url),
-        !(InternalURL(url)?.isSessionRestore ?? false),
-        Domain.getOrCreate(
-          forUrl: url,
-          persistent: !PrivateBrowsingManager.shared.isPrivateBrowsing
-        )
-        .isShieldExpected(.AdblockAndTp, considerAllShieldsOption: true),
-        let cosmeticFiltersScript = try AdBlockStats.shared.cosmeticFiltersScript(for: url) {
+         !InternalURL.isValid(url: url),
+         !(InternalURL(url)?.isSessionRestore ?? false),
+         Domain.getOrCreate(
+           forUrl: url,
+           persistent: !PrivateBrowsingManager.shared.isPrivateBrowsing
+         )
+           .isShieldExpected(.AdblockAndTp, considerAllShieldsOption: true),
+           let cosmeticFiltersScript = try AdBlockStats.shared.cosmeticFiltersScript(for: url) {
         // Execute the cosmetic filters script in the cosmetic filters sandbox world
-        webView.evaluateSafeJavaScript(functionName: cosmeticFiltersScript, args: [], contentWorld: .cosmeticFiltersSandbox, asFunction: false) { _, error in
+        webView.evaluateSafeJavaScript(
+          functionName: cosmeticFiltersScript,
+          args: [],
+          contentWorld: .cosmeticFiltersSandbox,
+          asFunction: false
+        ) { _, error in
           log.error("AdblockRustInjector error: \(String(describing: error))")
         }
       }
@@ -511,7 +553,9 @@ extension BrowserViewController: WKNavigationDelegate {
   }
 
   func webView(_ webView: WKWebView, didReceiveServerRedirectForProvisionalNavigation navigation: WKNavigation!) {
-    guard let tab = tabManager[webView], let url = webView.url, rewards.isEnabled else { return }
+    guard let tab = tabManager[webView], let url = webView.url, rewards.isEnabled else {
+      return
+    }
     tab.redirectURLs.append(url)
   }
 }

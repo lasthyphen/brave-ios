@@ -19,11 +19,11 @@ open class WeakList<T: AnyObject>: Sequence {
   public init() {}
 
   /**
-     * Adds an item to the list.
-     * Note that every insertion iterates through the list to find any "holes" (items that have
-     * been deallocated) to reuse them, so this class may not be appropriate in situations where
-     * insertion is frequent.
-     */
+   * Adds an item to the list.
+   * Note that every insertion iterates through the list to find any "holes" (items that have
+   * been deallocated) to reuse them, so this class may not be appropriate in situations where
+   * insertion is frequent.
+   */
   open func insert(_ item: T) {
     // Reuse any existing slots that have been deallocated.
     for wrapper in items where wrapper.value == nil {
@@ -37,7 +37,7 @@ open class WeakList<T: AnyObject>: Sequence {
   open func makeIterator() -> AnyIterator<T> {
     var index = 0
 
-    return AnyIterator() {
+    return AnyIterator {
       if index >= self.items.count {
         return nil
       }
@@ -55,15 +55,15 @@ open class WeakList<T: AnyObject>: Sequence {
   }
 
   open func count() -> Int {
-    return self.items.count
+    self.items.count
   }
 
   open func index(of object: T) -> Int? {
-    return self.items.firstIndex(where: { $0.value === object })
+    self.items.firstIndex(where: { $0.value === object })
   }
 
   open subscript(index: Int) -> T? {
-    return self.items[index].value
+    self.items[index].value
   }
 }
 

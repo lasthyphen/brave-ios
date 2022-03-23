@@ -46,46 +46,48 @@ struct AddressQRCodeScannerView: View {
         isPermissionDenied: $permissionDenied,
         dismiss: { presentationMode.dismiss() }
       )
-      .navigationBarTitleDisplayMode(.inline)
-      .toolbar {
-        ToolbarItemGroup(placement: .cancellationAction) {
-          Button(action: {
-            presentationMode.dismiss()
-          }) {
-            Text(Strings.cancelButtonTitle)
-              .foregroundColor(Color(.braveOrange))
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+          ToolbarItemGroup(placement: .cancellationAction) {
+            Button(action: {
+              presentationMode.dismiss()
+            }) {
+              Text(Strings.cancelButtonTitle)
+                .foregroundColor(Color(.braveOrange))
+            }
           }
         }
-      }
-      .ignoresSafeArea()
-      .background(
-        Color.clear
-          .alert(isPresented: $isErrorPresented) {
-            Alert(
-              title: Text(""),
-              message: Text(Strings.scanQRCodeInvalidDataErrorMessage),
-              dismissButton: .default(
-                Text(Strings.scanQRCodeErrorOKButton),
-                action: {
-                  presentationMode.dismiss()
-                })
-            )
-          }
-      )
-      .background(
-        Color.clear
-          .alert(isPresented: $permissionDenied) {
-            Alert(
-              title: Text(""),
-              message: Text(Strings.scanQRCodePermissionErrorMessage),
-              dismissButton: .default(
-                Text(Strings.openPhoneSettingsActionTitle),
-                action: {
-                  UIApplication.shared.open(URL(string: UIApplication.openSettingsURLString)!)
-                })
-            )
-          }
-      )
+        .ignoresSafeArea()
+        .background(
+          Color.clear
+            .alert(isPresented: $isErrorPresented) {
+              Alert(
+                title: Text(""),
+                message: Text(Strings.scanQRCodeInvalidDataErrorMessage),
+                dismissButton: .default(
+                  Text(Strings.scanQRCodeErrorOKButton),
+                  action: {
+                    presentationMode.dismiss()
+                  }
+                )
+              )
+            }
+        )
+        .background(
+          Color.clear
+            .alert(isPresented: $permissionDenied) {
+              Alert(
+                title: Text(""),
+                message: Text(Strings.scanQRCodePermissionErrorMessage),
+                dismissButton: .default(
+                  Text(Strings.openPhoneSettingsActionTitle),
+                  action: {
+                    UIApplication.shared.open(URL(string: UIApplication.openSettingsURLString)!)
+                  }
+                )
+              )
+            }
+        )
       #endif
     }
   }
@@ -224,8 +226,13 @@ private class AddressQRCodeScannerViewController: UIViewController {
 }
 
 extension AddressQRCodeScannerViewController: AVCaptureMetadataOutputObjectsDelegate {
-  func metadataOutput(_ output: AVCaptureMetadataOutput, didOutput metadataObjects: [AVMetadataObject], from connection: AVCaptureConnection) {
-    if let stringValue = (metadataObjects.first as? AVMetadataMachineReadableCodeObject)?.stringValue, stringValue.isETHAddress {
+  func metadataOutput(
+    _ output: AVCaptureMetadataOutput,
+    didOutput metadataObjects: [AVMetadataObject],
+    from connection: AVCaptureConnection
+  ) {
+    if let stringValue = (metadataObjects.first as? AVMetadataMachineReadableCodeObject)?.stringValue,
+       stringValue.isETHAddress {
       address = stringValue
       dismiss()
     } else {

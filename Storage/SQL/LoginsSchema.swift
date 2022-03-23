@@ -32,8 +32,8 @@ open class LoginsSchema: Schema {
 
   static let defaultVersion = 3
 
-  public var name: String { return "LOGINS" }
-  public var version: Int { return LoginsSchema.defaultVersion }
+  public var name: String { "LOGINS" }
+  public var version: Int { LoginsSchema.defaultVersion }
 
   public init() {}
 
@@ -67,43 +67,43 @@ open class LoginsSchema: Schema {
 
   public func create(_ db: SQLiteDBConnection) -> Bool {
     let common = """
-        id INTEGER PRIMARY KEY AUTOINCREMENT
-      , hostname TEXT NOT NULL
-      , httpRealm TEXT
-      , formSubmitURL TEXT
-      , usernameField TEXT
-      , passwordField TEXT
-      , timesUsed INTEGER NOT NULL DEFAULT 0
-      , timeCreated INTEGER NOT NULL
-      , timeLastUsed INTEGER
-      , timePasswordChanged INTEGER NOT NULL
-      , username TEXT
-      , password TEXT NOT NULL
-      """
+      id INTEGER PRIMARY KEY AUTOINCREMENT
+    , hostname TEXT NOT NULL
+    , httpRealm TEXT
+    , formSubmitURL TEXT
+    , usernameField TEXT
+    , passwordField TEXT
+    , timesUsed INTEGER NOT NULL DEFAULT 0
+    , timeCreated INTEGER NOT NULL
+    , timeLastUsed INTEGER
+    , timePasswordChanged INTEGER NOT NULL
+    , username TEXT
+    , password TEXT NOT NULL
+    """
 
     let mirror = """
-      CREATE TABLE IF NOT EXISTS loginsM (
-          \(common)
-          , guid TEXT NOT NULL UNIQUE
-          -- Integer milliseconds.
-          , server_modified INTEGER NOT NULL
-          , is_overridden TINYINT NOT NULL DEFAULT 0
-      )
-      """
+    CREATE TABLE IF NOT EXISTS loginsM (
+        \(common)
+        , guid TEXT NOT NULL UNIQUE
+        -- Integer milliseconds.
+        , server_modified INTEGER NOT NULL
+        , is_overridden TINYINT NOT NULL DEFAULT 0
+    )
+    """
 
     let local = """
-      CREATE TABLE IF NOT EXISTS loginsL (
-          \(common)
-          -- Typically overlaps one in the mirror unless locally new.
-          , guid TEXT NOT NULL UNIQUE
-          -- Can be null. Client clock. In extremis only.
-          , local_modified INTEGER
-          -- Boolean. Locally deleted.
-          , is_deleted TINYINT NOT NULL DEFAULT 0
-          -- SyncStatus enum. Set when changed or created.
-          , sync_status TINYINT NOT NULL DEFAULT \(SyncStatus.synced.rawValue)
-      )
-      """
+    CREATE TABLE IF NOT EXISTS loginsL (
+        \(common)
+        -- Typically overlaps one in the mirror unless locally new.
+        , guid TEXT NOT NULL UNIQUE
+        -- Can be null. Client clock. In extremis only.
+        , local_modified INTEGER
+        -- Boolean. Locally deleted.
+        , is_deleted TINYINT NOT NULL DEFAULT 0
+        -- SyncStatus enum. Set when changed or created.
+        , sync_status TINYINT NOT NULL DEFAULT \(SyncStatus.synced.rawValue)
+    )
+    """
 
     return self.run(db, queries: [mirror, local, indexIsOverriddenHostname, indexIsDeletedHostname])
   }

@@ -13,6 +13,7 @@ class SwapButton: SpringButton {
     $0.isUserInteractionEnabled = false
     $0.clipsToBounds = true
   }
+
   private let imageView = UIImageView(image: UIImage(imageLiteralResourceName: "swap")).then {
     $0.isUserInteractionEnabled = false
   }

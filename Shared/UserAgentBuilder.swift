@@ -5,7 +5,6 @@
 import UIKit
 
 public struct UserAgentBuilder {
-
   // These parts of UA are frozen in WebKit.
   private let kernelVersion = "15E148"
   private let safariBuildNumber = "604.1"
@@ -29,23 +28,23 @@ public struct UserAgentBuilder {
   ///
   /// - returns: A proper user agent to use in WKWebView and url requests.
   public func build(desktopMode: Bool) -> String {
-
-    if desktopMode { return desktopUA }
+    if desktopMode {
+      return desktopUA
+    }
 
     return """
-      Mozilla/5.0 (\(cpuInfo)) \
-      AppleWebKit/\(webkitVersion) (KHTML, like Gecko) \
-      Version/\(safariVersion) \
-      Mobile/\(kernelVersion) \
-      Safari/\(safariBuildNumber)
-      """
+    Mozilla/5.0 (\(cpuInfo)) \
+    AppleWebKit/\(webkitVersion) (KHTML, like Gecko) \
+    Version/\(safariVersion) \
+    Mobile/\(kernelVersion) \
+    Safari/\(safariBuildNumber)
+    """
   }
 
   // These user agents are taken from iOS Safari in desktop mode and hardcoded.
   // These are not super precise because each iOS version can have slighly different desktop UA.
   // The only differences are with exact `Version/XX` and `MAC OS X 10_XX` numbers.
   private var desktopUA: String {
-
     let iOS15DesktopUA =
       """
       Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_6) \
@@ -99,7 +98,6 @@ public struct UserAgentBuilder {
     case 14: return "14_6"
     case 15: return "15_0"
     default: return "\(os.majorVersion)_0"
-
     }
   }
 
@@ -110,7 +108,6 @@ public struct UserAgentBuilder {
     case 14: return "14.1.1"
     case 15: return "15.0"
     default: return "\(os.majorVersion).0"
-
     }
   }
 }

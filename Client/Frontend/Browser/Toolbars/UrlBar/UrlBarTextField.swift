@@ -6,7 +6,6 @@ import UIKit
 import BraveShared
 
 class UrlBarTextField: AutocompleteTextField {
-
   @objc dynamic var clearButtonTintColor: UIColor? {
     didSet {
       // Clear previous tinted image that's cache and ask for a relayout
@@ -21,6 +20,7 @@ class UrlBarTextField: AutocompleteTextField {
     super.init(frame: frame)
   }
 
+  @available(*, unavailable)
   required init?(coder aDecoder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }
@@ -49,7 +49,9 @@ class UrlBarTextField: AutocompleteTextField {
   }
 
   fileprivate func tintImage(_ image: UIImage, color: UIColor?) -> UIImage {
-    guard let color = color else { return image }
+    guard let color = color else {
+      return image
+    }
 
     let size = image.size
 

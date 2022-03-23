@@ -7,7 +7,6 @@ import UIKit
 // We need a subclass so we can setup the shadows correctly
 // This subclass creates a strong shadow on the URLBar
 class LocationContainerView: UIView {
-
   private struct LocationContainerUX {
     static let cornerRadius: CGFloat = 8.0
   }
@@ -20,6 +19,7 @@ class LocationContainerView: UIView {
     layer.masksToBounds = true
   }
 
+  @available(*, unavailable)
   required init?(coder aDecoder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }

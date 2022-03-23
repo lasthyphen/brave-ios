@@ -31,7 +31,8 @@ public struct DeviceCheckRegistration: Codable {
         domain: "com.brave.device.check.enrollment", code: -1,
         userInfo: [
           NSLocalizedDescriptionKey: "Cannot decode enrollmentBlob"
-        ])
+        ]
+      )
     }
 
     enrollmentBlob = try JSONDecoder().decode(DeviceCheckEnrollment.self, from: data)
@@ -90,7 +91,8 @@ public struct AttestationVerifcation: Codable {
         domain: "com.brave.device.check.enrollment", code: -1,
         userInfo: [
           NSLocalizedDescriptionKey: "Cannot decode attestationBlob"
-        ])
+        ]
+      )
     }
 
     attestationBlob = try JSONDecoder().decode(AttestationBlob.self, from: data)
@@ -131,7 +133,6 @@ public struct Attestation: Codable {
 }
 
 public class DeviceCheckClient {
-
   // The ID of the private-key stored in the secure-enclave chip
   private static let privateKeyId = "com.brave.device.check.private.key"
 
@@ -200,7 +201,11 @@ public class DeviceCheckClient {
   }
 
   // Sends the attestation to the server along with the nonce and the challenge signature
-  public func setAttestation(nonce: String, verification: AttestationVerifcation, _ completion: @escaping (Error?) -> Void) {
+  public func setAttestation(
+    nonce: String,
+    verification: AttestationVerifcation,
+    _ completion: @escaping (Error?) -> Void
+  ) {
     do {
       try executeRequest(.setAttestation(nonce, verification)) { (result: Swift.Result<Data, Error>) in
         if case .failure(let error) = result {
@@ -232,7 +237,11 @@ public class DeviceCheckClient {
   }
 
   // Generates an enrollment structure to be used with `registerDevice`
-  public func generateEnrollment(paymentId: String, token: String, _ completion: (DeviceCheckRegistration?, Error?) -> Void) {
+  public func generateEnrollment(
+    paymentId: String,
+    token: String,
+    _ completion: (DeviceCheckRegistration?, Error?) -> Void
+  ) {
     do {
       guard let privateKey = try Cryptography.generateKey(id: DeviceCheckClient.privateKeyId) else {
         throw CryptographyError(description: "Unable to generate private key")
@@ -245,13 +254,15 @@ public class DeviceCheckClient {
       let enrollment = DeviceCheckEnrollment(
         paymentId: paymentId,
         publicKey: publicKey,
-        deviceToken: token)
+        deviceToken: token
+      )
 
       let signature = try privateKey.sign(message: enrollment.bsonData()).base64EncodedString()
 
       let registration = DeviceCheckRegistration(
         enrollmentBlob: enrollment,
-        signature: signature)
+        signature: signature
+      )
       completion(registration, nil)
     } catch {
       completion(nil, error)
@@ -271,7 +282,8 @@ public class DeviceCheckClient {
 
       let attestation = Attestation(
         publicKeyHash: publicKeyFingerprint,
-        paymentId: paymentId)
+        paymentId: paymentId
+      )
 
       completion(attestation, nil)
     } catch {
@@ -290,7 +302,8 @@ public class DeviceCheckClient {
       let signature = try privateKey.sign(message: try attestation.bsonData()).base64EncodedString()
       let verification = AttestationVerifcation(
         attestationBlob: attestation,
-        signature: signature)
+        signature: signature
+      )
 
       completion(verification, nil)
     } catch {
@@ -299,7 +312,7 @@ public class DeviceCheckClient {
   }
 }
 
-private extension DeviceCheckClient {
+extension DeviceCheckClient {
   // The base URL of the server
   private var baseURL: URL? {
     switch environment {
@@ -349,51 +362,54 @@ private extension DeviceCheckClient {
   }
 
   @discardableResult
-  private func executeRequest<T: Codable>(_ request: Request, _ completion: @escaping (Swift.Result<T, Error>) -> Void) throws -> URLSessionDataTask {
-
+  private func executeRequest<T: Codable>(
+    _ request: Request,
+    _ completion: @escaping (Swift.Result<T, Error>) -> Void
+  ) throws -> URLSessionDataTask {
     let request = try encodeRequest(request)
-    let task = URLSession(configuration: .ephemeral, delegate: nil, delegateQueue: .main).dataTask(with: request) { data, response, error in
+    let task = URLSession(configuration: .ephemeral, delegate: nil, delegateQueue: .main)
+      .dataTask(with: request) { data, response, error in
 
-      if let error = error {
-        return completion(.failure(error))
-      }
+        if let error = error {
+          return completion(.failure(error))
+        }
 
-      if let data = data, let error = try? JSONDecoder().decode(DeviceCheckError.self, from: data) {
-        return completion(.failure(error))
-      }
+        if let data = data, let error = try? JSONDecoder().decode(DeviceCheckError.self, from: data) {
+          return completion(.failure(error))
+        }
 
-      if let response = response as? HTTPURLResponse {
-        if response.statusCode < 200 || response.statusCode > 299 {
+        if let response = response as? HTTPURLResponse {
+          if response.statusCode < 200 || response.statusCode > 299 {
+            return completion(
+              .failure(
+                DeviceCheckError(message: "Validation Failed: Invalid Response Code", code: response.statusCode)
+              )
+            )
+          }
+        }
+
+        guard let data = data else {
           return completion(
             .failure(
-              DeviceCheckError(message: "Validation Failed: Invalid Response Code", code: response.statusCode)
+              DeviceCheckError(message: "Validation Failed: Empty Server Response", code: 500)
             )
           )
         }
-      }
 
-      guard let data = data else {
-        return completion(
-          .failure(
-            DeviceCheckError(message: "Validation Failed: Empty Server Response", code: 500)
-          )
-        )
-      }
+        if T.self == Data.self {
+          return completion(.success(data as! T)) // swiftlint:disable:this force_cast
+        }
 
-      if T.self == Data.self {
-        return completion(.success(data as! T))  // swiftlint:disable:this force_cast
-      }
+        if T.self == String.self {
+          return completion(.success(String(data: data, encoding: .utf8) as! T)) // swiftlint:disable:this force_cast
+        }
 
-      if T.self == String.self {
-        return completion(.success(String(data: data, encoding: .utf8) as! T))  // swiftlint:disable:this force_cast
+        do {
+          completion(.success(try JSONDecoder().decode(T.self, from: data)))
+        } catch {
+          completion(.failure(error))
+        }
       }
-
-      do {
-        completion(.success(try JSONDecoder().decode(T.self, from: data)))
-      } catch {
-        completion(.failure(error))
-      }
-    }
     task.resume()
     return task
   }
@@ -425,8 +441,7 @@ private extension DeviceCheckClient {
   }
 }
 
-private extension DeviceCheckClient {
-
+extension DeviceCheckClient {
   // Encodes parameters into the query component of the URL
   private func encodeQueryURL(url: URL, parameters: [String: String]) -> URL? {
     var urlComponents = URLComponents()

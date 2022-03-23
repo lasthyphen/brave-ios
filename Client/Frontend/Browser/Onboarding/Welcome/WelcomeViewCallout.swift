@@ -17,8 +17,8 @@ enum WelcomeViewCalloutState {
     var details: String
     var primaryButtonTitle: String
     var secondaryButtonTitle: String
-    var primaryAction: (() -> Void)
-    var secondaryAction: (() -> Void)
+    var primaryAction: () -> Void
+    var secondaryAction: () -> Void
   }
 
   case welcome(title: String)
@@ -135,6 +135,7 @@ class WelcomeViewCallout: UIView {
     }
   }
 
+  @available(*, unavailable)
   required init?(coder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }
@@ -285,7 +286,9 @@ class WelcomeViewCallout: UIView {
             identifier: .init(rawValue: "primary.action"),
             handler: { _ in
               action()
-            }), for: .touchUpInside)
+            }
+          ), for: .touchUpInside
+        )
         $0.alpha = 1.0
         $0.isHidden = false
       }
@@ -334,7 +337,9 @@ class WelcomeViewCallout: UIView {
             identifier: .init(rawValue: "primary.action"),
             handler: { _ in
               info.primaryAction()
-            }), for: .touchUpInside)
+            }
+          ), for: .touchUpInside
+        )
         $0.alpha = 1.0
         $0.isHidden = false
       }
@@ -352,7 +357,9 @@ class WelcomeViewCallout: UIView {
             identifier: .init(rawValue: "secondary.action"),
             handler: { _ in
               info.secondaryAction()
-            }), for: .touchUpInside)
+            }
+          ), for: .touchUpInside
+        )
         $0.alpha = 1.0
         $0.isHidden = false
       }
@@ -393,7 +400,9 @@ class WelcomeViewCallout: UIView {
             identifier: .init(rawValue: "primary.action"),
             handler: { _ in
               info.primaryAction()
-            }), for: .touchUpInside)
+            }
+          ), for: .touchUpInside
+        )
         $0.alpha = 1.0
         $0.isHidden = false
       }
@@ -417,7 +426,9 @@ class WelcomeViewCallout: UIView {
             identifier: .init(rawValue: "secondary.action"),
             handler: { _ in
               info.secondaryAction()
-            }), for: .touchUpInside)
+            }
+          ), for: .touchUpInside
+        )
         $0.alpha = 1.0
         $0.isHidden = false
       }
@@ -480,6 +491,7 @@ private class CalloutArrowView: UIView {
     super.init(frame: frame)
   }
 
+  @available(*, unavailable)
   required init?(coder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }
@@ -521,6 +533,7 @@ private class RoundedBackgroundView: UIView {
     backgroundColor = .clear
   }
 
+  @available(*, unavailable)
   required init?(coder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }

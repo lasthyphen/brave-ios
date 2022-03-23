@@ -7,24 +7,25 @@ import UIKit
 public let PopoverArrowHeight: CGFloat = 8.0
 
 open class PopoverNavigationController: UINavigationController, PopoverContentComponent {
-
   private class NavigationBar: UINavigationBar {
     override var frame: CGRect {
-      get { return super.frame.with { $0.origin.y = PopoverArrowHeight } }
+      get { super.frame.with { $0.origin.y = PopoverArrowHeight } }
       set { super.frame = newValue }
     }
+
     override var barPosition: UIBarPosition {
-      return .topAttached
+      .topAttached
     }
   }
 
   private class Toolbar: UIToolbar {
     override var frame: CGRect {
-      get { return super.frame.with { $0.size.height = 44 } }
+      get { super.frame.with { $0.size.height = 44 } }
       set { super.frame = newValue }
     }
+
     override var barPosition: UIBarPosition {
-      return .bottom
+      .bottom
     }
   }
 
@@ -51,8 +52,8 @@ open class PopoverNavigationController: UINavigationController, PopoverContentCo
   }
 
   public override var additionalSafeAreaInsets: UIEdgeInsets {
-    get { return UIEdgeInsets(top: PopoverArrowHeight, left: 0, bottom: 0, right: 0) }
-    set {}  // swiftlint:disable:this unused_setter_value
+    get { UIEdgeInsets(top: PopoverArrowHeight, left: 0, bottom: 0, right: 0) }
+    set {} // swiftlint:disable:this unused_setter_value
   }
 
   open override func viewDidLoad() {
@@ -88,11 +89,11 @@ open class PopoverNavigationController: UINavigationController, PopoverContentCo
   }
 
   public var extendEdgeIntoArrow: Bool {
-    return true
+    true
   }
 
   public var isPanToDismissEnabled: Bool {
-    return self.visibleViewController === self.viewControllers.first
+    self.visibleViewController === self.viewControllers.first
   }
 
   override public func preferredContentSizeDidChange(forChildContentContainer container: UIContentContainer) {
@@ -121,8 +122,12 @@ open class PopoverNavigationController: UINavigationController, PopoverContentCo
 
 extension PopoverNavigationController: UIGestureRecognizerDelegate {
   public func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
-    guard let pan = gestureRecognizer as? UIPanGestureRecognizer else { return false }
-    if viewControllers.first == visibleViewController { return false }
+    guard let pan = gestureRecognizer as? UIPanGestureRecognizer else {
+      return false
+    }
+    if viewControllers.first == visibleViewController {
+      return false
+    }
     let velocity = pan.velocity(in: view)
     // Only allow left-to-right swipes
     return velocity.x > 0

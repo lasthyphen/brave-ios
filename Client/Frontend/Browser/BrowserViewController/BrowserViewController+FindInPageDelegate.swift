@@ -62,8 +62,8 @@ class WKWebViewFindStringFindDelegate: NSObject {
     .showHighlight,
     .wrapAround,
     .showFindIndicator,
-    /*.showOverlay, // Options used by Safari
-                                          .atWordStarts*/
+    /* .showOverlay, // Options used by Safari
+      .atWordStarts */
   ]
 
   /// List of selectors used. The only ones really needed is `set` and `find`.
@@ -140,7 +140,9 @@ class WKWebViewFindStringFindDelegate: NSObject {
   ///              - First parameter is the Index of the currently highlighted item
   ///              - Second parameter is the Total results found on the page
   func find(string: String, backwards: Bool, _ completion: @escaping (Int, Int) -> Void) {
-    guard didConstructorSucceed, let webView = webView else { return }
+    guard didConstructorSucceed, let webView = webView else {
+      return
+    }
     findMatchesCallback = completion
 
     var options = self.options
@@ -156,7 +158,8 @@ class WKWebViewFindStringFindDelegate: NSObject {
       selector,
       string as NSString,
       options.rawValue,
-      UInt.max - 1)
+      UInt.max - 1
+    )
   }
 
   @objc
@@ -165,7 +168,12 @@ class WKWebViewFindStringFindDelegate: NSObject {
   }
 
   @objc
-  private func _webView(_ webView: WKWebView, didFindMatches matches: UInt, forString string: NSString, withMatchIndex matchIndex: NSInteger) {
+  private func _webView(
+    _ webView: WKWebView,
+    didFindMatches matches: UInt,
+    forString string: NSString,
+    withMatchIndex matchIndex: NSInteger
+  ) {
     var matches = matches
 
     // kWKMoreThanMaximumMatchCount = static_cast<unsigned>(-1)

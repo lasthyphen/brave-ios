@@ -24,6 +24,7 @@ extension Ledger.DrainStatus: RepresentableOptionType {
       return ""
     }
   }
+
   var statusButtonTitle: String {
     switch self {
     case .invalid:
@@ -40,6 +41,7 @@ extension Ledger.DrainStatus: RepresentableOptionType {
       return ""
     }
   }
+
   var transferStatusTitle: String {
     switch self {
     case .invalid:
@@ -56,6 +58,7 @@ extension Ledger.DrainStatus: RepresentableOptionType {
       return ""
     }
   }
+
   var transferStatusBody: String {
     switch self {
     case .invalid:

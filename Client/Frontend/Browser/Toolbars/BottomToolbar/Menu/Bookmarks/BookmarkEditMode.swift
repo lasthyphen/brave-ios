@@ -20,14 +20,14 @@ enum BookmarkEditMode {
   /// Returns a initial, default save location if none is provided
   var initialSaveLocation: BookmarkSaveLocation {
     switch self {
-    case .addBookmark(_, _), .addFolder(_), .addFolderUsingTabs(_, _):
+    case .addBookmark(_, _), .addFolder(_), .addFolderUsingTabs:
       return .rootLevel
     // Set current parent folder if possible, fallback to root folder
     case .editBookmark(let bookmark):
       return folderOrRoot(bookmarkOrFolder: bookmark)
     case .editFolder(let folder):
       return folderOrRoot(bookmarkOrFolder: folder)
-    case .editFavorite(_):
+    case .editFavorite:
       return .favorites
     }
   }
@@ -45,16 +45,18 @@ enum BookmarkEditMode {
   /// Returns a title for view controller.
   var title: String {
     switch self {
-    case .addBookmark(_, _): return Strings.newBookmarkTitle
-    case .addFolder(_), .addFolderUsingTabs(_, _): return Strings.newFolderTitle
-    case .editBookmark(_): return Strings.editBookmarkTitle
-    case .editFolder(_): return Strings.editFolderTitle
-    case .editFavorite(_): return Strings.editFavoriteTitle
+    case .addBookmark: return Strings.newBookmarkTitle
+    case .addFolder(_), .addFolderUsingTabs: return Strings.newFolderTitle
+    case .editBookmark: return Strings.editBookmarkTitle
+    case .editFolder: return Strings.editFolderTitle
+    case .editFavorite: return Strings.editFavoriteTitle
     }
   }
 
   private func folderOrRoot(bookmarkOrFolder: Bookmarkv2) -> BookmarkSaveLocation {
-    guard let parent = bookmarkOrFolder.parent else { return .rootLevel }
+    guard let parent = bookmarkOrFolder.parent else {
+      return .rootLevel
+    }
     return .folder(folder: parent)
   }
 

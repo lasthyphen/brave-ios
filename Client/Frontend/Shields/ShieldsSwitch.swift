@@ -11,7 +11,6 @@ import Shared
 ///
 /// Treat it the same way you'd use a UISwitch (addTarget for .valueChanged)
 class ShieldsSwitch: UIControl {
-
   /// The static size of this switch
   private static let size = CGSize(width: 100, height: 60)
 
@@ -33,7 +32,9 @@ class ShieldsSwitch: UIControl {
       gradientView.basicAnimate(property: kPOPViewAlpha, key: "alpha") { animation, _ in
         animation.toValue = on ? 1.0 : 0.0
         animation.completionBlock = { [weak self] _, _ in
-          guard let self = self else { return }
+          guard let self = self else {
+            return
+          }
           if on {
             self.beginGradientAnimations()
           } else {
@@ -119,7 +120,7 @@ class ShieldsSwitch: UIControl {
     get {
       "\(Strings.Shields.statusTitle): \(isOn ? Strings.Shields.statusValueUp : Strings.Shields.statusValueDown)"
     }
-    set { assertionFailure() }  // swiftlint:disable:this unused_setter_value
+    set { assertionFailure() } // swiftlint:disable:this unused_setter_value
   }
 
   @available(*, unavailable)
@@ -188,7 +189,7 @@ class ShieldsSwitch: UIControl {
   }
 
   override var intrinsicContentSize: CGSize {
-    return Self.size
+    Self.size
   }
 
   // MARK: - Animation
@@ -214,11 +215,11 @@ class ShieldsSwitch: UIControl {
   private func beginGradientAnimations() {
     let colorsKeyframe = CAKeyframeAnimation(keyPath: "colors")
     colorsKeyframe.calculationMode = .paced
-    colorsKeyframe.values = steps.map { $0.gradientColors }
+    colorsKeyframe.values = steps.map(\.gradientColors)
 
     let shadowKeyframe = CAKeyframeAnimation(keyPath: "shadowColor")
     shadowKeyframe.calculationMode = .paced
-    shadowKeyframe.values = steps.map { $0.shadowColor }
+    shadowKeyframe.values = steps.map(\.shadowColor)
 
     let group = CAAnimationGroup()
     group.animations = [colorsKeyframe, shadowKeyframe]

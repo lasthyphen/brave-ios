@@ -25,7 +25,9 @@ class SyncWelcomeViewController: SyncViewController {
       // Prevent dismissing the modal by swipe when migration happens.
       navigationController?.isModalInPresentation = isLoading == true
 
-      if !isLoading { return }
+      if !isLoading {
+        return
+      }
 
       let overlay = UIView().then {
         $0.backgroundColor = UIColor.black.withAlphaComponent(0.5)
@@ -174,14 +176,21 @@ class SyncWelcomeViewController: SyncViewController {
     buttonsStackView.addArrangedSubview(existingUserButton)
     mainStackView.addArrangedSubview(buttonsStackView)
 
-    navigationItem.rightBarButtonItem = UIBarButtonItem(image: UIImage(systemName: "gearshape"), style: .plain, target: self, action: #selector(onSyncInternalsTapped))
+    navigationItem.rightBarButtonItem = UIBarButtonItem(
+      image: UIImage(systemName: "gearshape"),
+      style: .plain,
+      target: self,
+      action: #selector(onSyncInternalsTapped)
+    )
   }
 
   /// Sync setup failure is handled here because it can happen from few places in children VCs(new chain, qr code, codewords)
   /// This makes all presented Sync View Controllers to dismiss, cleans up any sync setup and shows user a friendly message.
   private func handleSyncSetupFailure() {
     syncServiceObserver = syncAPI.addServiceStateObserver { [weak self] in
-      guard let self = self else { return }
+      guard let self = self else {
+        return
+      }
 
       if !self.syncAPI.isInSyncGroup {
         self.dismiss(animated: true)
@@ -203,14 +212,20 @@ class SyncWelcomeViewController: SyncViewController {
   @objc func newToSyncAction() {
     handleSyncSetupFailure()
     let addDevice = SyncSelectDeviceTypeViewController()
-    addDevice.syncInitHandler = { [weak self] (title, type) in
-      guard let self = self else { return }
+    addDevice.syncInitHandler = { [weak self] title, type in
+      guard let self = self else {
+        return
+      }
 
       func pushAddDeviceVC() {
         self.syncServiceObserver = nil
         guard self.syncAPI.isInSyncGroup else {
           addDevice.disableNavigationPrevention()
-          let alert = UIAlertController(title: Strings.syncUnsuccessful, message: Strings.syncUnableCreateGroup, preferredStyle: .alert)
+          let alert = UIAlertController(
+            title: Strings.syncUnsuccessful,
+            message: Strings.syncUnableCreateGroup,
+            preferredStyle: .alert
+          )
           alert.addAction(UIAlertAction(title: Strings.OKString, style: .default, handler: nil))
           addDevice.present(alert, animated: true, completion: nil)
           return
@@ -266,7 +281,9 @@ extension SyncWelcomeViewController: SyncPairControllerDelegate {
   func syncOnWordsEntered(_ controller: UIViewController & NavigationPrevention, codeWords: String) {
     controller.enableNavigationPrevention()
     syncDeviceInfoObserver = syncAPI.addDeviceStateObserver { [weak self] in
-      guard let self = self else { return }
+      guard let self = self else {
+        return
+      }
       self.syncServiceObserver = nil
       self.syncDeviceInfoObserver = nil
       controller.disableNavigationPrevention()

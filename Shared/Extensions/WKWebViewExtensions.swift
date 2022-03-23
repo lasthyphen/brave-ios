@@ -11,19 +11,32 @@ enum JavascriptError: Error {
   case invalid
 }
 
-public extension WKUserScript {
-  static func create(source: String, injectionTime: WKUserScriptInjectionTime, forMainFrameOnly: Bool, in contentWorld: WKContentWorld) -> WKUserScript {
-
+extension WKUserScript {
+  public static func create(
+    source: String,
+    injectionTime: WKUserScriptInjectionTime,
+    forMainFrameOnly: Bool,
+    in contentWorld: WKContentWorld
+  ) -> WKUserScript {
     if #available(iOS 14.3, *) {
-      return WKUserScript(source: source, injectionTime: injectionTime, forMainFrameOnly: forMainFrameOnly, in: contentWorld)
+      return WKUserScript(
+        source: source,
+        injectionTime: injectionTime,
+        forMainFrameOnly: forMainFrameOnly,
+        in: contentWorld
+      )
     } else {
       return WKUserScript(source: source, injectionTime: injectionTime, forMainFrameOnly: forMainFrameOnly)
     }
   }
 }
 
-public extension WKWebView {
-  func generateJSFunctionString(functionName: String, args: [Any?], escapeArgs: Bool = true) -> (javascript: String, error: Error?) {
+extension WKWebView {
+  public func generateJSFunctionString(
+    functionName: String,
+    args: [Any?],
+    escapeArgs: Bool = true
+  ) -> (javascript: String, error: Error?) {
     var sanitizedArgs = [String]()
     for arg in args {
       if let arg = arg {
@@ -55,7 +68,14 @@ public extension WKWebView {
     return ("\(functionName)(\(sanitizedArgs.joined(separator: ", ")))", nil)
   }
 
-  func evaluateSafeJavaScript(functionName: String, args: [Any] = [], contentWorld: WKContentWorld, escapeArgs: Bool = true, asFunction: Bool = true, completion: ((Any?, Error?) -> Void)? = nil) {
+  public func evaluateSafeJavaScript(
+    functionName: String,
+    args: [Any] = [],
+    contentWorld: WKContentWorld,
+    escapeArgs: Bool = true,
+    asFunction: Bool = true,
+    completion: ((Any?, Error?) -> Void)? = nil
+  ) {
     var javascript = functionName
 
     if asFunction {

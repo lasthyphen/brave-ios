@@ -41,7 +41,7 @@ class FavoritesOverflowButton: SpringButton {
 
   override func layoutSubviews() {
     super.layoutSubviews()
-    backgroundView.layer.cornerRadius = bounds.height / 2.0  // Pill shape
+    backgroundView.layer.cornerRadius = bounds.height / 2.0 // Pill shape
   }
 }
 
@@ -82,7 +82,11 @@ class FavoritesOverflowSectionProvider: NSObject, NTPObservableSectionProvider {
     return cell
   }
 
-  func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+  func collectionView(
+    _ collectionView: UICollectionView,
+    layout collectionViewLayout: UICollectionViewLayout,
+    sizeForItemAt indexPath: IndexPath
+  ) -> CGSize {
     var size = fittingSizeForCollectionView(collectionView, section: indexPath.section)
     size.height = 24
     return size

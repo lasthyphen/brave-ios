@@ -6,11 +6,9 @@
 import Foundation
 import XCTest
 import Storage
-
 @testable import Client
 
 class BlockSummaryTests: XCTestCase {
-
   override func setUp() {
     // The test json is loaded from Client Tests Target
 
@@ -28,29 +26,35 @@ class BlockSummaryTests: XCTestCase {
 
     XCTAssertTrue(
       fetchDomainSiteSavings(with: "http://dengekionline.com/") == "1.48",
-      "Rounded savings Amount - 1.477627916")
+      "Rounded savings Amount - 1.477627916"
+    )
 
     XCTAssertTrue(
       fetchDomainSiteSavings(with: "http://ascii.jp/") == "1.36",
-      "Rounded savings Amount - 1.359224634")
+      "Rounded savings Amount - 1.359224634"
+    )
 
     XCTAssertTrue(
       fetchDomainSiteSavings(with: "http://jisin.jp/") == "0.68",
-      "Rounded savings Amount - 0.678194046")
+      "Rounded savings Amount - 0.678194046"
+    )
 
     // Savings value rounded floor
 
     XCTAssertTrue(
       fetchDomainSiteSavings(with: "http://bunshun.jp/") == "1.13",
-      "Rounded savings Amount - 1.13061841")
+      "Rounded savings Amount - 1.13061841"
+    )
 
     XCTAssertFalse(
       fetchDomainSiteSavings(with: "http://jbpress.ismedia.jp/") == "0.66",
-      "Rounded savings Amount - 1.343074322 - Should return 1.34")
+      "Rounded savings Amount - 1.343074322 - Should return 1.34"
+    )
 
     XCTAssertTrue(
       fetchDomainSiteSavings(with: "https://ananweb.jp/") == "0.85",
-      "Rounded savings Amount - 0.8544185638")
+      "Rounded savings Amount - 0.8544185638"
+    )
 
     // Websites that doesnt exist in Json file
 
@@ -59,14 +63,13 @@ class BlockSummaryTests: XCTestCase {
     XCTAssertNil(fetchDomainSiteSavings(with: "https://abc.com/"))
 
     XCTAssertNil(fetchDomainSiteSavings(with: "https://test.com/"))
-
   }
 
   // Function utility that will fetch savings amount
   // It will return nil If website and savings amount for it doesnt exist in json file
   private func fetchDomainSiteSavings(with urlString: String) -> String? {
     if let url = URL(string: urlString),
-      let savings = subject.fetchDomainFetchedSiteSavings(url) {
+       let savings = subject.fetchDomainFetchedSiteSavings(url) {
       return savings
     }
 

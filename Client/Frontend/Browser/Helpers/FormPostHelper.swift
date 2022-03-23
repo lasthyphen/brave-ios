@@ -13,13 +13,13 @@ struct FormPostData {
 
   init?(messageBody: Any) {
     guard let messageBodyDict = messageBody as? [String: String],
-      let actionString = messageBodyDict["action"],
-      let method = messageBodyDict["method"],
-      let target = messageBodyDict["target"],
-      let enctype = messageBodyDict["enctype"],
-      let requestBodyString = messageBodyDict["requestBody"],
-      let action = URL(string: actionString),
-      let requestBody = requestBodyString.data(using: .utf8)
+          let actionString = messageBodyDict["action"],
+          let method = messageBodyDict["method"],
+          let target = messageBodyDict["target"],
+          let enctype = messageBodyDict["enctype"],
+          let requestBodyString = messageBodyDict["requestBody"],
+          let action = URL(string: actionString),
+          let requestBody = requestBodyString.data(using: .utf8)
     else {
       return nil
     }
@@ -36,8 +36,8 @@ struct FormPostData {
     let headers = request.allHTTPHeaderFields ?? [:]
 
     if self.action == request.url,
-      self.method == request.httpMethod,
-      self.enctype == headers["Content-Type"] {
+       self.method == request.httpMethod,
+       self.enctype == headers["Content-Type"] {
       return true
     }
 
@@ -63,14 +63,18 @@ class FormPostHelper: TabContentScript {
   }
 
   static func name() -> String {
-    return "FormPostHelper"
+    "FormPostHelper"
   }
 
   func scriptMessageHandlerName() -> String? {
-    return "formPostHelper"
+    "formPostHelper"
   }
 
-  func userContentController(_ userContentController: WKUserContentController, didReceiveScriptMessage message: WKScriptMessage, replyHandler: (Any?, String?) -> Void) {
+  func userContentController(
+    _ userContentController: WKUserContentController,
+    didReceiveScriptMessage message: WKScriptMessage,
+    replyHandler: (Any?, String?) -> Void
+  ) {
     defer { replyHandler(nil, nil) }
     guard let formPostData = FormPostData(messageBody: message.body) else {
       print("Unable to parse FormPostData from script message body.")

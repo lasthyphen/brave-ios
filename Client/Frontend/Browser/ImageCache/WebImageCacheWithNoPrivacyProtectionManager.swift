@@ -5,7 +5,6 @@
 import Foundation
 
 final class WebImageCacheWithNoPrivacyProtectionManager {
-
   private let webImageCache: WebImageCache
 
   static let shared: WebImageCache = {
@@ -17,5 +16,4 @@ final class WebImageCacheWithNoPrivacyProtectionManager {
     let webImageCache = WebImageCache(isPrivate: isPrivate)
     self.webImageCache = webImageCache
   }
-
 }

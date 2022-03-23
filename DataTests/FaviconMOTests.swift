@@ -15,7 +15,7 @@ class FaviconMOTests: CoreDataTestCase {
   let fetchRequest = NSFetchRequest<FaviconMO>(entityName: "Favicon")
 
   private func entity(for context: NSManagedObjectContext) -> NSEntityDescription {
-    return NSEntityDescription.entity(forEntityName: "Favicon", in: context)!
+    NSEntityDescription.entity(forEntityName: "Favicon", in: context)!
   }
 
   func testAdd() {
@@ -37,7 +37,6 @@ class FaviconMOTests: CoreDataTestCase {
 
     XCTAssertNil(FaviconMO.get(forFaviconUrl: wrongUrl, context: context))
     XCTAssertNotNil(FaviconMO.get(forFaviconUrl: exampleUrl.absoluteString, context: context))
-
   }
 
   @discardableResult

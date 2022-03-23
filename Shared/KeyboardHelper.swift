@@ -61,11 +61,21 @@ open class KeyboardHelper: NSObject {
   }
 
   /**
-     * Starts monitoring the keyboard state.
-     */
+   * Starts monitoring the keyboard state.
+   */
   open func startObserving() {
-    NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow), name: UIResponder.keyboardWillShowNotification, object: nil)
-    NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide), name: UIResponder.keyboardWillHideNotification, object: nil)
+    NotificationCenter.default.addObserver(
+      self,
+      selector: #selector(keyboardWillShow),
+      name: UIResponder.keyboardWillShowNotification,
+      object: nil
+    )
+    NotificationCenter.default.addObserver(
+      self,
+      selector: #selector(keyboardWillHide),
+      name: UIResponder.keyboardWillHideNotification,
+      object: nil
+    )
   }
 
   deinit {
@@ -73,9 +83,9 @@ open class KeyboardHelper: NSObject {
   }
 
   /**
-     * Adds a delegate to the helper.
-     * Delegates are weakly held.
-     */
+   * Adds a delegate to the helper.
+   * Delegates are weakly held.
+   */
   open func addDelegate(_ delegate: KeyboardHelperDelegate) {
     // Reuse any existing slots that have been deallocated.
     for weakDelegate in delegates where weakDelegate.delegate == nil {

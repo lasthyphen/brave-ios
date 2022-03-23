@@ -81,7 +81,9 @@ public class KeyringStore: ObservableObject {
   /// The users selected account when buying/sending/swapping currencies
   @Published var selectedAccount: BraveWallet.AccountInfo = .init() {
     didSet {
-      if oldValue.address == selectedAccount.address { return }
+      if oldValue.address == selectedAccount.address {
+        return
+      }
       keyringService.setSelectedAccount(selectedAccount.address, coin: .eth) { _ in }
     }
   }
@@ -122,7 +124,8 @@ public class KeyringStore: ObservableObject {
       keyring = keyringInfo
       if !keyring.accountInfos.isEmpty {
         keyringService.selectedAccount(.eth) { [self] accountAddress in
-          selectedAccount = keyringInfo.accountInfos.first(where: { $0.address == accountAddress }) ?? keyringInfo.accountInfos.first!
+          selectedAccount = keyringInfo.accountInfos.first(where: { $0.address == accountAddress }) ?? keyringInfo
+            .accountInfos.first!
         }
       }
     }
@@ -170,15 +173,25 @@ public class KeyringStore: ObservableObject {
     keyringService.mnemonic { phrase in
       let words =
         phrase
-        .split(separator: " ")
-        .enumerated()
-        .map { RecoveryWord(value: String($0.element), index: $0.offset) }
+          .split(separator: " ")
+          .enumerated()
+          .map { RecoveryWord(value: String($0.element), index: $0.offset) }
       completion(words)
     }
   }
 
-  func restoreWallet(words: [String], password: String, isLegacyBraveWallet: Bool, completion: ((Bool) -> Void)? = nil) {
-    restoreWallet(phrase: words.joined(separator: " "), password: password, isLegacyBraveWallet: isLegacyBraveWallet, completion: completion)
+  func restoreWallet(
+    words: [String],
+    password: String,
+    isLegacyBraveWallet: Bool,
+    completion: ((Bool) -> Void)? = nil
+  ) {
+    restoreWallet(
+      phrase: words.joined(separator: " "),
+      password: password,
+      isLegacyBraveWallet: isLegacyBraveWallet,
+      completion: completion
+    )
   }
 
   func restoreWallet(phrase: String, password: String, isLegacyBraveWallet: Bool, completion: ((Bool) -> Void)? = nil) {
@@ -187,7 +200,9 @@ public class KeyringStore: ObservableObject {
       password: password,
       isLegacyBraveWallet: isLegacyBraveWallet
     ) { [weak self] isMnemonicValid in
-      guard let self = self else { return }
+      guard let self = self else {
+        return
+      }
       if isMnemonicValid {
         // Restoring from wallet means you already have your phrase backed up
         self.notifyWalletBackupComplete()
@@ -236,9 +251,19 @@ public class KeyringStore: ObservableObject {
       completion?(success)
     }
     if account.isImported {
-      keyringService.setKeyringImportedAccountName(BraveWallet.DefaultKeyringId, address: account.address, name: name, completion: handler)
+      keyringService.setKeyringImportedAccountName(
+        BraveWallet.DefaultKeyringId,
+        address: account.address,
+        name: name,
+        completion: handler
+      )
     } else {
-      keyringService.setKeyringDerivedAccountName(BraveWallet.DefaultKeyringId, address: account.address, name: name, completion: handler)
+      keyringService.setKeyringDerivedAccountName(
+        BraveWallet.DefaultKeyringId,
+        address: account.address,
+        name: name,
+        completion: handler
+      )
     }
   }
 
@@ -268,7 +293,9 @@ public class KeyringStore: ObservableObject {
 
   /// Stores the users wallet password in the keychain so that they may unlock using biometrics/passcode
   static func storePasswordInKeychain(_ password: String) -> OSStatus {
-    guard let passwordData = password.data(using: .utf8) else { return errSecInvalidData }
+    guard let passwordData = password.data(using: .utf8) else {
+      return errSecInvalidData
+    }
     #if targetEnvironment(simulator)
     // There is a bug with iOS 15 simulators when attempting to add a keychain item with
     // `kSecAttrAccessControl` set. This of course means that on simulator we will not ask for biometrics
@@ -338,8 +365,8 @@ public class KeyringStore: ObservableObject {
     var passwordData: AnyObject?
     let status = SecItemCopyMatching(query as CFDictionary, &passwordData)
     guard status == errSecSuccess,
-      let data = passwordData as? Data,
-      let password = String(data: data, encoding: .utf8)
+          let data = passwordData as? Data,
+          let password = String(data: data, encoding: .utf8)
     else {
       return nil
     }

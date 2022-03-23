@@ -8,7 +8,6 @@ import BraveUI
 import Shared
 
 class BraveNewsAddSourceResultsViewController: UITableViewController {
-
   let feedDataSource: FeedDataSource
   let searchedURL: URL
   private let secureLocations: [RSSFeedLocation]
@@ -62,7 +61,11 @@ class BraveNewsAddSourceResultsViewController: UITableViewController {
 
     if navigationController?.viewControllers.first === self {
       // Presented via share screen or isolated
-      navigationItem.leftBarButtonItem = .init(barButtonSystemItem: .cancel, target: self, action: #selector(tappedCancel))
+      navigationItem.leftBarButtonItem = .init(
+        barButtonSystemItem: .cancel,
+        target: self,
+        action: #selector(tappedCancel)
+      )
     }
   }
 
@@ -84,7 +87,7 @@ class BraveNewsAddSourceResultsViewController: UITableViewController {
   override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
     let locations = indexPath.section == 0 ? secureLocations : insecureLocations
     if let location = locations[safe: indexPath.row],
-      let cell = tableView.cellForRow(at: indexPath) as? FeedLocationCell {
+       let cell = tableView.cellForRow(at: indexPath) as? FeedLocationCell {
       if selectedLocations.remove(location) == nil {
         selectedLocations.insert(location)
       }
@@ -103,7 +106,8 @@ class BraveNewsAddSourceResultsViewController: UITableViewController {
       return UITableViewCell()
     }
     let cell = tableView.dequeueReusableCell(for: indexPath) as FeedLocationCell
-    cell.imageView?.image = indexPath.section == 0 ? #imageLiteral(resourceName: "lock_verified").template : #imageLiteral(resourceName: "insecure-site-icon")
+    cell.imageView?.image = indexPath.section == 0 ? #imageLiteral(resourceName: "lock_verified")
+      .template : #imageLiteral(resourceName: "insecure-site-icon")
     cell.imageView?.tintColor = .braveLabel
     cell.textLabel?.text = location.title
     cell.detailTextLabel?.text = location.url.absoluteString
@@ -131,6 +135,7 @@ private class FeedLocationCell: UITableViewCell, TableViewReusable {
   override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
     super.init(style: .subtitle, reuseIdentifier: reuseIdentifier)
   }
+
   @available(*, unavailable)
   required init(coder: NSCoder) {
     fatalError()

@@ -11,7 +11,6 @@ import BraveUI
 import BraveShared
 
 class PasscodeSettingsViewController: TableViewController {
-
   init() {
     super.init(style: .grouped)
   }

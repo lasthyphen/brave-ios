@@ -16,7 +16,6 @@ protocol NTPLearnMoreViewDelegate: AnyObject {
 
 /// A view controller that is presented after user taps on 'Learn more' on one of `NTPNotificationViewController` views.
 class NTPLearnMoreViewController: BottomSheetViewController {
-
   var linkHandler: ((URL) -> Void)?
 
   private let state: BrandedImageCalloutState
@@ -60,13 +59,16 @@ class NTPLearnMoreViewController: BottomSheetViewController {
         headerText: Strings.NTP.sponsoredImageDescription,
         tosText: false,
         learnMoreButtonText: Strings.NTP.learnMoreAboutSI,
-        headerBodySpacing: 8)
+        headerBodySpacing: 8
+      )
     case .dontShow:
       assertionFailure()
       return nil
     }
 
-    guard let viewConfig = config else { return nil }
+    guard let viewConfig = config else {
+      return nil
+    }
 
     return NTPLearnMoreContentView(config: viewConfig)
   }
@@ -75,7 +77,9 @@ class NTPLearnMoreViewController: BottomSheetViewController {
 // MARK: - NTPLearnMoreDelegate
 extension NTPLearnMoreViewController: NTPLearnMoreViewDelegate {
   func learnMoreTapped() {
-    guard let url = URL(string: learnMoreAboutBraveRewardsUrl) else { return }
+    guard let url = URL(string: learnMoreAboutBraveRewardsUrl) else {
+      return
+    }
 
     // Normal case, open link in current tab and close the modal.
     linkHandler?(url)
@@ -88,7 +92,9 @@ extension NTPLearnMoreViewController: NTPLearnMoreViewDelegate {
   }
 
   func tosTapped() {
-    guard let url = URL(string: termsOfServiceUrl) else { return }
+    guard let url = URL(string: termsOfServiceUrl) else {
+      return
+    }
     self.showSFSafariViewController(url: url)
   }
 

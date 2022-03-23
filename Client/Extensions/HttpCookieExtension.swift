@@ -8,28 +8,30 @@ import Shared
 
 private let log = Logger.browserLogger
 
-public extension HTTPCookie {
-
-  static var locallySavedFile: String {
-    return "CookiesData.json"
+extension HTTPCookie {
+  public static var locallySavedFile: String {
+    "CookiesData.json"
   }
 
   private static let directory = FileManager.SearchPathDirectory.applicationSupportDirectory.url
 
-  typealias Success = Bool
-  class func saveToDisk(_ filename: String = HTTPCookie.locallySavedFile, completion: ((Success) -> Void)? = nil) {
+  public typealias Success = Bool
+  public class func saveToDisk(
+    _ filename: String = HTTPCookie.locallySavedFile,
+    completion: ((Success) -> Void)? = nil
+  ) {
     let cookieStore = WKWebsiteDataStore.default().httpCookieStore
 
     /* For reason unkown the callback to getAllCookies is not called, when the save is done from Settings.
-         A possibility is https://bugs.webkit.org/show_bug.cgi?id=188242
-         Even with the issue being fixed it still sometimes doesn't work.
-         The network process is in suspened maybe?
+     A possibility is https://bugs.webkit.org/show_bug.cgi?id=188242
+     Even with the issue being fixed it still sometimes doesn't work.
+     The network process is in suspened maybe?
 
-         And for some reason fetch cookie records preemptively guarantees this works.
-         Best guess is that fetching records brings network process to active.
+     And for some reason fetch cookie records preemptively guarantees this works.
+     Best guess is that fetching records brings network process to active.
 
-         Same applies to setting cookies back below.
-         */
+     Same applies to setting cookies back below.
+     */
     WKWebsiteDataStore.default().fetchDataRecords(ofTypes: [WKWebsiteDataTypeCookies]) { _ in }
     cookieStore.getAllCookies { cookies in
       guard let baseDir = directory else {
@@ -47,13 +49,19 @@ public extension HTTPCookie {
     }
   }
 
-  class func loadFromDisk(_ filename: String = HTTPCookie.locallySavedFile, completion: ((Success) -> Void)? = nil) {
+  public class func loadFromDisk(
+    _ filename: String = HTTPCookie.locallySavedFile,
+    completion: ((Success) -> Void)? = nil
+  ) {
     guard let baseDir = directory else {
       completion?(false)
       return
     }
     do {
-      let data = try Data(contentsOf: baseDir.appendingPathComponent(filename), options: Data.ReadingOptions.alwaysMapped)
+      let data = try Data(
+        contentsOf: baseDir.appendingPathComponent(filename),
+        options: Data.ReadingOptions.alwaysMapped
+      )
       if let cookies = try NSKeyedUnarchiver.unarchiveTopLevelObjectWithData(data) as? [HTTPCookie] {
         HTTPCookie.setCookies(cookies) { success in
           completion?(success)
@@ -82,7 +90,7 @@ public extension HTTPCookie {
     }
   }
 
-  class func deleteLocalCookieFile(_ filename: String = HTTPCookie.locallySavedFile) {
+  public class func deleteLocalCookieFile(_ filename: String = HTTPCookie.locallySavedFile) {
     guard let baseDir = directory else {
       return
     }

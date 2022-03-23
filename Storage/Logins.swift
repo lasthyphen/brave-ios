@@ -13,7 +13,7 @@ private var log = Logger.syncLogger
  * LoginData is a wrapper around NSURLCredential and NSURLProtectionSpace to allow us to add extra fields where needed.
  **/
 public protocol LoginData: AnyObject {
-  var guid: String { get set }  // It'd be nice if this were read-only.
+  var guid: String { get set } // It'd be nice if this were read-only.
   var credentials: URLCredential { get }
   var protectionSpace: URLProtectionSpace { get }
   var hostname: String { get }
@@ -57,21 +57,21 @@ open class Login: CustomStringConvertible, LoginData, LoginUsageData, Equatable 
 
   open var hasMalformedHostname: Bool = false
 
-  open var username: String? { return credentials.user }
-  open var password: String { return credentials.password ?? "" }
+  open var username: String? { credentials.user }
+  open var password: String { credentials.password ?? "" }
   open var usernameField: String?
   open var passwordField: String?
 
   fileprivate var _httpRealm: String?
   open var httpRealm: String? {
-    get { return self._httpRealm ?? protectionSpace.realm }
+    get { self._httpRealm ?? protectionSpace.realm }
     set { self._httpRealm = newValue }
   }
 
   fileprivate var _formSubmitURL: String?
   open var formSubmitURL: String? {
     get {
-      return self._formSubmitURL
+      self._formSubmitURL
     }
     set(value) {
       guard let value = value, !value.isEmpty else {
@@ -98,7 +98,7 @@ open class Login: CustomStringConvertible, LoginData, LoginUsageData, Equatable 
 
   // Printable
   open var description: String {
-    return "Login for \(hostname)"
+    "Login for \(hostname)"
   }
 
   open var isValid: Maybe<()> {
@@ -136,22 +136,28 @@ open class Login: CustomStringConvertible, LoginData, LoginUsageData, Equatable 
   // Essentially: should we sync a change?
   // Desktop ignores usernameField and hostnameField.
   open func isSignificantlyDifferentFrom(_ login: LoginData) -> Bool {
-    return login.password != self.password || login.hostname != self.hostname || login.username != self.username || login.formSubmitURL != self.formSubmitURL || login.httpRealm != self.httpRealm
+    login.password != self.password || login.hostname != self.hostname || login.username != self.username || login
+      .formSubmitURL != self.formSubmitURL || login.httpRealm != self.httpRealm
   }
 
   /* Used for testing purposes since formSubmitURL should be given back to use from the Logins.js script */
-  open class func createWithHostname(_ hostname: String, username: String, password: String, formSubmitURL: String?) -> LoginData {
+  open class func createWithHostname(
+    _ hostname: String,
+    username: String,
+    password: String,
+    formSubmitURL: String?
+  ) -> LoginData {
     let loginData = Login(hostname: hostname, username: username, password: password) as LoginData
     loginData.formSubmitURL = formSubmitURL
     return loginData
   }
 
   open class func createWithHostname(_ hostname: String, username: String, password: String) -> LoginData {
-    return Login(hostname: hostname, username: username, password: password) as LoginData
+    Login(hostname: hostname, username: username, password: password) as LoginData
   }
 
   open class func createWithCredential(_ credential: URLCredential, protectionSpace: URLProtectionSpace) -> LoginData {
-    return Login(credential: credential, protectionSpace: protectionSpace) as LoginData
+    Login(credential: credential, protectionSpace: protectionSpace) as LoginData
   }
 
   public init(guid: String, hostname: String, username: String, password: String) {
@@ -169,7 +175,13 @@ open class Login: CustomStringConvertible, LoginData, LoginUsageData, Equatable 
       port = 0
     }
 
-    self.protectionSpace = URLProtectionSpace(host: host, port: port, protocol: scheme, realm: nil, authenticationMethod: nil)
+    self.protectionSpace = URLProtectionSpace(
+      host: host,
+      port: port,
+      protocol: scheme,
+      realm: nil,
+      authenticationMethod: nil
+    )
   }
 
   convenience init(hostname: String, username: String, password: String) {
@@ -188,7 +200,7 @@ open class Login: CustomStringConvertible, LoginData, LoginUsageData, Equatable 
   }
 
   open func toDict() -> [String: String] {
-    return [
+    [
       "hostname": hostname,
       "formSubmitURL": formSubmitURL ?? "",
       "httpRealm": httpRealm ?? "",
@@ -201,7 +213,7 @@ open class Login: CustomStringConvertible, LoginData, LoginUsageData, Equatable 
 
   open class func fromScript(_ url: URL, script: [String: Any]) -> LoginData? {
     guard let username = script["username"] as? String,
-      let password = script["password"] as? String
+          let password = script["password"] as? String
     else {
       return nil
     }
@@ -230,8 +242,8 @@ open class Login: CustomStringConvertible, LoginData, LoginUsageData, Equatable 
   fileprivate class func getPasswordOrigin(_ uriString: String, allowJS: Bool = false) -> String? {
     var realm: String?
     if let uri = URL(string: uriString),
-      let scheme = uri.scheme, !scheme.isEmpty,
-      let host = uri.host {
+       let scheme = uri.scheme, !scheme.isEmpty,
+       let host = uri.host {
       if allowJS && scheme == "javascript" {
         return "javascript:"
       }
@@ -254,14 +266,15 @@ open class Login: CustomStringConvertible, LoginData, LoginUsageData, Equatable 
 }
 
 public func == (lhs: Login, rhs: Login) -> Bool {
-  return lhs.credentials == rhs.credentials && lhs.protectionSpace == rhs.protectionSpace
+  lhs.credentials == rhs.credentials && lhs.protectionSpace == rhs.protectionSpace
 }
 
 public protocol BrowserLogins {
   func getUsageDataForLoginByGUID(_ guid: GUID) -> Deferred<Maybe<LoginUsageData>>
   func getLoginDataForGUID(_ guid: GUID) -> Deferred<Maybe<Login>>
   func getLoginsForProtectionSpace(_ protectionSpace: URLProtectionSpace) -> Deferred<Maybe<Cursor<LoginData>>>
-  func getLoginsForProtectionSpace(_ protectionSpace: URLProtectionSpace, withUsername username: String?) -> Deferred<Maybe<Cursor<LoginData>>>
+  func getLoginsForProtectionSpace(_ protectionSpace: URLProtectionSpace, withUsername username: String?)
+    -> Deferred<Maybe<Cursor<LoginData>>>
   func getAllLogins() -> Deferred<Maybe<Cursor<Login>>>
   func getLoginsForQuery(_ query: String) -> Deferred<Maybe<Cursor<Login>>>
 

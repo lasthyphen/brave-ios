@@ -31,7 +31,7 @@ struct FavoritesHelper {
   }
 
   static func isAlreadyAdded(_ url: URL) -> Bool {
-    return Favorite.contains(url: url)
+    Favorite.contains(url: url)
   }
 
   static func fallbackIcon(withLetter letter: String, color: UIColor, andSize iconSize: CGSize) -> UIImage {
@@ -47,14 +47,21 @@ struct FavoritesHelper {
       paragraphStyle.alignment = .center
 
       let attrs = [
-        NSAttributedString.Key.font: UIFont(name: "HelveticaNeue-Thin", size: iconSize.height - 90) ?? UIFont.systemFont(ofSize: iconSize.height - 90, weight: UIFont.Weight.thin),
+        NSAttributedString.Key.font: UIFont(name: "HelveticaNeue-Thin", size: iconSize.height - 90) ?? UIFont
+          .systemFont(
+            ofSize: iconSize.height - 90,
+            weight: UIFont.Weight.thin
+          ),
         NSAttributedString.Key.paragraphStyle: paragraphStyle,
         NSAttributedString.Key.backgroundColor: UIColor.clear,
       ]
 
       let string: NSString = NSString(string: letter.uppercased())
       let size = string.size(withAttributes: attrs)
-      string.draw(at: CGPoint(x: (iconSize.width - size.width) / 2, y: (iconSize.height - size.height) / 2), withAttributes: attrs)
+      string.draw(
+        at: CGPoint(x: (iconSize.width - size.width) / 2, y: (iconSize.height - size.height) / 2),
+        withAttributes: attrs
+      )
     }
   }
 }

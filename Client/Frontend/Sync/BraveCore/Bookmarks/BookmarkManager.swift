@@ -13,7 +13,6 @@ import Shared
 private let log = Logger.browserLogger
 
 class BookmarkManager {
-
   // MARK: Lifecycle
 
   init(bookmarksAPI: BraveBookmarksAPI?) {
@@ -38,7 +37,7 @@ class BookmarkManager {
     }
 
     guard Preferences.General.showLastVisitedBookmarksFolder.value,
-      let nodeId = Preferences.Chromium.lastBookmarksFolderNodeId.value
+          let nodeId = Preferences.Chromium.lastBookmarksFolderNodeId.value
     else {
       // Default folder is the mobile node..
       if let mobileNode = bookmarksAPI.mobileNode {
@@ -54,7 +53,7 @@ class BookmarkManager {
 
     // Display last visited folder..
     if let folderNode = bookmarksAPI.getNodeById(nodeId),
-      folderNode.isVisible {
+       folderNode.isVisible {
       return Bookmarkv2(folderNode)
     }
 
@@ -71,10 +70,9 @@ class BookmarkManager {
     }
 
     if Preferences.General.showLastVisitedBookmarksFolder.value,
-      let nodeId = Preferences.Chromium.lastBookmarksFolderNodeId.value,
-      var folderNode = bookmarksAPI.getNodeById(nodeId),
-      folderNode.isVisible {
-
+       let nodeId = Preferences.Chromium.lastBookmarksFolderNodeId.value,
+       var folderNode = bookmarksAPI.getNodeById(nodeId),
+       folderNode.isVisible {
       // We don't ever display the root node
       // It is the mother of all nodes
       let rootNodeGuid = bookmarksAPI.rootNode?.guid
@@ -187,8 +185,9 @@ class BookmarkManager {
     return bookmarksAPI.search(
       withQuery: query, maxCount: 200,
       completion: { nodes in
-        completion(nodes.compactMap({ return !$0.isFolder ? Bookmarkv2($0) : nil }))
-      })
+        completion(nodes.compactMap({ !$0.isFolder ? Bookmarkv2($0) : nil }))
+      }
+    )
   }
 
   public func fetchBookmarks(with query: String = "", _ completion: @escaping () -> Void) {
@@ -201,22 +200,28 @@ class BookmarkManager {
     bookmarksAPI.search(
       withQuery: query, maxCount: 200,
       completion: { [weak self] nodes in
-        guard let self = self else { return }
+        guard let self = self else {
+          return
+        }
 
-        self.searchBookmarkList = nodes.compactMap({ return !$0.isFolder ? Bookmarkv2($0) : nil })
+        self.searchBookmarkList = nodes.compactMap({ !$0.isFolder ? Bookmarkv2($0) : nil })
 
         completion()
-      })
+      }
+    )
   }
 
-  public func reorderBookmarks(frc: BookmarksV2FetchResultsController?, sourceIndexPath: IndexPath, destinationIndexPath: IndexPath) {
+  public func reorderBookmarks(
+    frc: BookmarksV2FetchResultsController?,
+    sourceIndexPath: IndexPath,
+    destinationIndexPath: IndexPath
+  ) {
     guard let frc = frc, let bookmarksAPI = bookmarksAPI else {
       return
     }
 
     if let node = frc.object(at: sourceIndexPath)?.bookmarkNode,
-      let parent = node.parent ?? bookmarksAPI.mobileNode {
-
+       let parent = node.parent ?? bookmarksAPI.mobileNode {
       // Moving to the very last index.. same as appending..
       if destinationIndexPath.row == parent.children.count - 1 {
         node.move(toParent: parent)
@@ -242,7 +247,12 @@ class BookmarkManager {
     }
   }
 
-  public func updateWithNewLocation(_ bookmarkItem: Bookmarkv2, customTitle: String?, url: URL?, location: Bookmarkv2?) {
+  public func updateWithNewLocation(
+    _ bookmarkItem: Bookmarkv2,
+    customTitle: String?,
+    url: URL?,
+    location: Bookmarkv2?
+  ) {
     guard let bookmarksAPI = bookmarksAPI else {
       return
     }
@@ -275,7 +285,6 @@ class BookmarkManager {
       if case .favIconChanged(let node) = state {
         if node.isValid && bookmarkItem.bookmarkNode.isValid
           && node.guid == bookmarkItem.bookmarkNode.guid {
-
           if bookmarkItem.bookmarkNode.isFavIconLoaded {
             self?.removeFavIconObserver(bookmarkItem)
           }
@@ -307,7 +316,6 @@ class BookmarkManager {
 // MARK: Brave-Core Only
 
 extension BookmarkManager {
-
   public func waitForBookmarkModelLoaded(_ completion: @escaping () -> Void) {
     guard let bookmarksAPI = bookmarksAPI else {
       return
@@ -328,7 +336,8 @@ extension BookmarkManager {
               completion()
             }
           }
-        }))
+        })
+      )
     }
   }
 }

@@ -53,7 +53,9 @@ class WelcomeNTPOnboardingController: UIViewController & PopoverContentComponent
           string: "\(title)\n",
           attributes: [
             .font: UIFont.preferredFont(forTextStyle: .headline)
-          ]))
+          ]
+        )
+      )
     }
 
     attributedString.append(
@@ -61,7 +63,9 @@ class WelcomeNTPOnboardingController: UIViewController & PopoverContentComponent
         string: details,
         attributes: [
           .font: UIFont.preferredFont(forTextStyle: .body)
-        ]))
+        ]
+      )
+    )
 
     textLabel.attributedText = attributedString
   }

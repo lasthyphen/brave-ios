@@ -8,7 +8,6 @@ import BraveShared
 @testable import Client
 
 class SafeBrowsingTests: XCTestCase {
-
   override func setUp() {
     super.setUp()
 
@@ -57,6 +56,5 @@ class SafeBrowsingTests: XCTestCase {
 
     XCTAssertFalse(SafeBrowsing.isSafeBrowsingEnabledForURL(braveUrl))
     XCTAssert(SafeBrowsing.isSafeBrowsingEnabledForURL(exampleUrl))
-
   }
 }

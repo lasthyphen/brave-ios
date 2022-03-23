@@ -21,6 +21,7 @@ public class AdsNotificationHandler: BraveAdsNotificationHandler {
     /// The user clicked the thumbs down button by swiping on the ad
     case disliked
   }
+
   /// An ad was tapped and a URL should be opened
   public var actionOccured: ((AdNotification, Action) -> Void)?
   /// The ads object
@@ -46,7 +47,9 @@ public class AdsNotificationHandler: BraveAdsNotificationHandler {
   private lazy var adsViewController = AdsViewController()
 
   private func displayAd(notification: AdNotification) {
-    guard let presentingController = presentingController else { return }
+    guard let presentingController = presentingController else {
+      return
+    }
 
     guard let window = presentingController.view.window else {
       return
@@ -63,8 +66,10 @@ public class AdsNotificationHandler: BraveAdsNotificationHandler {
 
     adsViewController.display(
       ad: notification,
-      handler: { [weak self] (notification, action) in
-        guard let self = self else { return }
+      handler: { [weak self] notification, action in
+        guard let self = self else {
+          return
+        }
         switch action {
         case .opened:
           self.ads.reportAdNotificationEvent(notification.uuid, eventType: .clicked)
@@ -83,13 +88,16 @@ public class AdsNotificationHandler: BraveAdsNotificationHandler {
         }
       },
       animatedOut: { [weak self] in
-        guard let self = self else { return }
+        guard let self = self else {
+          return
+        }
         if self.adsViewController.visibleAdView == nil && self.adsQueue.isEmpty {
           self.adsViewController.willMove(toParent: nil)
           self.adsViewController.view.removeFromSuperview()
           self.adsViewController.removeFromParent()
         }
-      })
+      }
+    )
   }
 
   public func showNotification(_ notification: AdNotification) {
@@ -106,16 +114,18 @@ public class AdsNotificationHandler: BraveAdsNotificationHandler {
 
   public func shouldShowNotifications() -> Bool {
     guard let presentingController = presentingController,
-      let rootVC = presentingController.currentScene?.browserViewController
-    else { return false }
+          let rootVC = presentingController.currentScene?.browserViewController
+    else {
+      return false
+    }
     func topViewController(startingFrom viewController: UIViewController) -> UIViewController {
       var top = viewController
       if let navigationController = top as? UINavigationController,
-        let vc = navigationController.visibleViewController {
+         let vc = navigationController.visibleViewController {
         return topViewController(startingFrom: vc)
       }
       if let tabController = top as? UITabBarController,
-        let vc = tabController.selectedViewController {
+         let vc = tabController.selectedViewController {
         return topViewController(startingFrom: vc)
       }
       while let next = top.presentedViewController {

@@ -40,14 +40,18 @@ class ResourceDownloadManager: TabContentScript {
   }
 
   static func name() -> String {
-    return "ResourceDownloadManager"
+    "ResourceDownloadManager"
   }
 
   func scriptMessageHandlerName() -> String? {
-    return "ResourceDownloadManager\(UserScriptManager.messageHandlerTokenString)"
+    "ResourceDownloadManager\(UserScriptManager.messageHandlerTokenString)"
   }
 
-  func userContentController(_ userContentController: WKUserContentController, didReceiveScriptMessage message: WKScriptMessage, replyHandler: (Any?, String?) -> Void) {
+  func userContentController(
+    _ userContentController: WKUserContentController,
+    didReceiveScriptMessage message: WKScriptMessage,
+    replyHandler: (Any?, String?) -> Void
+  ) {
     defer { replyHandler(nil, nil) }
 
     do {
@@ -61,7 +65,11 @@ class ResourceDownloadManager: TabContentScript {
   static func downloadResource(for tab: Tab, url: URL) {
     let token = UserScriptManager.securityTokenString
 
-    tab.webView?.evaluateSafeJavaScript(functionName: "D\(token).download", args: [url.absoluteString], contentWorld: .defaultClient) { _, error in
+    tab.webView?.evaluateSafeJavaScript(
+      functionName: "D\(token).download",
+      args: [url.absoluteString],
+      contentWorld: .defaultClient
+    ) { _, error in
       if let error = error {
         tab.temporaryDocument?.onDocumentDownloaded(document: nil, error: error)
       }

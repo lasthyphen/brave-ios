@@ -7,7 +7,7 @@ import UIKit
 private struct ETLDEntry: CustomStringConvertible {
   let entry: String
 
-  var isNormal: Bool { return isWild || !isException }
+  var isNormal: Bool { isWild || !isException }
   var isWild: Bool = false
   var isException: Bool = false
 
@@ -18,14 +18,20 @@ private struct ETLDEntry: CustomStringConvertible {
   }
 
   fileprivate var description: String {
-    return "{ Entry: \(entry), isWildcard: \(isWild), isException: \(isException) }"
+    "{ Entry: \(entry), isWildcard: \(isWild), isException: \(isException) }"
   }
 }
 
 private typealias TLDEntryMap = [String: ETLDEntry]
 
 private func loadEntriesFromDisk() -> TLDEntryMap? {
-  if let data = String.contentsOfFileWithResourceName("effective_tld_names", ofType: "dat", fromBundle: Bundle(identifier: "com.brave.Shared")!, encoding: .utf8, error: nil) {
+  if let data = String.contentsOfFileWithResourceName(
+    "effective_tld_names",
+    ofType: "dat",
+    fromBundle: Bundle(identifier: "com.brave.Shared")!,
+    encoding: .utf8,
+    error: nil
+  ) {
     let lines = data.components(separatedBy: "\n")
     let trimmedLines = lines.filter { !$0.hasPrefix("//") && $0 != "\n" && $0 != "" }
 
@@ -49,9 +55,7 @@ private func loadEntriesFromDisk() -> TLDEntryMap? {
   return nil
 }
 
-private var etldEntries: TLDEntryMap? = {
-  return loadEntriesFromDisk()
-}()
+private var etldEntries: TLDEntryMap? = loadEntriesFromDisk()
 
 // MARK: - Local Resource URL Extensions
 extension URL {
@@ -59,12 +63,11 @@ extension URL {
     static let localhost = "localhost"
     static let localhostIp = "127.0.0.1"
     static let http = "http"
-
   }
 
   public func allocatedFileSize() -> Int64 {
     // First try to get the total allocated size and in failing that, get the file allocated size
-    return getResourceLongLongForKey(URLResourceKey.totalFileAllocatedSizeKey.rawValue)
+    getResourceLongLongForKey(URLResourceKey.totalFileAllocatedSizeKey.rawValue)
       ?? getResourceLongLongForKey(URLResourceKey.fileAllocatedSizeKey.rawValue)
       ?? 0
   }
@@ -90,24 +93,116 @@ extension URL {
   }
 
   public func getResourceLongLongForKey(_ key: String) -> Int64? {
-    return (getResourceValueForKey(key) as? NSNumber)?.int64Value
+    (getResourceValueForKey(key) as? NSNumber)?.int64Value
   }
 
   public func getResourceBoolForKey(_ key: String) -> Bool? {
-    return getResourceValueForKey(key) as? Bool
+    getResourceValueForKey(key) as? Bool
   }
 
   public var isRegularFile: Bool {
-    return getResourceBoolForKey(URLResourceKey.isRegularFileKey.rawValue) ?? false
+    getResourceBoolForKey(URLResourceKey.isRegularFileKey.rawValue) ?? false
   }
 
   public func lastComponentIsPrefixedBy(_ prefix: String) -> Bool {
-    return (pathComponents.last?.hasPrefix(prefix) ?? false)
+    pathComponents.last?.hasPrefix(prefix) ?? false
   }
 }
 
 // The list of permanent URI schemes has been taken from http://www.iana.org/assignments/uri-schemes/uri-schemes.xhtml
-private let permanentURISchemes = ["aaa", "aaas", "about", "acap", "acct", "cap", "cid", "coap", "coaps", "crid", "data", "dav", "dict", "dns", "example", "file", "ftp", "geo", "go", "gopher", "h323", "http", "https", "iax", "icap", "im", "imap", "info", "ipp", "ipps", "iris", "iris.beep", "iris.lwz", "iris.xpc", "iris.xpcs", "jabber", "javascript", "ldap", "mailto", "mid", "msrp", "msrps", "mtqp", "mupdate", "news", "nfs", "ni", "nih", "nntp", "opaquelocktoken", "pkcs11", "pop", "pres", "reload", "rtsp", "rtsps", "rtspu", "service", "session", "shttp", "sieve", "sip", "sips", "sms", "snmp", "soap.beep", "soap.beeps", "stun", "stuns", "tag", "tel", "telnet", "tftp", "thismessage", "tip", "tn3270", "turn", "turns", "tv", "urn", "vemmi", "vnc", "ws", "wss", "xcon", "xcon-userid", "xmlrpc.beep", "xmlrpc.beeps", "xmpp", "z39.50r", "z39.50s"]
+private let permanentURISchemes = [
+  "aaa",
+  "aaas",
+  "about",
+  "acap",
+  "acct",
+  "cap",
+  "cid",
+  "coap",
+  "coaps",
+  "crid",
+  "data",
+  "dav",
+  "dict",
+  "dns",
+  "example",
+  "file",
+  "ftp",
+  "geo",
+  "go",
+  "gopher",
+  "h323",
+  "http",
+  "https",
+  "iax",
+  "icap",
+  "im",
+  "imap",
+  "info",
+  "ipp",
+  "ipps",
+  "iris",
+  "iris.beep",
+  "iris.lwz",
+  "iris.xpc",
+  "iris.xpcs",
+  "jabber",
+  "javascript",
+  "ldap",
+  "mailto",
+  "mid",
+  "msrp",
+  "msrps",
+  "mtqp",
+  "mupdate",
+  "news",
+  "nfs",
+  "ni",
+  "nih",
+  "nntp",
+  "opaquelocktoken",
+  "pkcs11",
+  "pop",
+  "pres",
+  "reload",
+  "rtsp",
+  "rtsps",
+  "rtspu",
+  "service",
+  "session",
+  "shttp",
+  "sieve",
+  "sip",
+  "sips",
+  "sms",
+  "snmp",
+  "soap.beep",
+  "soap.beeps",
+  "stun",
+  "stuns",
+  "tag",
+  "tel",
+  "telnet",
+  "tftp",
+  "thismessage",
+  "tip",
+  "tn3270",
+  "turn",
+  "turns",
+  "tv",
+  "urn",
+  "vemmi",
+  "vnc",
+  "ws",
+  "wss",
+  "xcon",
+  "xcon-userid",
+  "xmlrpc.beep",
+  "xmlrpc.beeps",
+  "xmpp",
+  "z39.50r",
+  "z39.50s"
+]
 
 private let ignoredSchemes = ["data"]
 private let supportedSchemes = permanentURISchemes.filter { !ignoredSchemes.contains($0) }
@@ -164,10 +259,10 @@ extension URL {
   }
 
   /**
-     * Returns the second level domain (SLD) of a url. It removes any subdomain/TLD
-     *
-     * E.g., https://m.foo.com/bar/baz?noo=abc#123  => foo
-     **/
+   * Returns the second level domain (SLD) of a url. It removes any subdomain/TLD
+   *
+   * E.g., https://m.foo.com/bar/baz?noo=abc#123  => foo
+   **/
   public var hostSLD: String {
     guard let publicSuffix = self.publicSuffix, let baseDomain = self.baseDomain else {
       return self.normalizedHost() ?? self.absoluteString
@@ -176,7 +271,7 @@ extension URL {
   }
 
   public var normalizedHostAndPath: String? {
-    return normalizedHost().flatMap { $0 + self.path }
+    normalizedHost().flatMap { $0 + self.path }
   }
 
   public var absoluteDisplayString: String {
@@ -209,7 +304,7 @@ extension URL {
   /// String suitable for displaying outside of the app, for example in notifications, were Data Detectors will
   /// linkify the text and make it into a openable-in-Safari link.
   public var absoluteDisplayExternalString: String {
-    return self.absoluteDisplayString.replacingOccurrences(of: ".", with: "\u{2024}")
+    self.absoluteDisplayString.replacingOccurrences(of: ".", with: "\u{2024}")
   }
 
   public var displayURL: URL? {
@@ -242,19 +337,23 @@ extension URL {
 
   // Obtain a schemeless absolute string
   public var schemelessAbsoluteString: String {
-    guard let scheme = self.scheme else { return absoluteString }
+    guard let scheme = self.scheme else {
+      return absoluteString
+    }
     return absoluteString.replacingOccurrences(of: "\(scheme)://", with: "")
   }
 
   /**
-    Returns the base domain from a given hostname. The base domain name is defined as the public domain suffix
-    with the base private domain attached to the front. For example, for the URL www.bbc.co.uk, the base domain
-    would be bbc.co.uk. The base domain includes the public suffix (co.uk) + one level down (bbc).
+   Returns the base domain from a given hostname. The base domain name is defined as the public domain suffix
+   with the base private domain attached to the front. For example, for the URL www.bbc.co.uk, the base domain
+   would be bbc.co.uk. The base domain includes the public suffix (co.uk) + one level down (bbc).
 
-    :returns: The base domain string for the given host name.
-    */
+   :returns: The base domain string for the given host name.
+   */
   public var baseDomain: String? {
-    guard !isIPv6, let host = host else { return nil }
+    guard !isIPv6, let host = host else {
+      return nil
+    }
 
     // If this is just a hostname and not a FQDN, use the entire hostname.
     if !host.contains(".") {
@@ -265,12 +364,12 @@ extension URL {
   }
 
   /**
-     * Returns just the domain, but with the same scheme.
-     *
-     * E.g., https://m.foo.com/bar/baz?noo=abc#123  => https://foo.com
-     *
-     * Any failure? Return this URL.
-     */
+   * Returns just the domain, but with the same scheme.
+   *
+   * E.g., https://m.foo.com/bar/baz?noo=abc#123  => https://foo.com
+   *
+   * Any failure? Return this URL.
+   */
   public var domainURL: URL {
     if let normalized = self.normalizedHost() {
       // Use URLComponents instead of URL since the former correctly preserves
@@ -287,7 +386,7 @@ extension URL {
 
   public var withoutWWW: URL {
     if let normalized = self.normalizedHost(stripWWWSubdomainOnly: true),
-      var components = URLComponents(url: self, resolvingAgainstBaseURL: false) {
+       var components = URLComponents(url: self, resolvingAgainstBaseURL: false) {
       components.scheme = self.scheme
       components.port = self.port
       components.host = normalized
@@ -300,7 +399,8 @@ extension URL {
   public func normalizedHost(stripWWWSubdomainOnly: Bool = false) -> String? {
     // Use components.host instead of self.host since the former correctly preserves
     // brackets for IPv6 hosts, whereas the latter strips them.
-    guard let components = URLComponents(url: self, resolvingAgainstBaseURL: false), var host = components.host, host != "" else {
+    guard let components = URLComponents(url: self, resolvingAgainstBaseURL: false), var host = components.host,
+          host != "" else {
       return nil
     }
 
@@ -314,13 +414,13 @@ extension URL {
   }
 
   /**
-    Returns the public portion of the host name determined by the public suffix list found here: https://publicsuffix.org/list/.
-    For example for the url www.bbc.co.uk, based on the entries in the TLD list, the public suffix would return co.uk.
+   Returns the public portion of the host name determined by the public suffix list found here: https://publicsuffix.org/list/.
+   For example for the url www.bbc.co.uk, based on the entries in the TLD list, the public suffix would return co.uk.
 
-    :returns: The public suffix for within the given hostname.
-    */
+   :returns: The public suffix for within the given hostname.
+   */
   public var publicSuffix: String? {
-    return host.flatMap { publicSuffixFromHost($0, withAdditionalParts: 0) }
+    host.flatMap { publicSuffixFromHost($0, withAdditionalParts: 0) }
   }
 
   public func isWebPage(includeDataURIs: Bool = true) -> Bool {
@@ -329,7 +429,7 @@ extension URL {
   }
 
   public func isSecureWebPage() -> Bool {
-    return scheme?.contains("https") ?? false
+    scheme?.contains("https") ?? false
   }
 
   // This helps find local urls that we do not want to show loading bars on.
@@ -338,7 +438,12 @@ extension URL {
     guard self.isLocal else {
       return false
     }
-    let utilityURLs = ["/\(InternalURL.Path.errorpage)", "/\(InternalURL.Path.sessionrestore)", "/about/home", "/reader-mode"]
+    let utilityURLs = [
+      "/\(InternalURL.Path.errorpage)",
+      "/\(InternalURL.Path.sessionrestore)",
+      "/about/home",
+      "/reader-mode"
+    ]
     return utilityURLs.contains { self.path.hasPrefix($0) }
   }
 
@@ -355,15 +460,17 @@ extension URL {
   }
 
   public var isIPv6: Bool {
-    return host?.contains(":") ?? false
+    host?.contains(":") ?? false
   }
 
   /**
-     Returns whether the URL's scheme is one of those listed on the official list of URI schemes.
-     This only accepts permanent schemes: historical and provisional schemes are not accepted.
-     */
+   Returns whether the URL's scheme is one of those listed on the official list of URI schemes.
+   This only accepts permanent schemes: historical and provisional schemes are not accepted.
+   */
   public var schemeIsValid: Bool {
-    guard let scheme = scheme else { return false }
+    guard let scheme = scheme else {
+      return false
+    }
     return supportedSchemes.contains(scheme.lowercased())
   }
 
@@ -390,7 +497,8 @@ extension URL {
 
   public var decodeReaderModeURL: URL? {
     if self.isReaderModeURL {
-      if let components = URLComponents(url: self, resolvingAgainstBaseURL: false), let queryItems = components.queryItems {
+      if let components = URLComponents(url: self, resolvingAgainstBaseURL: false),
+         let queryItems = components.queryItems {
         if let queryItem = queryItems.find({ $0.name == "url" }), let value = queryItem.value {
           return URL(string: value)
         }
@@ -413,7 +521,7 @@ extension URL {
 
 extension URL {
   private var isLocalhost: Bool {
-    return scheme == "http" && (host == "localhost" || host == "127.0.0.1")
+    scheme == "http" && (host == "localhost" || host == "127.0.0.1")
   }
 
   // Check if the website is a video streaming content site used inside product notifications
@@ -466,20 +574,20 @@ extension URL {
     }
 
     /// Additonal sites for NewZealand and Australia locale
-    /*if Locale.current.regionCode == "AU" || Locale.current.regionCode == "NZ" {
-            let nzAUList = Set<String>([
-                "sparksport.co.nz",
-                "neontv.co.nz",
-                "stan.com.au",
-                "binge.com.au",
-                "sbs.com.au",
-                "7plus.com.au",
-                "9now.com.au",
-                "iview.abc.net.au",
-                "10play.com.au"
-            ])
-         siteList.formUnion(nzAUList)
-        }*/
+    /* if Locale.current.regionCode == "AU" || Locale.current.regionCode == "NZ" {
+         let nzAUList = Set<String>([
+             "sparksport.co.nz",
+             "neontv.co.nz",
+             "stan.com.au",
+             "binge.com.au",
+             "sbs.com.au",
+             "7plus.com.au",
+             "9now.com.au",
+             "iview.abc.net.au",
+             "10play.com.au"
+         ])
+      siteList.formUnion(nzAUList)
+     } */
 
     return siteList.contains(where: domain.contains)
   }
@@ -487,7 +595,9 @@ extension URL {
   public func uniquePathForFilename(_ filename: String) throws -> URL {
     let basePath = self.appendingPathComponent(filename)
     let fileExtension = basePath.pathExtension
-    let filenameWithoutExtension = !fileExtension.isEmpty ? String(filename.dropLast(fileExtension.count + 1)) : filename
+    let filenameWithoutExtension = !fileExtension.isEmpty
+      ? String(filename.dropLast(fileExtension.count + 1))
+      : filename
 
     var proposedPath = basePath
     var count = 0
@@ -509,7 +619,9 @@ extension URL {
   public var eligibleForPeekAndPop: Bool {
     let ignoredSchemes = ["about"]
 
-    guard let scheme = self.scheme else { return false }
+    guard let scheme = self.scheme else {
+      return false
+    }
 
     if let _ = ignoredSchemes.firstIndex(of: scheme) {
       return false
@@ -523,15 +635,19 @@ extension URL {
   }
 
   public var isImageResource: Bool {
-    return ["jpg", "jpeg", "png", "gif"].contains(pathExtension)
+    ["jpg", "jpeg", "png", "gif"].contains(pathExtension)
   }
 
   public var imageSize: CGSize? {
     let imageSourceOptions = [kCGImageSourceShouldCache: false] as CFDictionary
     guard let imageSource = CGImageSourceCreateWithURL(self as CFURL, imageSourceOptions),
-      let imageProperties = CGImageSourceCopyPropertiesAtIndex(imageSource, 0, imageSourceOptions) as? [AnyHashable: Any],
-      let pixelWidth = imageProperties[kCGImagePropertyPixelWidth as String],
-      let pixelHeight = imageProperties[kCGImagePropertyPixelHeight as String]
+          let imageProperties = CGImageSourceCopyPropertiesAtIndex(
+            imageSource,
+            0,
+            imageSourceOptions
+          ) as? [AnyHashable: Any],
+          let pixelWidth = imageProperties[kCGImagePropertyPixelWidth as String],
+          let pixelHeight = imageProperties[kCGImagePropertyPixelHeight as String]
     else {
       return nil
     }
@@ -540,10 +656,10 @@ extension URL {
     var height: CGFloat = 0
 
     // swiftlint:disable force_cast
-    CFNumberGetValue((pixelWidth as! CFNumber), .cgFloatType, &width)
+    CFNumberGetValue(pixelWidth as! CFNumber, .cgFloatType, &width)
 
     // swiftlint:disable force_cast
-    CFNumberGetValue((pixelHeight as! CFNumber), .cgFloatType, &height)
+    CFNumberGetValue(pixelHeight as! CFNumber, .cgFloatType, &height)
 
     guard width > 0, height > 0 else {
       return nil
@@ -557,11 +673,11 @@ extension URL {
 
 extension URL {
   public var isBookmarklet: Bool {
-    return self.absoluteString.isBookmarklet
+    self.absoluteString.isBookmarklet
   }
 
   public var bookmarkletCodeComponent: String? {
-    return self.absoluteString.bookmarkletCodeComponent
+    self.absoluteString.bookmarkletCodeComponent
   }
 }
 
@@ -569,7 +685,7 @@ extension URL {
 
 extension URL {
   public var isFileScheme: Bool {
-    return self.scheme == "file"
+    self.scheme == "file"
   }
 }
 
@@ -606,22 +722,24 @@ public struct InternalURL {
     case errorpage = "errorpage"
     case sessionrestore = "sessionrestore"
     func matches(_ string: String) -> Bool {
-      return string.range(of: "/?\(self.rawValue)", options: .regularExpression, range: nil, locale: nil) != nil
+      string.range(of: "/?\(self.rawValue)", options: .regularExpression, range: nil, locale: nil) != nil
     }
   }
 
   public enum Param: String {
     case uuidkey = "uuidkey"
     case url = "url"
-    func matches(_ string: String) -> Bool { return string == self.rawValue }
+    func matches(_ string: String) -> Bool { string == self.rawValue }
   }
 
   public let url: URL
 
-  private let sessionRestoreHistoryItemBaseUrl = "\(InternalURL.baseUrl)/\(InternalURL.Path.sessionrestore.rawValue)?url="
+  private let sessionRestoreHistoryItemBaseUrl =
+    "\(InternalURL.baseUrl)/\(InternalURL.Path.sessionrestore.rawValue)?url="
 
   public static func isValid(url: URL) -> Bool {
-    let isWebServerUrl = url.absoluteString.hasPrefix("http://localhost:\(AppConstants.webServerPort)/") || url.absoluteString.hasPrefix("http://127.0.0.1:\(AppConstants.webServerPort)/")
+    let isWebServerUrl = url.absoluteString.hasPrefix("http://localhost:\(AppConstants.webServerPort)/") || url
+      .absoluteString.hasPrefix("http://127.0.0.1:\(AppConstants.webServerPort)/")
     if isWebServerUrl, url.path.hasPrefix("/test-fixture/") {
       // internal test pages need to be treated as external pages
       return false
@@ -640,20 +758,25 @@ public struct InternalURL {
   }
 
   public var isAuthorized: Bool {
-    return (url.getQuery()[InternalURL.Param.uuidkey.rawValue] ?? "") == InternalURL.uuid
+    (url.getQuery()[InternalURL.Param.uuidkey.rawValue] ?? "") == InternalURL.uuid
   }
 
   public var stripAuthorization: String {
-    guard var components = URLComponents(string: url.absoluteString), let items = components.queryItems else { return url.absoluteString }
+    guard var components = URLComponents(string: url.absoluteString),
+          let items = components.queryItems else {
+      return url.absoluteString
+    }
     components.queryItems = items.filter { !Param.uuidkey.matches($0.name) }
     if let items = components.queryItems, items.count == 0 {
-      components.queryItems = nil  // This cleans up the url to not end with a '?'
+      components.queryItems = nil // This cleans up the url to not end with a '?'
     }
     return components.url?.absoluteString ?? ""
   }
 
   public static func authorize(url: URL) -> URL? {
-    guard var components = URLComponents(string: url.absoluteString) else { return nil }
+    guard var components = URLComponents(string: url.absoluteString) else {
+      return nil
+    }
     if components.queryItems == nil {
       components.queryItems = []
     }
@@ -667,7 +790,7 @@ public struct InternalURL {
   }
 
   public var isSessionRestore: Bool {
-    return url.absoluteString.hasPrefix(sessionRestoreHistoryItemBaseUrl)
+    url.absoluteString.hasPrefix(sessionRestoreHistoryItemBaseUrl)
   }
 
   public var isErrorPage: Bool {
@@ -701,7 +824,7 @@ public struct InternalURL {
   }
 
   public var isAboutURL: Bool {
-    return aboutComponent != nil
+    aboutComponent != nil
   }
 
   /// Return the path after "about/" in the URI.
@@ -719,8 +842,8 @@ public struct InternalURL {
 }
 
 // MARK: Private Helpers
-private extension URL {
-  func publicSuffixFromHost(_ host: String, withAdditionalParts additionalPartCount: Int) -> String? {
+extension URL {
+  private func publicSuffixFromHost(_ host: String, withAdditionalParts additionalPartCount: Int) -> String? {
     if host.isEmpty {
       return nil
     }
@@ -737,26 +860,26 @@ private extension URL {
     }
 
     /**
-        *  The following algorithm breaks apart the domain and checks each sub domain against the effective TLD
-        *  entries from the effective_tld_names.dat file. It works like this:
-        *
-        *  Example Domain: test.bbc.co.uk
-        *  TLD Entry: bbc
-        *
-        *  1. Start off by checking the current domain (test.bbc.co.uk)
-        *  2. Also store the domain after the next dot (bbc.co.uk)
-        *  3. If we find an entry that matches the current domain (test.bbc.co.uk), perform the following checks:
-        *    i. If the domain is a wildcard AND the previous entry is not nil, then the current domain matches
-        *       since it satisfies the wildcard requirement.
-        *    ii. If the domain is normal (no wildcard) and we don't have anything after the next dot, then
-        *        currentDomain is a valid TLD
-        *    iii. If the entry we matched is an exception case, then the base domain is the part after the next dot
-        *
-        *  On the next run through the loop, we set the new domain to check as the part after the next dot,
-        *  update the next dot reference to be the string after the new next dot, and check the TLD entries again.
-        *  If we reach the end of the host (nextDot = nil) and we haven't found anything, then we've hit the
-        *  top domain level so we use it by default.
-        */
+     *  The following algorithm breaks apart the domain and checks each sub domain against the effective TLD
+     *  entries from the effective_tld_names.dat file. It works like this:
+     *
+     *  Example Domain: test.bbc.co.uk
+     *  TLD Entry: bbc
+     *
+     *  1. Start off by checking the current domain (test.bbc.co.uk)
+     *  2. Also store the domain after the next dot (bbc.co.uk)
+     *  3. If we find an entry that matches the current domain (test.bbc.co.uk), perform the following checks:
+     *    i. If the domain is a wildcard AND the previous entry is not nil, then the current domain matches
+     *       since it satisfies the wildcard requirement.
+     *    ii. If the domain is normal (no wildcard) and we don't have anything after the next dot, then
+     *        currentDomain is a valid TLD
+     *    iii. If the entry we matched is an exception case, then the base domain is the part after the next dot
+     *
+     *  On the next run through the loop, we set the new domain to check as the part after the next dot,
+     *  update the next dot reference to be the string after the new next dot, and check the TLD entries again.
+     *  If we reach the end of the host (nextDot = nil) and we haven't found anything, then we've hit the
+     *  top domain level so we use it by default.
+     */
 
     let tokens = currentHost.components(separatedBy: ".")
     let tokenCount = tokens.count
@@ -794,10 +917,10 @@ private extension URL {
       if let suffix = suffix {
         // Take out the public suffixed and add in the additional parts we want.
         let literalFromEnd: NSString.CompareOptions = [
-          .literal,  // Match the string exactly.
-          .backwards,  // Search from the end.
+          .literal, // Match the string exactly.
+          .backwards, // Search from the end.
           .anchored,
-        ]  // Stick to the end.
+        ] // Stick to the end.
         let suffixlessHost = currentHost.replacingOccurrences(of: suffix, with: "", options: literalFromEnd, range: nil)
         let suffixlessTokens = suffixlessHost.components(separatedBy: ".").filter { $0 != "" }
         let maxAdditionalCount = max(0, suffixlessTokens.count - additionalPartCount)

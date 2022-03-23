@@ -7,13 +7,11 @@ import Foundation
 import XCTest
 import Storage
 import BraveCore
-
 @testable import Client
 
 // MARK: SchemePermissionTests
 
 class SchemePermissionTests: XCTestCase {
-
   enum SchemeTestType: String {
     case http
     case https
@@ -70,7 +68,8 @@ class SchemePermissionTests: XCTestCase {
       diskImageStore: imageStore,
       braveCore: appDelegate.braveCore,
       migration: migration,
-      crashedLastSession: false)
+      crashedLastSession: false
+    )
   }
 
   override func tearDown() {

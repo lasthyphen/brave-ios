@@ -33,12 +33,16 @@ struct UniversalLinkManager {
   /// app delegate doesn't handle such case, it must be handled manually.
   static func universalLinkType(for url: URL, checkPath: Bool) -> LinkType? {
     guard let components = URLComponents(url: url, resolvingAgainstBaseURL: false),
-      let host = components.host
-    else { return nil }
+          let host = components.host
+    else {
+      return nil
+    }
 
     if checkPath {
       for type in LinkType.allCases where type.associatedDomain == host {
-        if components.path.starts(with: type.path) { return type }
+        if components.path.starts(with: type.path) {
+          return type
+        }
       }
     } else {
       return LinkType.allCases.first(where: { $0.associatedDomain == host })

@@ -9,7 +9,6 @@ import Data
 private let log = Logger.browserLogger
 
 class SyncPairWordsViewController: SyncViewController {
-
   weak var delegate: SyncPairControllerDelegate?
   var scrollView: UIScrollView!
   var containerView: UIView!
@@ -78,7 +77,7 @@ class SyncPairWordsViewController: SyncViewController {
     scrollView.addSubview(containerView)
 
     codewordsView = SyncCodewordsView(data: [])
-    codewordsView.wordCountChangeCallback = { (count) in
+    codewordsView.wordCountChangeCallback = { count in
       self.wordCountLabel.text = String(format: Strings.wordCount, count)
     }
     containerView.addSubview(codewordsView)
@@ -95,15 +94,20 @@ class SyncPairWordsViewController: SyncViewController {
     view.addSubview(loadingView)
     view.addSubview(useCameraButton)
 
-    navigationItem.rightBarButtonItem = UIBarButtonItem(title: Strings.confirm, style: .done, target: self, action: #selector(SEL_done))
+    navigationItem.rightBarButtonItem = UIBarButtonItem(
+      title: Strings.confirm,
+      style: .done,
+      target: self,
+      action: #selector(SEL_done)
+    )
 
     edgesForExtendedLayout = UIRectEdge()
 
-    scrollView.snp.makeConstraints { (make) in
+    scrollView.snp.makeConstraints { make in
       make.edges.equalTo(self.view)
     }
 
-    containerView.snp.makeConstraints { (make) in
+    containerView.snp.makeConstraints { make in
       // Making these edges based off of the scrollview removes selectability on codewords.
       //  This currently works for all layouts and enables interaction, so using `view` instead.
       make.top.equalTo(self.view)
@@ -113,26 +117,26 @@ class SyncPairWordsViewController: SyncViewController {
       make.width.equalTo(self.view)
     }
 
-    codewordsView.snp.makeConstraints { (make) in
+    codewordsView.snp.makeConstraints { make in
       make.edges.equalTo(self.containerView).inset(UIEdgeInsets(top: 0, left: 0, bottom: 45, right: 0))
     }
 
-    wordCountLabel.snp.makeConstraints { (make) in
+    wordCountLabel.snp.makeConstraints { make in
       make.top.equalTo(codewordsView.snp.bottom)
       make.left.equalTo(codewordsView).inset(24)
     }
 
-    copyPasteButton.snp.makeConstraints { (make) in
+    copyPasteButton.snp.makeConstraints { make in
       make.size.equalTo(45)
       make.right.equalTo(containerView).inset(15)
       make.bottom.equalTo(containerView).inset(15)
     }
 
-    loadingView.snp.makeConstraints { (make) in
+    loadingView.snp.makeConstraints { make in
       make.edges.equalTo(loadingView.superview!)
     }
 
-    loadingSpinner.snp.makeConstraints { (make) in
+    loadingSpinner.snp.makeConstraints { make in
       make.center.equalTo(loadingView)
     }
 
@@ -201,7 +205,8 @@ class SyncPairWordsViewController: SyncViewController {
       execute: {
         self.disableNavigationPrevention()
         alert()
-      })
+      }
+    )
 
     if syncAPI.isValidSyncCode(codes.joined(separator: " ")) {
       delegate?.syncOnWordsEntered(self, codeWords: codes.joined(separator: " "))
@@ -209,7 +214,6 @@ class SyncPairWordsViewController: SyncViewController {
       alert(message: Strings.invalidSyncCodeDescription)
       disableNavigationPrevention()
     }
-
   }
 }
 
@@ -224,6 +228,5 @@ extension SyncPairWordsViewController: NavigationPrevention {
     loadingView.isHidden = true
     navigationItem.rightBarButtonItem?.isEnabled = true
     navigationItem.hidesBackButton = false
-
   }
 }

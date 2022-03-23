@@ -58,16 +58,17 @@ class AccountActivityStore: ObservableObject {
         assetRatioService.price(
           updatedTokens.map { $0.symbol.lowercased() },
           toAssets: ["usd"],
-          timeframe: .oneDay) { success, prices in
-            defer { dispatchGroup.leave() }
-            for price in prices {
-              if let index = updatedAssets.firstIndex(where: {
-                $0.token.symbol.caseInsensitiveCompare(price.fromAsset) == .orderedSame
-              }) {
-                updatedAssets[index].price = price.price
-              }
+          timeframe: .oneDay
+        ) { success, prices in
+          defer { dispatchGroup.leave() }
+          for price in prices {
+            if let index = updatedAssets.firstIndex(where: {
+              $0.token.symbol.caseInsensitiveCompare(price.fromAsset) == .orderedSame
+            }) {
+              updatedAssets[index].price = price.price
             }
           }
+        }
         for token in updatedTokens {
           dispatchGroup.enter()
           rpcService.balance(for: token, in: account) { value in
@@ -90,7 +91,7 @@ class AccountActivityStore: ObservableObject {
     txService.allTransactionInfo(.eth, from: account.address) { transactions in
       self.transactions =
         transactions
-        .sorted(by: { $0.createdTime > $1.createdTime })
+          .sorted(by: { $0.createdTime > $1.createdTime })
     }
   }
 }
@@ -102,8 +103,10 @@ extension AccountActivityStore: BraveWalletJsonRpcServiceObserver {
       self.update()
     }
   }
+
   func onAddEthereumChainRequestCompleted(_ chainId: String, error: String) {
   }
+
   func onIsEip1559Changed(_ chainId: String, isEip1559: Bool) {
   }
 }
@@ -111,9 +114,11 @@ extension AccountActivityStore: BraveWalletJsonRpcServiceObserver {
 extension AccountActivityStore: BraveWalletTxServiceObserver {
   func onNewUnapprovedTx(_ txInfo: BraveWallet.TransactionInfo) {
   }
+
   func onTransactionStatusChanged(_ txInfo: BraveWallet.TransactionInfo) {
     fetchTransactions()
   }
+
   func onUnapprovedTxUpdated(_ txInfo: BraveWallet.TransactionInfo) {
   }
 }

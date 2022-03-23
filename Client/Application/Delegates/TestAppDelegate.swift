@@ -29,9 +29,16 @@ class TestAppDelegate: AppDelegate {
 
         // Grab the name of file in the bundle's test-fixtures dir, and copy it to the runtime app dir.
         let filename = arg.replacingOccurrences(of: LaunchArguments.loadDatabasePrefix, with: "")
-        let input = URL(fileURLWithPath: Bundle(for: TestAppDelegate.self).path(forResource: filename, ofType: nil, inDirectory: "test-fixtures")!)
+        let input = URL(
+          fileURLWithPath: Bundle(for: TestAppDelegate.self)
+            .path(forResource: filename, ofType: nil, inDirectory: "test-fixtures")!
+        )
         let profileDir = "\(appRootDir())/profile.testProfile"
-        try? FileManager.default.createDirectory(atPath: profileDir, withIntermediateDirectories: false, attributes: nil)
+        try? FileManager.default.createDirectory(
+          atPath: profileDir,
+          withIntermediateDirectories: false,
+          attributes: nil
+        )
         let output = URL(fileURLWithPath: "\(profileDir)/browser.db")
 
         let enumerator = FileManager.default.enumerator(atPath: profileDir)
@@ -56,7 +63,10 @@ class TestAppDelegate: AppDelegate {
     return profile
   }
 
-  override func application(_ application: UIApplication, willFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+  override func application(
+    _ application: UIApplication,
+    willFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
+  ) -> Bool {
     // If the app is running from a XCUITest reset all settings in the app
     if ProcessInfo.processInfo.arguments.contains(LaunchArguments.clearProfile) {
       resetApplication()
@@ -66,8 +76,8 @@ class TestAppDelegate: AppDelegate {
   }
 
   /**
-     Use this to reset the application between tests.
-     **/
+   Use this to reset the application between tests.
+   **/
   func resetApplication() {
     log.debug("Wiping everything for a clean start.")
 
@@ -101,7 +111,10 @@ class TestAppDelegate: AppDelegate {
     }
   }
 
-  override func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+  override func application(
+    _ application: UIApplication,
+    didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
+  ) -> Bool {
     // Speed up the animations to 100 times as fast.
     defer { application.keyWindow?.layer.speed = 100.0 }
     return super.application(application, didFinishLaunchingWithOptions: launchOptions)
@@ -113,7 +126,7 @@ class TestAppDelegate: AppDelegate {
     if let url = FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: sharedContainerIdentifier) {
       rootPath = url.path
     } else {
-      rootPath = (NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)[0])
+      rootPath = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)[0]
     }
     return rootPath
   }

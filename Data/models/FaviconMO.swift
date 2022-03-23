@@ -10,7 +10,6 @@ import BraveShared
 private let log = Logger.browserLogger
 
 public final class FaviconMO: NSManagedObject, CRUD {
-
   @NSManaged public var url: String?
   @NSManaged public var width: Int32
   @NSManaged public var height: Int32
@@ -44,7 +43,8 @@ public final class FaviconMO: NSManagedObject, CRUD {
 
         item!.domain = Domain.getOrCreateInternal(
           siteUrl, context: context,
-          saveStrategy: strategy)
+          saveStrategy: strategy
+        )
       }
 
       let w = Int32(favicon.width ?? 0)
@@ -76,7 +76,7 @@ public final class FaviconMO: NSManagedObject, CRUD {
 extension FaviconMO {
   // Necessary override due to bad classname, maybe not needed depending on future CD
   static func entity(_ context: NSManagedObjectContext) -> NSEntityDescription {
-    return NSEntityDescription.entity(forEntityName: "Favicon", in: context)!
+    NSEntityDescription.entity(forEntityName: "Favicon", in: context)!
   }
 
   class func get(forFaviconUrl urlString: String, context: NSManagedObjectContext) -> FaviconMO? {
@@ -85,5 +85,4 @@ extension FaviconMO {
 
     return first(where: predicate, context: context)
   }
-
 }

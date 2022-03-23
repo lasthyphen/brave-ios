@@ -11,7 +11,6 @@ import BraveCore
 
 /// A place where all rewards debugging information will live.
 class RewardsInternalsDebugViewController: TableViewController {
-
   private let ledger: BraveLedger
   private var internalsInfo: Ledger.RewardsInternalsInfo?
   private var transferrableTokens: Double = 0.0
@@ -34,7 +33,9 @@ class RewardsInternalsDebugViewController: TableViewController {
 
     title = Strings.RewardsInternals.title
 
-    guard let info = internalsInfo else { return }
+    guard let info = internalsInfo else {
+      return
+    }
 
     let dateFormatter = DateFormatter().then {
       $0.dateStyle = .short
@@ -45,7 +46,11 @@ class RewardsInternalsDebugViewController: TableViewController {
       $0.maximumFractionDigits = 3
     }
 
-    navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .action, target: self, action: #selector(tappedShare)).then {
+    navigationItem.rightBarButtonItem = UIBarButtonItem(
+      barButtonSystemItem: .action,
+      target: self,
+      action: #selector(tappedShare)
+    ).then {
       $0.accessibilityLabel = Strings.RewardsInternals.shareInternalsTitle
     }
 
@@ -53,16 +58,32 @@ class RewardsInternalsDebugViewController: TableViewController {
       .init(
         header: .title(Strings.RewardsInternals.walletInfoHeader),
         rows: [
-          Row(text: Strings.RewardsInternals.keyInfoSeed, detailText: "\(info.isKeyInfoSeedValid ? Strings.RewardsInternals.valid : Strings.RewardsInternals.invalid)"),
+          Row(
+            text: Strings.RewardsInternals.keyInfoSeed,
+            detailText: "\(info.isKeyInfoSeedValid ? Strings.RewardsInternals.valid : Strings.RewardsInternals.invalid)"
+          ),
           Row(text: Strings.RewardsInternals.walletPaymentID, detailText: info.paymentId, cellClass: SubtitleCell.self),
-          Row(text: Strings.RewardsInternals.walletCreationDate, detailText: dateFormatter.string(from: Date(timeIntervalSince1970: TimeInterval(info.bootStamp)))),
+          Row(
+            text: Strings.RewardsInternals.walletCreationDate,
+            detailText: dateFormatter.string(from: Date(timeIntervalSince1970: TimeInterval(info.bootStamp)))
+          ),
         ]
       ),
       .init(
         header: .title(Strings.RewardsInternals.deviceInfoHeader),
         rows: [
-          Row(text: Strings.RewardsInternals.status, detailText: DCDevice.current.isSupported ? Strings.RewardsInternals.supported : Strings.RewardsInternals.notSupported),
-          Row(text: Strings.RewardsInternals.enrollmentState, detailText: DeviceCheckClient.isDeviceEnrolled() ? Strings.RewardsInternals.enrolled : Strings.RewardsInternals.notEnrolled),
+          Row(
+            text: Strings.RewardsInternals.status,
+            detailText: DCDevice.current.isSupported
+              ? Strings.RewardsInternals.supported
+              : Strings.RewardsInternals.notSupported
+          ),
+          Row(
+            text: Strings.RewardsInternals.enrollmentState,
+            detailText: DeviceCheckClient.isDeviceEnrolled()
+              ? Strings.RewardsInternals.enrolled
+              : Strings.RewardsInternals.notEnrolled
+          ),
         ]
       ),
     ]
@@ -73,14 +94,17 @@ class RewardsInternalsDebugViewController: TableViewController {
         "uphold": "Uphold",
         "blinded": "Rewards \(Strings.BAT)",
       ]
-      let walletRows = balance.wallets.map { (key, value) -> Row in
+      let walletRows = balance.wallets.map { key, value -> Row in
         Row(text: keyMaps[key] ?? key, detailText: "\(batFormatter.string(from: value) ?? "0.0") \(Strings.BAT)")
       }
       sections.append(
         .init(
           header: .title(Strings.RewardsInternals.balanceInfoHeader),
           rows: [
-            Row(text: Strings.RewardsInternals.totalBalance, detailText: "\(batFormatter.string(from: NSNumber(value: balance.total)) ?? "0.0") \(Strings.BAT)")
+            Row(
+              text: Strings.RewardsInternals.totalBalance,
+              detailText: "\(batFormatter.string(from: NSNumber(value: balance.total)) ?? "0.0") \(Strings.BAT)"
+            )
           ] + walletRows
         )
       )
@@ -94,19 +118,22 @@ class RewardsInternalsDebugViewController: TableViewController {
             selection: { [unowned self] in
               let controller = RewardsInternalsPromotionListController(ledger: self.ledger)
               self.navigationController?.pushViewController(controller, animated: true)
-            }, accessory: .disclosureIndicator),
+            }, accessory: .disclosureIndicator
+          ),
           Row(
             text: Strings.RewardsInternals.contributionsTitle,
             selection: { [unowned self] in
               let controller = RewardsInternalsContributionListController(ledger: self.ledger)
               self.navigationController?.pushViewController(controller, animated: true)
-            }, accessory: .disclosureIndicator),
+            }, accessory: .disclosureIndicator
+          ),
           Row(
             text: "Auto-Contribute",
             selection: { [unowned self] in
               let controller = RewardsInternalsAutoContributeController(ledger: self.ledger)
               self.navigationController?.pushViewController(controller, animated: true)
-            }, accessory: .disclosureIndicator),
+            }, accessory: .disclosureIndicator
+          ),
         ]
       )
     )
@@ -115,7 +142,11 @@ class RewardsInternalsDebugViewController: TableViewController {
   }
 
   @objc private func tappedShare() {
-    let controller = RewardsInternalsShareController(ledger: self.ledger, initiallySelectedSharables: RewardsInternalsSharable.qa, sharables: RewardsInternalsSharable.qa)
+    let controller = RewardsInternalsShareController(
+      ledger: self.ledger,
+      initiallySelectedSharables: RewardsInternalsSharable.qa,
+      sharables: RewardsInternalsSharable.qa
+    )
     let container = UINavigationController(rootViewController: controller)
     present(container, animated: true)
   }

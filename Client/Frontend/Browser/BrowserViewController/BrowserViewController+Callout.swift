@@ -13,7 +13,6 @@ import SwiftUI
 // MARK: - Callouts
 
 extension BrowserViewController {
-
   func presentPassCodeMigration() {
     if KeychainWrapper.sharedAppContainerKeychain.authenticationInfo() != nil {
       let controller = UIHostingController(rootView: PasscodeMigrationContainerView())
@@ -29,7 +28,9 @@ extension BrowserViewController {
   }
 
   func presentVPNAlertCallout() {
-    if Preferences.DebugFlag.skipNTPCallouts == true || isOnboardingOrFullScreenCalloutPresented { return }
+    if Preferences.DebugFlag.skipNTPCallouts == true || isOnboardingOrFullScreenCalloutPresented {
+      return
+    }
 
     if presentedViewController != nil || !FullScreenCalloutManager.shouldShowDefaultBrowserCallout(calloutType: .vpn) {
       return
@@ -62,9 +63,12 @@ extension BrowserViewController {
   }
 
   func presentDefaultBrowserScreenCallout() {
-    if Preferences.DebugFlag.skipNTPCallouts == true || isOnboardingOrFullScreenCalloutPresented { return }
+    if Preferences.DebugFlag.skipNTPCallouts == true || isOnboardingOrFullScreenCalloutPresented {
+      return
+    }
 
-    if presentedViewController != nil || !FullScreenCalloutManager.shouldShowDefaultBrowserCallout(calloutType: .defaultBrowser) {
+    if presentedViewController != nil || !FullScreenCalloutManager
+      .shouldShowDefaultBrowserCallout(calloutType: .defaultBrowser) {
       return
     }
 
@@ -98,9 +102,12 @@ extension BrowserViewController {
   }
 
   func presentBraveRewardsScreenCallout() {
-    if Preferences.DebugFlag.skipNTPCallouts == true || isOnboardingOrFullScreenCalloutPresented { return }
+    if Preferences.DebugFlag.skipNTPCallouts == true || isOnboardingOrFullScreenCalloutPresented {
+      return
+    }
 
-    if presentedViewController != nil || !FullScreenCalloutManager.shouldShowDefaultBrowserCallout(calloutType: .rewards) {
+    if presentedViewController != nil || !FullScreenCalloutManager
+      .shouldShowDefaultBrowserCallout(calloutType: .rewards) {
       return
     }
 
@@ -111,12 +118,13 @@ extension BrowserViewController {
       }
       present(controller, animated: true)
       isOnboardingOrFullScreenCalloutPresented = true
-
     }
   }
 
   func presentSyncAlertCallout() {
-    if Preferences.DebugFlag.skipNTPCallouts == true || isOnboardingOrFullScreenCalloutPresented { return }
+    if Preferences.DebugFlag.skipNTPCallouts == true || isOnboardingOrFullScreenCalloutPresented {
+      return
+    }
 
     if presentedViewController != nil || !FullScreenCalloutManager.shouldShowDefaultBrowserCallout(calloutType: .sync) {
       return
@@ -129,7 +137,9 @@ extension BrowserViewController {
       }
 
       privacyEverywhereView.syncNow = { [weak self] in
-        guard let self = self else { return }
+        guard let self = self else {
+          return
+        }
         self.dismiss(animated: true) {
           self.openInsideSettingsNavigation(with: SyncWelcomeViewController(syncAPI: self.braveCore.syncAPI))
         }

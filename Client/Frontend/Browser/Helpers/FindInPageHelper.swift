@@ -18,7 +18,7 @@ class FindInPageHelper: TabContentScript {
   fileprivate weak var tab: Tab?
 
   class func name() -> String {
-    return "FindInPage"
+    "FindInPage"
   }
 
   required init(tab: Tab) {
@@ -26,10 +26,14 @@ class FindInPageHelper: TabContentScript {
   }
 
   func scriptMessageHandlerName() -> String? {
-    return "findInPageHandler"
+    "findInPageHandler"
   }
 
-  func userContentController(_ userContentController: WKUserContentController, didReceiveScriptMessage message: WKScriptMessage, replyHandler: (Any?, String?) -> Void) {
+  func userContentController(
+    _ userContentController: WKUserContentController,
+    didReceiveScriptMessage message: WKScriptMessage,
+    replyHandler: (Any?, String?) -> Void
+  ) {
     defer { replyHandler(nil, nil) }
     guard let body = message.body as? [String: AnyObject] else {
       return

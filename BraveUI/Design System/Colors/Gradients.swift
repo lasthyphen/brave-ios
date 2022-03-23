@@ -32,6 +32,7 @@ public struct BraveGradient {
     public var color: UIColor
     public var position: Double
   }
+
   public var type: CAGradientLayerType = .axial
   public var stops: [Stop]
   public var startPoint: CGPoint
@@ -77,6 +78,7 @@ extension BraveGradient {
       angle: .figmaDegrees(122.5)
     )
   }
+
   public static var lightAlternateGradient02: BraveGradient {
     .init(
       stops: [
@@ -87,6 +89,7 @@ extension BraveGradient {
       angle: .figmaDegrees(304.5)
     )
   }
+
   public static var darkGradient02: BraveGradient {
     .init(
       stops: [
@@ -97,6 +100,7 @@ extension BraveGradient {
       angle: .figmaDegrees(314)
     )
   }
+
   public static var darkAlternateGradient02: BraveGradient {
     .init(
       stops: [
@@ -107,6 +111,7 @@ extension BraveGradient {
       angle: .figmaDegrees(135)
     )
   }
+
   public static var gradient03: BraveGradient {
     .init(
       stops: [
@@ -127,6 +132,7 @@ extension BraveGradientView {
       return .lightGradient02
     }
   }
+
   public static var alternateGradient02: BraveGradientView {
     .init { traitCollection in
       if traitCollection.userInterfaceStyle == .dark {
@@ -135,6 +141,7 @@ extension BraveGradientView {
       return .lightAlternateGradient02
     }
   }
+
   public static var gradient03: BraveGradientView {
     .init(gradient: .gradient03)
   }
