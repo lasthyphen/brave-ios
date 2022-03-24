@@ -23,8 +23,7 @@ public class NetworkStore: ObservableObject {
     .init(
       get: { self.ethereumChains.first(where: { $0.chainId == self.selectedChainId }) ?? .init() },
       set: {
-        self.selectedChainId = $0.chainId
-        self.rpcService.setNetwork($0.chainId) { _ in }
+        self.setSelectedChain(chainId: $0.chainId)
       }
     )
   }
@@ -50,6 +49,11 @@ public class NetworkStore: ObservableObject {
     }
   }
 
+  func setSelectedChain(chainId: String) {
+    self.selectedChainId = chainId
+    self.rpcService.setNetwork(chainId) { _ in }
+  }
+  
   // MARK: - Custom Networks
 
   @Published var isAddingNewNetwork: Bool = false

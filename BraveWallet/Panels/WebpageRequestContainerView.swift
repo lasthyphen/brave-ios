@@ -14,11 +14,45 @@ struct WebpageRequestContainerView<DismissContent: ToolbarContent>: View {
   @ObservedObject var cryptoStore: CryptoStore
   var toolbarDismissContent: DismissContent
   
+  @available(iOS, introduced: 14.0, deprecated: 15.0, message: "Use PresentationMode on iOS 15")
+  var onDismiss: () -> Void
+  
   var body: some View {
     UIKitNavigationView {
       Group {
         if let pendingRequest = cryptoStore.pendingWebpageRequest {
-
+          switch pendingRequest {
+          case .switchChain(let request):
+            SuggestedNetworkView(
+              mode: .switchNetworks(chainId: request.chainId, origin: request.origin),
+              keyringStore: keyringStore,
+              networkStore: cryptoStore.networkStore,
+              onApprove: {
+                cryptoStore.handleWebpageRequestResponse(.switchChain(approved: true, origin: request.origin))
+                onDismiss()
+              },
+              onCancel: {
+                cryptoStore.handleWebpageRequestResponse(.switchChain(approved: false, origin: request.origin))
+                onDismiss()
+              }
+            )
+          case .addChain(let chain):
+            SuggestedNetworkView(
+              mode: .addNetwork(chain),
+              keyringStore: keyringStore,
+              networkStore: cryptoStore.networkStore,
+              onApprove: {
+                cryptoStore.handleWebpageRequestResponse(.addNetwork(approved: true, chainId: chain.chainId))
+                onDismiss()
+              },
+              onCancel: {
+                cryptoStore.handleWebpageRequestResponse(.addNetwork(approved: false, chainId: chain.chainId))
+                onDismiss()
+              }
+            )
+          case .requestEthereumPermissions, .addSuggestedToken, .signMessage:
+            EmptyView()
+          }
         }
       }
       .toolbar {
@@ -26,7 +60,7 @@ struct WebpageRequestContainerView<DismissContent: ToolbarContent>: View {
       }
     }
     .onAppear {
-      // TODO: Fetch pending requests
+      cryptoStore.fetchPendingRequests()
     }
   }
 }
