@@ -2168,6 +2168,10 @@ extension BrowserViewController: SearchViewControllerDelegate {
     finishEditingAndSubmit(url, visitType: .typed)
   }
 
+  func searchViewController(_ searchViewController: SearchViewController, didSelectOpenTabURL url: URL) {
+    switchToTabForURLOrOpen(url, isPrivileged: false)
+  }
+  
   func searchViewController(_ searchViewController: SearchViewController, didLongPressSuggestion suggestion: String) {
     self.topToolbar.setLocation(suggestion, search: true)
   }
