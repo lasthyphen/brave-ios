@@ -103,6 +103,14 @@ public struct WalletPanelContainerView: View {
             }
           )
           .transition(.asymmetric(insertion: .identity, removal: .opacity))
+          .onChange(of: cryptoStore.pendingWebpageRequest) { newValue in
+            if newValue != nil {
+              presentWalletWithContext?(.webpageRequests)
+            }
+          }
+          .onAppear {
+            cryptoStore.fetchPendingRequests()
+          }
         }
       case .unlock:
         lockedView
