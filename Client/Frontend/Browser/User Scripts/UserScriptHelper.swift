@@ -62,9 +62,6 @@ class UserScriptHelper {
       // Note: The added farbling protection script based on the document url, not the frame's url.
       // It is also added for every frame, including subframes.
       if let etldP1 = mainDocumentURL.baseDomain, isFPProtectionOn {
-        #if DEBUG
-        print("[NAV] Doc eTLD+1:  \(etldP1)")
-        #endif
         userScriptTypes.insert(.nacl) // dependency for `farblingProtection`
         userScriptTypes.insert(.farblingProtection(etld: etldP1))
       }

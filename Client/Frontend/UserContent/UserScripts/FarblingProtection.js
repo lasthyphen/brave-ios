@@ -259,7 +259,7 @@ window.braveFarble = (args) => {
   const descriptor = Reflect.getOwnPropertyDescriptor(SpeechSynthesisUtterance.prototype, 'voice')
   Reflect.defineProperty(SpeechSynthesisUtterance.prototype, 'voice', {
     get: function () {
-      if (passedFakeVoice === undefined) {
+      if (!passedFakeVoice) {
         // We didn't set a fake voice
         return Reflect.apply(descriptor.get, this, arguments)
       } else {
