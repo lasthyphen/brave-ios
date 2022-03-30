@@ -7,7 +7,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/brave/brave-ios.git"
+    "url": "git+https://github.com/lasthyphen/brave-ios.git"
   },
   "license": "MPL-2.0",
   "dependencies": {
